@@ -655,17 +655,16 @@ function setSyncStatus(state){
   }
 }
 
-async function syncDown(){
-  try{
-    setSyncStatus('syncing');
-    var resp=await fetch(SUPA_URL+'/rest/v1/hc_state?id=eq.heath&select=*',{
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
-    });
+function syncDown(){
+  setSyncStatus('syncing');
+  return fetch(SUPA_URL+'/rest/v1/hc_state?id=eq.heath&select=*',{
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+  }).then(function(resp){
     if(!resp.ok)throw new Error('HTTP '+resp.status);
-    var rows=await resp.json();
+    return resp.json();
+  }).then(function(rows){
     if(rows.length>0){
       var remote=rows[0];
-      // Merge: remote wins for most things, but merge visits (keep all)
       var merged={
         visits:mergeVisits(ST.visits,remote.visits||{}),
         notes:Object.assign({},ST.notes,remote.notes||{}),
@@ -681,10 +680,10 @@ async function syncDown(){
     }
     setSyncStatus('ok');
     return true;
-  }catch(e){
+  }).catch(function(){
     setSyncStatus('err');
     return false;
-  }
+  });
 }
 
 function mergeVisits(local,remote){
@@ -710,33 +709,32 @@ function mergeAdded(local,remote){
   return Object.values(codes);
 }
 
-async function syncUp(){
-  try{
-    setSyncStatus('syncing');
-    var payload={
-      id:'heath',
-      visits:ST.visits,notes:ST.notes,hot:ST.hot,
-      archived:ST.archived,removed:ST.removed,edits:ST.edits,
-      added_customers:ST.addedCustomers||[],
-      scheduled:ST.scheduled||{},
-      updated_at:new Date().toISOString()
-    };
-    var resp=await fetch(SUPA_URL+'/rest/v1/hc_state',{
-      method:'POST',
-      headers:{
-        'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,
-        'Content-Type':'application/json',
-        'Prefer':'resolution=merge-duplicates'
-      },
-      body:JSON.stringify(payload)
-    });
+function syncUp(){
+  setSyncStatus('syncing');
+  var payload={
+    id:'heath',
+    visits:ST.visits,notes:ST.notes,hot:ST.hot,
+    archived:ST.archived,removed:ST.removed,edits:ST.edits,
+    added_customers:ST.addedCustomers||[],
+    scheduled:ST.scheduled||{},
+    updated_at:new Date().toISOString()
+  };
+  return fetch(SUPA_URL+'/rest/v1/hc_state',{
+    method:'POST',
+    headers:{
+      'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,
+      'Content-Type':'application/json',
+      'Prefer':'resolution=merge-duplicates'
+    },
+    body:JSON.stringify(payload)
+  }).then(function(resp){
     if(!resp.ok)throw new Error('HTTP '+resp.status);
     setSyncStatus('ok');
     return true;
-  }catch(e){
+  }).catch(function(){
     setSyncStatus('err');
     return false;
-  }
+  });
 }
 
 function ss(){
@@ -773,7 +771,7 @@ function mv(code,type){
   ss();
 }
 function all(){
-  return[...CUSTOMERS_BASE,...(ST.addedCustomers||[])]
+  return CUSTOMERS_BASE.concat(ST.addedCustomers||[])
     .filter(function(c){return !ST.archived[c.code]&&!(ST.removed&&ST.removed[c.code]);})
     .map(function(c){var e=ST.edits&&ST.edits[c.code];return e?Object.assign({},c,e):c;});
 }
@@ -858,8 +856,8 @@ function rDash(){
   document.getElementById('d-date').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
 
   var a=all(),today=now.toDateString();
-  var vt=Object.values(ST.visits).flat().filter(function(l){return new Date(l.date).toDateString()===today&&l.type==='visited';}).length;
-  var nt=Object.values(ST.visits).flat().filter(function(l){return new Date(l.date).toDateString()===today&&l.type==='not_available';}).length;
+  var vt=[].concat.apply([],Object.values(ST.visits)).filter(function(l){return new Date(l.date).toDateString()===today&&l.type==='visited';}).length;
+  var nt=[].concat.apply([],Object.values(ST.visits)).filter(function(l){return new Date(l.date).toDateString()===today&&l.type==='not_available';}).length;
   var od=a.filter(function(c){return ds(c.code)>45;}).length;
 
   document.getElementById('d-stats').innerHTML=
@@ -912,7 +910,10 @@ function rRoute(){
   });
 
   // Combine: scheduled first, then regular, sorted by sales
-  var stops=[...new Set([...scheduledToday,...regular])]
+  var combined=scheduledToday.concat(regular);
+  var seen={};
+  var deduped=combined.filter(function(c){if(seen[c.code])return false;seen[c.code]=true;return true;});
+  var stops=deduped
     .sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;})
     .slice(0,10);
 
@@ -1007,7 +1008,9 @@ function rGrps(){
   a.forEach(function(c){if(!groups[c.group])groups[c.group]=[];groups[c.group].push(c);});
   document.getElementById('g-list').innerHTML=Object.keys(groups).sort(function(a,b){return+a-+b;}).map(function(g){
     var gc=groups[g];
-    var cities=[...new Set(gc.map(function(c){return c.city;}).filter(Boolean))].slice(0,2).join(', ');
+    var allCities=gc.map(function(c){return c.city;}).filter(Boolean);
+    var uniqCities=allCities.filter(function(v,i){return allCities.indexOf(v)===i;});
+    var cities=uniqCities.slice(0,2).join(', ');
     var vis=gc.filter(function(c){return ds(c.code)<=30;}).length;
     var ov=gc.filter(function(c){return ds(c.code)>45;}).length;
     var pct=Math.round(vis/gc.length*100);
@@ -1140,7 +1143,8 @@ function rFrom(){
   var a=all(),c=a.find(function(x){return x.code===mC;});
   if(!c||!c.address){toast('No address');return;}
   var rest=a.filter(function(x){return x.group===c.group&&x.code!==mC&&x.address;}).sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
-  window.open('https://www.google.com/maps/dir/'+[c,...rest.slice(0,9)].map(function(s){return encodeURIComponent([s.address,s.city,'CA'].filter(Boolean).join(', '));}).join('/'),'_blank');
+  var routeStops=[c].concat(rest.slice(0,9));
+  window.open('https://www.google.com/maps/dir/'+routeStops.map(function(s){return encodeURIComponent([s.address,s.city,'CA'].filter(Boolean).join(', '));}).join('/'),'_blank');
   toast('Opening route');
 }
 
