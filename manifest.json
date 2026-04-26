@@ -2,23 +2,24 @@
   "name": "Heath Route Tracker",
   "short_name": "Route Tracker",
   "description": "Sales route tracker for Heath Chartier - 610 customers across Southern California",
-  "start_url": "/",
+  "start_url": "/route-app/",
   "display": "standalone",
   "background_color": "#0f1b2d",
   "theme_color": "#0f1b2d",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "scope": "/route-app/"
 }
