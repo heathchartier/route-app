@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HC Debug</title>
+<style>
+body{background:#0a0f1e;color:#f0f4ff;font-family:monospace;font-size:13px;padding:16px}
+.ok{color:#10b981}.err{color:#ef4444}.info{color:#00d4aa}
+div{margin-bottom:4px;padding:4px 0;border-bottom:1px solid #1e2d45}
+</style>
+</head>
+<body>
+<div class="info">HC Routes Debug</div>
+<div id="log"></div>
+<script>
+function log(msg,cls){
+  var d=document.createElement('div');
+  d.className=cls||'ok';
+  d.textContent=msg;
+  document.getElementById('log').appendChild(d);
+}
+log('Script started','info');
+
+try{
+  log('Step 1: Building customer data...');
+  var _D=[];
+  log('Step 2: Raw array length: '+_D.length);
+  
+  var CUSTOMERS_BASE=_D.map(function(r){
+    return{code:r[0],name:r[1],group:r[2],stop:r[3],
+      address:r[4],address2:r[5],city:r[6],state:r[7],zip:r[8],
+      phone:r[9],email:r[10],lifetimeSales:r[11],sales2024:r[12],
+      sales2025:r[13],sales2026:r[14],sales2526:r[15],distance:r[16]};
+  });
+  log('Step 3: CUSTOMERS_BASE built: '+CUSTOMERS_BASE.length+' customers');
+  log('Step 4: First customer: '+CUSTOMERS_BASE[0].name+' / Group '+CUSTOMERS_BASE[0].group);
+  
+  var ZIP_TO_GROUP={"92507":1,"92501":1,"92502":1,"92500":2,"92504":2,"92503":2,"92337":2,"92553":3,"92508":3,"92571":3,"92518":3,"92334":3,"92376":3,"92335":3,"92570":4,"92860":4,"92879":4,"92532":4,"92336":5,"91752":5,"91761":5,"91730":5,"92881":6,"92880":6,"92882":6,"92545":7,"92530":7,"91710":8,"91762":9,"91786":9,"91763":9,"92595":10,"91766":11,"91768":11,"92583":12,"92584":12,"92563":12,"92592":17,"92539":12,"91767":13,"91765":13,"91773":13,"91740":13,"91741":13,"92562":14,"92591":14,"92590":18,"92618":15,"92806":15,"92691":15,"92821":15,"92831":15,"90680":15,"90620":15,"92672":15,"92841":15,"92627":15,"91789":16,"91748":16,"91724":16,"91745":16,"91706":16,"91010":16,"91776":16,"91775":16,"91125":16,"92345":17,"92344":17,"92301":17,"91105":17,"90113":17,"92028":19,"92003":19,"92084":20,"92083":20,"92058":21,"92054":21,"92056":24,"92081":22,"92082":23,"92026":23,"92027":23,"92025":23,"92088":24,"90911":25,"92010":25,"92008":25,"90016":25,"90064":25,"91324":25,"93065":25,"92069":26,"92078":27,"92029":30,"92018":28,"92011":28,"92009":28,"92024":31,"92079":29,"92127":31,"92075":32,"92014":32,"92130":32,"92121":36,"92065":33,"92074":33,"92064":33,"92126":34,"92131":35,"92122":37,"92037":37,"92117":40,"92071":38,"92022":39,"92020":50,"92111":40,"92109":41,"92110":41,"92040":42,"92021":43,"92123":44,"92108":44,"92120":46,"92182":46,"91941":46,"91945":46,"92103":47,"92107":47,"92106":49,"92104":48,"92105":48,"92101":48,"92102":49,"92167":49,"92019":51,"91977":51,"92113":52,"92136":52,"91901":53,"91978":53,"91902":53,"91935":53,"91979":54,"92114":54,"91950":54,"91910":55,"91914":56,"91913":56,"91911":57,"92154":58,"91932":59,"92153":59,"92173":60,"91962":60,"92243":60,"95326":60,"94040":60,"37174":60,"85260":61,"90065":61,"92067":61};
+  log('Step 5: ZIP_TO_GROUP entries: '+Object.keys(ZIP_TO_GROUP).length);
+  
+  var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{}};
+  log('Step 6: ST initialized');
+  
+  try{var s=localStorage.getItem('heath_rt_v11');if(s)ST=JSON.parse(s);}catch(e){}
+  if(!ST.scheduled)ST.scheduled={};
+  log('Step 7: localStorage loaded, visits: '+Object.keys(ST.visits).length);
+  
+  // Test allC
+  var combined=CUSTOMERS_BASE.concat(ST.addedCustomers||[]);
+  var filtered=combined.filter(function(c){return !ST.archived[c.code]&&!(ST.removed&&ST.removed[c.code]);});
+  log('Step 8: allC() would return: '+filtered.length+' customers');
+  
+  // Test smartGroup
+  var groups={};
+  for(var i=0;i<filtered.length;i++){
+    var c=filtered[i];if(!groups[c.group])groups[c.group]=0;groups[c.group]+=10;
+  }
+  var keys=Object.keys(groups);
+  keys.sort(function(a,b){return groups[b]-groups[a];});
+  log('Step 9: smartGroup would pick: Group '+keys[0]+' ('+keys.length+' groups total)');
+  
+  // Test DOM
+  log('Step 10: document.body exists: '+(!!document.body));
+  
+  log('ALL STEPS PASSED - logic works fine','info');
+  log('Issue must be in DOM rendering or CSS','info');
+  
+} catch(e) {
+  log('ERROR at: '+e.message,'err');
+  log('Stack: '+(e.stack||'none'),'err');
+}
+</script>
+</body>
+</html>
