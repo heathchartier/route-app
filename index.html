@@ -204,9 +204,9 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
   </div>
   <div class="body">
     <div class="stats" id="d-stats">
-      <div class="stat"><div class="stat-n" style="color:#10b981">0</div><div class="stat-l">Visited</div></div>
-      <div class="stat"><div class="stat-n" style="color:#f59e0b">0</div><div class="stat-l">Not Avail</div></div>
-      <div class="stat"><div class="stat-n" style="color:#ef4444">0</div><div class="stat-l">Overdue</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--green)">0</div><div class="stat-l">Visited</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--amber)">0</div><div class="stat-l">Not Avail</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--red)">0</div><div class="stat-l">Overdue</div></div>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -217,7 +217,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
           <button class="cbtn" id="btn-next">&#8594;</button>
         </div>
       </div>
-      <div id="d-route"><div style="color:#8896b3;font-size:13px;padding:8px 0">Loading...</div></div>
+      <div id="d-route"><div style="color:var(--sub);font-size:13px;padding:8px 0">Loading...</div></div>
       <button class="btn btn-t" id="btn-map">Open Route in Maps</button>
     </div>
     <div class="retry-card" id="d-retry" style="display:none">
@@ -273,7 +273,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
     <h1>Settings</h1>
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
-  <div class="body">
+  <div class="body" style="padding-top:16px">
     <div class="card">
       <div class="lbl" style="color:var(--teal)">Import Excel or CSV</div>
       <div class="drop" onclick="document.getElementById('xl-input').click())">
@@ -282,7 +282,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
         <div style="font-size:12px;color:var(--sub);margin-top:5px">.xlsx or .csv accepted</div>
       </div>
       <input type="file" id="xl-input" accept=".xlsx,.csv" style="display:none">
-      <div id="import-status" style="margin-top:10px;font-size:13px;display:none;color:#00d4aa"></div>
+      <div id="import-status" style="margin-top:10px;font-size:13px;display:none;color:var(--teal)"></div>
     </div>
     <div class="card">
       <div class="lbl">Add Customer</div>
@@ -710,9 +710,31 @@ var cm=document.getElementById('c-more');if(cm)cm.addEventListener('click',funct
 var bp=document.getElementById('btn-prev');if(bp)bp.addEventListener('click',function(){cG=Math.max(1,cG-1);document.getElementById('g-lbl').textContent='Grp '+cG;localStorage.setItem('hrt_lg',String(cG));rRoute();});
 var bn=document.getElementById('btn-next');if(bn)bn.addEventListener('click',function(){cG=Math.min(61,cG+1);document.getElementById('g-lbl').textContent='Grp '+cG;localStorage.setItem('hrt_lg',String(cG));rRoute();});
 var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',function(){
-  var a=allC(),gc=[];for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
+  var a=allC(),gc=[];
+  for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
   if(!gc.length){toast('No addresses');return;}
-  window.open('https://www.google.com/maps/dir/'+gc.slice(0,10).map(function(c){return encodeURIComponent([c.address,c.city,'CA'].filter(function(x){return x;}).join(', '));}).join('/'),'_blank');
+  var stops=gc.slice(0,10);
+  var destStr=stops.map(function(c){return encodeURIComponent([c.address,c.city,'CA'].filter(function(x){return x;}).join(', '));}).join('/');
+  // Try to get current location first
+  if(navigator.geolocation){
+    toast('Getting your location...');
+    navigator.geolocation.getCurrentPosition(
+      function(pos){
+        // Got location - use it as start point
+        var lat=pos.coords.latitude.toFixed(6);
+        var lng=pos.coords.longitude.toFixed(6);
+        var origin=encodeURIComponent(lat+','+lng);
+        window.open('https://www.google.com/maps/dir/'+origin+'/'+destStr,'_blank');
+      },
+      function(){
+        // Location denied or failed - open without origin
+        window.open('https://www.google.com/maps/dir/'+destStr,'_blank');
+      },
+      {timeout:5000,maximumAge:60000}
+    );
+  } else {
+    window.open('https://www.google.com/maps/dir/'+destStr,'_blank');
+  }
 });
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeM();});
 document.getElementById('m-cls').addEventListener('click',closeM);
@@ -734,8 +756,21 @@ document.getElementById('m-rte').addEventListener('click',function(){
   var rest=[];for(var i=0;i<a.length;i++){if(a[i].group===c.group&&a[i].code!==mC&&a[i].address)rest.push(a[i]);}
   rest.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
   var stops=[c].concat(rest.slice(0,9));
-  window.open('https://www.google.com/maps/dir/'+stops.map(function(s){return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));}).join('/'),'_blank');
-  toast('Opening route');
+  var destStr=stops.map(function(s){return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));}).join('/');
+  if(navigator.geolocation){
+    toast('Getting your location...');
+    navigator.geolocation.getCurrentPosition(
+      function(pos){
+        var origin=encodeURIComponent(pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6));
+        window.open('https://www.google.com/maps/dir/'+origin+'/'+destStr,'_blank');
+      },
+      function(){window.open('https://www.google.com/maps/dir/'+destStr,'_blank');},
+      {timeout:5000,maximumAge:60000}
+    );
+  } else {
+    window.open('https://www.google.com/maps/dir/'+destStr,'_blank');
+  }
+  toast('Opening route from your location');
 });
 document.getElementById('m-snote').addEventListener('click',function(){if(!mC)return;if(!ST.notes)ST.notes={};ST.notes[mC]=document.getElementById('m-note').value;lSave();syncUp();toast('Note saved');});
 document.getElementById('m-edt').addEventListener('click',function(){
