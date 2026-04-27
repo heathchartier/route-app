@@ -604,7 +604,9 @@ function rGrps(){
     var cl=Object.keys(cities).filter(function(x){return x;}).slice(0,2).join(', ');
     var col=ov>gc.length*.5?'var(--red)':vis>gc.length*.5?'var(--green)':'var(--amber)';
     var pct=Math.round(vis/gc.length*100);
-    h+='<div class="grp-row" data-g="'+g+'"><div class="gbadge" style="background:'+col+'">'+g+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Group '+g+' <span style="font-size:11px;font-weight:500;color:var(--sub)">'+gc.length+' stops</span></div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(cl)+'</div><div style="font-size:11px;margin-top:4px"><span style="color:var(--green)">'+vis+' recent</span> <span style="color:var(--dim)"> | </span><span style="color:var(--red)">'+ov+' overdue</span></div></div><div style="text-align:right;flex-shrink:0"><div class="grp-pct" style="color:'+col+'">'+pct+'%</div><div class="grp-pct-l">done</div></div></div>';
+    var sizeWarn=gc.length>=13?'<span style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - consider splitting</span>':'';
+    var sizeNote=gc.length<8?'<span style="background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - small group</span>':'';
+    h+='<div class="grp-row" data-g="'+g+'"><div class="gbadge" style="background:'+col+'">'+g+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Group '+g+' '+sizeWarn+sizeNote+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(cl)+'</div><div style="font-size:11px;margin-top:4px"><span style="color:var(--green)">'+vis+' recent</span> <span style="color:var(--dim)"> | </span><span style="color:var(--red)">'+ov+' overdue</span></div></div><div style="text-align:right;flex-shrink:0"><div class="grp-pct" style="color:'+col+'">'+pct+'%</div><div class="grp-pct-l">done</div></div></div>';
   }
   var gl=document.getElementById('g-list');if(gl)gl.innerHTML=h;
 }
@@ -684,8 +686,12 @@ function addCust(){
   if(!name){toast('Name required');return;}
   var nc={code:'NEW'+Date.now().toString().slice(-6),name:name,group:parseInt(document.getElementById('a-grp').value)||61,stop:999,address:document.getElementById('a-addr').value.trim(),address2:'',city:document.getElementById('a-city').value.trim(),state:'CA',zip:'',phone:document.getElementById('a-ph').value.trim(),email:'',lifetimeSales:0,sales2024:0,sales2025:0,sales2026:0,sales2526:0,distance:0};
   if(!ST.addedCustomers)ST.addedCustomers=[];ST.addedCustomers.push(nc);lSave();syncUp();
+  // Warn if group is getting large
+  var grpCustomers=allC().filter(function(c){return c.group===nc.group;});
+  var msg='Added: '+name+' to Group '+nc.group;
+  if(grpCustomers.length>=13)msg+=' (Group '+nc.group+' now has '+grpCustomers.length+' stops - consider splitting)';
   ['a-name','a-addr','a-city','a-ph','a-grp'].forEach(function(id){document.getElementById(id).value='';});
-  toast('Added: '+name);rCust();
+  toast(msg);rCust();rGrps();
 }
 
 function doExport(){
@@ -720,16 +726,15 @@ var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',func
     navigator.geolocation.getCurrentPosition(
       function(pos){
         var origin=encodeURIComponent(pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6));
-        var url='https://www.google.com/maps/dir/'+origin+'/'+destStr;
-        location.href=url;
+        win.location.href='https://www.google.com/maps/dir/'+origin+'/'+destStr;
       },
       function(){
-        location.href='https://www.google.com/maps/dir/'+destStr;
+        win.location.href='https://www.google.com/maps/dir/'+destStr;
       },
       {timeout:8000,maximumAge:30000,enableHighAccuracy:false}
     );
   } else {
-    location.href='https://www.google.com/maps/dir/'+destStr;
+    win.location.href='https://www.google.com/maps/dir/'+destStr;
   }
 });
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeM();});
@@ -785,16 +790,18 @@ document.getElementById('m-rte').addEventListener('click',function(){
   var destStr=stops.map(function(s){return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));}).join('/');
   if(navigator.geolocation){
     toast('Getting your location...');
+    var win2=window.open('','_blank');
     navigator.geolocation.getCurrentPosition(
       function(pos){
         var origin=encodeURIComponent(pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6));
-        location.href='https://www.google.com/maps/dir/'+origin+'/'+destStr;
+        win2.location.href='https://www.google.com/maps/dir/'+origin+'/'+destStr;
       },
-      function(){location.href='https://www.google.com/maps/dir/'+destStr;},
+      function(){win2.location.href='https://www.google.com/maps/dir/'+destStr;},
       {timeout:5000,maximumAge:60000}
     );
   } else {
-    window.open('https://www.google.com/maps/dir/'+destStr,'_blank');
+    var win2=window.open('','_blank');
+    win2.location.href='https://www.google.com/maps/dir/'+destStr;
   }
   toast('Opening route from your location');
 });
@@ -817,18 +824,36 @@ if(efz)efz.addEventListener('input',function(){
   var el=document.getElementById('ef-zh'),zip=this.value;
   if(!el)return;if(!zip||zip.length<5){el.style.display='none';return;}
   var g=ZIP_TO_GROUP[zip];
-  if(g){el.style.display='block';el.innerHTML='Group '+g+' suggested <button onclick="document.getElementById(\'ef-grp\').value='+g+';document.getElementById(\'ef-zh\').style.display=\'none\';" style="margin-left:8px;background:#00d4aa;color:#000;border:none;border-radius:6px;padding:2px 10px;font-size:12px;font-weight:700;cursor:pointer">Use</button>';}
-  else{el.style.display='block';el.textContent='Zip not mapped';}
+  if(g){
+    document.getElementById('ef-grp').value=g;
+    el.style.display='block';el.style.background='var(--teal2)';el.style.color='var(--teal)';
+    el.textContent='Group '+g+' auto-assigned from zip '+zip;
+    setTimeout(function(){if(el)el.style.display='none';},2500);
+  } else {
+    el.style.display='block';el.style.background='var(--amber2)';el.style.color='var(--amber)';
+    el.textContent='Zip '+zip+' not in territory - set group manually';
+  }
 });
 document.getElementById('m-sav').addEventListener('click',function(){
   if(!mC)return;var ed={};
   var fields=['name','addr','addr2','city','state','zip','phone','email'];
   var keys=['name','address','address2','city','state','zip','phone','email'];
   for(var i=0;i<fields.length;i++){var v=document.getElementById('ef-'+fields[i]).value.trim();if(v)ed[keys[i]]=v;}
-  var gr=parseInt(document.getElementById('ef-grp').value);if(gr>=1&&gr<=61)ed.group=gr;
-  if(!ST.edits)ST.edits={};ST.edits[mC]=ed;lSave();syncUp();toast('Saved');
+  // Auto-assign group from zip
+  var newZip=document.getElementById('ef-zip').value.trim();
+  var manualGr=parseInt(document.getElementById('ef-grp').value);
+  var a2=allC(),c2=null;for(var i=0;i<a2.length;i++){if(a2[i].code===mC){c2=a2[i];break;}}
+  var currentGr=c2?c2.group:0;
+  if(newZip&&ZIP_TO_GROUP[newZip]){
+    var sugGr=ZIP_TO_GROUP[newZip];
+    ed.group=(manualGr>=1&&manualGr<=61)?manualGr:sugGr;
+    toast('Saved - Group '+ed.group+(sugGr!==currentGr?' (moved from '+currentGr+')':''));
+  } else if(manualGr>=1&&manualGr<=61){
+    ed.group=manualGr;toast('Saved');
+  } else {toast('Saved');}
+  if(!ST.edits)ST.edits={};ST.edits[mC]=ed;lSave();syncUp();
   document.getElementById('m-edit').style.display='none';document.getElementById('m-view').style.display='block';document.getElementById('m-edt').textContent='Edit';
-  openM(mC);rCust();rDash();
+  openM(mC);rCust();rDash();rGrps();
 });
 document.getElementById('m-can').addEventListener('click',function(){document.getElementById('m-edit').style.display='none';document.getElementById('m-view').style.display='block';document.getElementById('m-edt').textContent='Edit';});
 document.getElementById('btn-add').addEventListener('click',addCust);
