@@ -336,7 +336,15 @@ function rDash(){
   var now=new Date(),hr=now.getHours();
   var greet=hr<12?'Good morning, Heath':hr<17?'Good afternoon, Heath':'Good evening, Heath';
   var dg=document.getElementById('d-greet');if(dg)dg.textContent=greet;
-  var dd=document.getElementById('d-date');if(dd)dd.textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  var dd=document.getElementById('d-date');
+  if(dd){
+    var dateStr=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    var timeStr=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+    dd.textContent=dateStr+' · '+timeStr;
+  }
+  // Refresh time every minute
+  clearTimeout(window._timeTick);
+  window._timeTick=setTimeout(function(){var dg=document.getElementById('d-greet');if(dg){var h=new Date().getHours();dg.textContent=(h<12?'Good morning, Heath':h<17?'Good afternoon, Heath':'Good evening, Heath');}var dd2=document.getElementById('d-date');if(dd2){var n2=new Date();dd2.textContent=n2.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+' · '+n2.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});}},60000);
   var a=allC(),today=now.toDateString(),vt=0,nt=0,od=0;
   for(var code in ST.visits){var logs=ST.visits[code];for(var i=0;i<logs.length;i++){if(new Date(logs[i].date).toDateString()===today){if(logs[i].type==='visited')vt++;else nt++;}}}
   for(var i=0;i<a.length;i++){if(ds(a[i].code)>45)od++;}
