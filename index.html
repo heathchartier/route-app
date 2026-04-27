@@ -720,22 +720,10 @@ var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',func
   for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
   if(!gc.length){toast('No addresses');return;}
   var stops=gc.slice(0,10);
-  var destStr=stops.map(function(c){return encodeURIComponent([c.address,c.city,'CA'].filter(function(x){return x;}).join(', '));}).join('/');
-  if(navigator.geolocation){
-    toast('Getting your location...');
-    navigator.geolocation.getCurrentPosition(
-      function(pos){
-        var origin=encodeURIComponent(pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6));
-        win.location.href='https://www.google.com/maps/dir/'+origin+'/'+destStr;
-      },
-      function(){
-        win.location.href='https://www.google.com/maps/dir/'+destStr;
-      },
-      {timeout:8000,maximumAge:30000,enableHighAccuracy:false}
-    );
-  } else {
-    win.location.href='https://www.google.com/maps/dir/'+destStr;
-  }
+  var url='https://www.google.com/maps/dir/'+stops.map(function(c){
+    return encodeURIComponent([c.address,c.city,'CA'].filter(function(x){return x;}).join(', '));
+  }).join('/');
+  window.open(url,'_blank');
 });
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeM();});
 document.getElementById('m-cls').addEventListener('click',closeM);
@@ -782,28 +770,18 @@ document.getElementById('m-rem').addEventListener('click',function(){
   lSave();syncUp();closeM();rCust();rDash();rGrps();toast('Removed');
 });
 document.getElementById('m-rte').addEventListener('click',function(){
-  if(!mC)return;var a=allC(),c=null;for(var i=0;i<a.length;i++){if(a[i].code===mC){c=a[i];break;}}
+  if(!mC)return;var a=allC(),c=null;
+  for(var i=0;i<a.length;i++){if(a[i].code===mC){c=a[i];break;}}
   if(!c||!c.address){toast('No address');return;}
-  var rest=[];for(var i=0;i<a.length;i++){if(a[i].group===c.group&&a[i].code!==mC&&a[i].address)rest.push(a[i]);}
+  var rest=[];
+  for(var i=0;i<a.length;i++){if(a[i].group===c.group&&a[i].code!==mC&&a[i].address)rest.push(a[i]);}
   rest.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
   var stops=[c].concat(rest.slice(0,9));
-  var destStr=stops.map(function(s){return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));}).join('/');
-  if(navigator.geolocation){
-    toast('Getting your location...');
-    var win2=window.open('','_blank');
-    navigator.geolocation.getCurrentPosition(
-      function(pos){
-        var origin=encodeURIComponent(pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6));
-        win2.location.href='https://www.google.com/maps/dir/'+origin+'/'+destStr;
-      },
-      function(){win2.location.href='https://www.google.com/maps/dir/'+destStr;},
-      {timeout:5000,maximumAge:60000}
-    );
-  } else {
-    var win2=window.open('','_blank');
-    win2.location.href='https://www.google.com/maps/dir/'+destStr;
-  }
-  toast('Opening route from your location');
+  var url='https://www.google.com/maps/dir/'+stops.map(function(s){
+    return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));
+  }).join('/');
+  window.open(url,'_blank');
+  toast('Opening route in Maps');
 });
 document.getElementById('m-snote').addEventListener('click',function(){if(!mC)return;if(!ST.notes)ST.notes={};ST.notes[mC]=document.getElementById('m-note').value;lSave();syncUp();toast('Note saved');});
 document.getElementById('m-edt').addEventListener('click',function(){
