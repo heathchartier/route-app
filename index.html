@@ -783,13 +783,28 @@ window.addEventListener('load',function(){
   document.getElementById('xl-input').addEventListener('change',function(){handleImport(this);});
 
   // ── INIT ──────────────────────────────────────────────────
+  var dbg=document.getElementById('d-route');
+  dbg.innerHTML='<div style="color:#00d4aa;font-size:13px">Step 1: load started</div>';
+  
   lLoad();
+  dbg.innerHTML+='<div style="color:#00d4aa;font-size:13px">Step 2: lLoad done, visits='+Object.keys(ST.visits).length+'</div>';
+  
   var sg=smartGroup();
+  dbg.innerHTML+='<div style="color:#00d4aa;font-size:13px">Step 3: smartGroup='+sg+'</div>';
+  
   cG=sg;
   document.getElementById('g-lbl').textContent='Grp '+sg;
-  rDash();
-  rCust();
-  rGrps();
+  
+  var allCustomers=allC();
+  dbg.innerHTML+='<div style="color:#00d4aa;font-size:13px">Step 4: allC()='+allCustomers.length+' customers</div>';
+  
+  try{rDash();}catch(e){dbg.innerHTML+='<div style="color:red">rDash ERROR: '+e.message+'</div>';}
+  dbg.innerHTML+='<div style="color:#00d4aa;font-size:13px">Step 5: rDash done</div>';
+  
+  try{rCust();}catch(e){document.getElementById('c-list').innerHTML='<div style="color:red">rCust ERROR: '+e.message+'</div>';}
+  
+  try{rGrps();}catch(e){document.getElementById('g-list').innerHTML='<div style="color:red">rGrps ERROR: '+e.message+'</div>';}
+  
   syncDown();
 });
 
