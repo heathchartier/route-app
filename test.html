@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS Test</title>
+</head>
+<body style="background:#000;color:#fff;font-size:20px;padding:20px">
+<div id="out">Testing...</div>
+<script>
+var out = document.getElementById('out');
+try {
+  out.innerHTML = 'Step 1: JS works<br>';
+  var x = [1,2,3].filter(function(n){return n>1;});
+  out.innerHTML += 'Step 2: filter works - ' + x.join(',') + '<br>';
+  var y = [].concat.apply([], [[1,2],[3,4]]);
+  out.innerHTML += 'Step 3: concat works - ' + y.join(',') + '<br>';
+  var p = fetch('https://oaxkcsnmiozpnnhlmkmi.supabase.co/rest/v1/hc_state?id=eq.heath&select=id', {
+    headers: {'apikey': 'sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P', 'Authorization': 'Bearer sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P'}
+  });
+  p.then(function(r){ return r.json(); }).then(function(d){
+    out.innerHTML += 'Step 4: Supabase reached - rows: ' + d.length + '<br>';
+    out.innerHTML += '<b style="color:lime">ALL GOOD</b>';
+  }).catch(function(e){
+    out.innerHTML += 'Step 4 FAILED: Supabase error - ' + e.message + '<br>';
+  });
+  out.innerHTML += 'Step 4: Supabase fetch fired (waiting...)<br>';
+} catch(e) {
+  out.innerHTML += '<b style="color:red">ERROR: ' + e.message + '</b>';
+}
+</script>
+</body>
+</html>

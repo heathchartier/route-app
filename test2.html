@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test 2</title>
+</head>
+<body style="background:#000;color:#fff;font-size:18px;padding:20px;font-family:sans-serif">
+<div id="out">Starting...</div>
+<script>
+document.getElementById('out').innerHTML = 'Script 1 loaded OK';
+</script>
+<script src="data-test.js"></script>
+<script>
+try {
+  document.getElementById('out').innerHTML += '<br>Script 2 loaded OK';
+  var count = typeof CUSTOMERS_BASE !== 'undefined' ? CUSTOMERS_BASE.length : 'NOT LOADED';
+  document.getElementById('out').innerHTML += '<br>Customers: ' + count;
+  if(count === 610) {
+    document.getElementById('out').innerHTML += '<br><b style="color:lime">DATA LOADS FINE</b>';
+  } else {
+    document.getElementById('out').innerHTML += '<br><b style="color:red">DATA FAILED TO LOAD</b>';
+  }
+} catch(e) {
+  document.getElementById('out').innerHTML += '<br><b style="color:red">ERROR: ' + e.message + '</b>';
+}
+</script>
+</body>
+</html>
