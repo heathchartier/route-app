@@ -715,25 +715,21 @@ var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',func
   if(!gc.length){toast('No addresses');return;}
   var stops=gc.slice(0,10);
   var destStr=stops.map(function(c){return encodeURIComponent([c.address,c.city,'CA'].filter(function(x){return x;}).join(', '));}).join('/');
-  // Try to get current location first
   if(navigator.geolocation){
     toast('Getting your location...');
     navigator.geolocation.getCurrentPosition(
       function(pos){
-        // Got location - use it as start point
-        var lat=pos.coords.latitude.toFixed(6);
-        var lng=pos.coords.longitude.toFixed(6);
-        var origin=encodeURIComponent(lat+','+lng);
-        window.open('https://www.google.com/maps/dir/'+origin+'/'+destStr,'_blank');
+        var origin=encodeURIComponent(pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6));
+        var url='https://www.google.com/maps/dir/'+origin+'/'+destStr;
+        location.href=url;
       },
       function(){
-        // Location denied or failed - open without origin
-        window.open('https://www.google.com/maps/dir/'+destStr,'_blank');
+        location.href='https://www.google.com/maps/dir/'+destStr;
       },
-      {timeout:5000,maximumAge:60000}
+      {timeout:8000,maximumAge:30000,enableHighAccuracy:false}
     );
   } else {
-    window.open('https://www.google.com/maps/dir/'+destStr,'_blank');
+    location.href='https://www.google.com/maps/dir/'+destStr;
   }
 });
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeM();});
@@ -762,9 +758,9 @@ document.getElementById('m-rte').addEventListener('click',function(){
     navigator.geolocation.getCurrentPosition(
       function(pos){
         var origin=encodeURIComponent(pos.coords.latitude.toFixed(6)+','+pos.coords.longitude.toFixed(6));
-        window.open('https://www.google.com/maps/dir/'+origin+'/'+destStr,'_blank');
+        location.href='https://www.google.com/maps/dir/'+origin+'/'+destStr;
       },
-      function(){window.open('https://www.google.com/maps/dir/'+destStr,'_blank');},
+      function(){location.href='https://www.google.com/maps/dir/'+destStr;},
       {timeout:5000,maximumAge:60000}
     );
   } else {
