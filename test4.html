@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Test</title>
+</head>
+<body style="background:#000;color:#fff;font-size:18px;padding:20px;font-family:sans-serif">
+<div id="out">Loading data.js...</div>
+<script src="data.js"></script>
+<script>
+try {
+  var count = typeof CUSTOMERS_BASE !== 'undefined' ? CUSTOMERS_BASE.length : 'UNDEFINED';
+  var zip = typeof ZIP_TO_GROUP !== 'undefined' ? Object.keys(ZIP_TO_GROUP).length : 'UNDEFINED';
+  document.getElementById('out').innerHTML = 
+    'CUSTOMERS_BASE: ' + count + '<br>' +
+    'ZIP_TO_GROUP entries: ' + zip + '<br>' +
+    (count === 610 ? '<b style="color:lime">DATA LOADED OK</b>' : '<b style="color:red">DATA FAILED</b>');
+} catch(e) {
+  document.getElementById('out').innerHTML = '<b style="color:red">ERROR: ' + e.message + '</b>';
+}
+</script>
+</body>
+</html>
