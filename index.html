@@ -113,6 +113,7 @@ nav a svg{width:22px;height:22px}
     <div class="chips">
       <button class="chip on" data-f="all">All</button>
       <button class="chip" data-f="visited">Visited</button>
+      <button class="chip" data-f="not_avail">Not Avail</button>
       <button class="chip" data-f="overdue">Overdue</button>
       <button class="chip" data-f="active">Active</button>
       <button class="chip" data-f="hot">Hot</button>
@@ -332,9 +333,9 @@ function rDash(){
   for(var i=0;i<a.length;i++){if(ds(a[i].code)>45)od++;}
   var ds_el=document.getElementById('d-stats');
   if(ds_el)ds_el.innerHTML=
-    '<div class="stat"><div class="stat-n" style="color:#10b981">'+vt+'</div><div class="stat-l">Visited</div></div>'+
-    '<div class="stat"><div class="stat-n" style="color:#f59e0b">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
-    '<div class="stat"><div class="stat-n" style="color:#ef4444">'+od+'</div><div class="stat-l">Overdue</div></div>';
+    '<div class="stat" style="cursor:pointer" onclick="goFilter('visited')"><div class="stat-n" style="color:#10b981">'+vt+'</div><div class="stat-l">Visited</div></div>'+
+    '<div class="stat" style="cursor:pointer" onclick="goFilter('not_avail')"><div class="stat-n" style="color:#f59e0b">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
+    '<div class="stat" style="cursor:pointer" onclick="goFilter('overdue')"><div class="stat-n" style="color:#ef4444">'+od+'</div><div class="stat-l">Overdue</div></div>';
   rRoute();rAttn(a);
 }
 
@@ -391,6 +392,7 @@ function rCust(){
     var c=a[i];
     if(q&&c.name.toLowerCase().indexOf(q)<0&&c.code.toLowerCase().indexOf(q)<0&&(c.city||'').toLowerCase().indexOf(q)<0)continue;
     if(cF==='visited'){var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;if(!lv||lv.type!=='visited')continue;}
+    else if(cF==='not_avail'){var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;if(!lv||lv.type!=='not_available')continue;}
     else if(cF==='overdue'){if(ds(c.code)<=45)continue;}
     else if(cF==='active'){if(!c.sales2526&&!c.lifetimeSales)continue;}
     else if(cF==='hot'){if(!ST.hot[c.code])continue;}
@@ -640,6 +642,28 @@ function doImport(hdrs,rows,fname,status){
   }
   lSave();syncUp();rCust();rDash();rGrps();
   status.textContent='Done: '+updated+' updated, '+added+' added, '+skipped+' skipped';
+}
+
+function goFilter(f){
+  // Map dashboard filter names to chip data-f values
+  var map={'visited':'visited','not_avail':'visited','overdue':'overdue'};
+  // For not_avail we filter visited by type
+  cF=f==='not_avail'?'not_avail':f;
+  pg=0;
+  // Switch to customers tab
+  var pages=['dash','cust','grps','set'];
+  for(var i=0;i<pages.length;i++){
+    var el=document.getElementById('p-'+pages[i]);
+    if(el)el.style.display=pages[i]==='cust'?'block':'none';
+    var nb=document.getElementById('nb-'+pages[i]);
+    if(nb)nb.className=pages[i]==='cust'?'on':'';
+  }
+  window.scrollTo(0,0);
+  // Update chip UI
+  document.querySelectorAll('.chip').forEach(function(c){
+    c.className='chip'+(c.getAttribute('data-f')===cF?' on':'');
+  });
+  rCust();
 }
 
 // ── INIT ─────────────────────────────────────────────────
