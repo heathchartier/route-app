@@ -115,6 +115,7 @@ nav a svg{width:22px;height:22px}
       <button class="chip" data-f="visited">Visited</button>
       <button class="chip" data-f="not_avail">Not Avail</button>
       <button class="chip" data-f="overdue">Overdue</button>
+      <button class="chip" data-f="scheduled">Scheduled</button>
       <button class="chip" data-f="active">Active</button>
       <button class="chip" data-f="hot">Hot</button>
       <button class="chip" data-f="never">Never</button>
@@ -333,9 +334,9 @@ function rDash(){
   for(var i=0;i<a.length;i++){if(ds(a[i].code)>45)od++;}
   var ds_el=document.getElementById('d-stats');
   if(ds_el)ds_el.innerHTML=
-    '<div class="stat" style="cursor:pointer" onclick="goFilter('visited')"><div class="stat-n" style="color:#10b981">'+vt+'</div><div class="stat-l">Visited</div></div>'+
-    '<div class="stat" style="cursor:pointer" onclick="goFilter('not_avail')"><div class="stat-n" style="color:#f59e0b">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
-    '<div class="stat" style="cursor:pointer" onclick="goFilter('overdue')"><div class="stat-n" style="color:#ef4444">'+od+'</div><div class="stat-l">Overdue</div></div>';
+    '<div class="stat" style="cursor:pointer" data-gf="visited"><div class="stat-n" style="color:#10b981">'+vt+'</div><div class="stat-l">Visited</div></div>'+
+    '<div class="stat" style="cursor:pointer" data-gf="not_avail"><div class="stat-n" style="color:#f59e0b">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
+    '<div class="stat" style="cursor:pointer" data-gf="overdue"><div class="stat-n" style="color:#ef4444">'+od+'</div><div class="stat-l">Overdue</div></div>';
   rRoute();rAttn(a);
 }
 
@@ -391,12 +392,14 @@ function rCust(){
   for(var i=0;i<a.length;i++){
     var c=a[i];
     if(q&&c.name.toLowerCase().indexOf(q)<0&&c.code.toLowerCase().indexOf(q)<0&&(c.city||'').toLowerCase().indexOf(q)<0)continue;
-    if(cF==='visited'){var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;if(!lv||lv.type!=='visited')continue;}
-    else if(cF==='not_avail'){var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;if(!lv||lv.type!=='not_available')continue;}
+    var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
+    if(cF==='visited'){if(!lv||lv.type!=='visited')continue;}
+    else if(cF==='not_avail'){if(!lv||lv.type!=='not_available')continue;}
     else if(cF==='overdue'){if(ds(c.code)<=45)continue;}
     else if(cF==='active'){if(!c.sales2526&&!c.lifetimeSales)continue;}
     else if(cF==='hot'){if(!ST.hot[c.code])continue;}
     else if(cF==='never'){if(ds(c.code)<1000000)continue;}
+    else if(cF==='scheduled'){var td=new Date().toISOString().split('T')[0];if(!ST.scheduled||!ST.scheduled[c.code]||ST.scheduled[c.code].date<td)continue;}
     f.push(c);
   }
   fc=f;
@@ -603,6 +606,11 @@ document.addEventListener('click',function(e){
   else if(action==='vis'&&code){e.stopPropagation();mv(code,'visited');if(ST.scheduled&&ST.scheduled[code])delete ST.scheduled[code];lSave();syncUp();var a=allC(),cn='';for(var i=0;i<a.length;i++){if(a[i].code===code){cn=a[i].name;break;}}toast('Visited: '+cn);rCust();rDash();}
   else if(action==='na'&&code){e.stopPropagation();mv(code,'not_available');if(!ST.scheduled)ST.scheduled={};var td=new Date();td.setDate(td.getDate()+3);ST.scheduled[code]={date:td.toISOString().split('T')[0]};lSave();syncUp();var a=allC(),cn='';for(var i=0;i<a.length;i++){if(a[i].code===code){cn=a[i].name;break;}}toast('N/A: '+cn);rCust();rDash();}
   else {
+    // Check for stat card tap (data-gf)
+    var gfEl=t;var gfVal=null;
+    while(gfEl&&!gfVal){gfVal=gfEl.getAttribute('data-gf');if(!gfVal)gfEl=gfEl.parentElement;}
+    if(gfVal){goFilter(gfVal);return;}
+    // Check for group row tap (data-g)
     var gEl=t;var gVal=null;
     while(gEl&&!gVal){gVal=gEl.getAttribute('data-g');if(!gVal)gEl=gEl.parentElement;}
     if(gVal){cG=+gVal;document.getElementById('g-lbl').textContent='Grp '+cG;localStorage.setItem('hrt_lg',gVal);go('dash');}
