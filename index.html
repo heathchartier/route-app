@@ -624,7 +624,7 @@ function doExport(){
 }
 
 // ── WIRE UP ALL EVENTS IN ONE PLACE ─────────────────────────
-window.addEventListener('load',function(){
+
 
   // Nav
   document.querySelectorAll('nav a').forEach(function(a){
@@ -806,7 +806,7 @@ window.addEventListener('load',function(){
   try{rGrps();}catch(e){document.getElementById('g-list').innerHTML='<div style="color:red">rGrps ERROR: '+e.message+'</div>';}
   
   syncDown();
-});
+
 
 // ── IMPORT ────────────────────────────────────────────────────
 function handleImport(inp){
