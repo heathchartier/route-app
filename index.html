@@ -720,9 +720,10 @@ var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',func
   for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
   if(!gc.length){toast('No addresses');return;}
   var stops=gc.slice(0,10);
-  var url='https://www.google.com/maps/dir/'+stops.map(function(c){
+  var waypoints=stops.map(function(c){
     return encodeURIComponent([c.address,c.city,'CA'].filter(function(x){return x;}).join(', '));
   }).join('/');
+  var url='https://www.google.com/maps/dir/My+Location/'+waypoints;
   window.open(url,'_blank');
 });
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeM();});
@@ -777,10 +778,10 @@ document.getElementById('m-rte').addEventListener('click',function(){
   for(var i=0;i<a.length;i++){if(a[i].group===c.group&&a[i].code!==mC&&a[i].address)rest.push(a[i]);}
   rest.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
   var stops=[c].concat(rest.slice(0,9));
-  var url='https://www.google.com/maps/dir/'+stops.map(function(s){
+  var waypoints=stops.map(function(s){
     return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));
   }).join('/');
-  window.open(url,'_blank');
+  window.open('https://www.google.com/maps/dir/My+Location/'+waypoints,'_blank');
   toast('Opening route in Maps');
 });
 document.getElementById('m-snote').addEventListener('click',function(){if(!mC)return;if(!ST.notes)ST.notes={};ST.notes[mC]=document.getElementById('m-note').value;lSave();syncUp();toast('Note saved');});
