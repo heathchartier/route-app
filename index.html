@@ -98,6 +98,14 @@ nav a svg{width:22px;height:22px}
       <div id="d-route"><div style="color:#8896b3;font-size:13px;padding:8px 0">Loading...</div></div>
       <button class="btn btn-t" id="btn-map">Open Route in Maps</button>
     </div>
+    <div class="card" id="d-retry" style="display:none;border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.06)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div>
+        <div class="lbl" style="margin:0;color:#3b82f6">Retry Today</div>
+        <div id="d-retry-count" style="background:#3b82f6;color:#fff;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700;margin-left:auto"></div>
+      </div>
+      <div id="d-retry-list"></div>
+    </div>
     <div class="card" id="d-attn" style="display:none">
       <div class="lbl">Needs Attention</div>
       <div id="d-attn-list"></div>
@@ -337,7 +345,7 @@ function rDash(){
     '<div class="stat" style="cursor:pointer" data-gf="visited"><div class="stat-n" style="color:#10b981">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" style="cursor:pointer" data-gf="not_avail"><div class="stat-n" style="color:#f59e0b">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" style="cursor:pointer" data-gf="overdue"><div class="stat-n" style="color:#ef4444">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rAttn(a);
+  rRoute();rRetry(a);rAttn(a);
 }
 
 function rRoute(){
@@ -366,6 +374,40 @@ function rRoute(){
       '</div></div>';
   }
   el.innerHTML=h;
+}
+
+function rRetry(a){
+  var card=document.getElementById('d-retry');
+  var list=document.getElementById('d-retry-list');
+  var countEl=document.getElementById('d-retry-count');
+  if(!card||!list)return;
+  var todayStr=new Date().toISOString().split('T')[0];
+  var retries=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    if(ST.scheduled&&ST.scheduled[c.code]&&ST.scheduled[c.code].date===todayStr){
+      retries.push(c);
+    }
+  }
+  if(!retries.length){card.style.display='none';return;}
+  card.style.display='block';
+  if(countEl)countEl.textContent=retries.length+' due';
+  var h='';
+  for(var i=0;i<retries.length;i++){
+    var c=retries[i];
+    h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
+      '<div class="dot" style="background:#3b82f6"></div>'+
+      '<div class="ri">'+
+        '<div class="rn">'+esc(c.name)+'</div>'+
+        '<div class="rm" style="color:#3b82f6">Retry today &bull; '+esc(c.city||'')+'</div>'+
+      '</div>'+
+      '<div class="vbs">'+
+        '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
+        '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
+      '</div>'+
+    '</div>';
+  }
+  list.innerHTML=h;
 }
 
 function rAttn(a){
