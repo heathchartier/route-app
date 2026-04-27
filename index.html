@@ -43,7 +43,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .page{padding-bottom:90px;min-height:100vh}
 
 /* ── HEADER ── */
-.hdr{position:sticky;top:0;z-index:40;background:rgba(7,17,31,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:16px 18px 12px}
+.hdr{position:sticky;top:0;z-index:40;background:rgba(7,17,31,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 12px}
 .hdr-top{display:flex;justify-content:space-between;align-items:flex-start}
 .hdr h1{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
 .hdr .sub{font-size:12px;color:var(--sub);margin-top:3px}
@@ -735,7 +735,37 @@ var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',func
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeM();});
 document.getElementById('m-cls').addEventListener('click',closeM);
 document.getElementById('m-vis').addEventListener('click',function(){if(!mC)return;mv(mC,'visited');if(ST.scheduled&&ST.scheduled[mC])delete ST.scheduled[mC];lSave();syncUp();toast('Visited');openM(mC);rDash();rCust();});
-document.getElementById('m-na').addEventListener('click',function(){if(!mC)return;mv(mC,'not_available');if(!ST.scheduled)ST.scheduled={};var t=new Date();t.setDate(t.getDate()+3);ST.scheduled[mC]={date:t.toISOString().split('T')[0]};lSave();syncUp();toast('Retry in 3 days');openM(mC);rDash();rCust();});
+document.getElementById('m-na').addEventListener('click',function(){
+  if(!mC)return;
+  mv(mC,'not_available');
+  if(!ST.scheduled)ST.scheduled={};
+  var t=new Date();t.setDate(t.getDate()+3);
+  ST.scheduled[mC]={date:t.toISOString().split('T')[0]};
+  lSave();syncUp();
+  // Find nearby overdue customers in same city
+  var a=allC(),c=null;
+  for(var i=0;i<a.length;i++){if(a[i].code===mC){c=a[i];break;}}
+  if(c){
+    var nearby=[];
+    for(var i=0;i<a.length;i++){
+      var x=a[i];
+      if(x.code===mC)continue;
+      if(x.city===c.city&&ds(x.code)>45&&ds(x.code)<1000000)nearby.push(x);
+      else if(x.city===c.city&&ds(x.code)>=1000000)nearby.push(x);
+    }
+    nearby.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
+    nearby=nearby.slice(0,3);
+    if(nearby.length>0){
+      showNearby(c,nearby);
+    } else {
+      toast('Scheduled retry in 3 days');
+      closeM();rDash();rCust();
+    }
+  } else {
+    toast('Scheduled retry in 3 days');
+    closeM();rDash();rCust();
+  }
+});
 document.getElementById('m-hot').addEventListener('click',function(){if(!mC)return;ST.hot[mC]=!ST.hot[mC];lSave();syncUp();this.textContent=ST.hot[mC]?'Remove Hot':'Hot Lead';toast(ST.hot[mC]?'Hot lead set':'Removed');});
 document.getElementById('m-arc').addEventListener('click',function(){if(!mC||!confirm('Archive?'))return;ST.archived[mC]=true;lSave();syncUp();closeM();rCust();rDash();toast('Archived');});
 document.getElementById('m-rem').addEventListener('click',function(){
@@ -811,7 +841,34 @@ document.addEventListener('click',function(e){
   if(!action){var p=t.parentElement;while(p&&!action){action=p.getAttribute('data-action');code=p.getAttribute('data-code');p=p.parentElement;}}
   if(action==='open'&&code)openM(code);
   else if(action==='vis'&&code){e.stopPropagation();mv(code,'visited');if(ST.scheduled&&ST.scheduled[code])delete ST.scheduled[code];lSave();syncUp();var a=allC(),cn='';for(var i=0;i<a.length;i++){if(a[i].code===code){cn=a[i].name;break;}}toast('Visited: '+cn);rCust();rDash();}
-  else if(action==='na'&&code){e.stopPropagation();mv(code,'not_available');if(!ST.scheduled)ST.scheduled={};var td=new Date();td.setDate(td.getDate()+3);ST.scheduled[code]={date:td.toISOString().split('T')[0]};lSave();syncUp();var a=allC(),cn='';for(var i=0;i<a.length;i++){if(a[i].code===code){cn=a[i].name;break;}}toast('N/A: '+cn);rCust();rDash();}
+  else if(action==='na'&&code){
+    e.stopPropagation();
+    mv(code,'not_available');
+    if(!ST.scheduled)ST.scheduled={};
+    var td=new Date();td.setDate(td.getDate()+3);
+    ST.scheduled[code]={date:td.toISOString().split('T')[0]};
+    lSave();syncUp();
+    var a=allC(),naC=null,cn='';
+    for(var i=0;i<a.length;i++){if(a[i].code===code){naC=a[i];cn=a[i].name;break;}}
+    // Show nearby suggestion toast
+    if(naC){
+      var nearby=[];
+      for(var i=0;i<a.length;i++){
+        var x=a[i];
+        if(x.code===code)continue;
+        if(x.city===naC.city&&(ds(x.code)>45||ds(x.code)>=1000000))nearby.push(x);
+      }
+      nearby.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
+      if(nearby.length>0){
+        toast('N/A: '+cn+' → '+nearby[0].name+' is nearby & overdue');
+      } else {
+        toast('N/A: '+cn+' • Retry in 3 days');
+      }
+    } else {
+      toast('N/A: '+cn);
+    }
+    rCust();rDash();
+  }
   else {
     // Check for stat card tap (data-gf)
     var gfEl=t;var gfVal=null;
@@ -879,6 +936,46 @@ function goFilter(f){
     c.className='chip'+(c.getAttribute('data-f')===cF?' on':'');
   });
   rCust();
+}
+
+function showNearby(namedC,nearby){
+  // Show a nearby suggestions overlay within the modal
+  var modal=document.querySelector('.modal');
+  if(!modal)return;
+  var existing=document.getElementById('nearby-panel');
+  if(existing)existing.parentNode.removeChild(existing);
+
+  var panel=document.createElement('div');
+  panel.id='nearby-panel';
+  panel.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+
+  var inner=document.createElement('div');
+  inner.style.cssText='background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)';
+
+  var h='<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>';
+  h+='<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px">Scheduled for retry in 3 days</div>';
+  h+='<div style="font-size:18px;font-weight:700;margin-bottom:16px;letter-spacing:-.3px">'+esc(namedC.name)+'</div>';
+  h+='<div style="font-size:13px;color:var(--sub);margin-bottom:12px;font-weight:600">While you're in '+esc(namedC.city||'the area')+', these customers are overdue:</div>';
+
+  for(var i=0;i<nearby.length;i++){
+    var x=nearby[i];
+    var d=ds(x.code);
+    var meta=d>=1000000?'Never visited':d+'d overdue';
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="document.getElementById('nearby-panel').remove();closeM();setTimeout(function(){openM(''+x.code+'');},100)">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;box-shadow:0 0 6px var(--red)"></div>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(x.name)+'</div>'
+        +'<div style="font-size:12px;color:var(--sub);margin-top:2px">'+meta+' &bull; '+fmt(x.lifetimeSales)+' lifetime</div>'
+      +'</div>'
+      +'<div style="font-size:12px;color:var(--blue);font-weight:600">View &rsaquo;</div>'
+      +'</div>';
+  }
+
+  h+='<button onclick="document.getElementById('nearby-panel').remove();closeM();rDash();rCust();" style="width:100%;margin-top:14px;padding:13px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;letter-spacing:.2px">Got it, close</button>';
+
+  inner.innerHTML=h;
+  panel.appendChild(inner);
+  document.body.appendChild(panel);
 }
 
 // ── INIT ─────────────────────────────────────────────────
