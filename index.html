@@ -955,7 +955,7 @@ function showNearby(namedC,nearby){
   var h='<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>';
   h+='<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px">Scheduled for retry in 3 days</div>';
   h+='<div style="font-size:18px;font-weight:700;margin-bottom:16px;letter-spacing:-.3px">'+esc(namedC.name)+'</div>';
-  h+='<div style="font-size:13px;color:var(--sub);margin-bottom:12px;font-weight:600">While you're in '+esc(namedC.city||'the area')+', these customers are overdue:</div>';
+  h+='<div style="font-size:13px;color:var(--sub);margin-bottom:12px;font-weight:600">While you\'re in '+esc(namedC.city||'the area')+', these customers are overdue:</div>';
 
   for(var i=0;i<nearby.length;i++){
     var x=nearby[i];
