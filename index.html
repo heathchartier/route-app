@@ -486,7 +486,7 @@ function allC(){
 }
 
 function go(p){
-  var pages=['dash','cust','grps','set'];
+  var pages=['dash','cust','grps','vend','set'];
   for(var i=0;i<pages.length;i++){
     var el=document.getElementById('p-'+pages[i]);
     if(el)el.style.display=pages[i]===p?'block':'none';
@@ -497,6 +497,7 @@ function go(p){
   if(p==='dash')rDash();
   else if(p==='cust')rCust();
   else if(p==='grps')rGrps();
+  else if(p==='vend')rVend();
 }
 
 function smartGroup(){
