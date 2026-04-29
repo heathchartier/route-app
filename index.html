@@ -219,6 +219,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       </div>
       <div id="d-route"><div style="color:var(--sub);font-size:13px;padding:8px 0">Loading...</div></div>
       <button class="btn btn-t" id="btn-map">Open Route in Maps</button>
+      <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
     <div class="retry-card" id="d-retry" style="display:none">
       <div class="retry-hdr">
@@ -231,6 +232,16 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
     <div class="card" id="d-attn" style="display:none">
       <div class="lbl">Needs Attention</div>
       <div id="d-attn-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="lbl" style="margin:0">Custom Route</div>
+        <button id="btn-clear-route" style="font-size:12px;background:transparent;border:none;color:var(--sub);cursor:pointer;font-family:inherit">Clear</button>
+      </div>
+      <div class="srch-wrap" style="margin-bottom:8px"><span class="srch-icon">&#128269;</span><input class="srch" id="cr-srch" type="search" placeholder="Add customers or vendors..."></div>
+      <div id="cr-results" style="display:none;max-height:150px;overflow-y:auto;margin-bottom:8px;border:1px solid var(--border);border-radius:var(--r2)"></div>
+      <div id="cr-stops"></div>
+      <button class="btn btn-t" id="btn-run-route" style="display:none;margin-top:10px">Open Custom Route in Maps</button>
     </div>
   </div>
 </div>
@@ -284,13 +295,23 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <input type="file" id="xl-input" accept=".xlsx,.csv" style="display:none">
       <div id="import-status" style="margin-top:10px;font-size:13px;display:none;color:var(--teal)"></div>
     </div>
-    <div class="card">
+        <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--blue)">Add Vendor</div>
+      <div class="fl">Name *</div><input class="fi" id="av-name" type="text" placeholder="Vendor name">
+      <div class="fl">Address</div><input class="fi" id="av-addr" type="text">
+      <div class="fl">City</div><input class="fi" id="av-city" type="text">
+      <div class="fl">State</div><input class="fi" id="av-state" type="text">
+      <div class="fl">Zip</div><input class="fi" id="av-zip" type="text">
+      <div class="fl">Phone</div><input class="fi" id="av-ph" type="tel">
+      <button class="btn btn-b" id="btn-add-vendor">Add Vendor</button>
+    </div>
+<div class="card">
       <div class="lbl">Add Customer</div>
       <div class="fl">Name *</div><input class="fi" id="a-name" type="text">
       <div class="fl">Address</div><input class="fi" id="a-addr" type="text">
       <div class="fl">City</div><input class="fi" id="a-city" type="text">
       <div class="fl">Phone</div><input class="fi" id="a-ph" type="tel">
-      <div class="fl">Group (1-61)</div><input class="fi" id="a-grp" type="number" min="1" max="61" style="width:100px">
+      <div class="fl">Zip (group auto-assigned)</div><input class="fi" id="a-zip" type="text" style="width:120px" placeholder="e.g. 92507">
       <button class="btn btn-b" id="btn-add">Add Customer</button>
     </div>
     <div class="card">
@@ -305,23 +326,18 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
   </div>
 </div>
 
+<div id="p-vend" style="display:none;padding-bottom:90px">
+  <div class="hdr"><h1>Vendors</h1><div class="sub" id="v-lbl">Loading...</div>
+    <div class="srch-wrap" style="margin-top:8px"><span class="srch-icon">&#128269;</span><input class="srch" id="v-srch" type="search" placeholder="Search vendors..."></div>
+  </div>
+  <div class="body" id="v-list"></div>
+</div>
 <nav>
-  <a id="nb-dash" class="on" data-p="dash">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-    Home
-  </a>
-  <a id="nb-cust" data-p="cust">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-    Customers
-  </a>
-  <a id="nb-grps" data-p="grps">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-    Groups
-  </a>
-  <a id="nb-set" data-p="set">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-    Settings
-  </a>
+  <a id="nb-dash" class="on" data-p="dash"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Home</a>
+  <a id="nb-cust" data-p="cust"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Customers</a>
+  <a id="nb-grps" data-p="grps"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>Groups</a>
+  <a id="nb-vend" data-p="vend"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Vendors</a>
+  <a id="nb-set" data-p="set"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
 </nav>
 
 <div class="ov" id="ov">
@@ -390,16 +406,61 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
   </div>
 </div>
 
+<div class="ov" id="v-ov">
+  <div class="modal">
+    <div class="mh"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+      <div style="flex:1;min-width:0"><div class="mname" id="vm-n"></div><div style="font-size:12px;color:var(--blue);margin-top:4px;font-weight:600;letter-spacing:.3px">Vendor</div></div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button id="vm-edt" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Edit</button>
+        <button id="vm-cls" style="background:var(--bg3);border:none;color:var(--sub);border-radius:var(--r3);width:34px;height:34px;cursor:pointer;font-size:16px">&#10005;</button>
+      </div>
+    </div>
+    <div class="msect"><div class="msect-lbl">Contact</div>
+      <div class="contact-row"><div class="contact-icon">&#128205;</div><div id="vm-a" style="font-size:14px"></div></div>
+      <div class="contact-row"><div class="contact-icon">&#128222;</div><div id="vm-p" style="font-size:14px"></div></div>
+    </div>
+    <div class="mb2" style="margin-top:12px">
+      <a id="vm-gm" href="#" target="_blank" class="abtn" style="background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);text-decoration:none">Google Maps</a>
+      <a id="vm-am" href="#" target="_blank" class="abtn" style="background:var(--teal3);color:var(--teal);border:1px solid rgba(0,229,184,.3);text-decoration:none">Apple Maps</a>
+    </div>
+    <button class="btn btn-t" id="vm-nearby" style="margin-top:10px">Find nearest customer group</button>
+    <button class="btn" id="vm-route" style="background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);margin-top:8px">Route from here to nearest group</button>
+    <div class="msect"><div class="msect-lbl">Notes</div><div id="vm-notes" style="font-size:14px;color:var(--sub);min-height:24px"></div></div>
+    <div id="vm-edit" class="msect" style="display:none">
+      <div class="msect-lbl">Edit Vendor</div>
+      <div class="fl">Name</div><input class="fi" id="vf-name" type="text">
+      <div class="fl">Address</div><input class="fi" id="vf-addr" type="text">
+      <div class="fl">City</div><input class="fi" id="vf-city" type="text">
+      <div class="fl">State</div><input class="fi" id="vf-state" type="text">
+      <div class="fl">Zip</div><input class="fi" id="vf-zip" type="text">
+      <div class="fl">Phone</div><input class="fi" id="vf-phone" type="tel">
+      <div class="fl">Notes</div><textarea class="note" id="vf-notes" style="margin-bottom:10px"></textarea>
+      <div class="mb2"><button class="btn btn-b" id="vm-sav">Save</button><button class="btn btn-g" id="vm-can">Cancel</button></div>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
 var _D=[];
 var CUSTOMERS_BASE=_D.map(function(r){return{code:r[0],name:r[1],group:r[2],stop:r[3],address:r[4],address2:r[5],city:r[6],state:r[7],zip:r[8],phone:r[9],email:r[10],lifetimeSales:r[11],sales2024:r[12],sales2025:r[13],sales2026:r[14],sales2526:r[15],distance:r[16]};});
 var ZIP_TO_GROUP={"92507":1,"92501":1,"92502":1,"92500":2,"92504":2,"92503":2,"92337":2,"92553":3,"92508":3,"92571":3,"92518":3,"92334":3,"92376":3,"92335":3,"92570":4,"92860":4,"92879":4,"92532":4,"92336":5,"91752":5,"91761":5,"91730":5,"92881":6,"92880":6,"92882":6,"92545":7,"92530":7,"91710":8,"91762":9,"91786":9,"91763":9,"92595":10,"91766":11,"91768":11,"92583":12,"92584":12,"92563":12,"92592":17,"92539":12,"91767":13,"91765":13,"91773":13,"91740":13,"91741":13,"92562":14,"92591":14,"92590":18,"92618":15,"92806":15,"92691":15,"92821":15,"92831":15,"90680":15,"90620":15,"92672":15,"92841":15,"92627":15,"91789":16,"91748":16,"91724":16,"91745":16,"91706":16,"91010":16,"91776":16,"91775":16,"91125":16,"92345":17,"92344":17,"92301":17,"91105":17,"90113":17,"92028":19,"92003":19,"92084":20,"92083":20,"92058":21,"92054":21,"92056":24,"92081":22,"92082":23,"92026":23,"92027":23,"92025":23,"92088":24,"90911":25,"92010":25,"92008":25,"90016":25,"90064":25,"91324":25,"93065":25,"92069":26,"92078":27,"92029":30,"92018":28,"92011":28,"92009":28,"92024":31,"92079":29,"92127":31,"92075":32,"92014":32,"92130":32,"92121":36,"92065":33,"92074":33,"92064":33,"92126":34,"92131":35,"92122":37,"92037":37,"92117":40,"92071":38,"92022":39,"92020":50,"92111":40,"92109":41,"92110":41,"92040":42,"92021":43,"92123":44,"92108":44,"92120":46,"92182":46,"91941":46,"91945":46,"92103":47,"92107":47,"92106":49,"92104":48,"92105":48,"92101":48,"92102":49,"92167":49,"92019":51,"91977":51,"92113":52,"92136":52,"91901":53,"91978":53,"91902":53,"91935":53,"91979":54,"92114":54,"91950":54,"91910":55,"91914":56,"91913":56,"91911":57,"92154":58,"91932":59,"92153":59,"92173":60,"91962":60,"92243":60,"95326":60,"94040":60,"37174":60,"85260":61,"90065":61,"92067":61};
+var VENDORS_BASE=[
+  {code:'V001',name:'Bison Lumber',address:'7711 Industry Ave',city:'Pico Rivera',state:'CA',zip:'90660',phone:'',notes:''},
+  {code:'V002',name:'Brooks Architectural Products',address:'1130 Research Dr',city:'Redlands',state:'CA',zip:'92374',phone:'',notes:''},
+  {code:'V003',name:'Cal Timberline',address:'4650 Edison Ave',city:'Chino',state:'CA',zip:'91710',phone:'',notes:''},
+  {code:'V004',name:'California Custom Milling',address:'1900 Nancita Cir',city:'Placentia',state:'CA',zip:'92870',phone:'',notes:''},
+  {code:'V005',name:'Chapman',address:'11203 Shoemaker Ave',city:'Santa Fe Springs',state:'CA',zip:'90670',phone:'',notes:''},
+  {code:'V006',name:'El & El',address:'6011 Schaefer Ave',city:'Chino',state:'CA',zip:'91710',phone:'',notes:''},
+  {code:'V007',name:'GL Veneer',address:'2224 Slauson Ave',city:'Huntington Park',state:'CA',zip:'90255',phone:'',notes:''},
+  {code:'V008',name:'Talbert',address:'711 S Stimson Ave',city:'City of Industry',state:'CA',zip:'91745',phone:'',notes:''},
+  {code:'V009',name:'Vintage Wood Flooring',address:'2770 E Coronado St',city:'Anaheim',state:'CA',zip:'92806',phone:'',notes:''}
+];
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};}catch(e){}}
@@ -478,7 +539,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);
+  rRoute();rRetry(a);rAttn(a);if(typeof updateNextStopBtn==='function')updateNextStopBtn();
 }
 
 function rRoute(){
@@ -720,10 +781,9 @@ var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',func
   for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
   if(!gc.length){toast('No addresses');return;}
   var stops=gc.slice(0,10);
-  var waypoints=stops.map(function(c){
+  var url='https://www.google.com/maps/dir/'+stops.map(function(c){
     return encodeURIComponent([c.address,c.city,'CA'].filter(function(x){return x;}).join(', '));
   }).join('/');
-  var url='https://www.google.com/maps/dir/My+Location/'+waypoints;
   window.open(url,'_blank');
 });
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeM();});
@@ -778,10 +838,10 @@ document.getElementById('m-rte').addEventListener('click',function(){
   for(var i=0;i<a.length;i++){if(a[i].group===c.group&&a[i].code!==mC&&a[i].address)rest.push(a[i]);}
   rest.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
   var stops=[c].concat(rest.slice(0,9));
-  var waypoints=stops.map(function(s){
+  var url='https://www.google.com/maps/dir/'+stops.map(function(s){
     return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));
   }).join('/');
-  window.open('https://www.google.com/maps/dir/My+Location/'+waypoints,'_blank');
+  window.open(url,'_blank');
   toast('Opening route in Maps');
 });
 document.getElementById('m-snote').addEventListener('click',function(){if(!mC)return;if(!ST.notes)ST.notes={};ST.notes[mC]=document.getElementById('m-note').value;lSave();syncUp();toast('Note saved');});
@@ -838,7 +898,7 @@ document.getElementById('m-can').addEventListener('click',function(){document.ge
 document.getElementById('btn-add').addEventListener('click',addCust);
 document.getElementById('btn-exp').addEventListener('click',doExport);
 document.getElementById('btn-clr').addEventListener('click',function(){if(!confirm('Clear all visits?'))return;ST.visits={};lSave();syncUp();rDash();rCust();toast('Cleared');});
-document.getElementById('btn-rst').addEventListener('click',function(){if(!confirm('Reset ALL data?'))return;ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{}};lSave();syncUp();rDash();rCust();rGrps();toast('Reset');});
+document.getElementById('btn-rst').addEventListener('click',function(){if(!confirm('Reset ALL data?'))return;ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{}};lSave();syncUp();rDash();rCust();rGrps();toast('Reset');});
 document.getElementById('xl-input').addEventListener('change',function(){handleImport(this);});
 document.addEventListener('click',function(e){
   var t=e.target,action=t.getAttribute('data-action'),code=t.getAttribute('data-code');
@@ -906,7 +966,18 @@ function doImport(hdrs,rows,fname,status){
     var ex=null;for(var j=0;j<a.length;j++){if(code&&a[j].code===code){ex=a[j];break;}if(name&&a[j].name.toLowerCase()===name.toLowerCase()){ex=a[j];break;}}
     if(ex){
       var ed=ST.edits&&ST.edits[ex.code]?JSON.parse(JSON.stringify(ST.edits[ex.code])):{},chg=false;
-      var sf=['name','address','city','zip','phone','email'];for(var j=0;j<sf.length;j++){if(ci[sf[j]]>=0&&row[ci[sf[j]]]){ed[sf[j]]=row[ci[sf[j]]];chg=true;}}
+      var sf=['name','address','city','zip','phone','email'];
+      var contactF=['address','city','zip','phone','email'];
+      for(var j=0;j<sf.length;j++){
+        if(ci[sf[j]]>=0&&row[ci[sf[j]]]){
+          var isContact=contactF.indexOf(sf[j])>=0;
+          if(isContact&&row[ci[sf[j]]]!==ex[sf[j]]){
+            if(!ST.pendingEdits)ST.pendingEdits={};
+            if(!ST.pendingEdits[ex.code])ST.pendingEdits[ex.code]={};
+            ST.pendingEdits[ex.code][sf[j]]=row[ci[sf[j]]];
+          } else if(!isContact){ed[sf[j]]=row[ci[sf[j]]];chg=true;}
+        }
+      }
       var nf=['lifetimeSales','sales2024','sales2025','sales2026','sales2526'];for(var j=0;j<nf.length;j++){if(ci[nf[j]]>=0&&row[ci[nf[j]]]!==''){var v=parseFloat(String(row[ci[nf[j]]]).replace(/[$,]/g,''));if(!isNaN(v)){ed[nf[j]]=v;chg=true;}}}
       if(ci.group>=0&&row[ci.group]){var g=parseInt(row[ci.group]);if(g>=1&&g<=61){ed.group=g;chg=true;}}
       if(chg){if(!ST.edits)ST.edits={};ST.edits[ex.code]=ed;updated++;}else skipped++;
@@ -1009,7 +1080,309 @@ function showNearby(namedC,nearby){
   document.body.appendChild(panel);
 }
 
+
+// ── VENDOR STATE ────────────────────────────────────────────────────
+function allV(){
+  var base=VENDORS_BASE;
+  var added=ST.addedVendors||[];
+  var combined=base.concat(added);
+  var result=[];
+  for(var i=0;i<combined.length;i++){
+    var v=combined[i];
+    var e=ST.vendorEdits&&ST.vendorEdits[v.code];
+    if(e){var m={};for(var k in v)m[k]=v[k];for(var k in e)m[k]=e[k];result.push(m);}
+    else result.push(v);
+  }
+  result.sort(function(a,b){return a.name.localeCompare(b.name);});
+  return result;
+}
+
+// ── RENDER VENDORS ──────────────────────────────────────────────────
+function rVend(){
+  var v=allV();
+  var q=(document.getElementById('v-srch').value||'').toLowerCase();
+  if(q)v=v.filter(function(x){return x.name.toLowerCase().indexOf(q)>=0||(x.city||'').toLowerCase().indexOf(q)>=0;});
+  var el=document.getElementById('v-lbl');if(el)el.textContent=v.length+' vendors';
+  var list=document.getElementById('v-list');if(!list)return;
+  if(!v.length){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--sub)">No vendors found</div>';return;}
+  var h='';
+  for(var i=0;i<v.length;i++){
+    var x=v[i];
+    h+='<div class="row" data-vcode="'+x.code+'">'
+      +'<div style="width:36px;height:36px;border-radius:10px;background:var(--blue2);border:1px solid rgba(74,158,255,.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">&#127968;</div>'
+      +'<div class="ri"><div class="rn">'+esc(x.name)+'</div>'
+      +'<div class="rm">'+esc(x.city||'')+(x.zip?' &bull; '+x.zip:'')+'</div></div>'
+      +'<div style="font-size:12px;color:var(--blue);font-weight:600">View &#8250;</div>'
+      +'</div>';
+  }
+  list.innerHTML=h;
+}
+
+// ── OPEN VENDOR MODAL ───────────────────────────────────────────────
+var mVC=null;
+function openVM(code){
+  var v=allV(),vend=null;
+  for(var i=0;i<v.length;i++){if(v[i].code===code){vend=v[i];break;}}
+  if(!vend)return;
+  mVC=code;
+  var mn=document.getElementById('vm-n');if(mn)mn.textContent=vend.name;
+  var addr=[vend.address,vend.city,vend.state,vend.zip].filter(function(x){return x;}).join(', ');
+  var ma=document.getElementById('vm-a');
+  if(ma)ma.innerHTML=addr?'<a href="https://maps.apple.com/?q='+encodeURIComponent(addr)+'" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
+  var mp=document.getElementById('vm-p');
+  if(mp)mp.innerHTML=vend.phone?'<a href="tel:'+esc(vend.phone)+'" style="color:var(--blue);text-decoration:none">'+esc(vend.phone)+'</a>':'No phone';
+  var mgm=document.getElementById('vm-gm');if(mgm)mgm.href='https://www.google.com/maps/search/'+encodeURIComponent(addr);
+  var mam=document.getElementById('vm-am');if(mam)mam.href='https://maps.apple.com/?q='+encodeURIComponent(addr);
+  var mn2=document.getElementById('vm-notes');if(mn2)mn2.textContent=vend.notes||'No notes';
+  var ved=document.getElementById('vm-edit');if(ved)ved.style.display='none';
+  var vedt=document.getElementById('vm-edt');if(vedt)vedt.textContent='Edit';
+  var vov=document.getElementById('v-ov');if(vov)vov.className='ov on';
+}
+function closeVM(){var vov=document.getElementById('v-ov');if(vov)vov.className='ov';mVC=null;}
+
+// ── NEAREST GROUP TO VENDOR ─────────────────────────────────────────
+function nearestGroupToVendor(vend){
+  // Use zip map first
+  if(vend.zip&&ZIP_TO_GROUP[vend.zip])return ZIP_TO_GROUP[vend.zip];
+  // Fallback: find group whose customers are most overdue (most need visiting)
+  var a=allC(),groups={};
+  for(var i=0;i<a.length;i++){
+    var c=a[i];if(!groups[c.group])groups[c.group]=0;
+    if(ds(c.code)>45)groups[c.group]+=1;
+  }
+  var keys=Object.keys(groups);
+  keys.sort(function(a,b){return groups[b]-groups[a];});
+  return keys.length?+keys[0]:1;
+}
+
+// ── AUTO-ASSIGN GROUP FOR NEW CUSTOMER ─────────────────────────────
+function autoAssignGroup(zip){
+  // 1. Check zip map
+  if(zip&&ZIP_TO_GROUP[zip])return ZIP_TO_GROUP[zip];
+  // 2. Find smallest group (keep groups balanced)
+  var a=allC(),sizes={};
+  for(var i=0;i<a.length;i++){var g=a[i].group;if(!sizes[g])sizes[g]=0;sizes[g]++;}
+  var keys=[];
+  for(var g=1;g<=61;g++)keys.push(g);
+  keys.sort(function(a,b){return (sizes[a]||0)-(sizes[b]||0);});
+  return keys[0]||61;
+}
+
+// ── NEXT STOP BUTTON ────────────────────────────────────────────────
+function goNextStop(){
+  var a=allC(),gc=[];
+  for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
+  // Find first unvisited stop sorted by sales
+  var unvisited=gc.filter(function(c){
+    var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
+    if(lv&&lv.type==='not_available')return ds(c.code)>=2;
+    return ds(c.code)>14||ds(c.code)>=1000000;
+  });
+  unvisited.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
+  if(!unvisited.length){toast('All done in Group '+cG+'!');return;}
+  var next=unvisited[0];
+  var addr=[next.address,next.city,'CA'].filter(function(x){return x;}).join(', ');
+  window.open('https://www.google.com/maps/dir/My+Location/'+encodeURIComponent(addr),'_blank');
+  toast('Navigating to '+next.name);
+}
+
+// ── CUSTOM ROUTE BUILDER ────────────────────────────────────────────
+var customRoute=[];
+
+function crSearch(){
+  var q=(document.getElementById('cr-srch').value||'').toLowerCase();
+  var res=document.getElementById('cr-results');
+  if(!q||q.length<2){if(res)res.style.display='none';return;}
+  var customers=allC().filter(function(c){
+    return c.name.toLowerCase().indexOf(q)>=0||(c.city||'').toLowerCase().indexOf(q)>=0;
+  }).slice(0,5);
+  var vendors=allV().filter(function(v){
+    return v.name.toLowerCase().indexOf(q)>=0||(v.city||'').toLowerCase().indexOf(q)>=0;
+  }).slice(0,3);
+  if(!customers.length&&!vendors.length){if(res)res.style.display='none';return;}
+  var h='';
+  for(var i=0;i<customers.length;i++){
+    var c=customers[i];
+    h+='<div style="padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:8px" data-crid="'+c.code+'" data-crtype="cust">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:'+dc(c.code)+';flex-shrink:0"></div>'
+      +'<div><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">Customer &bull; '+esc(c.city||'')+'</div></div>'
+      +'<div style="margin-left:auto;font-size:12px;color:var(--teal)">+ Add</div>'
+      +'</div>';
+  }
+  for(var i=0;i<vendors.length;i++){
+    var v=vendors[i];
+    h+='<div style="padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:8px" data-crid="'+v.code+'" data-crtype="vend">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>'
+      +'<div><div style="font-size:13px;font-weight:600">'+esc(v.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">Vendor &bull; '+esc(v.city||'')+'</div></div>'
+      +'<div style="margin-left:auto;font-size:12px;color:var(--blue)">+ Add</div>'
+      +'</div>';
+  }
+  if(res){res.innerHTML=h;res.style.display='block';}
+}
+
+function addToCustomRoute(id,type){
+  // Check not already added
+  for(var i=0;i<customRoute.length;i++){if(customRoute[i].id===id)return;}
+  var name='',addr='';
+  if(type==='cust'){
+    var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===id){name=a[i].name;addr=[a[i].address,a[i].city,'CA'].filter(function(x){return x;}).join(', ');break;}}
+  } else {
+    var v=allV();for(var i=0;i<v.length;i++){if(v[i].code===id){name=v[i].name;addr=[v[i].address,v[i].city,'CA'].filter(function(x){return x;}).join(', ');break;}}
+  }
+  if(!addr){toast('No address for '+name);return;}
+  customRoute.push({id:id,type:type,name:name,addr:addr});
+  renderCustomRoute();
+  var srch=document.getElementById('cr-srch');if(srch)srch.value='';
+  var res=document.getElementById('cr-results');if(res)res.style.display='none';
+  toast('Added: '+name);
+}
+
+function removeFromCustomRoute(idx){
+  customRoute.splice(idx,1);
+  renderCustomRoute();
+}
+
+function renderCustomRoute(){
+  var el=document.getElementById('cr-stops');
+  var btn=document.getElementById('btn-run-route');
+  if(!el)return;
+  if(!customRoute.length){
+    el.innerHTML='<div style="font-size:13px;color:var(--dim);padding:4px 0">Search above to build your route</div>';
+    if(btn)btn.style.display='none';
+    return;
+  }
+  var h='';
+  for(var i=0;i<customRoute.length;i++){
+    var s=customRoute[i];
+    var col=s.type==='vend'?'var(--blue)':'var(--teal)';
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="width:22px;height:22px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>'
+      +'<div style="width:7px;height:7px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(s.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+(s.type==='vend'?'Vendor':'Customer')+'</div></div>'
+      +'<button data-cridx="'+i+'" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:2px 6px">&#10005;</button>'
+      +'</div>';
+  }
+  el.innerHTML=h;
+  if(btn)btn.style.display='block';
+}
+
+function runCustomRoute(){
+  if(!customRoute.length){toast('No stops added');return;}
+  var waypoints=customRoute.map(function(s){return encodeURIComponent(s.addr);}).join('/');
+  window.open('https://www.google.com/maps/dir/My+Location/'+waypoints,'_blank');
+  toast('Opening custom route in Maps');
+}
+
+
+
 // ── INIT ─────────────────────────────────────────────────
+// Vendor search
+var vsrch=document.getElementById('v-srch');
+if(vsrch)vsrch.addEventListener('input',function(){rVend();});
+
+// Vendor list + custom route click delegation (use capture phase to catch before others)
+document.addEventListener('click',function(e){
+  var t=e.target;
+  // Vendor row
+  var vEl=t,vCode=null;
+  while(vEl&&!vCode){vCode=vEl.getAttribute('data-vcode');if(!vCode)vEl=vEl.parentElement;}
+  if(vCode){openVM(vCode);return;}
+  // Custom route add result
+  var crEl=t,crId=null,crType=null;
+  while(crEl&&!crId){crId=crEl.getAttribute('data-crid');crType=crEl.getAttribute('data-crtype');if(!crId)crEl=crEl.parentElement;}
+  if(crId&&crType){addToCustomRoute(crId,crType);return;}
+  // Custom route remove
+  var ridx=t.getAttribute('data-cridx');
+  if(ridx!==null&&ridx!==''){removeFromCustomRoute(parseInt(ridx));return;}
+},false);
+
+// Vendor modal
+var vov2=document.getElementById('v-ov');
+if(vov2)vov2.addEventListener('click',function(e){if(e.target===this)closeVM();});
+var vmcls=document.getElementById('vm-cls');if(vmcls)vmcls.addEventListener('click',closeVM);
+
+document.getElementById('vm-nearby').addEventListener('click',function(){
+  if(!mVC)return;
+  var v=allV(),vend=null;for(var i=0;i<v.length;i++){if(v[i].code===mVC){vend=v[i];break;}}
+  if(!vend)return;
+  var grp=nearestGroupToVendor(vend);
+  cG=grp;document.getElementById('g-lbl').textContent='Grp '+grp;
+  closeVM();go('dash');toast('Group '+grp+' is nearest');
+});
+
+document.getElementById('vm-route').addEventListener('click',function(){
+  if(!mVC)return;
+  var v=allV(),vend=null;for(var i=0;i<v.length;i++){if(v[i].code===mVC){vend=v[i];break;}}
+  if(!vend||!vend.address){toast('No vendor address');return;}
+  var grp=nearestGroupToVendor(vend);
+  var a=allC(),gc=[];
+  for(var i=0;i<a.length;i++){if(a[i].group===grp&&a[i].address)gc.push(a[i]);}
+  gc.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
+  var stops=[vend].concat(gc.slice(0,9));
+  window.open('https://www.google.com/maps/dir/My+Location/'+stops.map(function(s){return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));}).join('/'),'_blank');
+  toast('Routing vendor then Group '+grp);
+});
+
+document.getElementById('vm-edt').addEventListener('click',function(){
+  if(!mVC)return;
+  var v=allV(),vend=null;for(var i=0;i<v.length;i++){if(v[i].code===mVC){vend=v[i];break;}}
+  if(!vend)return;
+  var isEdit=document.getElementById('vm-edit').style.display==='none';
+  document.getElementById('vm-edit').style.display=isEdit?'block':'none';
+  this.textContent=isEdit?'View':'Edit';
+  if(isEdit){
+    var fmap={name:'name',addr:'address',city:'city',state:'state',zip:'zip',phone:'phone'};
+    for(var f in fmap){var el=document.getElementById('vf-'+f);if(el)el.value=vend[fmap[f]]||'';}
+    var n=document.getElementById('vf-notes');if(n)n.value=vend.notes||'';
+  }
+});
+
+document.getElementById('vm-sav').addEventListener('click',function(){
+  if(!mVC)return;
+  var ed={};
+  var fmap={name:'name',addr:'address',city:'city',state:'state',zip:'zip',phone:'phone'};
+  for(var f in fmap){var el=document.getElementById('vf-'+f);if(el&&el.value.trim())ed[fmap[f]]=el.value.trim();}
+  var n=document.getElementById('vf-notes');if(n)ed.notes=n.value;
+  if(!ST.vendorEdits)ST.vendorEdits={};ST.vendorEdits[mVC]=ed;
+  lSave();syncUp();toast('Vendor saved');
+  document.getElementById('vm-edit').style.display='none';
+  document.getElementById('vm-edt').textContent='Edit';
+  openVM(mVC);rVend();
+});
+
+document.getElementById('vm-can').addEventListener('click',function(){
+  document.getElementById('vm-edit').style.display='none';
+  document.getElementById('vm-edt').textContent='Edit';
+});
+
+// Add vendor
+var bavend=document.getElementById('btn-add-vendor');
+if(bavend)bavend.addEventListener('click',function(){
+  var name=(document.getElementById('av-name').value||'').trim();
+  if(!name){toast('Name required');return;}
+  var nc={code:'VEN'+Date.now().toString().slice(-6),name:name,
+    address:(document.getElementById('av-addr').value||'').trim(),
+    city:(document.getElementById('av-city').value||'').trim(),
+    state:(document.getElementById('av-state').value||'CA').trim(),
+    zip:(document.getElementById('av-zip').value||'').trim(),
+    phone:(document.getElementById('av-ph').value||'').trim(),notes:''};
+  if(!ST.addedVendors)ST.addedVendors=[];ST.addedVendors.push(nc);lSave();syncUp();
+  ['av-name','av-addr','av-city','av-state','av-zip','av-ph'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  toast('Added vendor: '+name);rVend();
+});
+
+// Next Stop
+var bns=document.getElementById('btn-next-stop');if(bns)bns.addEventListener('click',goNextStop);
+
+// Custom route
+var crsrch=document.getElementById('cr-srch');if(crsrch)crsrch.addEventListener('input',crSearch);
+var brr=document.getElementById('btn-run-route');if(brr)brr.addEventListener('click',runCustomRoute);
+var bcr=document.getElementById('btn-clear-route');
+if(bcr)bcr.addEventListener('click',function(){customRoute=[];renderCustomRoute();});
+
 lLoad();
 var sg=smartGroup();
 cG=sg;
@@ -1017,6 +1390,8 @@ document.getElementById('g-lbl').textContent='Grp '+sg;
 rDash();
 rCust();
 rGrps();
+rVend();
+renderCustomRoute();
 syncDown();
 </script>
 </body>
