@@ -349,6 +349,8 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
         <div class="mcode" id="m-c"></div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
+        <button id="m-prev" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);width:34px;height:34px;cursor:pointer;font-size:18px">&#8249;</button>
+        <button id="m-next" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);width:34px;height:34px;cursor:pointer;font-size:18px">&#8250;</button>
         <button id="m-edt" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px">Edit</button>
         <button id="m-cls" style="background:var(--bg3);border:1px solid var(--border);color:var(--sub);border-radius:var(--r3);width:34px;height:34px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">&#10005;</button>
       </div>
@@ -1304,6 +1306,20 @@ document.addEventListener('click',function(e){
 var vov2=document.getElementById('v-ov');
 if(vov2)vov2.addEventListener('click',function(e){if(e.target===this)closeVM();});
 var vmcls=document.getElementById('vm-cls');if(vmcls)vmcls.addEventListener('click',closeVM);
+var mPrev=document.getElementById('m-prev');
+var mNext=document.getElementById('m-next');
+function navModal(dir){
+  if(!mC)return;
+  var list=fc.length?fc:allC();
+  var idx=-1;for(var i=0;i<list.length;i++){if(list[i].code===mC){idx=i;break;}}
+  if(idx<0)return;
+  var ni=idx+dir;
+  if(ni<0)ni=list.length-1;
+  if(ni>=list.length)ni=0;
+  openM(list[ni].code);
+}
+if(mPrev)mPrev.addEventListener('click',function(){navModal(-1);});
+if(mNext)mNext.addEventListener('click',function(){navModal(1);});
 
 document.getElementById('vm-nearby').addEventListener('click',function(){
   if(!mVC)return;
