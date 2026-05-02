@@ -841,7 +841,7 @@ document.getElementById('m-rte').addEventListener('click',function(){
   for(var i=0;i<a.length;i++){if(a[i].group===c.group&&a[i].code!==mC&&a[i].address)rest.push(a[i]);}
   rest.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
   var stops=[c].concat(rest.slice(0,9));
-  var url='https://www.google.com/maps/dir/'+stops.map(function(s){
+  var url='https://www.google.com/maps/dir/My+Location/'+stops.map(function(s){
     return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));
   }).join('/');
   window.open(url,'_blank');
