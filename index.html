@@ -689,7 +689,7 @@ function openM(code){
   var mn2=document.getElementById('m-note');if(mn2)mn2.value=(ST.notes&&ST.notes[code])||'';;
   var mgm=document.getElementById('m-gm');if(mgm)mgm.href='https://www.google.com/maps/search/'+encodeURIComponent(addr);
   var mam=document.getElementById('m-am');if(mam)mam.href='https://maps.apple.com/?q='+encodeURIComponent(addr);
-  var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="https://maps.apple.com/?q='+encodeURIComponent(addr)+'" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
+  var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="https://www.google.com/maps/search/'+encodeURIComponent(addr)+'" target="_blank" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
   var mp=document.getElementById('m-p');if(mp)mp.innerHTML=c.phone?'<a href="tel:'+esc(c.phone)+'" style="color:var(--blue);text-decoration:none">'+esc(c.phone)+'</a>':'No phone';
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="mailto:'+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
@@ -784,7 +784,7 @@ var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',func
   for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
   if(!gc.length){toast('No addresses');return;}
   var stops=gc.slice(0,10);
-  var url='https://www.google.com/maps/dir/'+stops.map(function(c){
+  var url='https://www.google.com/maps/dir/My+Location/'+stops.map(function(c){
     return encodeURIComponent([c.address,c.city,'CA'].filter(function(x){return x;}).join(', '));
   }).join('/');
   window.open(url,'_blank');
@@ -880,7 +880,7 @@ document.getElementById('m-sav').addEventListener('click',function(){
   if(!mC)return;var ed={};
   var fields=['name','addr','addr2','city','state','zip','phone','email'];
   var keys=['name','address','address2','city','state','zip','phone','email'];
-  for(var i=0;i<fields.length;i++){var v=document.getElementById('ef-'+fields[i]).value.trim();if(v)ed[keys[i]]=v;}
+  for(var i=0;i<fields.length;i++){ed[keys[i]]=document.getElementById('ef-'+fields[i]).value.trim();}
   // Auto-assign group from zip
   var newZip=document.getElementById('ef-zip').value.trim();
   var manualGr=parseInt(document.getElementById('ef-grp').value);
