@@ -180,6 +180,17 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 /* ── ZIP HINT ── */
 .zh{background:var(--teal3);border:1px solid rgba(0,229,184,.2);border-radius:var(--r2);padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--teal);display:none}
 
+/* ── TESLA ROLLING ROUTE CARD ── */
+.tesla-card{background:linear-gradient(135deg,rgba(232,33,39,.12),rgba(232,33,39,.06));border:1px solid rgba(232,33,39,.35);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.tesla-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tesla-dot{width:8px;height:8px;border-radius:50%;background:#e82127;box-shadow:0 0 8px #e82127}
+.tesla-lbl{font-size:10px;font-weight:700;color:#e82127;text-transform:uppercase;letter-spacing:1.2px;flex:1}
+.tesla-batch{background:#e82127;color:#fff;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700}
+.tesla-stops{margin-bottom:10px}
+.tesla-btns{display:grid;grid-template-columns:1fr auto;gap:8px}
+.tesla-cont{padding:11px;border-radius:var(--r2);border:none;background:#e82127;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.2px}
+.tesla-clear{padding:11px 14px;border-radius:var(--r2);border:1px solid rgba(232,33,39,.4);background:transparent;color:#e82127;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+
 /* ── SECTION DIVIDER ── */
 .msect{margin-top:20px}
 .msect-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--sub);font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
@@ -245,6 +256,18 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <div id="d-route"><div style="color:var(--sub);font-size:13px;padding:8px 0">Loading...</div></div>
       <button class="btn btn-t" id="btn-map">Open Route</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
+    </div>
+    <div class="tesla-card" id="d-tesla" style="display:none">
+      <div class="tesla-hdr">
+        <div class="tesla-dot"></div>
+        <div class="tesla-lbl">⚡ Tesla Route Active</div>
+        <div class="tesla-batch" id="d-tesla-batch"></div>
+      </div>
+      <div class="tesla-stops" id="d-tesla-stops"></div>
+      <div class="tesla-btns">
+        <button class="tesla-cont" id="d-tesla-cont">Continue Route in Apple Maps</button>
+        <button class="tesla-clear" onclick="clearRollingRoute()">Done</button>
+      </div>
     </div>
     <div class="retry-card" id="d-retry" style="display:none">
       <div class="retry-hdr">
@@ -609,7 +632,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);if(typeof updateNextStopBtn==='function')updateNextStopBtn();
+  rRoute();rRetry(a);rAttn(a);rRolling();if(typeof updateNextStopBtn==='function')updateNextStopBtn();
 }
 
 function rRoute(){
@@ -1373,14 +1396,17 @@ function showMapPicker(stops){
   ttl.textContent='Open '+stops.length+'-stop route with';
   inner.appendChild(ttl);
 
+  var teslaAvail=stops.length>1;
   var opts=[
     {icon:'&#127758;',name:'Google Maps',sub:'All '+stops.length+' stops from your location',url:googleUrl,bg:'rgba(66,133,244,.15)'},
     {icon:'&#63743;',name:'Apple Maps',sub:appleStopNote,url:appleUrl,bg:'rgba(0,212,170,.12)'},
+    {icon:'&#9889;',name:'Tesla / CarPlay',sub:'Rolling route — 4 now, then 3+3, sorted by GPS',handler:function(){startTeslaRoute(stops);},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail},
     {icon:'&#128663;',name:'Waze',sub:'First stop only — '+esc(stops[0].name),url:wazeUrl,bg:'rgba(255,176,32,.12)'}
   ];
 
   for(var i=0;i<opts.length;i++){
     (function(opt){
+      if(opt.hidden)return;
       var row=document.createElement('div');row.className='map-opt';
       var ico=document.createElement('div');ico.className='map-icon';
       ico.style.background=opt.bg;ico.innerHTML=opt.icon;
@@ -1391,8 +1417,8 @@ function showMapPicker(stops){
       row.appendChild(ico);row.appendChild(inf);row.appendChild(arr);
       row.addEventListener('click',function(){
         picker.parentNode.removeChild(picker);
-        window.open(opt.url,'_blank');
-        toast('Opening in '+opt.name);
+        if(opt.handler){opt.handler();}
+        else{window.open(opt.url,'_blank');toast('Opening in '+opt.name);}
       });
       inner.appendChild(row);
     })(opts[i]);
@@ -1539,6 +1565,179 @@ var brr=document.getElementById('btn-run-route');if(brr)brr.addEventListener('cl
 var bcr=document.getElementById('btn-clear-route');
 if(bcr)bcr.addEventListener('click',function(){customRoute=[];renderCustomRoute();});
 
+// ── TESLA ROLLING ROUTE ──────────────────────────────────────────────────────
+// Approximate centroids for SoCal zip codes in customer data [lat, lng]
+var ZIP_LL={
+  '90016':[33.973,-118.359],'90064':[34.040,-118.423],'90065':[34.110,-118.200],
+  '90113':[34.052,-118.244],'90620':[33.863,-118.003],'90680':[33.795,-117.993],
+  '90911':[33.859,-118.068],'91010':[34.139,-117.967],'91105':[34.147,-118.159],
+  '91125':[34.138,-118.123],'91324':[34.239,-118.543],'91706':[34.085,-117.975],
+  '91710':[34.013,-117.688],'91724':[34.091,-117.880],'91730':[34.106,-117.593],
+  '91740':[34.135,-117.865],'91741':[34.134,-117.852],'91745':[33.993,-117.975],
+  '91748':[33.992,-117.892],'91752':[34.003,-117.529],'91761':[34.038,-117.601],
+  '91762':[34.059,-117.651],'91763':[34.068,-117.690],'91765':[34.009,-117.810],
+  '91766':[34.055,-117.750],'91767':[34.082,-117.746],'91768':[34.064,-117.717],
+  '91773':[34.107,-117.819],'91775':[34.103,-118.088],'91776':[34.089,-118.081],
+  '91786':[34.098,-117.649],'91789':[34.021,-117.866],'91901':[32.842,-116.766],
+  '91902':[32.663,-117.002],'91910':[32.640,-117.084],'91911':[32.614,-117.071],
+  '91913':[32.634,-116.974],'91914':[32.655,-116.956],'91932':[32.580,-117.114],
+  '91935':[32.714,-116.879],'91941':[32.776,-117.003],'91945':[32.742,-117.031],
+  '91950':[32.677,-117.098],'91962':[32.830,-116.527],'91977':[32.745,-117.011],
+  '91978':[32.730,-116.997],'91979':[32.740,-116.988],'92003':[33.287,-117.219],
+  '92008':[33.163,-117.329],'92009':[33.123,-117.290],'92010':[33.178,-117.311],
+  '92011':[33.107,-117.302],'92014':[32.957,-117.263],'92018':[33.156,-117.315],
+  '92019':[32.783,-116.939],'92020':[32.794,-116.963],'92021':[32.804,-116.934],
+  '92022':[32.792,-116.963],'92024':[33.037,-117.291],'92025':[33.119,-117.086],
+  '92026':[33.166,-117.102],'92027':[33.126,-117.047],'92028':[33.376,-117.250],
+  '92029':[33.096,-117.134],'92037':[32.847,-117.272],'92040':[32.845,-116.929],
+  '92054':[33.194,-117.376],'92056':[33.211,-117.320],'92058':[33.194,-117.395],
+  '92064':[32.963,-117.036],'92065':[33.042,-116.873],'92067':[33.020,-117.204],
+  '92069':[33.145,-117.161],'92071':[32.838,-116.980],'92074':[32.971,-117.007],
+  '92075':[32.991,-117.272],'92078':[33.152,-117.189],'92079':[33.143,-117.162],
+  '92081':[33.205,-117.232],'92082':[33.218,-117.038],'92083':[33.198,-117.249],
+  '92084':[33.214,-117.253],'92088':[33.200,-117.244],'92101':[32.729,-117.167],
+  '92102':[32.716,-117.132],'92103':[32.750,-117.166],'92104':[32.737,-117.135],
+  '92105':[32.735,-117.107],'92106':[32.725,-117.226],'92107':[32.745,-117.241],
+  '92108':[32.762,-117.139],'92109':[32.793,-117.244],'92110':[32.768,-117.204],
+  '92111':[32.790,-117.177],'92113':[32.707,-117.141],'92114':[32.707,-117.057],
+  '92117':[32.810,-117.207],'92120':[32.788,-117.083],'92121':[32.899,-117.200],
+  '92122':[32.856,-117.217],'92123':[32.810,-117.144],'92126':[32.917,-117.148],
+  '92127':[33.015,-117.107],'92130':[32.949,-117.215],'92131':[32.888,-117.098],
+  '92136':[32.676,-117.131],'92153':[32.547,-117.027],'92154':[32.558,-117.052],
+  '92167':[32.698,-117.245],'92173':[32.547,-117.037],'92182':[32.776,-117.071],
+  '92243':[32.792,-115.563],'92301':[34.577,-117.400],'92334':[34.092,-117.435],
+  '92335':[34.092,-117.435],'92336':[34.117,-117.441],'92337':[34.055,-117.449],
+  '92344':[34.428,-117.299],'92345':[34.426,-117.341],'92376':[34.106,-117.393],
+  '92500':[33.953,-117.396],'92501':[33.983,-117.376],'92502':[33.983,-117.376],
+  '92503':[33.934,-117.458],'92504':[33.933,-117.411],'92507':[33.952,-117.328],
+  '92508':[33.887,-117.289],'92518':[33.878,-117.261],'92530':[33.671,-117.328],
+  '92532':[33.706,-117.367],'92539':[33.551,-116.678],'92545':[33.741,-117.015],
+  '92553':[33.924,-117.228],'92562':[33.574,-117.213],'92563':[33.574,-117.175],
+  '92570':[33.784,-117.228],'92571':[33.789,-117.196],'92583':[33.786,-116.959],
+  '92584':[33.694,-117.199],'92590':[33.521,-117.171],'92591':[33.521,-117.145],
+  '92592':[33.504,-117.083],'92595':[33.598,-117.278],'92618':[33.624,-117.748],
+  '92627':[33.630,-117.898],'92672':[33.428,-117.618],'92691':[33.600,-117.658],
+  '92806':[33.845,-117.832],'92821':[33.917,-117.899],'92831':[33.879,-117.937],
+  '92841':[33.773,-117.958],'92860':[33.931,-117.551],'92879':[33.872,-117.565],
+  '92880':[33.918,-117.574],'92881':[33.851,-117.550],'92882':[33.878,-117.627],
+  '93065':[34.270,-118.781]
+};
+
+function haversine(la1,lo1,la2,lo2){
+  var R=3959,d2r=Math.PI/180;
+  var dLa=(la2-la1)*d2r,dLo=(lo2-lo1)*d2r;
+  var a=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(la1*d2r)*Math.cos(la2*d2r)*Math.sin(dLo/2)*Math.sin(dLo/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function getGPS(cb){
+  if(!navigator.geolocation){cb(null);return;}
+  navigator.geolocation.getCurrentPosition(
+    function(p){cb({lat:p.coords.latitude,lng:p.coords.longitude});},
+    function(){cb(null);},
+    {timeout:6000,maximumAge:120000}
+  );
+}
+
+function stopDist(stop,gps){
+  var zip=stop.zip&&stop.zip.length===5?stop.zip:null;
+  var ll=zip?ZIP_LL[zip]:null;
+  return ll?haversine(gps.lat,gps.lng,ll[0],ll[1]):9999;
+}
+
+function sortByGPS(stops,gps){
+  if(!gps)return stops.slice();
+  return stops.slice().sort(function(a,b){return stopDist(a,gps)-stopDist(b,gps);});
+}
+
+var ROLLING_KEY='hrt_rolling';
+var rollingRoute=null; // {remaining:[...], batchNum:N, total:N}
+
+function loadRolling(){
+  try{var s=localStorage.getItem(ROLLING_KEY);if(s)rollingRoute=JSON.parse(s);}catch(e){}
+}
+function saveRolling(){
+  try{
+    if(rollingRoute)localStorage.setItem(ROLLING_KEY,JSON.stringify(rollingRoute));
+    else localStorage.removeItem(ROLLING_KEY);
+  }catch(e){}
+}
+
+function startTeslaRoute(stops){
+  toast('Getting your location...');
+  getGPS(function(gps){
+    var sorted=sortByGPS(stops,gps);
+    var FIRST=4,REST=3;
+    var batch=sorted.slice(0,FIRST);
+    var remaining=sorted.slice(FIRST);
+    rollingRoute={remaining:remaining,batchNum:1,total:stops.length};
+    saveRolling();
+    openAppleMapsRoute(batch);
+    rRolling();
+    if(!gps)toast('GPS unavailable — using group order');
+    else toast('⚡ Tesla Route started — '+batch.length+' stops');
+  });
+}
+
+function continueRollingRoute(){
+  if(!rollingRoute||!rollingRoute.remaining.length){clearRollingRoute();return;}
+  toast('Getting your location...');
+  getGPS(function(gps){
+    var REST=3;
+    var sorted=sortByGPS(rollingRoute.remaining,gps);
+    var batch=sorted.slice(0,REST);
+    var remaining=sorted.slice(REST);
+    rollingRoute.remaining=remaining;
+    rollingRoute.batchNum++;
+    saveRolling();
+    openAppleMapsRoute(batch);
+    rRolling();
+    if(!gps)toast('GPS unavailable — using last order');
+    else toast('⚡ Batch '+rollingRoute.batchNum+' — '+batch.length+' stops');
+    if(!remaining.length){toast('Last batch — route complete after these stops!');}
+  });
+}
+
+function clearRollingRoute(){
+  rollingRoute=null;saveRolling();
+  var card=document.getElementById('d-tesla');
+  if(card)card.style.display='none';
+  toast('Tesla Route cleared');
+}
+
+function openAppleMapsRoute(stops){
+  var addrs=stops.map(function(s){
+    return [s.address,s.city,'CA'].filter(function(x){return x;}).join(', ');
+  });
+  var url='https://maps.apple.com/?dirflg=d&daddr='+
+    addrs.map(function(a){return a.replace(/ /g,'+');}).join('+to:');
+  window.open(url,'_blank');
+}
+
+function rRolling(){
+  var card=document.getElementById('d-tesla');
+  var contBtn=document.getElementById('d-tesla-cont');
+  var batchEl=document.getElementById('d-tesla-batch');
+  var stopsEl=document.getElementById('d-tesla-stops');
+  if(!card)return;
+  if(!rollingRoute){card.style.display='none';return;}
+  card.style.display='block';
+  var rem=rollingRoute.remaining.length;
+  var done=rollingRoute.total-rem;
+  batchEl.textContent='Batch '+rollingRoute.batchNum+' of '+(rollingRoute.batchNum+Math.ceil(rem/3));
+  if(rem===0){
+    stopsEl.innerHTML='<div style="color:#e82127;font-size:13px;font-weight:600">All '+rollingRoute.total+' stops routed ✓</div>';
+    contBtn.style.display='none';
+  }else{
+    var nextBatch=rollingRoute.remaining.slice(0,3);
+    stopsEl.innerHTML='<div style="font-size:12px;color:var(--sub);margin-bottom:6px">'+rem+' stop'+(rem!==1?'s':'')+' remaining — next '+Math.min(3,rem)+':</div>'+
+      nextBatch.map(function(s){return'<div style="font-size:13px;font-weight:600;padding:3px 0">'+esc(s.name)+' <span style="color:var(--sub);font-weight:400">· '+esc(s.city||'')+'</span></div>';}).join('');
+    contBtn.style.display='block';
+    contBtn.textContent='Continue — Next '+Math.min(3,rem)+' Stops in Apple Maps';
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── PRICING ──────────────────────────────────────────────────────────────────
 var PRICE_KEY='hrt_pricing';
 var priceData=[];
@@ -1651,7 +1850,10 @@ function parsePriceXLSX(buf,fname){
 // ─────────────────────────────────────────────────────────────────────────────
 
 lLoad();
+loadRolling();
 loadPricing();
+var teslaCont=document.getElementById('d-tesla-cont');
+if(teslaCont)teslaCont.addEventListener('click',continueRollingRoute);
 var sg=smartGroup();
 cG=sg;
 document.getElementById('g-lbl').textContent='Grp '+sg;
