@@ -565,6 +565,20 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <input type="file" id="xl-input" accept=".xlsx,.csv" style="display:none">
       <div id="import-status" style="margin-top:10px;font-size:13px;display:none;color:var(--teal)"></div>
     </div>
+    <div id="discrep-card" class="card" style="display:none;margin-top:4px;border:1px solid rgba(255,176,32,.3)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <div class="lbl" style="margin:0;color:var(--amber)">&#9888; Epicor Update List</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:2px">App data is correct — send this to accounting to fix Epicor</div>
+        </div>
+        <span id="discrep-count" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700">0</span>
+      </div>
+      <div id="discrep-list"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="exportDiscrepancyReport()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Export CSV for Accounting</button>
+        <button onclick="clearDiscrepancies()" style="padding:9px 14px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:12px">Clear</button>
+      </div>
+    </div>
     <div id="pend-card" class="pend-card">
       <div class="pend-hdr">
         <span class="pend-title">Pending Contact Changes</span>
@@ -618,7 +632,11 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="lbl">Dashboard Cards</div>
       <div id="dash-toggles"></div>
     </div>
-    <div style="text-align:center;padding:24px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v20 &bull; Southern California</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding-top:16px">
+      <button onclick="showHowToUse()" style="padding:10px 18px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
+      <button onclick="showEOD()" style="padding:10px 18px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
+    </div>
+    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v21 &bull; Southern California</div>
   </div>
 </div>
 
@@ -1147,10 +1165,12 @@ function rGrps(){
     var sizeWarn=gc.length>=13?'<span style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - consider splitting</span>':'';
     var sizeNote=gc.length<8?'<span style="background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - small group</span>':'';
     var gnote=(ST.groupNotes&&ST.groupNotes[g])||'';
-    var gnoteHtml='<div style="margin-top:8px;display:flex;gap:6px" onclick="event.stopPropagation()">'
-      +'<input id="gnote-inp-'+g+'" type="text" value="'+esc(gnote)+'" placeholder="Group note..." style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-family:inherit;outline:none">'
+    var gnoteBanner=gnote?'<div style="background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.25);border-radius:var(--r2);padding:6px 10px;font-size:12px;color:var(--amber);margin-top:6px;display:flex;align-items:center;gap:6px">&#128203; '+esc(gnote)+'</div>':'';
+    var gnoteHtml='<div onclick="event.stopPropagation()">'+gnoteBanner
+      +'<div style="margin-top:6px;display:flex;gap:6px">'
+      +'<input id="gnote-inp-'+g+'" type="text" value="'+esc(gnote)+'" placeholder="Add group note..." style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-family:inherit;outline:none">'
       +'<button onclick="saveGroupNote(\''+g+'\')" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Save</button>'
-      +'</div>';
+      +'</div></div>';
     h+='<div class="grp-row" data-g="'+g+'"><div class="gbadge" style="background:'+col+'">'+g+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Group '+g+' '+sizeWarn+sizeNote+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(cl)+'</div><div style="font-size:11px;margin-top:4px"><span style="color:var(--green)">'+vis+' recent</span> <span style="color:var(--dim)"> | </span><span style="color:var(--red)">'+ov+' overdue</span> <span style="color:var(--dim)"> | </span><span style="color:var(--sub)">'+lastWorkedStr+'</span></div>'+gnoteHtml+'</div><div style="text-align:right;flex-shrink:0"><div class="grp-pct" style="color:'+col+'">'+pct+'%</div><div class="grp-pct-l">done</div><button data-grp="'+g+'" class="btn-sm" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:11px;padding:4px 8px" onclick="event.stopPropagation();routeGroup('+g+')">Route</button></div></div>';
   }
   var gl=document.getElementById('g-list');if(gl)gl.innerHTML=h;
@@ -1944,40 +1964,113 @@ function handleImport(inp){
   else{status.style.color='#ef4444';status.textContent='Use .xlsx or .csv';}
 }
 function runXLSX(buf,fname,status){try{var wb=XLSX.read(buf,{type:'array'});var ws=wb.Sheets[wb.SheetNames[0]];var data=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});var hdrs=data[0].map(function(h){return String(h||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');});doImport(hdrs,data.slice(1).map(function(r){return r.map(function(v){return String(v==null?'':v).trim();});}),fname,status);}catch(e){status.style.color='#ef4444';status.textContent='Error: '+e.message;}}
+var _epicorDiscrep=JSON.parse(localStorage.getItem('hrt_discrep')||'[]');
+
 function doImport(hdrs,rows,fname,status){
-  var COLS={code:['code','customercode','acct'],name:['name','customername','company'],sales2526:['sales2526','ytd'],sales2026:['sales2026','2026'],sales2025:['sales2025','2025'],sales2024:['sales2024','2024'],lifetimeSales:['lifetimesales','lifetime'],address:['address','addr'],city:['city'],zip:['zip','zipcode'],phone:['phone','tel'],email:['email'],group:['group','route']};
-  var ci={};for(var f in COLS){ci[f]=-1;for(var i=0;i<COLS[f].length;i++){for(var j=0;j<hdrs.length;j++){if(hdrs[j]===COLS[f][i]||hdrs[j].indexOf(COLS[f][i])>=0){ci[f]=j;break;}}if(ci[f]>=0)break;}}
-  var updated=0,added=0,skipped=0,a=allC();
+  var COLS={code:['code','customercode','acct'],name:['name','customername','company'],
+    address:['address','addr'],city:['city'],zip:['zip','zipcode'],
+    phone:['phone','tel'],email:['email'],group:['group','route'],
+    lifetimeSales:['lifetimesales','lifetime'],sales2024:['sales2024','2024'],
+    sales2025:['sales2025','2025'],sales2526:['sales2526','ytd','2526']};
+  var ci={};
+  for(var f in COLS){ci[f]=-1;for(var i=0;i<COLS[f].length;i++){for(var j=0;j<hdrs.length;j++){if(hdrs[j]===COLS[f][i]||hdrs[j].indexOf(COLS[f][i])>=0){ci[f]=j;break;}}if(ci[f]>=0)break;}}
+  var added=0,skipped=0,flagged=0,a=allC(),newDiscrep=[];
+  var importDate=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
   for(var i=0;i<rows.length;i++){
     var row=rows[i];if(!row.some(function(v){return v;})){skipped++;continue;}
-    var code=ci.code>=0?row[ci.code].toUpperCase():'',name=ci.name>=0?row[ci.name]:'';
+    var code=ci.code>=0?row[ci.code].toString().toUpperCase().trim():'';
+    var name=ci.name>=0?row[ci.name]:'';
     if(!code&&!name){skipped++;continue;}
-    var ex=null;for(var j=0;j<a.length;j++){if(code&&a[j].code===code){ex=a[j];break;}if(name&&a[j].name.toLowerCase()===name.toLowerCase()){ex=a[j];break;}}
+
+    // Find existing account
+    var ex=null;
+    for(var j=0;j<a.length;j++){
+      if(code&&a[j].code===code){ex=a[j];break;}
+      if(!code&&name&&a[j].name.toLowerCase()===name.toLowerCase()){ex=a[j];break;}
+    }
+
     if(ex){
-      var ed=ST.edits&&ST.edits[ex.code]?JSON.parse(JSON.stringify(ST.edits[ex.code])):{},chg=false;
-      var sf=['name','address','city','zip','phone','email'];
-      var contactF=['address','city','zip','phone','email'];
-      for(var j=0;j<sf.length;j++){
-        if(ci[sf[j]]>=0&&row[ci[sf[j]]]){
-          var isContact=contactF.indexOf(sf[j])>=0;
-          if(isContact&&row[ci[sf[j]]]!==ex[sf[j]]){
-            if(!ST.pendingEdits)ST.pendingEdits={};
-            if(!ST.pendingEdits[ex.code])ST.pendingEdits[ex.code]={};
-            ST.pendingEdits[ex.code][sf[j]]=row[ci[sf[j]]];
-          } else if(!isContact){ed[sf[j]]=row[ci[sf[j]]];chg=true;}
+      // Existing account — compare contact fields, flag differences for Epicor update
+      var contactFields=['name','address','city','zip','phone','email'];
+      var fieldLabels={name:'Name',address:'Address',city:'City',zip:'Zip',phone:'Phone',email:'Email'};
+      var diffs=[];
+      for(var k=0;k<contactFields.length;k++){
+        var fld=contactFields[k];
+        if(ci[fld]<0)continue;
+        var epicorVal=String(row[ci[fld]]||'').trim();
+        var appVal=String((ST.edits&&ST.edits[ex.code]&&ST.edits[ex.code][fld]!=null?ST.edits[ex.code][fld]:ex[fld])||'').trim();
+        if(epicorVal&&epicorVal!==appVal){
+          diffs.push({field:fieldLabels[fld],app:appVal,epicor:epicorVal});
         }
       }
-      var nf=['lifetimeSales','sales2024','sales2025','sales2026','sales2526'];for(var j=0;j<nf.length;j++){if(ci[nf[j]]>=0&&row[ci[nf[j]]]!==''){var v=parseFloat(String(row[ci[nf[j]]]).replace(/[$,]/g,''));if(!isNaN(v)){ed[nf[j]]=v;chg=true;}}}
-      if(ci.group>=0&&row[ci.group]){var g=parseInt(row[ci.group]);if(g>=1&&g<=61){ed.group=g;chg=true;}}
-      if(chg){if(!ST.edits)ST.edits={};ST.edits[ex.code]=ed;updated++;}else skipped++;
-    }else{
+      if(diffs.length){
+        newDiscrep.push({code:ex.code,name:ex.name,date:importDate,diffs:diffs});
+        flagged++;
+      } else {skipped++;}
+    } else {
+      // New account — add to app
       if(!name){skipped++;continue;}
-      var nc={code:code||('IMP'+Date.now().toString().slice(-5)),name:name,group:ci.group>=0&&row[ci.group]?parseInt(row[ci.group])||61:61,stop:999,address:ci.address>=0?row[ci.address]:'',address2:'',city:ci.city>=0?row[ci.city]:'',state:'CA',zip:ci.zip>=0?row[ci.zip]:'',phone:ci.phone>=0?row[ci.phone]:'',email:'',lifetimeSales:0,sales2024:0,sales2025:0,sales2026:0,sales2526:0,distance:0};
-      if(!ST.addedCustomers)ST.addedCustomers=[];ST.addedCustomers.push(nc);added++;
+      var nc={code:code||('IMP'+Date.now().toString().slice(-6)),name:name,
+        group:ci.group>=0&&row[ci.group]?parseInt(row[ci.group])||61:61,
+        stop:999,address:ci.address>=0?row[ci.address]:'',address2:'',
+        city:ci.city>=0?row[ci.city]:'',state:'CA',zip:ci.zip>=0?row[ci.zip]:'',
+        phone:ci.phone>=0?row[ci.phone]:'',email:ci.email>=0?row[ci.email]:'',
+        lifetimeSales:0,sales2024:0,sales2025:0,sales2526:0,distance:0};
+      if(!ST.addedCustomers)ST.addedCustomers=[];
+      ST.addedCustomers.push(nc);added++;
     }
   }
-  lSave();syncUp();rCust();rDash();rGrps();rPendingEdits();
-  status.textContent='Done: '+updated+' updated, '+added+' added, '+skipped+' skipped';
+
+  // Merge new discrepancies (by code — replace if re-imported)
+  var dmap={};
+  for(var i=0;i<_epicorDiscrep.length;i++)dmap[_epicorDiscrep[i].code]=_epicorDiscrep[i];
+  for(var i=0;i<newDiscrep.length;i++)dmap[newDiscrep[i].code]=newDiscrep[i];
+  _epicorDiscrep=Object.values(dmap);
+  localStorage.setItem('hrt_discrep',JSON.stringify(_epicorDiscrep));
+
+  lSave();syncUp();rCust();rDash();rGrps();rDiscrepCard();
+  status.style.color=flagged?'var(--amber)':'var(--teal)';
+  status.textContent=added+' new accounts added, '+flagged+' Epicor discrepancies flagged, '+skipped+' matched/skipped';
+}
+
+function rDiscrepCard(){
+  var card=document.getElementById('discrep-card');if(!card)return;
+  if(!_epicorDiscrep.length){card.style.display='none';return;}
+  card.style.display='block';
+  var cnt=document.getElementById('discrep-count');if(cnt)cnt.textContent=_epicorDiscrep.length;
+  var list=document.getElementById('discrep-list');if(!list)return;
+  list.innerHTML=_epicorDiscrep.map(function(d){
+    var diffRows=d.diffs.map(function(df){
+      return '<div style="display:grid;grid-template-columns:70px 1fr 1fr;gap:4px;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px">'
+        +'<span style="color:var(--sub);font-weight:600">'+df.field+'</span>'
+        +'<span style="color:var(--teal)">&#10003; App: '+esc(df.app||'(blank)')+'</span>'
+        +'<span style="color:var(--amber)">Epicor: '+esc(df.epicor)+'</span>'
+        +'</div>';
+    }).join('');
+    return '<div style="background:var(--bg3);border-radius:var(--r2);padding:10px 12px;margin-bottom:8px">'
+      +'<div style="font-size:13px;font-weight:700;margin-bottom:6px">'+esc(d.name)+'<span style="color:var(--dim);font-size:11px;font-weight:400;margin-left:8px">'+esc(d.code)+' &bull; '+d.date+'</span></div>'
+      +diffRows+'</div>';
+  }).join('');
+}
+
+function exportDiscrepancyReport(){
+  if(!_epicorDiscrep.length){toast('No discrepancies to export');return;}
+  var lines=['Account,Code,Field,App Value (Correct),Epicor Value (Needs Update),Import Date'];
+  _epicorDiscrep.forEach(function(d){
+    d.diffs.forEach(function(df){
+      lines.push([d.name,d.code,df.field,df.app,df.epicor,d.date].map(function(v){return'"'+String(v||'').replace(/"/g,'""')+'"';}).join(','));
+    });
+  });
+  var blob=new Blob([lines.join('\r\n')],{type:'text/csv'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='epicor_updates_'+new Date().toISOString().split('T')[0]+'.csv';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  toast('Report downloaded');
+}
+
+function clearDiscrepancies(){
+  _epicorDiscrep=[];localStorage.removeItem('hrt_discrep');rDiscrepCard();
 }
 
 function goFilter(f){
@@ -2238,16 +2331,33 @@ function renderCustomRoute(){
   for(var i=0;i<customRoute.length;i++){
     var s=customRoute[i];
     var col=s.type==='vend'?'var(--blue)':'var(--teal)';
+    var lastV=s.type==='cust'?(ST.visits[s.id]||[]):[];
+    var lastVisit=lastV.length?lastV[lastV.length-1]:null;
+    var dotCol=lastVisit?(lastVisit.type==='visited'?'var(--green)':'var(--amber)'):'var(--border2)';
+    var visitBtns=s.type==='cust'
+      ?'<button data-crid="'+s.id+'" data-crtype="vis" style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:var(--r2);padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Done</button>'
+       +'<button data-crid="'+s.id+'" data-crtype="na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">N/A</button>'
+      :'';
     h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">'
       +'<div style="width:22px;height:22px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>'
-      +'<div style="width:7px;height:7px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex-shrink:0"></div>'
       +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(s.name)+'</div>'
-      +'<div style="font-size:11px;color:var(--sub)">'+(s.type==='vend'?'Vendor':'Customer')+'</div></div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+(s.type==='vend'?'Vendor':'Customer')+(lastVisit?' &bull; '+(lastVisit.type==='visited'?'<span style="color:var(--green)">Visited</span>':'<span style="color:var(--amber)">N/A</span>'):'')+'</div></div>'
+      +'<div style="display:flex;gap:4px;align-items:center">'+visitBtns
       +'<button data-cridx="'+i+'" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:2px 6px">&#10005;</button>'
-      +'</div>';
+      +'</div></div>';
   }
   el.innerHTML=h;
   if(btn)btn.style.display='block';
+  // Wire visit buttons
+  el.querySelectorAll('[data-crid]').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      var code=this.getAttribute('data-crid');
+      var type=this.getAttribute('data-crtype')==='vis'?'visited':'not_available';
+      mv(code,type);rDash();renderCustomRoute();
+    });
+  });
 }
 
 function runCustomRoute(){
@@ -3240,14 +3350,22 @@ function rRecentlyViewed(){
   var chips=_recentlyViewed.map(function(code){
     var c=map[code];if(!c)return'';
     var d=ds(code);var dot=d===0?'#10b981':d===null||d>14?'#ef4444':'#f59e0b';
-    return'<div onclick="openM(\''+code+'\')" style="flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:6px">'
+    return'<div style="flex-shrink:0;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 6px 5px 12px;display:flex;align-items:center;gap:6px">'
       +'<span style="width:7px;height:7px;border-radius:50%;background:'+dot+';flex-shrink:0;display:inline-block"></span>'
-      +'<span style="font-size:12px;font-weight:600;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis">'+esc(c.name)+'</span>'
+      +'<span onclick="openM(\''+code+'\')" style="font-size:12px;font-weight:600;white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis;cursor:pointer">'+esc(c.name)+'</span>'
+      +'<button data-rvcode="'+code+'" style="background:rgba(16,185,129,.2);color:#10b981;border:none;border-radius:14px;padding:3px 8px;font-size:10px;font-weight:800;cursor:pointer;font-family:inherit;flex-shrink:0">&#10003;</button>'
       +'</div>';
   }).join('');
   el.style.display='block';
   el.innerHTML='<div style="font-size:11px;color:var(--sub);font-weight:700;letter-spacing:.5px;margin-bottom:6px;text-transform:uppercase">Recently Viewed</div>'
-    +'<div class="rv-strip">'+chips+'</div>';
+    +'<div class="rv-strip" id="rv-strip-inner">'+chips+'</div>';
+  document.getElementById('rv-strip-inner').querySelectorAll('[data-rvcode]').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      var code=this.getAttribute('data-rvcode');
+      mv(code,'visited');rDash();
+    });
+  });
 }
 
 /* ── GROUP NOTES ── */
@@ -3337,10 +3455,95 @@ function exportVCard(code){
   URL.revokeObjectURL(url);
 }
 
+/* ── HOW TO USE ── */
+function showHowToUse(){
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:900;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+  var sections=[
+    {icon:'&#127968;',title:'Dashboard',body:'Your home base. Shows today\'s route, weekly goal, streak, hot leads, win-back targets, and a morning brief. Swipe right on any row to mark Visited.'},
+    {icon:'&#128197;',title:'Today\'s Route',body:'Auto-picks the top customers in your active group who are overdue (15+ days). Tap the group arrows to switch groups. Hit "GPS" to sort by distance from you. Tap any row to open the customer. Swipe right = Visited.'},
+    {icon:'&#128269;',title:'Dashboard Search',body:'Tap the magnifying glass in the top-right of the Home tab to search all 610 customers instantly by name, city, or code.'},
+    {icon:'&#128101;',title:'Customer Modal',body:'Tap any customer to open their card. Log visits, set a follow-up, mark as Hot Lead, add a competitor note, save a contact vCard, or view visit history.'},
+    {icon:'&#9733;',title:'Hot Leads',body:'Star any customer as a Hot Lead in their modal. They show up in the Hot Leads card on your dashboard and are highlighted on the route.'},
+    {icon:'&#128203;',title:'Notes & Follow-Ups',body:'Write a note in any customer modal — it shows as a pre-visit reminder next time you open them. Schedule a follow-up date and they\'ll appear in your schedule card.'},
+    {icon:'&#128205;',title:'Groups',body:'10–12 customers per geographic group. Tap a group to see details. Add a group note (shows as a banner on your route). Tap "Route" to push a group to your nav app.'},
+    {icon:'&#128190;',title:'Custom Route',body:'In the Customers tab, scroll right on filter chips to find custom route builder. Search and add any mix of customers and vendors. Tap Done/N/A to log stops right from the list.'},
+    {icon:'&#128202;',title:'Monthly Report',body:'Settings → Monthly Report. See total visits, N/A counts, and your top accounts visited for the month.'},
+    {icon:'&#128229;',title:'Excel Import',body:'Settings → Import Excel or CSV. New accounts are added automatically. If your app info differs from Epicor, a discrepancy list is generated — export it as CSV for accounting.'},
+    {icon:'&#128194;',title:'Pricing Tab',body:'Upload your Epicor price sheet (Excel or CSV). Set your margin % and sell prices calculate instantly. Search by item code or description.'},
+    {icon:'&#9889;',title:'Tesla / Rolling Route',body:'Opens 4 stops in Maps, then when you return it loads the next 3+3 automatically. Best for all-day routes.'},
+  ];
+  var html='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;overflow-y:auto">'
+    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px"></div>'
+    +'<div style="font-size:20px;font-weight:800;margin-bottom:16px">&#128214; How to Use HC Routes</div>'
+    +sections.map(function(s){
+      return '<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">'
+        +'<div style="font-size:22px;flex-shrink:0;width:30px;text-align:center">'+s.icon+'</div>'
+        +'<div><div style="font-size:14px;font-weight:700;margin-bottom:3px">'+s.title+'</div>'
+        +'<div style="font-size:12px;color:var(--sub);line-height:1.5">'+s.body+'</div></div>'
+        +'</div>';
+    }).join('')
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;margin-top:16px;padding:13px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+    +'</div>';
+  sheet.innerHTML=html;
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+
+/* ── EOD SUMMARY ── */
+function showEOD(){
+  var now=new Date(),today=now.toISOString().split('T')[0];
+  var all=allC(),vis=[],naList=[],skippedL=[];
+  all.forEach(function(c){
+    var logs=ST.visits[c.code]||[];
+    var todayLogs=logs.filter(function(l){return l.date.startsWith(today);});
+    if(!todayLogs.length)return;
+    var last=todayLogs[todayLogs.length-1];
+    if(last.type==='visited')vis.push(c);
+    else naList.push(c);
+  });
+  var dateStr=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  var summary='HC Routes - EOD Summary\n'+dateStr+'\n\n'
+    +'Visited ('+vis.length+'): '+vis.map(function(c){return c.name;}).join(', ')+'\n\n'
+    +'Not Available ('+naList.length+'): '+naList.map(function(c){return c.name;}).join(', ')+'\n\n'
+    +'Total stops: '+(vis.length+naList.length)+' | Goal: '+(localStorage.getItem('hrt_wg')||30)+'/wk';
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:900;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+    +'<div style="font-size:20px;font-weight:800;margin-bottom:4px">&#128202; End of Day</div>'
+    +'<div style="font-size:12px;color:var(--sub);margin-bottom:16px">'+dateStr+'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">'
+      +'<div style="background:var(--bg3);border-radius:var(--r);padding:12px;text-align:center"><div style="font-size:26px;font-weight:800;color:var(--green)">'+vis.length+'</div><div style="font-size:11px;color:var(--sub)">Visited</div></div>'
+      +'<div style="background:var(--bg3);border-radius:var(--r);padding:12px;text-align:center"><div style="font-size:26px;font-weight:800;color:var(--amber)">'+naList.length+'</div><div style="font-size:11px;color:var(--sub)">N/A</div></div>'
+      +'<div style="background:var(--bg3);border-radius:var(--r);padding:12px;text-align:center"><div style="font-size:26px;font-weight:800;color:var(--teal)">'+(vis.length+naList.length)+'</div><div style="font-size:11px;color:var(--sub)">Total</div></div>'
+    +'</div>'
+    +(vis.length?'<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Visited</div>'+vis.map(function(c){return'<div style="font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)">&#10003; '+esc(c.name)+'</div>';}).join('')+'</div>':'')
+    +(naList.length?'<div style="margin-bottom:16px"><div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Not Available</div>'+naList.map(function(c){return'<div style="font-size:13px;padding:4px 0;border-bottom:1px solid var(--border);color:var(--amber)">&#8212; '+esc(c.name)+'</div>';}).join('')+'</div>':'')
+    +'<div style="display:flex;gap:8px">'
+    +'<button id="eod-share" style="flex:1;padding:12px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#128172; Share Summary</button>'
+    +'<button id="eod-copy" style="padding:12px 16px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Copy</button>'
+    +'</div>'
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;margin-top:10px;padding:12px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+    +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+  var sumText=summary;
+  document.getElementById('eod-share').addEventListener('click',function(){
+    if(navigator.share){navigator.share({title:'HC Routes EOD',text:sumText}).catch(function(){});}
+    else{navigator.clipboard&&navigator.clipboard.writeText(sumText);toast('Copied to clipboard');}
+  });
+  document.getElementById('eod-copy').addEventListener('click',function(){
+    if(navigator.clipboard){navigator.clipboard.writeText(sumText).then(function(){toast('Copied!');});}
+    else{var ta=document.createElement('textarea');ta.value=sumText;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copied!');}
+  });
+}
+
 lLoad();
 loadRolling();
 loadPricing();
 rPendingEdits();
+rDiscrepCard();
 var teslaCont=document.getElementById('d-tesla-cont');
 if(teslaCont)teslaCont.addEventListener('click',continueRollingRoute);
 var sg=smartGroup();
