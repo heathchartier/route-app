@@ -195,6 +195,41 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .msect{margin-top:20px}
 .msect-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--sub);font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 
+/* ── PENDING EDITS ── */
+.pend-card{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(251,191,36,.04));border:1px solid rgba(251,191,36,.35);border-radius:var(--r);padding:16px;margin-bottom:12px;display:none}
+.pend-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.pend-title{font-size:14px;font-weight:700;color:#fbbf24;flex:1}
+.pend-count{background:#fbbf24;color:#000;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700}
+.pend-bulk{display:flex;gap:8px}
+.pend-aall{padding:7px 14px;border-radius:var(--r2);border:none;background:#fbbf24;color:#000;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.pend-rall{padding:7px 14px;border-radius:var(--r2);border:1px solid rgba(251,191,36,.4);background:transparent;color:#fbbf24;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.pend-cust{margin-bottom:14px;border-bottom:1px solid rgba(251,191,36,.15);padding-bottom:14px}
+.pend-cust:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.pend-cname{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;cursor:pointer}
+.pend-cname:active{opacity:.7}
+.pend-row{display:flex;align-items:center;gap:8px;padding:6px 0;flex-wrap:wrap}
+.pend-field{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);width:52px;flex-shrink:0}
+.pend-old{font-size:12px;color:var(--dim);text-decoration:line-through;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pend-arrow{font-size:11px;color:var(--sub);flex-shrink:0}
+.pend-new{font-size:12px;font-weight:600;color:#fbbf24;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pend-ok{padding:4px 10px;border-radius:6px;border:none;background:rgba(16,185,129,.2);color:#10b981;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.pend-no{padding:4px 10px;border-radius:6px;border:none;background:rgba(239,68,68,.15);color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.nav-badge{background:#ef4444;color:#fff;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;position:absolute;top:6px;right:4px;min-width:16px;text-align:center;line-height:14px;display:none}
+.rn2{font-size:11px;color:var(--amber);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.eod-sheet{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
+.eod-inner{background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:80vh;overflow-y:auto}
+.eod-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+.eod-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.eod-sub{font-size:12px;color:var(--sub);margin-bottom:16px}
+.eod-sec{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--teal);margin:14px 0 6px}
+.eod-row{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px}
+.eod-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.eod-name{font-weight:600;flex:1}
+.eod-note{font-size:11px;color:var(--sub);margin-top:2px}
+.eod-copy{width:100%;margin-top:16px;padding:12px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.eod-close{width:100%;margin-top:8px;padding:10px;border-radius:var(--r2);background:transparent;color:var(--sub);border:1px solid var(--border2);font-size:13px;cursor:pointer;font-family:inherit}
+.btn-eod{background:transparent;border:1px solid var(--border2);color:var(--sub);padding:7px 14px;border-radius:var(--r2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px}
+
 /* ── PRICING TABLE ── */
 .price-ctrl{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
 .price-margin-wrap{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:8px 14px;flex-shrink:0}
@@ -228,6 +263,43 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 /* ── MODAL CONTACT INFO ── */
 .contact-row{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px}
 .contact-icon{width:32px;height:32px;border-radius:var(--r3);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+/* streak */
+.streak-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 0 4px;flex-wrap:wrap}
+.streak-chip{display:flex;align-items:center;gap:5px;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.35);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:#fb923c}
+.streak-chip.cold{background:var(--bg3);border-color:var(--border2);color:var(--sub)}
+.streak-num{font-size:18px;font-weight:800}
+/* trend */
+.trend-up{color:#10b981;font-size:11px;font-weight:800}
+.trend-dn{color:#ef4444;font-size:11px;font-weight:800}
+.quiet-flag{display:inline-block;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:6px;font-size:10px;font-weight:700;padding:2px 8px;margin-top:6px}
+/* next stop button label */
+#btn-next-stop{transition:background .2s}
+
+/* ── TIER BADGES ── */
+.tier-a{display:inline-block;background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
+.tier-b{display:inline-block;background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
+.tier-c{display:inline-block;background:var(--bg3);color:var(--sub);border:1px solid var(--border);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
+
+/* ── WEEKLY GOAL ── */
+.goal-bar-wrap{background:var(--bg3);border-radius:6px;height:8px;overflow:hidden;margin:8px 0 4px}
+.goal-bar{height:100%;border-radius:6px;transition:width .5s ease;background:linear-gradient(90deg,var(--teal),#00c9a5)}
+.goal-row{display:flex;justify-content:space-between;align-items:center}
+.goal-pct{font-size:20px;font-weight:800;color:var(--teal);letter-spacing:-1px}
+.goal-lbl{font-size:11px;color:var(--sub);margin-top:2px}
+.goal-edit{background:transparent;border:1px solid var(--border2);border-radius:6px;padding:4px 10px;color:var(--sub);font-size:11px;cursor:pointer;font-family:inherit}
+
+/* ── COVERAGE MAP ── */
+.cov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin-top:10px}
+.cov-cell{border-radius:var(--r2);padding:10px 6px;text-align:center;cursor:pointer;transition:opacity .15s;border:1px solid transparent}
+.cov-cell:active{opacity:.7}
+.cov-num{font-size:20px;font-weight:800;letter-spacing:-1px}
+.cov-sub{font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px;font-weight:600}
+.cov-legend{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}
+.cov-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub)}
+.cov-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.view-toggle{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:3px;gap:3px}
+.vtab{padding:6px 14px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);background:transparent;transition:all .2s}
+.vtab.on{background:var(--card);color:var(--text);border:1px solid var(--border2)}
 </style>
 </head>
 <body>
@@ -243,6 +315,14 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <div class="stat"><div class="stat-n" style="color:var(--green)">0</div><div class="stat-l">Visited</div></div>
       <div class="stat"><div class="stat-n" style="color:var(--amber)">0</div><div class="stat-l">Not Avail</div></div>
       <div class="stat"><div class="stat-n" style="color:var(--red)">0</div><div class="stat-l">Overdue</div></div>
+    </div>
+    <div class="streak-bar" id="d-streak"></div>
+    <div class="card" id="d-goal-card">
+      <div class="goal-row">
+        <div><div class="lbl" style="margin:0">Weekly Goal</div><div class="goal-lbl" id="d-goal-sub">0 of 30 visits this week</div></div>
+        <div style="text-align:right"><div class="goal-pct" id="d-goal-pct">0%</div><button class="goal-edit" onclick="promptGoal()">Edit Goal</button></div>
+      </div>
+      <div class="goal-bar-wrap"><div class="goal-bar" id="d-goal-bar" style="width:0%"></div></div>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -281,6 +361,17 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <div class="lbl">Needs Attention</div>
       <div id="d-attn-list"></div>
     </div>
+    <div class="card" id="d-idle" style="display:none">
+      <div class="lbl" style="color:var(--red)">&#128680; Groups Not Worked</div>
+      <div id="d-idle-list"></div>
+    </div>
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-weight:700;font-size:14px">End of Day</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:2px">Summary of today's visits</div>
+      </div>
+      <button class="btn-eod" onclick="showEOD()">View Summary</button>
+    </div>
     <div class="card">
       <div class="card-hdr">
         <div class="lbl" style="margin:0">Custom Route</div>
@@ -311,6 +402,9 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <button class="chip" data-f="active">Active</button>
       <button class="chip" data-f="hot">Hot</button>
       <button class="chip" data-f="never">Never</button>
+      <button class="chip" data-f="tier_a">A Tier</button>
+      <button class="chip" data-f="tier_b">B Tier</button>
+      <button class="chip" data-f="tier_c">C Tier</button>
     </div>
   </div>
   <div class="body">
@@ -321,10 +415,16 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 
 <div id="p-grps" style="display:none;padding-bottom:80px">
   <div class="hdr">
-    <h1>Route Groups</h1>
-    <div class="sub">61 groups across Southern California</div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h1>Route Groups</h1><div class="sub">61 groups across Southern California</div></div>
+      <div class="view-toggle">
+        <button class="vtab on" id="vt-list" onclick="setGrpView('list')">List</button>
+        <button class="vtab" id="vt-map" onclick="setGrpView('map')">Map</button>
+      </div>
+    </div>
   </div>
   <div class="body" id="g-list"></div>
+  <div class="body" id="g-map" style="display:none"></div>
 </div>
 
 <div id="p-set" style="display:none;padding-bottom:80px">
@@ -342,6 +442,18 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       </div>
       <input type="file" id="xl-input" accept=".xlsx,.csv" style="display:none">
       <div id="import-status" style="margin-top:10px;font-size:13px;display:none;color:var(--teal)"></div>
+    </div>
+    <div id="pend-card" class="pend-card">
+      <div class="pend-hdr">
+        <span class="pend-title">Pending Contact Changes</span>
+        <span class="pend-count" id="pend-count">0</span>
+      </div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:12px">These address/phone/email changes came from your Excel import. Review and approve each one.</div>
+      <div class="pend-bulk">
+        <button class="pend-aall" onclick="approveAllPending()">Approve All</button>
+        <button class="pend-rall" onclick="rejectAllPending()">Reject All</button>
+      </div>
+      <div id="pend-list"></div>
     </div>
         <div class="card" style="margin-top:4px">
       <div class="lbl" style="color:var(--blue)">Add Vendor</div>
@@ -424,7 +536,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
   <a id="nb-grps" data-p="grps"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>Groups</a>
   <a id="nb-vend" data-p="vend"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Vendors</a>
   <a id="nb-price" data-p="price"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a2 2 0 012-2z"/></svg>Pricing</a>
-  <a id="nb-set" data-p="set"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+  <a id="nb-set" data-p="set" style="position:relative"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings<span id="pend-badge" class="nav-badge" style="display:none"></span></a>
 </nav>
 
 <div class="ov" id="ov">
@@ -590,19 +702,65 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
+  else if(p==='set')rPendingEdits();
 }
 
 function smartGroup(){
   var a=allC(),groups={};
+  var today=new Date(),dow=today.getDay(); // 0=Sun,1=Mon...
+
+  // Base score: unvisited/overdue customers weighted by sales
   for(var i=0;i<a.length;i++){
     var c=a[i];if(!groups[c.group])groups[c.group]=0;
     var d=ds(c.code);
     if(d>=1000000)groups[c.group]+=10+(c.lifetimeSales/10000);
     else if(d>45)groups[c.group]+=5+(c.lifetimeSales/20000);
   }
+
+  // Build group-level recency: days since ANY customer in group was visited
+  var grpLastVisit={};
+  for(var code in ST.visits){
+    var logs=ST.visits[code]||[];
+    for(var j=logs.length-1;j>=0;j--){
+      if(logs[j].type!=='visited')continue;
+      var cust=null;for(var i=0;i<a.length;i++){if(a[i].code===code){cust=a[i];break;}}
+      if(!cust)break;
+      var daysAgo=Math.floor((Date.now()-new Date(logs[j].date))/864e5);
+      if(grpLastVisit[cust.group]===undefined||daysAgo<grpLastVisit[cust.group])grpLastVisit[cust.group]=daysAgo;
+      break;
+    }
+  }
+
+  // Day-of-week bonus: boost groups not worked on this weekday in the last 4 weeks
+  var grpDowHistory={};
+  for(var code in ST.visits){
+    var logs=ST.visits[code]||[];
+    for(var j=0;j<logs.length;j++){
+      if(logs[j].type!=='visited')continue;
+      var visitDate=new Date(logs[j].date);
+      var daysAgo2=Math.floor((Date.now()-visitDate)/864e5);
+      if(daysAgo2>28)continue;
+      var cust2=null;for(var i=0;i<a.length;i++){if(a[i].code===code){cust2=a[i];break;}}
+      if(!cust2)continue;
+      if(!grpDowHistory[cust2.group])grpDowHistory[cust2.group]={};
+      grpDowHistory[cust2.group][visitDate.getDay()]=1;
+    }
+  }
+
   var keys=Object.keys(groups);
+  for(var i=0;i<keys.length;i++){
+    var g=keys[i];
+    // Recency boost: prefer groups not touched in >7 days
+    var lastD=grpLastVisit[g];
+    if(lastD===undefined)groups[g]+=8;       // never visited group
+    else if(lastD>14)groups[g]+=6;
+    else if(lastD>7)groups[g]+=3;
+    else if(lastD<=2)groups[g]-=5;           // worked very recently, de-prioritize
+    // Day-of-week bonus: group not normally worked today
+    if(!grpDowHistory[g]||!grpDowHistory[g][dow])groups[g]+=4;
+  }
+
   keys.sort(function(a,b){return groups[b]-groups[a];});
-  var today=new Date();
   var seed=today.getFullYear()*10000+(today.getMonth()+1)*100+today.getDate();
   var last=parseInt(localStorage.getItem('hrt_lg')||'0');
   var cands=keys.slice(0,5);
@@ -632,7 +790,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rRolling();if(typeof updateNextStopBtn==='function')updateNextStopBtn();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();
 }
 
 function rRoute(){
@@ -651,10 +809,12 @@ function rRoute(){
   for(var i=0;i<stops.length;i++){
     var c=stops[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var meta=d>=1000000?'Never':lv&&lv.type==='not_available'?'Retry':d+'d ago';
+    var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
+    var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>55?note.slice(0,55)+'…':note)+'</div>':'';
     h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
       '<div class="snum">'+( i+1)+'</div>'+
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
-      '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div></div>'+
+      '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+noteHtml+'</div>'+
       '<div class="vbs">'+
       '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
       '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
@@ -716,6 +876,51 @@ function rAttn(a){
   document.getElementById('d-attn-list').innerHTML=h;
 }
 
+function rIdle(a){
+  var card=document.getElementById('d-idle');
+  var list=document.getElementById('d-idle-list');
+  if(!card||!list)return;
+  // Find the most recent visit date per group
+  var grpLast={},grpCities={};
+  for(var i=0;i<a.length;i++){
+    var c=a[i],g=c.group,logs=ST.visits[c.code]||[];
+    if(!grpCities[g])grpCities[g]=c.city||'';
+    for(var j=logs.length-1;j>=0;j--){
+      if(logs[j].type==='visited'){
+        var t=new Date(logs[j].date).getTime();
+        if(!grpLast[g]||t>grpLast[g])grpLast[g]=t;
+        break;
+      }
+    }
+  }
+  var now=Date.now(),THRESH=21*86400000,idle=[];
+  var groups={};
+  for(var i=0;i<a.length;i++){var g=a[i].group;if(!groups[g])groups[g]=0;groups[g]++;}
+  for(var g in groups){
+    var last=grpLast[g]||0;
+    var age=Math.round((now-last)/86400000);
+    if(age>=21)idle.push({g:+g,age:age,city:grpCities[g]||'',count:groups[g]});
+  }
+  if(!idle.length){card.style.display='none';return;}
+  idle.sort(function(a,b){return b.age-a.age;});
+  idle=idle.slice(0,5);
+  card.style.display='block';
+  var h='';
+  for(var i=0;i<idle.length;i++){
+    var x=idle[i];
+    var label=x.age>=1000000||!grpLast[x.g]?'Never worked':'Last worked '+x.age+'d ago';
+    var col=x.age>42?'var(--red)':'var(--amber)';
+    h+='<div class="row" style="cursor:pointer" onclick="go(\'grps\')">'
+      +'<div class="gbadge" style="background:'+col+';font-size:11px;min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-weight:800;color:#fff;flex-shrink:0">'+x.g+'</div>'
+      +'<div class="ri">'
+        +'<div class="rn">Group '+x.g+' &bull; '+x.count+' stops</div>'
+        +'<div class="rm" style="color:'+col+'">'+label+(x.city?' &bull; '+esc(x.city):'')+'</div>'
+      +'</div>'
+    +'</div>';
+  }
+  list.innerHTML=h;
+}
+
 function rCust(){
   var a=allC(),f=[],q=cS.toLowerCase();
   for(var i=0;i<a.length;i++){
@@ -729,6 +934,9 @@ function rCust(){
     else if(cF==='hot'){if(!ST.hot[c.code])continue;}
     else if(cF==='never'){if(ds(c.code)<1000000)continue;}
     else if(cF==='scheduled'){var td=new Date().toISOString().split('T')[0];if(!ST.scheduled||!ST.scheduled[c.code]||ST.scheduled[c.code].date<td)continue;}
+    else if(cF==='tier_a'){if(getTier(c)!=='A')continue;}
+    else if(cF==='tier_b'){if(getTier(c)!=='B')continue;}
+    else if(cF==='tier_c'){if(getTier(c)!=='C')continue;}
     f.push(c);
   }
   fc=f;
@@ -741,7 +949,9 @@ function rCPage(){
   for(var i=0;i<shown.length;i++){
     var c=shown[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var meta=d>=1000000?'Never':(lv.type==='not_available'?'N/A':'Visited')+' '+d+'d';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div></div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
+    var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
+    var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>60?note.slice(0,60)+'…':note)+'</div>':'';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
   }
   var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
   var cm=document.getElementById('c-more');if(cm)cm.style.display=fc.length>PG*(pg+1)?'block':'none';
@@ -771,10 +981,20 @@ function openM(code){
   if(!c)return;
   mC=code;
   var mn=document.getElementById('m-n');if(mn)mn.textContent=c.name;
-  var mc=document.getElementById('m-c');if(mc)mc.textContent=c.code+' / Group '+c.group;
+  var mc=document.getElementById('m-c');if(mc)mc.innerHTML=esc(c.code)+' / Group '+c.group+' '+tierBadge(c);
   var addr=[c.address,c.address2,c.city,'CA',c.zip].filter(function(x){return x;}).join(', ');
   var ms=document.getElementById('m-s');
-  if(ms)ms.innerHTML=[['Lifetime',c.lifetimeSales],['2024',c.sales2024],['2025',c.sales2025],['YTD',c.sales2526]].map(function(x){return'<div class="sbox"><div class="sbl">'+x[0]+'</div><div class="sbv" style="'+( x[0]==='YTD'?'color:var(--teal)':'')+'">'+fmt(x[1])+'</div></div>';}).join('');
+  // Trend: compare current year (sales2526) vs prior year (sales2025)
+  var trendHtml='';
+  if(c.sales2025>0&&c.sales2526>=0){
+    var ratio=c.sales2526/c.sales2025;
+    if(ratio>=1.05)trendHtml='<span class="trend-up">&#9650; '+Math.round((ratio-1)*100)+'% vs last yr</span>';
+    else if(ratio<0.80)trendHtml='<span class="trend-dn">&#9660; '+Math.round((1-ratio)*100)+'% vs last yr</span>';
+  }
+  // Quiet account: used to spend, now isn't
+  var quietHtml='';
+  if(c.lifetimeSales>15000&&c.sales2526<500)quietHtml='<div class="quiet-flag">&#9888; Account Going Quiet</div>';
+  if(ms)ms.innerHTML=[['Lifetime',c.lifetimeSales],['2024',c.sales2024],['2025',c.sales2025],['YTD',c.sales2526]].map(function(x){return'<div class="sbox"><div class="sbl">'+x[0]+'</div><div class="sbv" style="'+( x[0]==='YTD'?'color:var(--teal)':'')+'">'+fmt(x[1])+'</div></div>';}).join('')+(trendHtml||quietHtml?'<div style="width:100%;margin-top:6px">'+trendHtml+quietHtml+'</div>':'');
   var mh=document.getElementById('m-hot');if(mh)mh.textContent=ST.hot[code]?'Remove Hot':'Hot Lead';
   var mn2=document.getElementById('m-note');if(mn2)mn2.value=(ST.notes&&ST.notes[code])||'';;
   var mgm=document.getElementById('m-gm');if(mgm)mgm.href='https://www.google.com/maps/search/'+encodeURIComponent(addr);
@@ -836,16 +1056,81 @@ function syncUp(){
   },1500);
 }
 
+// ── STREAK ─────────────────────────────────────────────────────────────────
+function calcStreak(){
+  // Walk backwards from today counting consecutive days with ≥1 visit
+  var days={};
+  for(var code in ST.visits){
+    var logs=ST.visits[code]||[];
+    for(var i=0;i<logs.length;i++){
+      if(logs[i].type==='visited'){
+        var d=new Date(logs[i].date).toDateString();
+        days[d]=1;
+      }
+    }
+  }
+  var streak=0,d=new Date();
+  // If today has no visits yet, start counting from yesterday
+  if(!days[d.toDateString()])d.setDate(d.getDate()-1);
+  while(days[d.toDateString()]){streak++;d.setDate(d.getDate()-1);}
+  return streak;
+}
+function rStreak(){
+  var el=document.getElementById('d-streak');if(!el)return;
+  var streak=calcStreak();
+  // Count this week's visits (Mon–today)
+  var now=new Date(),weekVisits=0;
+  var mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));mon.setHours(0,0,0,0);
+  for(var code in ST.visits){
+    var logs=ST.visits[code]||[];
+    for(var i=0;i<logs.length;i++){
+      if(logs[i].type==='visited'&&new Date(logs[i].date)>=mon)weekVisits++;
+    }
+  }
+  var streakChip=streak>0
+    ?'<div class="streak-chip"><span>&#128293;</span><span class="streak-num">'+streak+'</span><span>day streak</span></div>'
+    :'<div class="streak-chip cold"><span>&#10052;</span><span>No streak yet</span></div>';
+  var weekChip='<div class="streak-chip" style="background:rgba(74,158,255,.1);border-color:rgba(74,158,255,.3);color:var(--blue)"><span>&#128200;</span><span class="streak-num">'+weekVisits+'</span><span>this week</span></div>';
+  el.innerHTML=streakChip+weekChip;
+}
+
+// ── NEXT STOP BUTTON ───────────────────────────────────────────────────────
+function updateNextStopBtn(){
+  var btn=document.getElementById('btn-next-stop');if(!btn)return;
+  var a=allC(),gc=[];
+  for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
+  var unvisited=gc.filter(function(c){
+    var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
+    if(lv&&lv.type==='not_available')return ds(c.code)>=2;
+    return ds(c.code)>14||ds(c.code)>=1000000;
+  });
+  unvisited.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
+  if(!unvisited.length){btn.style.display='none';return;}
+  btn.style.display='block';
+  btn.textContent='Next: '+unvisited[0].name+' ›';
+  btn._nextCode=unvisited[0].code;
+}
+
+function zipToGroup(zip){
+  if(!zip)return 61;
+  var a=CUSTOMERS_BASE.concat(ST.addedCustomers||[]);
+  var tally={};
+  for(var i=0;i<a.length;i++){if((a[i].zip||'')==zip){var g=a[i].group;tally[g]=(tally[g]||0)+1;}}
+  var best=61,bestN=0;
+  for(var g in tally){if(tally[g]>bestN){bestN=tally[g];best=+g;}}
+  return best;
+}
 function addCust(){
   var name=document.getElementById('a-name').value.trim();
   if(!name){toast('Name required');return;}
-  var nc={code:'NEW'+Date.now().toString().slice(-6),name:name,group:parseInt(document.getElementById('a-grp').value)||61,stop:999,address:document.getElementById('a-addr').value.trim(),address2:'',city:document.getElementById('a-city').value.trim(),state:'CA',zip:'',phone:document.getElementById('a-ph').value.trim(),email:'',lifetimeSales:0,sales2024:0,sales2025:0,sales2026:0,sales2526:0,distance:0};
+  var zip=document.getElementById('a-zip').value.trim();
+  var grp=zipToGroup(zip);
+  var nc={code:'NEW'+Date.now().toString().slice(-6),name:name,group:grp,stop:999,address:document.getElementById('a-addr').value.trim(),address2:'',city:document.getElementById('a-city').value.trim(),state:'CA',zip:zip,phone:document.getElementById('a-ph').value.trim(),email:'',lifetimeSales:0,sales2024:0,sales2025:0,sales2026:0,sales2526:0,distance:0};
   if(!ST.addedCustomers)ST.addedCustomers=[];ST.addedCustomers.push(nc);lSave();syncUp();
-  // Warn if group is getting large
   var grpCustomers=allC().filter(function(c){return c.group===nc.group;});
-  var msg='Added: '+name+' to Group '+nc.group;
-  if(grpCustomers.length>=13)msg+=' (Group '+nc.group+' now has '+grpCustomers.length+' stops - consider splitting)';
-  ['a-name','a-addr','a-city','a-ph','a-grp'].forEach(function(id){document.getElementById(id).value='';});
+  var msg='Added '+name+' → Group '+nc.group+(zip?' (zip '+zip+')':'');
+  if(grpCustomers.length>=13)msg+=' — Group '+nc.group+' now has '+grpCustomers.length+' stops, consider splitting';
+  ['a-name','a-addr','a-city','a-ph','a-zip'].forEach(function(id){document.getElementById(id).value='';});
   toast(msg);rCust();rGrps();
 }
 
@@ -879,7 +1164,7 @@ var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',func
 });
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===this)closeM();});
 document.getElementById('m-cls').addEventListener('click',closeM);
-document.getElementById('m-vis').addEventListener('click',function(){if(!mC)return;mv(mC,'visited');if(ST.scheduled&&ST.scheduled[mC])delete ST.scheduled[mC];lSave();syncUp();toast('Visited');openM(mC);rDash();rCust();});
+document.getElementById('m-vis').addEventListener('click',function(){if(!mC)return;mv(mC,'visited');if(ST.scheduled&&ST.scheduled[mC])delete ST.scheduled[mC];lSave();syncUp();toast('Visited ✓');openM(mC);rDash();rCust();rStreak();updateNextStopBtn();});
 document.getElementById('m-na').addEventListener('click',function(){
   if(!mC)return;
   mv(mC,'not_available');
@@ -991,7 +1276,7 @@ document.addEventListener('click',function(e){
   var t=e.target,action=t.getAttribute('data-action'),code=t.getAttribute('data-code');
   if(!action){var p=t.parentElement;while(p&&!action){action=p.getAttribute('data-action');code=p.getAttribute('data-code');p=p.parentElement;}}
   if(action==='open'&&code)openM(code);
-  else if(action==='vis'&&code){e.stopPropagation();mv(code,'visited');if(ST.scheduled&&ST.scheduled[code])delete ST.scheduled[code];lSave();syncUp();var a=allC(),cn='';for(var i=0;i<a.length;i++){if(a[i].code===code){cn=a[i].name;break;}}toast('Visited: '+cn);rCust();rDash();}
+  else if(action==='vis'&&code){e.stopPropagation();mv(code,'visited');if(ST.scheduled&&ST.scheduled[code])delete ST.scheduled[code];lSave();syncUp();var a=allC(),cn='';for(var i=0;i<a.length;i++){if(a[i].code===code){cn=a[i].name;break;}}toast('Visited: '+cn);rCust();rDash();rStreak();updateNextStopBtn();}
   else if(action==='na'&&code){
     e.stopPropagation();
     mv(code,'not_available');
@@ -1074,7 +1359,7 @@ function doImport(hdrs,rows,fname,status){
       if(!ST.addedCustomers)ST.addedCustomers=[];ST.addedCustomers.push(nc);added++;
     }
   }
-  lSave();syncUp();rCust();rDash();rGrps();
+  lSave();syncUp();rCust();rDash();rGrps();rPendingEdits();
   status.textContent='Done: '+updated+' updated, '+added+' added, '+skipped+' skipped';
 }
 
@@ -1245,19 +1530,23 @@ function autoAssignGroup(zip){
 
 // ── NEXT STOP BUTTON ────────────────────────────────────────────────
 function goNextStop(){
-  var a=allC(),gc=[];
-  for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
-  // Find first unvisited stop sorted by sales
-  var unvisited=gc.filter(function(c){
-    var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
-    if(lv&&lv.type==='not_available')return ds(c.code)>=2;
-    return ds(c.code)>14||ds(c.code)>=1000000;
-  });
-  unvisited.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
-  if(!unvisited.length){toast('All done in Group '+cG+'!');return;}
-  var next=unvisited[0];
-  var addr=[next.address,next.city,'CA'].filter(function(x){return x;}).join(', ');
-  showMapPicker([next]);
+  // Use the code stored on the button if available (already computed by updateNextStopBtn)
+  var btn=document.getElementById('btn-next-stop');
+  var code=btn&&btn._nextCode;
+  if(!code){
+    var a=allC(),gc=[];
+    for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
+    var unvisited=gc.filter(function(c){
+      var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
+      if(lv&&lv.type==='not_available')return ds(c.code)>=2;
+      return ds(c.code)>14||ds(c.code)>=1000000;
+    });
+    unvisited.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
+    if(!unvisited.length){toast('All done in Group '+cG+'! &#127881;');return;}
+    code=unvisited[0].code;
+  }
+  // Open the customer card — log visit or navigate from there
+  openM(code);
 
 }
 
@@ -1849,9 +2138,284 @@ function parsePriceXLSX(buf,fname){
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+function showEOD(){
+  var a=allC(),today=new Date().toDateString();
+  var visited=[],notAvail=[],noted=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i],logs=ST.visits[c.code]||[];
+    for(var j=logs.length-1;j>=0;j--){
+      if(new Date(logs[j].date).toDateString()!==today)break;
+      if(logs[j].type==='visited')visited.push(c);
+      else notAvail.push(c);
+      break;
+    }
+  }
+  for(var code in ST.notes){
+    if(ST.notes[code]){
+      var nc=null;for(var i=0;i<a.length;i++){if(a[i].code===code){nc=a[i];break;}}
+      if(nc)noted.push({c:nc,note:ST.notes[code]});
+    }
+  }
+  var dateStr=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  var sheet=document.createElement('div');
+  sheet.className='eod-sheet';
+  var rows=function(list,color){
+    return list.map(function(c){
+      var note=ST.notes&&ST.notes[c.code]?'<div class="eod-note">'+esc(ST.notes[c.code])+'</div>':'';
+      return '<div class="eod-row"><div class="eod-dot" style="background:'+color+'"></div><div><div class="eod-name">'+esc(c.name)+'</div><div style="font-size:11px;color:var(--sub)">'+esc(c.city||'')+'</div>'+note+'</div></div>';
+    }).join('');
+  };
+  var notedRows=noted.map(function(x){
+    return '<div class="eod-row"><div class="eod-dot" style="background:var(--amber)"></div><div><div class="eod-name">'+esc(x.c.name)+'</div><div class="eod-note">'+esc(x.note)+'</div></div></div>';
+  }).join('');
+  sheet.innerHTML='<div class="eod-inner">'+
+    '<div class="eod-handle"></div>'+
+    '<div class="eod-title">End of Day</div>'+
+    '<div class="eod-sub">'+dateStr+'</div>'+
+    '<div style="display:flex;gap:16px;margin-bottom:4px">'+
+      '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green)">'+visited.length+'</div><div style="font-size:11px;color:var(--sub)">Visited</div></div>'+
+      '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--amber)">'+notAvail.length+'</div><div style="font-size:11px;color:var(--sub)">Not Avail</div></div>'+
+      '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--blue)">'+noted.length+'</div><div style="font-size:11px;color:var(--sub)">Notes</div></div>'+
+    '</div>'+
+    (visited.length?'<div class="eod-sec">&#10003; Visited ('+visited.length+')</div>'+rows(visited,'#10b981'):'<div class="eod-sec" style="color:var(--sub)">No visits logged today</div>')+
+    (notAvail.length?'<div class="eod-sec">&#9711; Not Available ('+notAvail.length+')</div>'+rows(notAvail,'#f59e0b'):'')+
+    (noted.length?'<div class="eod-sec">&#128221; Notes ('+noted.length+')</div>'+notedRows:'')+
+    '<button class="eod-copy" onclick="copyEOD('+visited.length+','+notAvail.length+')">Copy as Text</button>'+
+    '<button class="eod-copy" style="margin-top:8px;background:var(--blue2);color:var(--blue);border-color:rgba(74,158,255,.3)" onclick="emailEOD()">&#9993; Email Summary</button>'+
+    '<button class="eod-close" onclick="this.closest(\'.eod-sheet\').remove()">Close</button>'+
+  '</div>';
+  document.body.appendChild(sheet);
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+}
+function copyEOD(vn,nan){
+  var a=allC(),today=new Date().toDateString();
+  var dateStr=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  var lines=['Daily Route Summary — '+dateStr,'Visited: '+vn+' | Not Available: '+nan,''];
+  var visited=[];
+  for(var i=0;i<a.length;i++){
+    var logs=ST.visits[a[i].code]||[];
+    for(var j=logs.length-1;j>=0;j--){
+      if(new Date(logs[j].date).toDateString()!==today)break;
+      if(logs[j].type==='visited')visited.push(a[i]);
+      break;
+    }
+  }
+  if(visited.length){lines.push('VISITED:');for(var i=0;i<visited.length;i++){var n=ST.notes&&ST.notes[visited[i].code]?'  → '+ST.notes[visited[i].code]:'';lines.push('• '+visited[i].name+(visited[i].city?' ('+visited[i].city+')':'')+n);}lines.push('');}
+  navigator.clipboard.writeText(lines.join('\n')).then(function(){toast('Copied to clipboard');}).catch(function(){toast('Copy failed');});
+}
+
+function rPendingEdits(){
+  var pe=ST.pendingEdits||{};
+  var codes=Object.keys(pe);
+  var card=document.getElementById('pend-card');
+  var badge=document.getElementById('pend-badge');
+  var nbSet=document.getElementById('nb-set');
+  if(!card)return;
+  if(!codes.length){
+    card.style.display='none';
+    if(badge)badge.style.display='none';
+    return;
+  }
+  var total=0;
+  codes.forEach(function(c){total+=Object.keys(pe[c]).length;});
+  card.style.display='block';
+  document.getElementById('pend-count').textContent=total;
+  if(badge){badge.textContent=codes.length;badge.style.display='flex';}
+  var LABELS={address:'Address',city:'City',zip:'Zip',phone:'Phone',email:'Email'};
+  var a=allC();
+  var html='';
+  codes.forEach(function(code){
+    var fields=pe[code];
+    var cust=null;for(var i=0;i<a.length;i++){if(a[i].code===code){cust=a[i];break;}}
+    var cname=cust?cust.name:code;
+    var cur=cust?cust:{};
+    if(ST.edits&&ST.edits[code])Object.assign(cur,ST.edits[code]);
+    html+='<div class="pend-cust"><div class="pend-cname">'+cname+'</div>';
+    Object.keys(fields).forEach(function(f){
+      var oldVal=cur[f]||'—';
+      var newVal=fields[f];
+      html+='<div class="pend-row">'
+        +'<span class="pend-field">'+(LABELS[f]||f)+'</span>'
+        +'<span class="pend-old">'+oldVal+'</span>'
+        +'<span class="pend-arrow">→</span>'
+        +'<span class="pend-new">'+newVal+'</span>'
+        +'<button class="pend-ok" onclick="approvePending(\''+code+'\',\''+f+'\')">✓</button>'
+        +'<button class="pend-no" onclick="rejectPending(\''+code+'\',\''+f+'\')">✕</button>'
+        +'</div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('pend-list').innerHTML=html;
+}
+function approvePending(code,field){
+  if(!ST.pendingEdits||!ST.pendingEdits[code])return;
+  var val=ST.pendingEdits[code][field];
+  if(!ST.edits)ST.edits={};
+  if(!ST.edits[code])ST.edits[code]={};
+  ST.edits[code][field]=val;
+  delete ST.pendingEdits[code][field];
+  if(!Object.keys(ST.pendingEdits[code]).length)delete ST.pendingEdits[code];
+  lSave();syncUp();rPendingEdits();
+}
+function rejectPending(code,field){
+  if(!ST.pendingEdits||!ST.pendingEdits[code])return;
+  delete ST.pendingEdits[code][field];
+  if(!Object.keys(ST.pendingEdits[code]).length)delete ST.pendingEdits[code];
+  lSave();rPendingEdits();
+}
+function approveAllPending(){
+  var pe=ST.pendingEdits||{};
+  Object.keys(pe).forEach(function(code){
+    Object.keys(pe[code]).forEach(function(f){
+      if(!ST.edits)ST.edits={};
+      if(!ST.edits[code])ST.edits[code]={};
+      ST.edits[code][f]=pe[code][f];
+    });
+    delete ST.pendingEdits[code];
+  });
+  lSave();syncUp();rPendingEdits();toast('All changes approved');
+}
+function rejectAllPending(){
+  ST.pendingEdits={};
+  lSave();rPendingEdits();toast('All changes rejected');
+}
+
+// ── TIER HELPERS ─────────────────────────────────────────────────────────
+function getTier(c){
+  var s=c.lifetimeSales||0;
+  return s>=50000?'A':s>=10000?'B':'C';
+}
+function tierBadge(c){
+  var t=getTier(c);
+  return '<span class="tier-'+t.toLowerCase()+'">'+t+'</span>';
+}
+
+// ── EMAIL EOD ─────────────────────────────────────────────────────────────
+function emailEOD(){
+  var a=allC(),today=new Date().toDateString();
+  var dateStr=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  var visited=[],notAvail=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i],logs=ST.visits[c.code]||[];
+    for(var j=logs.length-1;j>=0;j--){
+      if(new Date(logs[j].date).toDateString()!==today)break;
+      if(logs[j].type==='visited')visited.push(c);
+      else notAvail.push(c);
+      break;
+    }
+  }
+  var body='Daily Route Summary - '+dateStr+'\r\n';
+  body+='Visited: '+visited.length+' | Not Available: '+notAvail.length+'\r\n\r\n';
+  if(visited.length){
+    body+='VISITED:\r\n';
+    for(var i=0;i<visited.length;i++){
+      var n=ST.notes&&ST.notes[visited[i].code]?'  -> '+ST.notes[visited[i].code]:'';
+      body+='* '+visited[i].name+(visited[i].city?' ('+visited[i].city+')':'')+n+'\r\n';
+    }
+    body+='\r\n';
+  }
+  if(notAvail.length){
+    body+='NOT AVAILABLE:\r\n';
+    for(var i=0;i<notAvail.length;i++){body+='* '+notAvail[i].name+'\r\n';}
+    body+='\r\n';
+  }
+  var subject=encodeURIComponent('Route Summary - '+dateStr);
+  var encodedBody=encodeURIComponent(body);
+  window.location.href='mailto:?subject='+subject+'&body='+encodedBody;
+}
+
+// ── WEEKLY GOAL ───────────────────────────────────────────────────────────
+function getWeekStart(){
+  var d=new Date();d.setHours(0,0,0,0);
+  var day=d.getDay();
+  d.setDate(d.getDate()-(day===0?6:day-1));
+  return d;
+}
+function getWeekVisits(){
+  var ws=getWeekStart().getTime(),count=0;
+  for(var code in ST.visits){
+    var logs=ST.visits[code]||[];
+    for(var i=0;i<logs.length;i++){
+      if(logs[i].type==='visited'&&new Date(logs[i].date).getTime()>=ws)count++;
+    }
+  }
+  return count;
+}
+function rWeekGoal(){
+  var goal=ST.weeklyGoal||30;
+  var done=getWeekVisits();
+  var pct=Math.min(100,Math.round(done/goal*100));
+  var el=document.getElementById('d-goal-sub');if(el)el.textContent=done+' of '+goal+' visits this week';
+  var ep=document.getElementById('d-goal-pct');if(ep)ep.textContent=pct+'%';
+  var eb=document.getElementById('d-goal-bar');if(eb)eb.style.width=pct+'%';
+  if(eb){
+    if(pct>=100)eb.style.background='linear-gradient(90deg,var(--green),#00b86a)';
+    else if(pct>=60)eb.style.background='linear-gradient(90deg,var(--teal),#00c9a5)';
+    else eb.style.background='linear-gradient(90deg,var(--amber),#e69600)';
+  }
+}
+function promptGoal(){
+  var cur=ST.weeklyGoal||30;
+  var v=prompt('Weekly visit goal (current: '+cur+'):',String(cur));
+  if(v===null)return;
+  var n=parseInt(v);
+  if(isNaN(n)||n<1){toast('Invalid goal');return;}
+  ST.weeklyGoal=n;lSave();rWeekGoal();toast('Goal set to '+n);
+}
+
+// ── COVERAGE MAP ─────────────────────────────────────────────────────────
+var grpView='list';
+function setGrpView(v){
+  grpView=v;
+  document.getElementById('vt-list').className='vtab'+(v==='list'?' on':'');
+  document.getElementById('vt-map').className='vtab'+(v==='map'?' on':'');
+  document.getElementById('g-list').style.display=v==='list'?'block':'none';
+  document.getElementById('g-map').style.display=v==='map'?'block':'none';
+  if(v==='map')rCovMap();
+}
+function rCovMap(){
+  var a=allC(),groups={};
+  for(var i=0;i<a.length;i++){
+    var c=a[i];if(!groups[c.group])groups[c.group]={custs:[],minDays:1000000};
+    groups[c.group].custs.push(c);
+    var d=ds(c.code);if(d<groups[c.group].minDays)groups[c.group].minDays=d;
+  }
+  var keys=Object.keys(groups);keys.sort(function(a,b){return+a-+b;});
+  var legend='<div class="cov-legend">'+
+    '<div class="cov-leg-item"><div class="cov-leg-dot" style="background:#10b981"></div>Visited &le;14d</div>'+
+    '<div class="cov-leg-item"><div class="cov-leg-dot" style="background:#f59e0b"></div>15-45d</div>'+
+    '<div class="cov-leg-item"><div class="cov-leg-dot" style="background:#ef4444"></div>Overdue 45d+</div>'+
+    '<div class="cov-leg-item"><div class="cov-leg-dot" style="background:#364e66"></div>Never</div>'+
+  '</div>';
+  var h=legend+'<div class="cov-grid">';
+  for(var i=0;i<keys.length;i++){
+    var g=keys[i],info=groups[g],d=info.minDays;
+    var col,bg,border;
+    if(d<=14){col='#10b981';bg='rgba(16,185,129,.12)';border='rgba(16,185,129,.35)';}
+    else if(d<=45){col='#f59e0b';bg='rgba(245,158,11,.12)';border='rgba(245,158,11,.35)';}
+    else if(d<1000000){col='#ef4444';bg='rgba(239,68,68,.12)';border='rgba(239,68,68,.35)';}
+    else{col='#364e66';bg='var(--bg3)';border='var(--border)';}
+    h+='<div class="cov-cell" style="background:'+bg+';border-color:'+border+'" onclick="goToGroup('+g+')">'
+      +'<div class="cov-num" style="color:'+col+'">'+g+'</div>'
+      +'<div class="cov-sub" style="color:'+col+'">'+info.custs.length+' stops</div>'
+      +(d<1000000?'<div style="font-size:9px;color:'+col+';margin-top:2px">'+d+'d</div>':'')
+      +'</div>';
+  }
+  h+='</div>';
+  var el=document.getElementById('g-map');if(el)el.innerHTML=h;
+}
+function goToGroup(g){
+  setGrpView('list');
+  cG=+g;
+  document.getElementById('g-lbl').textContent='Grp '+g;
+  localStorage.setItem('hrt_lg',String(g));
+  go('dash');
+}
+
 lLoad();
 loadRolling();
 loadPricing();
+rPendingEdits();
 var teslaCont=document.getElementById('d-tesla-cont');
 if(teslaCont)teslaCont.addEventListener('click',continueRollingRoute);
 var sg=smartGroup();
