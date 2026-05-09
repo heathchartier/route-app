@@ -365,6 +365,19 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <div class="lbl" style="color:var(--red)">&#128680; Groups Not Worked</div>
       <div id="d-idle-list"></div>
     </div>
+    <div class="card" id="d-quiet-card" style="display:none">
+      <div class="card-hdr">
+        <div class="lbl" style="margin:0;color:var(--red)">&#9888; Going Quiet</div>
+        <span id="d-quiet-count" style="background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700"></span>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Spending dropped — were active, now silent</div>
+      <div id="d-quiet-list"></div>
+      <button id="d-quiet-more" style="display:none;width:100%;margin-top:8px;padding:8px;background:transparent;border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Show all</button>
+    </div>
+    <div class="card" id="d-sched-card" style="display:none">
+      <div class="lbl" style="color:var(--blue)">&#128197; This Week's Schedule</div>
+      <div id="d-sched-body"></div>
+    </div>
     <div class="card" style="display:flex;align-items:center;justify-content:space-between">
       <div>
         <div style="font-weight:700;font-size:14px">End of Day</div>
@@ -478,6 +491,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <div class="lbl">Data</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button id="btn-exp" style="padding:9px 16px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export CSV</button>
+        <button id="btn-exp-notes" style="padding:9px 16px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export Notes</button>
         <button id="btn-clr" style="padding:9px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Visits</button>
         <button id="btn-rst" style="padding:9px 16px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All</button>
       </div>
@@ -790,7 +804,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();
 }
 
 function rRoute(){
@@ -814,7 +828,7 @@ function rRoute(){
     h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
       '<div class="snum">'+( i+1)+'</div>'+
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
-      '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+noteHtml+'</div>'+
+      '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+tierBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+noteHtml+'</div>'+
       '<div class="vbs">'+
       '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
       '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
@@ -1140,6 +1154,20 @@ function doExport(){
   var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='hc_routes_'+new Date().toISOString().split('T')[0]+'.csv';a2.click();toast('Exported');
 }
 
+function exportNotes(){
+  var a=allC(),rows=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i],note=(ST.notes&&ST.notes[c.code])||'';
+    if(!note.trim())continue;
+    var logs=ST.visits[c.code]||[],lv=logs[logs.length-1];
+    rows.push('"'+c.code+'","'+c.name+'","'+(c.city||'')+'",Grp '+c.group+','+getTier(c)+',"'+(lv?new Date(lv.date).toLocaleDateString():'-')+'","'+note.replace(/"/g,"'").replace(/\n/g,' ')+'"');
+  }
+  if(!rows.length){toast('No notes to export');return;}
+  var csv='Code,Name,City,Group,Tier,Last Visit,Note\n'+rows.join('\n');
+  var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='hc_notes_'+new Date().toISOString().split('T')[0]+'.csv';a2.click();
+  toast('Exported '+rows.length+' notes');
+}
+
 // Wire up all events
 document.querySelectorAll('nav a').forEach(function(a){
   a.addEventListener('click',function(){go(this.getAttribute('data-p'));});
@@ -1269,6 +1297,7 @@ document.getElementById('m-sav').addEventListener('click',function(){
 document.getElementById('m-can').addEventListener('click',function(){document.getElementById('m-edit').style.display='none';document.getElementById('m-view').style.display='block';document.getElementById('m-edt').textContent='Edit';});
 document.getElementById('btn-add').addEventListener('click',addCust);
 document.getElementById('btn-exp').addEventListener('click',doExport);
+document.getElementById('btn-exp-notes').addEventListener('click',exportNotes);
 document.getElementById('btn-clr').addEventListener('click',function(){if(!confirm('Clear all visits?'))return;ST.visits={};lSave();syncUp();rDash();rCust();toast('Cleared');});
 document.getElementById('btn-rst').addEventListener('click',function(){if(!confirm('Reset ALL data?'))return;ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{}};lSave();syncUp();rDash();rCust();rGrps();toast('Reset');});
 document.getElementById('xl-input').addEventListener('change',function(){handleImport(this);});
@@ -2280,6 +2309,98 @@ function rejectAllPending(){
   lSave();rPendingEdits();toast('All changes rejected');
 }
 
+// ── QUIET ACCOUNTS ────────────────────────────────────────────────────────
+function rQuietAccounts(){
+  var a=allC(),quiet=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    // Had meaningful history but little/no spend this year
+    if(c.lifetimeSales>=15000&&c.sales2526<500)quiet.push(c);
+  }
+  quiet.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
+  var card=document.getElementById('d-quiet-card');
+  var list=document.getElementById('d-quiet-list');
+  var cnt=document.getElementById('d-quiet-count');
+  var more=document.getElementById('d-quiet-more');
+  if(!card||!list)return;
+  if(!quiet.length){card.style.display='none';return;}
+  card.style.display='block';
+  if(cnt)cnt.textContent=quiet.length;
+  var preview=quiet.slice(0,4),showAll=false;
+  function renderList(all){
+    var items=all?quiet:preview;
+    var h='';
+    for(var i=0;i<items.length;i++){
+      var c=items[i],d=ds(c.code);
+      var lastVisit=d<1000000?d+'d ago':'Never visited';
+      var drop=c.sales2025>0?'Was '+fmt(c.sales2025)+' in \'25':'Lifetime '+fmt(c.lifetimeSales);
+      h+='<div class="row" data-code="'+c.code+'" data-action="open">'
+        +'<div class="dot" style="background:var(--red)"></div>'
+        +'<div class="ri">'
+          +'<div class="rn">'+esc(c.name)+tierBadge(c)+'</div>'
+          +'<div class="rm">'+esc(c.city||'')+' &bull; '+drop+'</div>'
+          +'<div style="font-size:11px;color:var(--red);margin-top:2px">YTD: '+fmt(c.sales2526)+' &bull; '+lastVisit+'</div>'
+        +'</div>'
+        +'<div style="font-size:12px;color:var(--sub)">&#8250;</div>'
+      +'</div>';
+    }
+    list.innerHTML=h;
+    if(more)more.style.display=(!all&&quiet.length>4)?'block':'none';
+  }
+  renderList(false);
+  if(more)more.onclick=function(){renderList(true);};
+}
+
+// ── WEEK SCHEDULE ─────────────────────────────────────────────────────────
+function rWeekSchedule(){
+  var a=allC();
+  var today=new Date();today.setHours(0,0,0,0);
+  var dow=today.getDay();
+  // Build Mon-Fri of current week
+  var days=[];
+  for(var d=0;d<7;d++){
+    var dt=new Date(today);
+    dt.setDate(today.getDate()-dow+1+d); // Mon=0 ... Sun=6
+    if(d<5)days.push(dt); // Mon-Fri only
+  }
+  var dayNames=['Mon','Tue','Wed','Thu','Fri'];
+  var byDay={};
+  for(var i=0;i<days.length;i++)byDay[days[i].toISOString().split('T')[0]]=[];
+
+  for(var i=0;i<a.length;i++){
+    var c=a[i],sc=ST.scheduled&&ST.scheduled[c.code];
+    if(!sc||!sc.date)continue;
+    if(byDay[sc.date]!==undefined)byDay[sc.date].push(c);
+  }
+
+  var total=0;for(var k in byDay)total+=byDay[k].length;
+  var card=document.getElementById('d-sched-card');
+  var body=document.getElementById('d-sched-body');
+  if(!card||!body)return;
+  if(!total){card.style.display='none';return;}
+  card.style.display='block';
+
+  var h='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:4px">';
+  for(var i=0;i<5;i++){
+    var dateKey=days[i].toISOString().split('T')[0];
+    var custs=byDay[dateKey]||[];
+    var isToday=days[i].toDateString()===today.toDateString();
+    var colBg=isToday?'var(--blue2)':'var(--bg3)';
+    var colBorder=isToday?'rgba(74,158,255,.4)':'var(--border)';
+    var colText=isToday?'var(--blue)':'var(--sub)';
+    h+='<div style="background:'+colBg+';border:1px solid '+colBorder+';border-radius:var(--r2);padding:8px 6px;text-align:center">'
+      +'<div style="font-size:10px;font-weight:700;color:'+colText+';text-transform:uppercase;letter-spacing:.5px">'+dayNames[i]+'</div>'
+      +'<div style="font-size:18px;font-weight:800;color:'+(custs.length?'var(--text)':'var(--dim)')+';margin:4px 0">'+custs.length+'</div>';
+    for(var j=0;j<Math.min(custs.length,2);j++){
+      h+='<div style="font-size:9px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer" onclick="openM(\''+custs[j].code+'\')">'+esc(custs[j].name.split(' ')[0])+'</div>';
+    }
+    if(custs.length>2)h+='<div style="font-size:9px;color:var(--dim)">+'+( custs.length-2)+' more</div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  body.innerHTML=h;
+}
+
 // ── TIER HELPERS ─────────────────────────────────────────────────────────
 function getTier(c){
   var s=c.lifetimeSales||0;
@@ -2353,6 +2474,12 @@ function rWeekGoal(){
     else if(pct>=60)eb.style.background='linear-gradient(90deg,var(--teal),#00c9a5)';
     else eb.style.background='linear-gradient(90deg,var(--amber),#e69600)';
   }
+  // Fire a one-time toast the moment the goal is hit (once per week)
+  var weekKey='hrt_goal_toast_'+getWeekStart().toISOString().split('T')[0];
+  if(done>=goal&&!localStorage.getItem(weekKey)){
+    localStorage.setItem(weekKey,'1');
+    toast('🎯 Weekly goal hit! '+done+' visits — great week!');
+  }
 }
 function promptGoal(){
   var cur=ST.weeklyGoal||30;
@@ -2395,7 +2522,7 @@ function rCovMap(){
     else if(d<=45){col='#f59e0b';bg='rgba(245,158,11,.12)';border='rgba(245,158,11,.35)';}
     else if(d<1000000){col='#ef4444';bg='rgba(239,68,68,.12)';border='rgba(239,68,68,.35)';}
     else{col='#364e66';bg='var(--bg3)';border='var(--border)';}
-    h+='<div class="cov-cell" style="background:'+bg+';border-color:'+border+'" onclick="goToGroup('+g+')">'
+    h+='<div class="cov-cell" style="background:'+bg+';border-color:'+border+'" onclick="showGroupSheet('+g+')">'
       +'<div class="cov-num" style="color:'+col+'">'+g+'</div>'
       +'<div class="cov-sub" style="color:'+col+'">'+info.custs.length+' stops</div>'
       +(d<1000000?'<div style="font-size:9px;color:'+col+';margin-top:2px">'+d+'d</div>':'')
@@ -2404,12 +2531,37 @@ function rCovMap(){
   h+='</div>';
   var el=document.getElementById('g-map');if(el)el.innerHTML=h;
 }
-function goToGroup(g){
-  setGrpView('list');
-  cG=+g;
-  document.getElementById('g-lbl').textContent='Grp '+g;
-  localStorage.setItem('hrt_lg',String(g));
-  go('dash');
+function showGroupSheet(g){
+  var a=allC(),custs=[];
+  for(var i=0;i<a.length;i++){if(a[i].group===+g)custs.push(a[i]);}
+  custs.sort(function(a,b){return ds(a.code)-ds(b.code);});
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var rows='';
+  for(var i=0;i<custs.length;i++){
+    var c=custs[i],d=ds(c.code),col=dc(c.code);
+    var meta=d>=1000000?'Never':d+'d ago';
+    rows+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="(function(){var s=document.querySelector(\'[data-covsheet]\');if(s)s.remove();openM(\''+c.code+'\');})()">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:'+col+';flex-shrink:0;box-shadow:0 0 6px '+col+'"></div>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(c.name)+tierBadge(c)+'</div>'
+        +'<div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'
+      +'</div>'
+      +'<div style="font-size:12px;color:var(--blue);font-weight:600">&#8250;</div>'
+    +'</div>';
+  }
+  sheet.setAttribute('data-covsheet','1');
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:82vh;overflow-y:auto">'
+    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
+      +'<div><div style="font-size:18px;font-weight:700">Group '+g+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+custs.length+' customers</div></div>'
+      +'<button style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="(function(){var s=document.querySelector(\'[data-covsheet]\');if(s)s.remove();cG='+g+';document.getElementById(\'g-lbl\').textContent=\'Grp '+g+'\';localStorage.setItem(\'hrt_lg\',\''+g+'\');go(\'dash\');})()">Route This Group</button>'
+    +'</div>'
+    +rows
+    +'<button style="width:100%;margin-top:14px;padding:12px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit" onclick="this.closest(\'[data-covsheet]\').remove()">Close</button>'
+  +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
 }
 
 lLoad();
