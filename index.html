@@ -1334,13 +1334,29 @@ function runCustomRoute(){
 function showMapPicker(stops){
   var ex=document.getElementById('map-picker');
   if(ex)ex.parentNode.removeChild(ex);
-  var addrs=stops.map(function(s){
-    if(s.addr)return s.addr; // already encoded (custom route)
-    return encodeURIComponent([s.address,s.city,'CA'].filter(function(x){return x;}).join(', '));
+
+  // Build decoded address list (used by all three map apps)
+  var rawAddrs=stops.map(function(s){
+    if(s.addr)return decodeURIComponent(s.addr);
+    return [s.address,s.city,'CA'].filter(function(x){return x;}).join(', ');
   });
-  var googleUrl='https://www.google.com/maps/dir/My+Location/'+addrs.join('/');
-  var appleUrl='https://maps.apple.com/maps?dirflg=d&saddr=Current+Location&daddr='+addrs.slice(0,4).join('&daddr=');
-  var wazeUrl='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(stops[0].address+', '+stops[0].city+', CA');
+
+  // Google Maps: supports up to 10 waypoints via /dir/ URL
+  var googleUrl='https://www.google.com/maps/dir/My+Location/'+
+    rawAddrs.map(function(a){return encodeURIComponent(a);}).join('/');
+
+  // Apple Maps: +to: chaining supports more stops than multiple &daddr= params
+  // iOS platform limit is ~4 stops regardless of format — be honest in the label
+  var APPLE_MAX=4;
+  var appleStops=rawAddrs.slice(0,APPLE_MAX);
+  var appleUrl='https://maps.apple.com/?dirflg=d&daddr='+
+    appleStops.map(function(a){return a.replace(/ /g,'+');}).join('+to:');
+  var appleStopNote=stops.length>APPLE_MAX
+    ? APPLE_MAX+' of '+stops.length+' stops (iOS limit)'
+    : stops.length+' stop'+(stops.length!==1?'s':'');
+
+  // Waze: URL scheme only supports a single destination
+  var wazeUrl='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(rawAddrs[0]);
 
   var picker=document.createElement('div');
   picker.id='map-picker';picker.className='map-picker';
@@ -1358,9 +1374,9 @@ function showMapPicker(stops){
   inner.appendChild(ttl);
 
   var opts=[
-    {icon:'&#127758;',name:'Google Maps',sub:stops.length+' stops from your location',url:googleUrl,bg:'rgba(66,133,244,.15)'},
-    {icon:'&#63743;',name:'Apple Maps',sub:'Best for Tesla CarPlay & full multi-stop',url:appleUrl,bg:'rgba(0,212,170,.12)'},
-    {icon:'&#128663;',name:'Waze',sub:'First stop only - navigate to '+stops[0].name.split(' ')[0],url:wazeUrl,bg:'rgba(255,176,32,.12)'}
+    {icon:'&#127758;',name:'Google Maps',sub:'All '+stops.length+' stops from your location',url:googleUrl,bg:'rgba(66,133,244,.15)'},
+    {icon:'&#63743;',name:'Apple Maps',sub:appleStopNote,url:appleUrl,bg:'rgba(0,212,170,.12)'},
+    {icon:'&#128663;',name:'Waze',sub:'First stop only — '+esc(stops[0].name),url:wazeUrl,bg:'rgba(255,176,32,.12)'}
   ];
 
   for(var i=0;i<opts.length;i++){
