@@ -300,6 +300,28 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .view-toggle{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:3px;gap:3px}
 .vtab{padding:6px 14px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);background:transparent;transition:all .2s}
 .vtab.on{background:var(--card);color:var(--text);border:1px solid var(--border2)}
+
+/* ── MORNING BRIEF ── */
+.brief-card{background:linear-gradient(135deg,rgba(0,229,184,.1),rgba(74,158,255,.08));border:1px solid rgba(0,229,184,.35);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.brief-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.brief-title{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.brief-dismiss{background:transparent;border:none;color:var(--sub);font-size:18px;cursor:pointer;padding:0;line-height:1}
+.brief-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.brief-stat{background:rgba(0,0,0,.2);border-radius:var(--r2);padding:10px 8px;text-align:center}
+.brief-n{font-size:22px;font-weight:800;letter-spacing:-1px}
+.brief-l{font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);margin-top:3px;font-weight:600}
+.brief-acct{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer}
+.brief-acct:last-child{border-bottom:none}
+
+/* ── HOT LEAD TRACKER ── */
+.hot-card{background:linear-gradient(135deg,rgba(255,176,32,.1),rgba(255,176,32,.05));border:1px solid rgba(255,176,32,.35);border-radius:var(--r);padding:16px;margin-bottom:12px}
+
+/* ── FOLLOW-UP SHEET ── */
+.fu-sheet{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
+.fu-inner{background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)}
+.fu-opt{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .15s}
+.fu-opt:last-child{border-bottom:none}
+.fu-opt:active{opacity:.7}
 </style>
 </head>
 <body>
@@ -316,6 +338,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <div class="stat"><div class="stat-n" style="color:var(--amber)">0</div><div class="stat-l">Not Avail</div></div>
       <div class="stat"><div class="stat-n" style="color:var(--red)">0</div><div class="stat-l">Overdue</div></div>
     </div>
+    <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
     <div class="card" id="d-goal-card">
       <div class="goal-row">
@@ -326,7 +349,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div class="lbl" style="margin:0">Today's Route</div>
+        <div><div class="lbl" style="margin:0">Today's Route</div><div id="d-route-est" style="font-size:11px;color:var(--sub);margin-top:2px"></div></div>
         <div class="cycle">
           <button class="cbtn" id="btn-prev">&#8592;</button>
           <span class="clbl" id="g-lbl">Grp 1</span>
@@ -365,6 +388,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <div class="lbl" style="color:var(--red)">&#128680; Groups Not Worked</div>
       <div id="d-idle-list"></div>
     </div>
+    <div id="d-hot-card" style="display:none"></div>
     <div class="card" id="d-quiet-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--red)">&#9888; Going Quiet</div>
@@ -611,9 +635,16 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       </div>
     </div>
     <div class="msect">
-      <div class="msect-lbl">Notes</div>
+      <div class="msect-lbl">Notes &amp; Intel</div>
       <textarea class="note" id="m-note" placeholder="Add notes..."></textarea>
-      <button class="btn btn-b" id="m-snote" style="margin-top:6px">Save Note</button>
+      <div class="fl" style="margin-top:8px">Competitor (who else are they buying from?)</div>
+      <input class="fi" id="m-comp" type="text" placeholder="e.g. Pacific Woodworking, Home Depot">
+      <button class="btn btn-b" id="m-snote" style="margin-top:4px">Save Note</button>
+      <button class="abtn" id="m-followup" style="width:100%;margin-top:8px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3)">&#128197; Schedule Follow-Up</button>
+    </div>
+    <div class="msect" id="m-comp-sect" style="display:none">
+      <div class="msect-lbl">Competitor</div>
+      <div id="m-comp-view" style="font-size:14px;color:var(--amber)"></div>
     </div>
     <div class="msect">
       <div class="msect-lbl">Visit History</div>
@@ -677,7 +708,7 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};}catch(e){}}
@@ -804,7 +835,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();
 }
 
 function rRoute(){
@@ -819,6 +850,12 @@ function rRoute(){
   stops.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
   stops=stops.slice(0,10);
   var el=document.getElementById('d-route');if(!el)return;
+  // Duration estimate: 25 min per stop average
+  var est=document.getElementById('d-route-est');
+  if(est){
+    if(!stops.length){est.textContent='';}
+    else{var mins=stops.length*25;var h=Math.floor(mins/60),m=mins%60;est.textContent='~'+(h?h+'h ':'')+(m?m+'m':'')+' · '+stops.length+' stop'+(stops.length!==1?'s':'');}
+  }
   if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">All caught up in Group '+cG+'!</div>';return;}
   for(var i=0;i<stops.length;i++){
     var c=stops[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
@@ -1010,7 +1047,11 @@ function openM(code){
   if(c.lifetimeSales>15000&&c.sales2526<500)quietHtml='<div class="quiet-flag">&#9888; Account Going Quiet</div>';
   if(ms)ms.innerHTML=[['Lifetime',c.lifetimeSales],['2024',c.sales2024],['2025',c.sales2025],['YTD',c.sales2526]].map(function(x){return'<div class="sbox"><div class="sbl">'+x[0]+'</div><div class="sbv" style="'+( x[0]==='YTD'?'color:var(--teal)':'')+'">'+fmt(x[1])+'</div></div>';}).join('')+(trendHtml||quietHtml?'<div style="width:100%;margin-top:6px">'+trendHtml+quietHtml+'</div>':'');
   var mh=document.getElementById('m-hot');if(mh)mh.textContent=ST.hot[code]?'Remove Hot':'Hot Lead';
-  var mn2=document.getElementById('m-note');if(mn2)mn2.value=(ST.notes&&ST.notes[code])||'';;
+  var mn2=document.getElementById('m-note');if(mn2)mn2.value=(ST.notes&&ST.notes[code])||'';
+  var mc2=document.getElementById('m-comp');if(mc2)mc2.value=(ST.competitors&&ST.competitors[code])||'';
+  var compVal=ST.competitors&&ST.competitors[code];
+  var mcs=document.getElementById('m-comp-sect');if(mcs)mcs.style.display=compVal?'block':'none';
+  var mcv=document.getElementById('m-comp-view');if(mcv)mcv.textContent=compVal?'⚔ '+compVal:'';;
   var mgm=document.getElementById('m-gm');if(mgm)mgm.href='https://www.google.com/maps/search/'+encodeURIComponent(addr);
   var mam=document.getElementById('m-am');if(mam)mam.href='https://maps.apple.com/?q='+encodeURIComponent(addr);
   var mwz=document.getElementById('m-wz');if(mwz)mwz.href='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr);
@@ -1049,6 +1090,7 @@ function syncDown(){
       ST.removed=Object.assign({},rem.removed||{},ST.removed);
       ST.edits=Object.assign({},rem.edits||{},ST.edits);
       ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
+      ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
       var ra=rem.added_customers||[],am={};
       for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
       for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
@@ -1065,7 +1107,7 @@ function syncUp(){
   syncTimer=setTimeout(function(){
     fetch(SURL+'/rest/v1/hc_state',{method:'POST',
       headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({id:'heath',visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],scheduled:ST.scheduled||{},updated_at:new Date().toISOString()})
+      body:JSON.stringify({id:'heath',visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],scheduled:ST.scheduled||{},competitors:ST.competitors||{},updated_at:new Date().toISOString()})
     }).catch(function(){});
   },1500);
 }
@@ -1154,16 +1196,157 @@ function doExport(){
   var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='hc_routes_'+new Date().toISOString().split('T')[0]+'.csv';a2.click();toast('Exported');
 }
 
+// ── MORNING BRIEF ─────────────────────────────────────────────────────────
+function rMorningBrief(){
+  var el=document.getElementById('d-brief');if(!el)return;
+  var hr=new Date().getHours();
+  var dismissKey='hrt_brief_'+new Date().toISOString().split('T')[0];
+  if(hr<6||hr>=10||localStorage.getItem(dismissKey)){el.style.display='none';return;}
+  var a=allC(),overdue=0,scheduledToday=0;
+  var today=new Date().toISOString().split('T')[0];
+  for(var i=0;i<a.length;i++){
+    if(ds(a[i].code)>45)overdue++;
+    if(ST.scheduled&&ST.scheduled[a[i].code]&&ST.scheduled[a[i].code].date===today)scheduledToday++;
+  }
+  var sg2=smartGroup();
+  // Top A-tier accounts overdue 30+ days
+  var topA=a.filter(function(c){return getTier(c)==='A'&&ds(c.code)>30;});
+  topA.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
+  topA=topA.slice(0,3);
+  var acctRows=topA.map(function(c){
+    return '<div class="brief-acct" data-code="'+c.code+'" data-action="open">'
+      +'<div class="dot" style="background:'+dc(c.code)+';box-shadow:0 0 6px '+dc(c.code)+'"></div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(c.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+fmt(c.lifetimeSales)+' lifetime &bull; '+ds(c.code)+'d overdue</div></div>'
+      +'<span class="tier-a">A</span></div>';
+  }).join('');
+  el.style.display='block';
+  el.innerHTML='<div class="brief-card">'
+    +'<div class="brief-hdr"><div>'
+      +'<div style="font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px">Good morning, Heath</div>'
+      +'<div class="brief-title">Today\'s Briefing</div>'
+    +'</div>'
+    +'<button class="brief-dismiss" onclick="(function(){localStorage.setItem(\''+dismissKey+'\',\'1\');document.getElementById(\'d-brief\').style.display=\'none\';})()">&times;</button>'
+    +'</div>'
+    +'<div class="brief-grid">'
+      +'<div class="brief-stat"><div class="brief-n" style="color:var(--teal)">'+sg2+'</div><div class="brief-l">Rec. Group</div></div>'
+      +'<div class="brief-stat"><div class="brief-n" style="color:var(--red)">'+overdue+'</div><div class="brief-l">Overdue</div></div>'
+      +'<div class="brief-stat"><div class="brief-n" style="color:var(--blue)">'+scheduledToday+'</div><div class="brief-l">Scheduled</div></div>'
+    +'</div>'
+    +(topA.length?'<div style="font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">A-Tier accounts overdue</div>'+acctRows:'')
+    +'</div>';
+  // Wire click-to-open on acct rows
+  el.querySelectorAll('[data-action="open"]').forEach(function(r){
+    r.addEventListener('click',function(){openM(this.getAttribute('data-code'));});
+  });
+}
+
+// ── HOT LEAD TRACKER ──────────────────────────────────────────────────────
+function rHotLeads(){
+  var el=document.getElementById('d-hot-card');if(!el)return;
+  var a=allC(),hot=[];
+  for(var i=0;i<a.length;i++){
+    if(ST.hot[a[i].code]&&ds(a[i].code)>14)hot.push(a[i]);
+  }
+  hot.sort(function(a,b){return ds(b.code)-ds(a.code);}); // longest overdue first
+  if(!hot.length){el.style.display='none';return;}
+  var rows=hot.slice(0,5).map(function(c){
+    var d=ds(c.code);
+    return '<div class="row" data-code="'+c.code+'" data-action="open">'
+      +'<div class="dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber)"></div>'
+      +'<div class="ri"><div class="rn">&#9733; '+esc(c.name)+tierBadge(c)+'</div>'
+      +'<div class="rm">'+esc(c.city||'')+' &bull; '+(d>=1000000?'Never visited':d+'d ago')+'</div></div>'
+      +'<div style="font-size:12px;color:var(--sub)">&#8250;</div>'
+      +'</div>';
+  }).join('');
+  el.style.display='block';
+  el.innerHTML='<div class="hot-card">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+      +'<div class="lbl" style="margin:0;color:var(--amber)">&#9733; Hot Leads Overdue</div>'
+      +'<span style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">'+hot.length+'</span>'
+    +'</div>'
+    +rows
+    +(hot.length>5?'<div style="font-size:11px;color:var(--sub);text-align:center;padding-top:8px">+'+( hot.length-5)+' more — see Customers &rarr; Hot</div>':'')
+    +'</div>';
+  el.querySelectorAll('[data-action="open"]').forEach(function(r){
+    r.addEventListener('click',function(){openM(this.getAttribute('data-code'));});
+  });
+}
+
+// ── FOLLOW-UP DATE PICKER ─────────────────────────────────────────────────
+function showFollowUpPicker(code){
+  var existing=document.getElementById('fu-sheet');if(existing)existing.remove();
+  var a=allC(),c=null;
+  for(var i=0;i<a.length;i++){if(a[i].code===code){c=a[i];break;}}
+  if(!c)return;
+  var sheet=document.createElement('div');
+  sheet.id='fu-sheet';sheet.className='fu-sheet';
+  var opts=[
+    {label:'Tomorrow',sub:fmtRelDate(1)},
+    {label:'3 days',sub:fmtRelDate(3)},
+    {label:'1 week',sub:fmtRelDate(7)},
+    {label:'2 weeks',sub:fmtRelDate(14)}
+  ];
+  var quickRows=opts.map(function(o,idx){
+    return '<div class="fu-opt" data-days="'+(idx===0?1:idx===1?3:idx===2?7:14)+'">'
+      +'<div style="font-size:15px;font-weight:600">'+o.label+'</div>'
+      +'<div style="font-size:13px;color:var(--sub)">'+o.sub+'</div>'
+    +'</div>';
+  }).join('');
+  var todayStr=new Date().toISOString().split('T')[0];
+  sheet.innerHTML='<div class="fu-inner">'
+    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+    +'<div style="font-size:18px;font-weight:700;margin-bottom:4px">Schedule Follow-Up</div>'
+    +'<div style="font-size:12px;color:var(--sub);margin-bottom:16px">'+esc(c.name)+'</div>'
+    +quickRows
+    +'<div class="fu-opt" style="flex-direction:column;align-items:flex-start;gap:8px">'
+      +'<div style="font-size:15px;font-weight:600">Pick a date</div>'
+      +'<input type="date" id="fu-date" class="fi" style="margin:0;width:100%" min="'+todayStr+'">'
+    +'</div>'
+    +'<button style="width:100%;margin-top:14px;padding:13px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit" onclick="document.getElementById(\'fu-sheet\').remove()">Cancel</button>'
+    +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  // Quick option handlers
+  sheet.querySelectorAll('.fu-opt[data-days]').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      var days=+this.getAttribute('data-days');
+      var d=new Date();d.setDate(d.getDate()+days);
+      scheduleFollowUp(code,d.toISOString().split('T')[0]);
+      sheet.remove();
+    });
+  });
+  // Custom date handler
+  sheet.querySelector('.fu-opt:last-of-type').addEventListener('click',function(e){
+    if(e.target.tagName==='INPUT')return;
+    var inp=document.getElementById('fu-date');
+    if(inp&&inp.value){scheduleFollowUp(code,inp.value);sheet.remove();}
+    else inp&&inp.focus();
+  });
+  document.body.appendChild(sheet);
+}
+function fmtRelDate(days){
+  var d=new Date();d.setDate(d.getDate()+days);
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+function scheduleFollowUp(code,dateStr){
+  if(!ST.scheduled)ST.scheduled={};
+  ST.scheduled[code]={date:dateStr};
+  lSave();syncUp();
+  var d=new Date(dateStr+'T12:00:00');
+  toast('Follow-up set for '+d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}));
+  rDash();
+}
+
 function exportNotes(){
   var a=allC(),rows=[];
   for(var i=0;i<a.length;i++){
-    var c=a[i],note=(ST.notes&&ST.notes[c.code])||'';
-    if(!note.trim())continue;
+    var c=a[i],note=(ST.notes&&ST.notes[c.code])||'',comp=(ST.competitors&&ST.competitors[c.code])||'';
+    if(!note.trim()&&!comp)continue;
     var logs=ST.visits[c.code]||[],lv=logs[logs.length-1];
-    rows.push('"'+c.code+'","'+c.name+'","'+(c.city||'')+'",Grp '+c.group+','+getTier(c)+',"'+(lv?new Date(lv.date).toLocaleDateString():'-')+'","'+note.replace(/"/g,"'").replace(/\n/g,' ')+'"');
+    rows.push('"'+c.code+'","'+c.name+'","'+(c.city||'')+'",Grp '+c.group+','+getTier(c)+',"'+(lv?new Date(lv.date).toLocaleDateString():'-')+'","'+note.replace(/"/g,"'").replace(/\n/g,' ')+'","'+comp.replace(/"/g,"'")+'"');
   }
   if(!rows.length){toast('No notes to export');return;}
-  var csv='Code,Name,City,Group,Tier,Last Visit,Note\n'+rows.join('\n');
+  var csv='Code,Name,City,Group,Tier,Last Visit,Note,Competitor\n'+rows.join('\n');
   var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='hc_notes_'+new Date().toISOString().split('T')[0]+'.csv';a2.click();
   toast('Exported '+rows.length+' notes');
 }
@@ -1244,7 +1427,16 @@ document.getElementById('m-rte').addEventListener('click',function(){
   var stops=[c].concat(rest.slice(0,9));
   showMapPicker(stops);
 });
-document.getElementById('m-snote').addEventListener('click',function(){if(!mC)return;if(!ST.notes)ST.notes={};ST.notes[mC]=document.getElementById('m-note').value;lSave();syncUp();toast('Note saved');});
+document.getElementById('m-snote').addEventListener('click',function(){
+  if(!mC)return;
+  if(!ST.notes)ST.notes={};
+  ST.notes[mC]=document.getElementById('m-note').value;
+  if(!ST.competitors)ST.competitors={};
+  var compVal=document.getElementById('m-comp').value.trim();
+  if(compVal)ST.competitors[mC]=compVal;else delete ST.competitors[mC];
+  lSave();syncUp();toast('Note saved');
+});
+document.getElementById('m-followup').addEventListener('click',function(){if(mC)showFollowUpPicker(mC);});
 document.getElementById('m-edt').addEventListener('click',function(){
   var isEdit=document.getElementById('m-edit').style.display==='none';
   document.getElementById('m-edit').style.display=isEdit?'block':'none';
