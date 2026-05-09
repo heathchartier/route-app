@@ -316,6 +316,26 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 /* ── HOT LEAD TRACKER ── */
 .hot-card{background:linear-gradient(135deg,rgba(255,176,32,.1),rgba(255,176,32,.05));border:1px solid rgba(255,176,32,.35);border-radius:var(--r);padding:16px;margin-bottom:12px}
 
+/* ── NEW BADGE ── */
+.new-badge{display:inline-block;background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
+
+/* ── SWIPE FEEDBACK ── */
+.row{transition:background .15s,transform .1s}
+.row.swiping{background:rgba(16,185,129,.12)!important}
+.swipe-hint{position:absolute;left:0;top:50%;transform:translateY(-50%);width:4px;height:70%;background:var(--green);border-radius:0 3px 3px 0;opacity:0;transition:opacity .15s}
+.row{position:relative;overflow:hidden}
+
+/* ── TOGGLE SWITCH ── */
+.tog-wrap{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+.tog-wrap:last-child{border-bottom:none}
+.tog-lbl{font-size:13px;font-weight:600}
+.tog{position:relative;width:42px;height:24px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-sl{position:absolute;cursor:pointer;inset:0;background:var(--border2);border-radius:12px;transition:.2s}
+.tog-sl:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:var(--sub);border-radius:50%;transition:.2s}
+input:checked+.tog-sl{background:var(--teal)}
+input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
+
 /* ── WIN-BACK ── */
 .wb-card{background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(139,92,246,.05));border:1px solid rgba(139,92,246,.35);border-radius:var(--r);padding:16px;margin-bottom:12px}
 
@@ -374,6 +394,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       </div>
       <div id="d-route"><div style="color:var(--sub);font-size:13px;padding:8px 0">Loading...</div></div>
       <button class="btn btn-t" id="btn-map">Open Route</button>
+      <button class="btn" id="btn-bulk-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25);margin-top:8px;display:none">Mark All Remaining N/A</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
     <div class="tesla-card" id="d-tesla" style="display:none">
@@ -404,6 +425,8 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <div class="lbl" style="color:var(--red)">&#128680; Groups Not Worked</div>
       <div id="d-idle-list"></div>
     </div>
+    <div id="d-new-card" style="display:none"></div>
+    <div id="d-leaderboard" style="display:none"></div>
     <div id="d-hot-card" style="display:none"></div>
     <div id="d-winback-card" style="display:none"></div>
     <div class="card" id="d-trend-card">
@@ -549,7 +572,11 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
       <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Tap any customer to fill in the missing info</div>
       <div id="missing-list"></div>
     </div>
-    <div style="text-align:center;padding:24px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v19 &bull; Southern California</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">Dashboard Cards</div>
+      <div id="dash-toggles"></div>
+    </div>
+    <div style="text-align:center;padding:24px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v20 &bull; Southern California</div>
   </div>
 </div>
 
@@ -741,7 +768,7 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};}catch(e){}}
@@ -780,7 +807,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();}
 }
 
 function smartGroup(){
@@ -868,7 +895,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();
 }
 
 function rRoute(){
@@ -889,10 +916,12 @@ function rRoute(){
     if(!stops.length){est.textContent='';}
     else{var mins=stops.length*25;var h=Math.floor(mins/60),m=mins%60;est.textContent='~'+(h?h+'h ':'')+(m?m+'m':'')+' · '+stops.length+' stop'+(stops.length!==1?'s':'');}
   }
+  var bbna2=document.getElementById('btn-bulk-na');
+  if(bbna2)bbna2.style.display=stops.length?'block':'none';
   if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">All caught up in Group '+cG+'!</div>';return;}
   for(var i=0;i<stops.length;i++){
     var c=stops[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
-    var meta=d>=1000000?'Never':lv&&lv.type==='not_available'?'Retry':d+'d ago';
+    var meta=d>=1000000?'Never':lv&&lv.type==='not_available'?('Retry · '+new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})):(new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+d+'d');
     var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>55?note.slice(0,55)+'…':note)+'</div>':'';
     h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
@@ -1035,7 +1064,7 @@ function rCPage(){
     var meta=d>=1000000?'Never':(lv.type==='not_available'?'N/A':'Visited')+' '+d+'d';
     var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>60?note.slice(0,60)+'…':note)+'</div>':'';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
   }
   var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
   var cm=document.getElementById('c-more');if(cm)cm.style.display=fc.length>PG*(pg+1)?'block':'none';
@@ -1046,15 +1075,29 @@ function rGrps(){
   for(var i=0;i<a.length;i++){var c=a[i];if(!groups[c.group])groups[c.group]=[];groups[c.group].push(c);}
   var keys=Object.keys(groups);keys.sort(function(a,b){return+a-+b;});
   var h='';
+  // Build group last-worked dates from visit history
+  var grpLastWorked={};
+  for(var code in ST.visits){
+    var logs2=ST.visits[code]||[];
+    for(var li=logs2.length-1;li>=0;li--){
+      if(logs2[li].type!=='visited')continue;
+      var cust2=null;for(var ci=0;ci<a.length;ci++){if(a[ci].code===code){cust2=a[ci];break;}}
+      if(!cust2)break;
+      var vd=new Date(logs2[li].date);
+      if(!grpLastWorked[cust2.group]||vd>grpLastWorked[cust2.group])grpLastWorked[cust2.group]=vd;
+      break;
+    }
+  }
   for(var i=0;i<keys.length;i++){
     var g=keys[i],gc=groups[g],cities={},vis=0,ov=0;
     for(var j=0;j<gc.length;j++){cities[gc[j].city||'']=1;var d=ds(gc[j].code);if(d<=30)vis++;if(d>45)ov++;}
     var cl=Object.keys(cities).filter(function(x){return x;}).slice(0,2).join(', ');
+    var lastWorkedStr=grpLastWorked[g]?'Last: '+grpLastWorked[g].toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Never worked';
     var col=ov>gc.length*.5?'var(--red)':vis>gc.length*.5?'var(--green)':'var(--amber)';
     var pct=Math.round(vis/gc.length*100);
     var sizeWarn=gc.length>=13?'<span style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - consider splitting</span>':'';
     var sizeNote=gc.length<8?'<span style="background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - small group</span>':'';
-    h+='<div class="grp-row" data-g="'+g+'"><div class="gbadge" style="background:'+col+'">'+g+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Group '+g+' '+sizeWarn+sizeNote+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(cl)+'</div><div style="font-size:11px;margin-top:4px"><span style="color:var(--green)">'+vis+' recent</span> <span style="color:var(--dim)"> | </span><span style="color:var(--red)">'+ov+' overdue</span></div></div><div style="text-align:right;flex-shrink:0"><div class="grp-pct" style="color:'+col+'">'+pct+'%</div><div class="grp-pct-l">done</div><button data-grp="'+g+'" class="btn-sm" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:11px;padding:4px 8px" onclick="event.stopPropagation();routeGroup('+g+')">Route</button></div></div>';
+    h+='<div class="grp-row" data-g="'+g+'"><div class="gbadge" style="background:'+col+'">'+g+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Group '+g+' '+sizeWarn+sizeNote+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(cl)+'</div><div style="font-size:11px;margin-top:4px"><span style="color:var(--green)">'+vis+' recent</span> <span style="color:var(--dim)"> | </span><span style="color:var(--red)">'+ov+' overdue</span> <span style="color:var(--dim)"> | </span><span style="color:var(--sub)">'+lastWorkedStr+'</span></div></div><div style="text-align:right;flex-shrink:0"><div class="grp-pct" style="color:'+col+'">'+pct+'%</div><div class="grp-pct-l">done</div><button data-grp="'+g+'" class="btn-sm" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:11px;padding:4px 8px" onclick="event.stopPropagation();routeGroup('+g+')">Route</button></div></div>';
   }
   var gl=document.getElementById('g-list');if(gl)gl.innerHTML=h;
 }
@@ -1168,6 +1211,7 @@ function calcStreak(){
   return streak;
 }
 function rStreak(){
+  var el=document.getElementById('d-streak');if(el)el.style.display=dashCardHidden('streak')?'none':'flex';
   var el=document.getElementById('d-streak');if(!el)return;
   var streak=calcStreak();
   // Count this week's visits (Mon–today)
@@ -1217,7 +1261,7 @@ function addCust(){
   if(!name){toast('Name required');return;}
   var zip=document.getElementById('a-zip').value.trim();
   var grp=zipToGroup(zip);
-  var nc={code:'NEW'+Date.now().toString().slice(-6),name:name,group:grp,stop:999,address:document.getElementById('a-addr').value.trim(),address2:'',city:document.getElementById('a-city').value.trim(),state:'CA',zip:zip,phone:document.getElementById('a-ph').value.trim(),email:'',lifetimeSales:0,sales2024:0,sales2025:0,sales2026:0,sales2526:0,distance:0};
+  var nc={code:'NEW'+Date.now().toString().slice(-6),name:name,group:grp,stop:999,address:document.getElementById('a-addr').value.trim(),address2:'',city:document.getElementById('a-city').value.trim(),state:'CA',zip:zip,phone:document.getElementById('a-ph').value.trim(),email:'',lifetimeSales:0,sales2024:0,sales2025:0,sales2026:0,sales2526:0,distance:0,addedAt:new Date().toISOString()};
   if(!ST.addedCustomers)ST.addedCustomers=[];ST.addedCustomers.push(nc);lSave();syncUp();
   var grpCustomers=allC().filter(function(c){return c.group===nc.group;});
   var msg='Added '+name+' → Group '+nc.group+(zip?' (zip '+zip+')':'');
@@ -1232,9 +1276,144 @@ function doExport(){
   var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='hc_routes_'+new Date().toISOString().split('T')[0]+'.csv';a2.click();toast('Exported');
 }
 
+// ── YTD LEADERBOARD ───────────────────────────────────────────────────────
+function rLeaderboard(){
+  var el=document.getElementById('d-leaderboard');if(!el)return;
+  if(dashCardHidden('leaderboard')){el.style.display='none';return;}
+  var a=allC();
+  var ranked=a.filter(function(c){return c.sales2526>0;});
+  ranked.sort(function(a,b){return b.sales2526-a.sales2526;});
+  ranked=ranked.slice(0,10);
+  if(!ranked.length){el.style.display='none';return;}
+  el.style.display='block';
+  var rows=ranked.map(function(c,i){
+    var bar=Math.round(c.sales2526/ranked[0].sales2526*100);
+    return '<div class="row" data-code="'+c.code+'" data-action="open" style="display:block;padding:8px 0">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+        +'<div style="width:18px;height:18px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);font-size:10px;font-weight:800;color:var(--sub);display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>'
+        +'<div style="flex:1;min-width:0;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(c.name)+tierBadge(c)+'</div>'
+        +'<div style="font-size:13px;font-weight:800;color:var(--teal);flex-shrink:0">'+fmt(c.sales2526)+'</div>'
+      +'</div>'
+      +'<div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-left:26px">'
+        +'<div style="height:100%;width:'+bar+'%;background:'+(i===0?'var(--teal)':i<3?'var(--blue)':'var(--border2)')+'"></div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  el.innerHTML='<div class="card">'
+    +'<div class="lbl" style="color:var(--teal)">&#127942; Top 10 — YTD Sales</div>'
+    +rows+'</div>';
+  el.querySelectorAll('[data-action="open"]').forEach(function(r){
+    r.addEventListener('click',function(){openM(this.getAttribute('data-code'));});
+  });
+}
+
+// ── NEW CUSTOMER TRACKER ──────────────────────────────────────────────────
+function isNew(c){
+  if(!c.addedAt)return false;
+  return (Date.now()-new Date(c.addedAt).getTime())<90*864e5;
+}
+function newBadge(c){
+  return isNew(c)?'<span class="new-badge">NEW</span>':'';
+}
+function rNewCustomers(){
+  var el=document.getElementById('d-new-card');if(!el)return;
+  if(dashCardHidden('newcusts')){el.style.display='none';return;}
+  var a=allC(),newCusts=a.filter(isNew);
+  if(!newCusts.length){el.style.display='none';return;}
+  newCusts.sort(function(a,b){return new Date(b.addedAt)-new Date(a.addedAt);});
+  el.style.display='block';
+  var rows=newCusts.slice(0,5).map(function(c){
+    var daysAgo=Math.floor((Date.now()-new Date(c.addedAt))/864e5);
+    return '<div class="row" data-code="'+c.code+'" data-action="open">'
+      +'<div class="dot" style="background:#10b981;box-shadow:0 0 6px #10b981"></div>'
+      +'<div class="ri"><div class="rn">'+esc(c.name)+'<span class="new-badge">NEW</span></div>'
+      +'<div class="rm">'+esc(c.city||'')+' &bull; Added '+(daysAgo===0?'today':daysAgo+'d ago')+'</div></div>'
+      +'<div style="font-size:12px;color:var(--sub)">&#8250;</div></div>';
+  }).join('');
+  el.innerHTML='<div class="card" style="border-color:rgba(16,185,129,.35)">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+      +'<div class="lbl" style="margin:0;color:#10b981">&#10010; New Accounts</div>'
+      +'<span style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.35);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">'+newCusts.length+'</span>'
+    +'</div>'+rows+'</div>';
+  el.querySelectorAll('[data-action="open"]').forEach(function(r){
+    r.addEventListener('click',function(){openM(this.getAttribute('data-code'));});
+  });
+}
+
+// ── DASHBOARD CARD TOGGLES ────────────────────────────────────────────────
+var DASH_CARDS=[
+  {key:'brief',label:'Morning Briefing'},
+  {key:'streak',label:'Visit Streak'},
+  {key:'goal',label:'Weekly Goal'},
+  {key:'newcusts',label:'New Accounts'},
+  {key:'leaderboard',label:'YTD Leaderboard'},
+  {key:'hotleads',label:'Hot Leads Overdue'},
+  {key:'winback',label:'Win-Back Targets'},
+  {key:'trend',label:'Visit Trend Chart'},
+  {key:'schedule',label:'This Week\'s Schedule'},
+  {key:'quiet',label:'Going Quiet'}
+];
+function dashCardHidden(key){
+  var h=ST.hiddenCards||{};return !!h[key];
+}
+function rDashToggles(){
+  var el=document.getElementById('dash-toggles');if(!el)return;
+  var h='';
+  for(var i=0;i<DASH_CARDS.length;i++){
+    var c=DASH_CARDS[i];
+    var on=!dashCardHidden(c.key);
+    h+='<div class="tog-wrap">'
+      +'<div class="tog-lbl">'+c.label+'</div>'
+      +'<label class="tog"><input type="checkbox" data-card="'+c.key+'"'+(on?' checked':'')+'><span class="tog-sl"></span></label>'
+    +'</div>';
+  }
+  el.innerHTML=h;
+  el.querySelectorAll('input[data-card]').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      if(!ST.hiddenCards)ST.hiddenCards={};
+      if(this.checked)delete ST.hiddenCards[this.getAttribute('data-card')];
+      else ST.hiddenCards[this.getAttribute('data-card')]=1;
+      lSave();rDash();
+    });
+  });
+}
+
+// ── SWIPE TO MARK VISITED ─────────────────────────────────────────────────
+function initSwipe(containerId){
+  var el=document.getElementById(containerId);if(!el)return;
+  var tx=0,row=null,hint=null;
+  el.addEventListener('touchstart',function(e){
+    var t=e.target;while(t&&t!==el){if(t.classList&&t.classList.contains('row')){row=t;break;}t=t.parentElement;}
+    if(!row)return;
+    tx=e.touches[0].clientX;
+    if(!row.querySelector('.swipe-hint')){hint=document.createElement('div');hint.className='swipe-hint';row.appendChild(hint);}
+    else hint=row.querySelector('.swipe-hint');
+  },{passive:true});
+  el.addEventListener('touchmove',function(e){
+    if(!row)return;
+    var dx=e.touches[0].clientX-tx;
+    if(dx>0&&dx<120){
+      row.classList.add('swiping');
+      if(hint)hint.style.opacity=String(dx/80);
+    }
+  },{passive:true});
+  el.addEventListener('touchend',function(e){
+    if(!row)return;
+    var dx=e.changedTouches[0].clientX-tx;
+    row.classList.remove('swiping');
+    if(hint)hint.style.opacity='0';
+    if(dx>80){
+      var code=row.getAttribute('data-code');
+      if(code){mv(code,'visited');if(ST.scheduled&&ST.scheduled[code])delete ST.scheduled[code];lSave();syncUp();toast('✓ Visited');rDash();rCust();}
+    }
+    row=null;hint=null;tx=0;
+  },{passive:true});
+}
+
 // ── WIN-BACK LIST ─────────────────────────────────────────────────────────
 function rWinBack(){
   var el=document.getElementById('d-winback-card');if(!el)return;
+  if(dashCardHidden('winback')){el.style.display='none';return;}
   var a=allC(),wb=[];
   for(var i=0;i<a.length;i++){
     var c=a[i];
@@ -1269,6 +1448,7 @@ function rWinBack(){
 
 // ── VISIT TREND CHART ─────────────────────────────────────────────────────
 function rTrendChart(){
+  var tc=document.getElementById('d-trend-card');if(tc)tc.style.display=dashCardHidden('trend')?'none':'block';
   var bars=document.getElementById('d-trend-bars');if(!bars)return;
   var now=new Date();
   var weeks=[];
@@ -1403,6 +1583,7 @@ function rMorningBrief(){
 // ── HOT LEAD TRACKER ──────────────────────────────────────────────────────
 function rHotLeads(){
   var el=document.getElementById('d-hot-card');if(!el)return;
+  if(dashCardHidden('hotleads')){el.style.display='none';return;}
   var a=allC(),hot=[];
   for(var i=0;i<a.length;i++){
     if(ST.hot[a[i].code]&&ds(a[i].code)>14)hot.push(a[i]);
@@ -2227,6 +2408,28 @@ if(bavend)bavend.addEventListener('click',function(){
 
 // Next Stop
 var bns=document.getElementById('btn-next-stop');if(bns)bns.addEventListener('click',goNextStop);
+var bbna=document.getElementById('btn-bulk-na');if(bbna)bbna.addEventListener('click',function(){
+  var a=allC(),gc=[],today=new Date().toDateString(),t=new Date();
+  for(var i=0;i<a.length;i++){if(a[i].group===cG)gc.push(a[i]);}
+  var remaining=gc.filter(function(c){
+    var logs=ST.visits[c.code]||[];
+    for(var j=logs.length-1;j>=0;j--){if(new Date(logs[j].date).toDateString()===today)return false;}
+    return true;
+  });
+  if(!remaining.length){toast('No remaining stops');return;}
+  if(!confirm('Mark '+remaining.length+' remaining stops as N/A?'))return;
+  t.setDate(t.getDate()+3);
+  var dateStr=t.toISOString().split('T')[0];
+  for(var i=0;i<remaining.length;i++){
+    mv(remaining[i].code,'not_available');
+    if(!ST.scheduled)ST.scheduled={};
+    ST.scheduled[remaining[i].code]={date:dateStr};
+  }
+  lSave();syncUp();toast('Marked '+remaining.length+' as N/A');rDash();rCust();
+});
+// init swipe on route card and customer list
+initSwipe('d-route');
+initSwipe('c-list');
 
 // Custom route
 var crsrch=document.getElementById('cr-srch');if(crsrch)crsrch.addEventListener('input',crSearch);
@@ -2662,6 +2865,7 @@ function rejectAllPending(){
 
 // ── QUIET ACCOUNTS ────────────────────────────────────────────────────────
 function rQuietAccounts(){
+  if(dashCardHidden('quiet')){var qc=document.getElementById('d-quiet-card');if(qc)qc.style.display='none';return;}
   var a=allC(),quiet=[];
   for(var i=0;i<a.length;i++){
     var c=a[i];
@@ -2704,6 +2908,7 @@ function rQuietAccounts(){
 
 // ── WEEK SCHEDULE ─────────────────────────────────────────────────────────
 function rWeekSchedule(){
+  if(dashCardHidden('schedule')){var sc=document.getElementById('d-sched-card');if(sc)sc.style.display='none';return;}
   var a=allC();
   var today=new Date();today.setHours(0,0,0,0);
   var dow=today.getDay();
@@ -2814,6 +3019,7 @@ function getWeekVisits(){
   return count;
 }
 function rWeekGoal(){
+  var gc=document.getElementById('d-goal-card');if(gc)gc.style.display=dashCardHidden('goal')?'none':'block';
   var goal=ST.weeklyGoal||30;
   var done=getWeekVisits();
   var pct=Math.min(100,Math.round(done/goal*100));
