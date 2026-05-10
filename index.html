@@ -648,7 +648,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="srch-wrap" style="margin-bottom:8px"><span class="srch-icon">&#128269;</span><input class="srch" id="cr-srch" type="search" placeholder="Add customers or vendors..."></div>
       <div id="cr-results" style="display:none;max-height:150px;overflow-y:auto;margin-bottom:8px;border:1px solid var(--border);border-radius:var(--r2)"></div>
       <div id="cr-stops"></div>
-      <button class="btn btn-t" id="btn-run-route" style="display:none;margin-top:10px">Open Custom Route</button>
+      <button class="btn btn-b" id="btn-optimize-gps" style="display:none;margin-top:10px">&#128205; GPS Optimize Order</button>
+      <button class="btn btn-t" id="btn-run-route" style="display:none;margin-top:6px">Open Custom Route</button>
     </div>
   </div>
 </div>
@@ -1207,7 +1208,7 @@ function rRoute(){
   }
   var bbna2=document.getElementById('btn-bulk-na');
   if(bbna2)bbna2.style.display=stops.length?'block':'none';
-  if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">All caught up in Group '+cG+'!</div>';return;}
+  if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">All caught up in '+getGroupName(cG)+'!</div>';return;}
   for(var i=0;i<stops.length;i++){
     var c=stops[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var meta=d>=1000000?'Never':lv&&lv.type==='not_available'?('Retry · '+new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})):(new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+d+'d');
@@ -1398,7 +1399,7 @@ function rGrps(){
       +'<input id="gnote-inp-'+g+'" type="text" value="'+esc(gnote)+'" placeholder="Add group note..." style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-family:inherit;outline:none">'
       +'<button onclick="saveGroupNote(\''+g+'\')" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Save</button>'
       +'</div></div>';
-    h+='<div class="grp-row" data-g="'+g+'"><div class="gbadge" style="background:'+col+'">'+g+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Group '+g+' '+sizeWarn+sizeNote+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(cl)+'</div><div style="font-size:11px;margin-top:4px"><span style="color:var(--green)">'+vis+' recent</span> <span style="color:var(--dim)"> | </span><span style="color:var(--red)">'+ov+' overdue</span> <span style="color:var(--dim)"> | </span><span style="color:var(--sub)">'+lastWorkedStr+'</span></div>'+gnoteHtml+'</div><div style="text-align:right;flex-shrink:0"><div class="grp-pct" style="color:'+col+'">'+pct+'%</div><div class="grp-pct-l">done</div><button data-grp="'+g+'" class="btn-sm" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:11px;padding:4px 8px" onclick="event.stopPropagation();routeGroup('+g+')">Route</button></div></div>';
+    h+='<div class="grp-row" data-g="'+g+'"><div class="gbadge" style="background:'+col+'">'+g+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">'+getGroupName(+g)+' '+sizeWarn+sizeNote+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(cl)+'</div><div style="font-size:11px;margin-top:4px"><span style="color:var(--green)">'+vis+' recent</span> <span style="color:var(--dim)"> | </span><span style="color:var(--red)">'+ov+' overdue</span> <span style="color:var(--dim)"> | </span><span style="color:var(--sub)">'+lastWorkedStr+'</span></div>'+gnoteHtml+'</div><div style="text-align:right;flex-shrink:0"><div class="grp-pct" style="color:'+col+'">'+pct+'%</div><div class="grp-pct-l">done</div><button data-grp="'+g+'" class="btn-sm" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:11px;padding:4px 8px" onclick="event.stopPropagation();routeGroup('+g+')">Route</button></div></div>';
   }
   var gl=document.getElementById('g-list');if(gl)gl.innerHTML=h;
 }
@@ -1409,7 +1410,7 @@ function openM(code){
   if(!c)return;
   mC=code;
   var mn=document.getElementById('m-n');if(mn)mn.textContent=c.name;
-  var mc=document.getElementById('m-c');if(mc)mc.innerHTML=esc(c.code)+' / Group '+c.group+' '+tierBadge(c);
+  var mc=document.getElementById('m-c');if(mc)mc.innerHTML=esc(c.code)+' / '+getGroupName(c.group)+' '+tierBadge(c);
   var addr=[c.address,c.address2,c.city,'CA',c.zip].filter(function(x){return x;}).join(', ');
   var ms=document.getElementById('m-s');
   // Trend: compare current year (sales2526) vs prior year (sales2025)
@@ -1438,7 +1439,7 @@ function openM(code){
   var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="https://www.google.com/maps/search/'+encodeURIComponent(addr)+'" target="_blank" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
   var mp=document.getElementById('m-p');if(mp)mp.innerHTML=c.phone?'<a href="tel:'+esc(c.phone)+'" style="color:var(--blue);text-decoration:none">'+esc(c.phone)+'</a><a href="sms:'+esc(c.phone)+'" style="margin-left:10px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;text-decoration:none">&#128172; SMS</a>':'No phone';
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
-  var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
+  var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?'&#128222; Called':'Not Available')+'</div></div>';}
   var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
@@ -2336,7 +2337,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="srch-wrap" style="margin-bottom:8px"><span class="srch-icon">&#128269;</span><input class="srch" id="cr-srch" type="search" placeholder="Add customers or vendors..."></div>
       <div id="cr-results" style="display:none;max-height:150px;overflow-y:auto;margin-bottom:8px;border:1px solid var(--border);border-radius:var(--r2)"></div>
       <div id="cr-stops"></div>
-      <button class="btn btn-t" id="btn-run-route" style="display:none;margin-top:10px">Open Custom Route</button>
+      <button class="btn btn-b" id="btn-optimize-gps" style="display:none;margin-top:10px">&#128205; GPS Optimize Order</button>
+      <button class="btn btn-t" id="btn-run-route" style="display:none;margin-top:6px">Open Custom Route</button>
     </div>
   </div>
 </div>
@@ -2895,7 +2897,7 @@ function rRoute(){
   }
   var bbna2=document.getElementById('btn-bulk-na');
   if(bbna2)bbna2.style.display=stops.length?'block':'none';
-  if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">All caught up in Group '+cG+'!</div>';return;}
+  if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">All caught up in '+getGroupName(cG)+'!</div>';return;}
   for(var i=0;i<stops.length;i++){
     var c=stops[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var meta=d>=1000000?'Never':lv&&lv.type==='not_available'?('Retry · '+new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})):(new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+d+'d');
@@ -3086,7 +3088,7 @@ function rGrps(){
       +'<input id="gnote-inp-'+g+'" type="text" value="'+esc(gnote)+'" placeholder="Add group note..." style="flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-family:inherit;outline:none">'
       +'<button onclick="saveGroupNote(\''+g+'\')" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Save</button>'
       +'</div></div>';
-    h+='<div class="grp-row" data-g="'+g+'"><div class="gbadge" style="background:'+col+'">'+g+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Group '+g+' '+sizeWarn+sizeNote+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(cl)+'</div><div style="font-size:11px;margin-top:4px"><span style="color:var(--green)">'+vis+' recent</span> <span style="color:var(--dim)"> | </span><span style="color:var(--red)">'+ov+' overdue</span> <span style="color:var(--dim)"> | </span><span style="color:var(--sub)">'+lastWorkedStr+'</span></div>'+gnoteHtml+'</div><div style="text-align:right;flex-shrink:0"><div class="grp-pct" style="color:'+col+'">'+pct+'%</div><div class="grp-pct-l">done</div><button data-grp="'+g+'" class="btn-sm" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:11px;padding:4px 8px" onclick="event.stopPropagation();routeGroup('+g+')">Route</button></div></div>';
+    h+='<div class="grp-row" data-g="'+g+'"><div class="gbadge" style="background:'+col+'">'+g+'</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">'+getGroupName(+g)+' '+sizeWarn+sizeNote+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(cl)+'</div><div style="font-size:11px;margin-top:4px"><span style="color:var(--green)">'+vis+' recent</span> <span style="color:var(--dim)"> | </span><span style="color:var(--red)">'+ov+' overdue</span> <span style="color:var(--dim)"> | </span><span style="color:var(--sub)">'+lastWorkedStr+'</span></div>'+gnoteHtml+'</div><div style="text-align:right;flex-shrink:0"><div class="grp-pct" style="color:'+col+'">'+pct+'%</div><div class="grp-pct-l">done</div><button data-grp="'+g+'" class="btn-sm" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:11px;padding:4px 8px" onclick="event.stopPropagation();routeGroup('+g+')">Route</button></div></div>';
   }
   var gl=document.getElementById('g-list');if(gl)gl.innerHTML=h;
 }
@@ -3097,7 +3099,7 @@ function openM(code){
   if(!c)return;
   mC=code;
   var mn=document.getElementById('m-n');if(mn)mn.textContent=c.name;
-  var mc=document.getElementById('m-c');if(mc)mc.innerHTML=esc(c.code)+' / Group '+c.group+' '+tierBadge(c);
+  var mc=document.getElementById('m-c');if(mc)mc.innerHTML=esc(c.code)+' / '+getGroupName(c.group)+' '+tierBadge(c);
   var addr=[c.address,c.address2,c.city,'CA',c.zip].filter(function(x){return x;}).join(', ');
   var ms=document.getElementById('m-s');
   // Trend: compare current year (sales2526) vs prior year (sales2025)
@@ -3126,7 +3128,7 @@ function openM(code){
   var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="https://www.google.com/maps/search/'+encodeURIComponent(addr)+'" target="_blank" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
   var mp=document.getElementById('m-p');if(mp)mp.innerHTML=c.phone?'<a href="tel:'+esc(c.phone)+'" style="color:var(--blue);text-decoration:none">'+esc(c.phone)+'</a><a href="sms:'+esc(c.phone)+'" style="margin-left:10px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;text-decoration:none">&#128172; SMS</a>':'No phone';
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
-  var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
+  var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?'&#128222; Called':'Not Available')+'</div></div>';}
   var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
@@ -3702,8 +3704,8 @@ document.querySelectorAll('.chip').forEach(function(chip){
 });
 var csrch=document.getElementById('c-srch');if(csrch)csrch.addEventListener('input',function(){cS=this.value;pg=0;rCust();});
 var cm=document.getElementById('c-more');if(cm)cm.addEventListener('click',function(){pg++;rCPage();});
-var bp=document.getElementById('btn-prev');if(bp)bp.addEventListener('click',function(){cG=Math.max(1,cG-1);document.getElementById('g-lbl').textContent='Grp '+cG;localStorage.setItem('hrt_lg',String(cG));rRoute();});
-var bn=document.getElementById('btn-next');if(bn)bn.addEventListener('click',function(){cG=Math.min(61,cG+1);document.getElementById('g-lbl').textContent='Grp '+cG;localStorage.setItem('hrt_lg',String(cG));rRoute();});
+var bp=document.getElementById('btn-prev');if(bp)bp.addEventListener('click',function(){cG=Math.max(1,cG-1);document.getElementById('g-lbl').textContent=getGroupName(cG);localStorage.setItem('hrt_lg',String(cG));rRoute();});
+var bn=document.getElementById('btn-next');if(bn)bn.addEventListener('click',function(){cG=Math.min(61,cG+1);document.getElementById('g-lbl').textContent=getGroupName(cG);localStorage.setItem('hrt_lg',String(cG));rRoute();});
 var bm=document.getElementById('btn-map');if(bm)bm.addEventListener('click',function(){
   var a=allC(),gc=[];
   for(var i=0;i<a.length;i++){if(a[i].group===cG&&a[i].address)gc.push(a[i]);}
@@ -3872,7 +3874,7 @@ document.addEventListener('click',function(e){
     // Check for group row tap (data-g)
     var gEl=t;var gVal=null;
     while(gEl&&!gVal){gVal=gEl.getAttribute('data-g');if(!gVal)gEl=gEl.parentElement;}
-    if(gVal){cG=+gVal;document.getElementById('g-lbl').textContent='Grp '+cG;localStorage.setItem('hrt_lg',gVal);go('dash');}
+    if(gVal){cG=+gVal;document.getElementById('g-lbl').textContent=getGroupName(cG);localStorage.setItem('hrt_lg',gVal);go('dash');}
   }
 });
 
@@ -4221,14 +4223,14 @@ function crSearch(){
 function addToCustomRoute(id,type){
   // Check not already added
   for(var i=0;i<customRoute.length;i++){if(customRoute[i].id===id)return;}
-  var name='',addr='';
+  var name='',addr='',city='';
   if(type==='cust'){
-    var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===id){name=a[i].name;addr=[a[i].address,a[i].city,'CA'].filter(function(x){return x;}).join(', ');break;}}
+    var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===id){name=a[i].name;city=a[i].city||'';addr=[a[i].address,city,'CA'].filter(function(x){return x;}).join(', ');break;}}
   } else {
-    var v=allV();for(var i=0;i<v.length;i++){if(v[i].code===id){name=v[i].name;addr=[v[i].address,v[i].city,'CA'].filter(function(x){return x;}).join(', ');break;}}
+    var v=allV();for(var i=0;i<v.length;i++){if(v[i].code===id){name=v[i].name;city=v[i].city||'';addr=[v[i].address,city,'CA'].filter(function(x){return x;}).join(', ');break;}}
   }
   if(!addr){toast('No address for '+name);return;}
-  customRoute.push({id:id,type:type,name:name,addr:addr});
+  customRoute.push({id:id,type:type,name:name,addr:addr,city:city});
   renderCustomRoute();
   var srch=document.getElementById('cr-srch');if(srch)srch.value='';
   var res=document.getElementById('cr-results');if(res)res.style.display='none';
@@ -4243,10 +4245,12 @@ function removeFromCustomRoute(idx){
 function renderCustomRoute(){
   var el=document.getElementById('cr-stops');
   var btn=document.getElementById('btn-run-route');
+  var gbtn=document.getElementById('btn-optimize-gps');
   if(!el)return;
   if(!customRoute.length){
     el.innerHTML='<div style="font-size:13px;color:var(--dim);padding:4px 0">Search above to build your route</div>';
     if(btn)btn.style.display='none';
+    if(gbtn)gbtn.style.display='none';
     return;
   }
   var h='';
@@ -4271,6 +4275,7 @@ function renderCustomRoute(){
   }
   el.innerHTML=h;
   if(btn)btn.style.display='block';
+  if(gbtn)gbtn.style.display='block';
   // Wire visit buttons
   el.querySelectorAll('[data-crid]').forEach(function(b){
     b.addEventListener('click',function(e){
@@ -4424,7 +4429,7 @@ document.getElementById('vm-nearby').addEventListener('click',function(){
   var v=allV(),vend=null;for(var i=0;i<v.length;i++){if(v[i].code===mVC){vend=v[i];break;}}
   if(!vend)return;
   var grp=nearestGroupToVendor(vend);
-  cG=grp;document.getElementById('g-lbl').textContent='Grp '+grp;
+  cG=grp;document.getElementById('g-lbl').textContent=getGroupName(grp);
   // Build stops for nearest group
   var na=allC(),ngc=[];
   for(var i=0;i<na.length;i++){if(na[i].group===grp&&na[i].address)ngc.push(na[i]);}
@@ -4523,6 +4528,12 @@ initSwipe('c-list');
 // Custom route
 var crsrch=document.getElementById('cr-srch');if(crsrch)crsrch.addEventListener('input',crSearch);
 var brr=document.getElementById('btn-run-route');if(brr)brr.addEventListener('click',runCustomRoute);
+var bgps=document.getElementById('btn-optimize-gps');
+if(bgps)bgps.addEventListener('click',function(){
+  if(!customRoute.length){toast('No stops to optimize');return;}
+  toast('Getting GPS location…');
+  optimizeRouteByGPS(customRoute,function(ordered){customRoute=ordered;renderCustomRoute();toast('Route optimized by GPS!');});
+});
 var bcr=document.getElementById('btn-clear-route');
 if(bcr)bcr.addEventListener('click',function(){customRoute=[];renderCustomRoute();});
 
@@ -5203,8 +5214,8 @@ function showGroupSheet(g){
   sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:82vh;overflow-y:auto">'
     +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
-      +'<div><div style="font-size:18px;font-weight:700">Group '+g+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+custs.length+' customers</div></div>'
-      +'<button style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="(function(){var s=document.querySelector(\'[data-covsheet]\');if(s)s.remove();cG='+g+';document.getElementById(\'g-lbl\').textContent=\'Grp '+g+'\';localStorage.setItem(\'hrt_lg\',\''+g+'\');go(\'dash\');})()">Route This Group</button>'
+      +'<div><div style="font-size:18px;font-weight:700">'+getGroupName(+g)+'</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+custs.length+' customers</div></div>'
+      +'<button style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="(function(){var s=document.querySelector(\'[data-covsheet]\');if(s)s.remove();cG='+g+';document.getElementById(\'g-lbl\').textContent=getGroupName('+g+');localStorage.setItem(\'hrt_lg\',\''+g+'\');go(\'dash\');})()">Route This Group</button>'
     +'</div>'
     +rows
     +'<button style="width:100%;margin-top:14px;padding:12px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit" onclick="this.closest(\'[data-covsheet]\').remove()">Close</button>'
@@ -6874,7 +6885,7 @@ var teslaCont=document.getElementById('d-tesla-cont');
 if(teslaCont)teslaCont.addEventListener('click',continueRollingRoute);
 var sg=smartGroup();
 cG=sg;
-document.getElementById('g-lbl').textContent='Grp '+sg;
+document.getElementById('g-lbl').textContent=getGroupName(sg);
 rDash();
 rCust();
 rGrps();
