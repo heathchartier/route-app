@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -371,6 +371,12 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .dupe-group{background:var(--bg3);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:12px;margin-bottom:10px}
 .dupe-item{font-size:13px;color:var(--text);padding:4px 0}
 .dupe-sub{font-size:11px;color:var(--sub)}
+/* ── ACCOUNT TAGS ── */
+.tag-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:20px;padding:2px 8px;margin:2px;cursor:pointer;border:1px solid transparent}
+.tag-chip-del{font-size:10px;opacity:.7;line-height:1}
+.tag-row{display:flex;flex-wrap:wrap;gap:2px;min-height:24px}
+/* ── CALL LOG ── */
+.ls-call{color:#818cf8}
 /* ── UNDO TOAST ── */
 #toast-undo{display:none;position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:10px 8px 10px 18px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.5);align-items:center;gap:10px}
 #toast-undo.on{opacity:1;display:flex}
@@ -629,6 +635,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <button class="chip" data-f="tier_a">A Tier</button>
       <button class="chip" data-f="tier_b">B Tier</button>
       <button class="chip" data-f="tier_c">C Tier</button>
+      <button class="chip" data-f="tagged">Tagged</button>
+      <button class="chip" data-f="called">Called Today</button>
     </div>
     <div style="padding:0 16px 8px">
       <button onclick="showNotesSearch()" style="width:100%;padding:9px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;text-align:left">&#128269; Search notes across all customers...</button>
@@ -886,6 +894,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
         <button class="btn btn-g" id="m-can">Cancel</button>
       </div>
     </div>
+    <div class="msect" id="m-tags-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Tags<button onclick="showTagPicker(mC)" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button></div>
+      <div id="m-tags-list" class="tag-row"><div style="color:var(--sub);font-size:12px">No tags</div></div>
+    </div>
     <div class="msect">
       <div class="msect-lbl">Notes &amp; Intel</div>
       <textarea class="note" id="m-note" placeholder="Add notes..."></textarea>
@@ -895,6 +907,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <button class="abtn" id="m-followup" style="width:100%;margin-top:8px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3)">&#128197; Schedule Follow-Up</button>
       <button class="abtn" id="m-vcard" onclick="exportVCard(mC)" style="width:100%;margin-top:8px;background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)">&#128101; Save Contact (vCard)</button>
       <button class="abtn" id="m-snooze" onclick="showSnoozeOptions(mC)" style="width:100%;margin-top:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--sub)">&#128164; Snooze Off Route</button>
+      <button class="abtn" onclick="logCall(mC)" style="width:100%;margin-top:8px;background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3)">&#128222; Log Call</button>
     </div>
     <div class="msect" id="m-comp-sect" style="display:none">
       <div class="msect-lbl">Competitor</div>
@@ -973,10 +986,10 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[]};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1264,6 +1277,8 @@ function rCust(){
     else if(cF==='tier_a'){if(getTier(c)!=='A')continue;}
     else if(cF==='tier_b'){if(getTier(c)!=='B')continue;}
     else if(cF==='tier_c'){if(getTier(c)!=='C')continue;}
+    else if(cF==='tagged'){if(!ST.tags||!ST.tags[c.code]||!ST.tags[c.code].length)continue;}
+    else if(cF==='called'){var todayStr=new Date().toDateString();var logs=ST.visits[c.code]||[];var calledToday=false;for(var ci=logs.length-1;ci>=0;ci--){if(new Date(logs[ci].date).toDateString()!==todayStr)break;if(logs[ci].type==='called'){calledToday=true;break;}}if(!calledToday)continue;}
     f.push(c);
   }
   fc=f;
@@ -1360,8 +1375,8 @@ function openM(code){
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
-  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':'#f59e0b')+'">'+( l.type==='visited'?'Visited':'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);
+  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?'&#128222; Called':'Not Available')+'</div></div>';}
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);rTags(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -1978,6 +1993,12 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .dupe-group{background:var(--bg3);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:12px;margin-bottom:10px}
 .dupe-item{font-size:13px;color:var(--text);padding:4px 0}
 .dupe-sub{font-size:11px;color:var(--sub)}
+/* ── ACCOUNT TAGS ── */
+.tag-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:20px;padding:2px 8px;margin:2px;cursor:pointer;border:1px solid transparent}
+.tag-chip-del{font-size:10px;opacity:.7;line-height:1}
+.tag-row{display:flex;flex-wrap:wrap;gap:2px;min-height:24px}
+/* ── CALL LOG ── */
+.ls-call{color:#818cf8}
 /* ── UNDO TOAST ── */
 #toast-undo{display:none;position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:10px 8px 10px 18px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.5);align-items:center;gap:10px}
 #toast-undo.on{opacity:1;display:flex}
@@ -2236,6 +2257,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <button class="chip" data-f="tier_a">A Tier</button>
       <button class="chip" data-f="tier_b">B Tier</button>
       <button class="chip" data-f="tier_c">C Tier</button>
+      <button class="chip" data-f="tagged">Tagged</button>
+      <button class="chip" data-f="called">Called Today</button>
     </div>
     <div style="padding:0 16px 8px">
       <button onclick="showNotesSearch()" style="width:100%;padding:9px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;text-align:left">&#128269; Search notes across all customers...</button>
@@ -2493,6 +2516,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
         <button class="btn btn-g" id="m-can">Cancel</button>
       </div>
     </div>
+    <div class="msect" id="m-tags-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Tags<button onclick="showTagPicker(mC)" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button></div>
+      <div id="m-tags-list" class="tag-row"><div style="color:var(--sub);font-size:12px">No tags</div></div>
+    </div>
     <div class="msect">
       <div class="msect-lbl">Notes &amp; Intel</div>
       <textarea class="note" id="m-note" placeholder="Add notes..."></textarea>
@@ -2502,6 +2529,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <button class="abtn" id="m-followup" style="width:100%;margin-top:8px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3)">&#128197; Schedule Follow-Up</button>
       <button class="abtn" id="m-vcard" onclick="exportVCard(mC)" style="width:100%;margin-top:8px;background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)">&#128101; Save Contact (vCard)</button>
       <button class="abtn" id="m-snooze" onclick="showSnoozeOptions(mC)" style="width:100%;margin-top:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--sub)">&#128164; Snooze Off Route</button>
+      <button class="abtn" onclick="logCall(mC)" style="width:100%;margin-top:8px;background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3)">&#128222; Log Call</button>
     </div>
     <div class="msect" id="m-comp-sect" style="display:none">
       <div class="msect-lbl">Competitor</div>
@@ -2580,10 +2608,10 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[]};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -2871,6 +2899,8 @@ function rCust(){
     else if(cF==='tier_a'){if(getTier(c)!=='A')continue;}
     else if(cF==='tier_b'){if(getTier(c)!=='B')continue;}
     else if(cF==='tier_c'){if(getTier(c)!=='C')continue;}
+    else if(cF==='tagged'){if(!ST.tags||!ST.tags[c.code]||!ST.tags[c.code].length)continue;}
+    else if(cF==='called'){var todayStr=new Date().toDateString();var logs=ST.visits[c.code]||[];var calledToday=false;for(var ci=logs.length-1;ci>=0;ci--){if(new Date(logs[ci].date).toDateString()!==todayStr)break;if(logs[ci].type==='called'){calledToday=true;break;}}if(!calledToday)continue;}
     f.push(c);
   }
   fc=f;
@@ -2967,8 +2997,8 @@ function openM(code){
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
-  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':'#f59e0b')+'">'+( l.type==='visited'?'Visited':'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);
+  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?'&#128222; Called':'Not Available')+'</div></div>';}
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);rTags(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -4650,15 +4680,17 @@ function parsePriceXLSX(buf,fname){
 
 function showEOD(){
   var a=allC(),today=new Date().toDateString();
-  var visited=[],notAvail=[],noted=[];
+  var visited=[],notAvail=[],noted=[],calledToday=[],samplesDropped=[];
   for(var i=0;i<a.length;i++){
     var c=a[i],logs=ST.visits[c.code]||[];
     for(var j=logs.length-1;j>=0;j--){
       if(new Date(logs[j].date).toDateString()!==today)break;
       if(logs[j].type==='visited')visited.push(c);
+      else if(logs[j].type==='called')calledToday.push(c);
       else notAvail.push(c);
       break;
     }
+    var samps=ST.samples&&ST.samples[c.code]?ST.samples[c.code]:[];for(var si=0;si<samps.length;si++){if(new Date(samps[si].date).toDateString()===today)samplesDropped.push({c:c,s:samps[si]});}
   }
   for(var code in ST.notes){
     if(ST.notes[code]){
@@ -4686,12 +4718,13 @@ function showEOD(){
       '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green)">'+visited.length+'</div><div style="font-size:11px;color:var(--sub)">Visited</div></div>'+
       '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--amber)">'+notAvail.length+'</div><div style="font-size:11px;color:var(--sub)">Not Avail</div></div>'+
       '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--blue)">'+noted.length+'</div><div style="font-size:11px;color:var(--sub)">Notes</div></div>'+
+      '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:#818cf8">'+calledToday.length+'</div><div style="font-size:11px;color:var(--sub)">Calls</div></div>'
     '</div>'+
     (visited.length?'<div class="eod-sec">&#10003; Visited ('+visited.length+')</div>'+rows(visited,'#10b981'):'<div class="eod-sec" style="color:var(--sub)">No visits logged today</div>')+
     (notAvail.length?'<div class="eod-sec">&#9711; Not Available ('+notAvail.length+')</div>'+rows(notAvail,'#f59e0b'):'')+
     (noted.length?'<div class="eod-sec">&#128221; Notes ('+noted.length+')</div>'+notedRows:'')+
     '<button class="eod-copy" onclick="copyEOD('+visited.length+','+notAvail.length+')">Copy as Text</button>'+
-    '<button class="eod-copy" style="margin-top:8px;background:var(--blue2);color:var(--blue);border-color:rgba(74,158,255,.3)" onclick="emailEOD()">&#9993; Email Summary</button>'+
+    '<button class="eod-copy" style="margin-top:8px;background:rgba(129,140,248,.15);color:#818cf8;border-color:rgba(129,140,248,.3)" onclick="shareEOD(calledToday.length,samplesDropped.length)">&#128279; Share Summary</button>'+
     '<button class="eod-close" onclick="this.closest(\'.eod-sheet\').remove()">Close</button>'+
   '</div>';
   document.body.appendChild(sheet);
@@ -5073,6 +5106,12 @@ function showGroupSheet(g){
 .dupe-group{background:var(--bg3);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:12px;margin-bottom:10px}
 .dupe-item{font-size:13px;color:var(--text);padding:4px 0}
 .dupe-sub{font-size:11px;color:var(--sub)}
+/* ── ACCOUNT TAGS ── */
+.tag-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:20px;padding:2px 8px;margin:2px;cursor:pointer;border:1px solid transparent}
+.tag-chip-del{font-size:10px;opacity:.7;line-height:1}
+.tag-row{display:flex;flex-wrap:wrap;gap:2px;min-height:24px}
+/* ── CALL LOG ── */
+.ls-call{color:#818cf8}
 /* ── UNDO TOAST ── */
 function showUndoToast(code,type){
   var t=document.getElementById('toast-undo');if(!t)return;
@@ -6000,6 +6039,129 @@ function dismissDupe(key){
   if(ST.dismissedDupes.indexOf(key)===-1)ST.dismissedDupes.push(key);
   lSave();syncUp();
   runDupeDetector();
+}
+
+/* ── CALL LOG ── */
+function logCall(code){
+  if(!code)return;
+  mv(code,'called');
+  lSave();syncUp();
+  toast('&#128222; Call logged');
+  rDash();rCust();
+}
+
+/* ── ACCOUNT TAGS ── */
+var PRESET_TAGS=['Big Fish','New Account','Competitor Risk','Price Sensitive','Champion','Problem Account','Follow Up','Hot Opportunity','Dormant'];
+function rTags(code){
+  var el=document.getElementById('m-tags-list');if(!el)return;
+  var tags=ST.tags&&ST.tags[code]?ST.tags[code]:[];
+  if(!tags.length){el.innerHTML='<div style="color:var(--sub);font-size:12px">No tags</div>';return;}
+  var tagColors=['rgba(0,229,184,.2)','rgba(74,158,255,.2)','rgba(255,176,32,.2)','rgba(129,140,248,.2)','rgba(255,77,106,.2)','rgba(16,185,129,.2)'];
+  var tagText=['var(--teal)','var(--blue)','var(--amber)','#818cf8','var(--red)','#10b981'];
+  var h='';
+  for(var i=0;i<tags.length;i++){
+    var ci=i%tagColors.length;
+    h+='<span class="tag-chip" style="background:'+tagColors[ci]+';color:'+tagText[ci]+';border-color:'+tagColors[ci]+'">'+esc(tags[i])+'<span class="tag-chip-del" onclick="removeTag(\''+esc(code)+'\',\''+esc(tags[i])+'\')">&#10005;</span></span>';
+  }
+  el.innerHTML=h;
+}
+function showTagPicker(code){
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:flex;align-items:flex-end;justify-content:center';
+  var existing=ST.tags&&ST.tags[code]?ST.tags[code]:[];
+  var presetHtml=PRESET_TAGS.map(function(t){
+    var on=existing.indexOf(t)!==-1;
+    return '<button onclick="toggleTag(\''+esc(code)+'\',\''+t+'\')" style="padding:7px 14px;border-radius:20px;border:1px solid '+(on?'rgba(0,229,184,.4)':'var(--border2)')+';background:'+(on?'var(--teal2)':'var(--bg3)')+';color:'+(on?'var(--teal)':'var(--sub)')+';font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">'+t+'</button>';
+  }).join('');
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">Tags</div>'
+   +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">'+presetHtml+'</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Custom tag</div>'
+   +'<div style="display:flex;gap:8px">'
+   +'<input id="tag-custom" type="text" placeholder="Type a custom tag..." style="flex:1;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px">'
+   +'<button onclick="addCustomTag(\''+esc(code)+'\')" style="padding:10px 16px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:none">Add</button>'
+   +'</div>'
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;margin-top:12px">Done</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+function toggleTag(code,tag){
+  if(!ST.tags)ST.tags={};
+  if(!ST.tags[code])ST.tags[code]=[];
+  var idx=ST.tags[code].indexOf(tag);
+  if(idx===-1)ST.tags[code].push(tag);
+  else ST.tags[code].splice(idx,1);
+  lSave();syncUp();
+  rTags(code);
+  var sheet=document.querySelector('div[style*="z-index: 1100"],div[style*="z-index:1100"]');
+  if(sheet){
+    var btns=sheet.querySelectorAll('button');
+    btns.forEach(function(btn){
+      if(btn.textContent.trim()===tag){
+        var on=ST.tags[code].indexOf(tag)!==-1;
+        btn.style.border='1px solid '+(on?'rgba(0,229,184,.4)':'var(--border2)');
+        btn.style.background=on?'var(--teal2)':'var(--bg3)';
+        btn.style.color=on?'var(--teal)':'var(--sub)';
+      }
+    });
+  }
+}
+function addCustomTag(code){
+  var inp=document.getElementById('tag-custom');
+  if(!inp||!inp.value.trim())return;
+  var tag=inp.value.trim();
+  if(!ST.tags)ST.tags={};
+  if(!ST.tags[code])ST.tags[code]=[];
+  if(ST.tags[code].indexOf(tag)===-1)ST.tags[code].push(tag);
+  lSave();syncUp();
+  rTags(code);
+  inp.value='';
+  toast('Tag added');
+}
+function removeTag(code,tag){
+  if(!ST.tags||!ST.tags[code])return;
+  var idx=ST.tags[code].indexOf(tag);
+  if(idx!==-1)ST.tags[code].splice(idx,1);
+  lSave();syncUp();
+  rTags(code);
+}
+
+/* ── EOD SHARE ── */
+function shareEOD(callCount,sampleCount){
+  var a=allC(),today=new Date().toDateString();
+  var dateStr=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  var visited=[],notAvail=[];
+  for(var i=0;i<a.length;i++){
+    var logs=ST.visits[a[i].code]||[];
+    for(var j=logs.length-1;j>=0;j--){
+      if(new Date(logs[j].date).toDateString()!==today)break;
+      if(logs[j].type==='visited')visited.push(a[i]);
+      else if(logs[j].type==='not_available')notAvail.push(a[i]);
+      break;
+    }
+  }
+  var lines=[];
+  lines.push('Route Summary — '+dateStr);
+  lines.push('');
+  lines.push('Visited: '+visited.length+'  |  Not Available: '+notAvail.length+'  |  Calls: '+(callCount||0)+'  |  Samples: '+(sampleCount||0));
+  if(visited.length){
+    lines.push('');lines.push('VISITED:');
+    visited.forEach(function(c){
+      var note=ST.notes&&ST.notes[c.code]?' — '+ST.notes[c.code]:'';
+      lines.push('• '+c.name+(c.city?' ('+c.city+')':'')+note);
+    });
+  }
+  var comp=[];
+  for(var code in ST.competitors){if(ST.competitors[code]){var ci=null;for(var i=0;i<a.length;i++){if(a[i].code===code){ci=a[i];break;}}if(ci)comp.push(ci.name+': '+ST.competitors[code]);}}
+  if(comp.length){lines.push('');lines.push('COMPETITOR NOTES:');comp.forEach(function(s){lines.push('• '+s);});}
+  var txt=lines.join('\n');
+  if(navigator.share){
+    navigator.share({title:'Route Summary',text:txt}).catch(function(){});
+  }else{
+    navigator.clipboard.writeText(txt).then(function(){toast('Copied to clipboard');}).catch(function(){toast('Copy failed');});
+  }
 }
 
 lLoad();
