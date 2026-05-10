@@ -1218,7 +1218,7 @@ function rRoute(){
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
       '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+tierBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+noteHtml+'</div>'+
       '<button class="btn-qnote" data-qn="'+c.code+'" style="background:transparent;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:2px 6px;flex-shrink:0">&#128221;</button>'+
-      (c.phone?'<a href="tel:'+c.phone+'" class="vb-call" onclick="setTimeout(function(){promptLogCall(\''+c.code+'\')},2000)">&#128222;</a>':'')+'
+      (c.phone?'<a href="tel:'+c.phone+'" data-dc="'+c.code+'" class="vb-call">&#128222;</a>':'')+'
       '<div class="vbs">'+
       '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
       '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
@@ -2906,7 +2906,7 @@ function rRoute(){
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
       '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+tierBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+noteHtml+'</div>'+
       '<button class="btn-qnote" data-qn="'+c.code+'" style="background:transparent;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:2px 6px;flex-shrink:0">&#128221;</button>'+
-      (c.phone?'<a href="tel:'+c.phone+'" class="vb-call" onclick="setTimeout(function(){promptLogCall(\''+c.code+'\')},2000)">&#128222;</a>':'')+'
+      (c.phone?'<a href="tel:'+c.phone+'" data-dc="'+c.code+'" class="vb-call">&#128222;</a>':'')+'
       '<div class="vbs">'+
       '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
       '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
@@ -5586,6 +5586,12 @@ function initQuickNotes(containerId){
     var inp=wrap.querySelector('.qnote-inp');if(!inp)return;
     if(!ST.notes)ST.notes={};ST.notes[code]=inp.value.trim();
     lSave();syncUp();wrap.style.display='none';toast('Note saved');
+  });
+  el.addEventListener('click',function(e){
+    var a=e.target.closest ? e.target.closest('.vb-call') : null;
+    if(!a)return;e.stopPropagation();
+    var code=a.getAttribute('data-dc');
+    if(code)setTimeout(function(){promptLogCall(code);},2000);
   });
 }
 /* ── HOW TO USE ── */
