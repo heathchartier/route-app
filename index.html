@@ -316,6 +316,36 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 /* ── HOT LEAD TRACKER ── */
 .hot-card{background:linear-gradient(135deg,rgba(255,176,32,.1),rgba(255,176,32,.05));border:1px solid rgba(255,176,32,.35);border-radius:var(--r);padding:16px;margin-bottom:12px}
 
+
+/* ── TIER CADENCE ── */
+.tier-behind{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:5px;vertical-align:middle;flex-shrink:0}
+.cadence-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.cadence-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
+.cadence-meta{font-size:11px;color:var(--sub);margin-top:1px}
+.cadence-days{font-size:12px;font-weight:700;color:var(--red);flex-shrink:0}
+.tier-target-inp{width:52px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:5px 8px;font-size:13px;font-family:inherit;text-align:center;outline:none}
+
+/* ── WEEKLY PLANNER ── */
+.wplan-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px}
+.wplan-day{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:8px 4px;text-align:center;cursor:pointer;transition:background .15s}
+.wplan-day.today{background:var(--blue2);border-color:rgba(74,158,255,.4)}
+.wplan-day-lbl{font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.wplan-grp{font-size:16px;font-weight:800;color:var(--teal)}
+.wplan-grp.empty{color:var(--dim);font-size:12px;font-weight:400}
+
+/* ── CONTACTS ── */
+.contact-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:10px 12px;margin-bottom:8px}
+.contact-role{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--teal);margin-bottom:4px}
+.contact-name{font-size:14px;font-weight:700;margin-bottom:4px}
+.contact-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.contact-link{font-size:12px;color:var(--blue);text-decoration:none}
+.contact-del{background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:2px 4px;float:right;margin-top:-2px}
+
+/* ── NOTES SEARCH ── */
+.nsrch-row{display:flex;flex-direction:column;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer}
+.nsrch-name{font-size:13px;font-weight:700}
+.nsrch-snippet{font-size:12px;color:var(--sub);margin-top:3px;line-height:1.4}
+.nsrch-highlight{background:rgba(0,229,184,.25);color:var(--teal);border-radius:3px;padding:0 2px}
 /* ── UNDO TOAST ── */
 #toast-undo{display:none;position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:10px 8px 10px 18px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.5);align-items:center;gap:10px}
 #toast-undo.on{opacity:1;display:flex}
@@ -496,6 +526,21 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="d-quiet-list"></div>
       <button id="d-quiet-more" style="display:none;width:100%;margin-top:8px;padding:8px;background:transparent;border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Show all</button>
     </div>
+    <div class="card" id="d-plan-card" style="display:none">
+      <div class="card-hdr">
+        <div class="lbl" style="margin:0;color:var(--teal)">&#128197; Weekly Plan</div>
+        <button onclick="showWeekPlanner()" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Edit</button>
+      </div>
+      <div id="d-plan-body" class="wplan-grid" style="margin-top:10px"></div>
+    </div>
+    <div class="card" id="d-tier-card" style="display:none">
+      <div class="card-hdr">
+        <div class="lbl" style="margin:0;color:var(--red)">&#9888; Behind on Visit Cadence</div>
+        <span id="d-tier-count" style="background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers past their tier visit target</div>
+      <div id="d-tier-list"></div>
+    </div>
     <div class="card" id="d-sched-card" style="display:none">
       <div class="lbl" style="color:var(--blue)">&#128197; This Week's Schedule</div>
       <div id="d-sched-body"></div>
@@ -548,6 +593,9 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <button class="chip" data-f="tier_a">A Tier</button>
       <button class="chip" data-f="tier_b">B Tier</button>
       <button class="chip" data-f="tier_c">C Tier</button>
+    </div>
+    <div style="padding:0 16px 8px">
+      <button onclick="showNotesSearch()" style="width:100%;padding:9px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;text-align:left">&#128269; Search notes across all customers...</button>
     </div>
   </div>
   <div class="body">
@@ -648,6 +696,24 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       </div>
       <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Tap any customer to fill in the missing info</div>
       <div id="missing-list"></div>
+    </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">Visit Cadence Targets</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Days between visits per tier (default A=14, B=30, C=45)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier A (days)</div>
+          <input class="tier-target-inp" id="tier-a-inp" type="number" min="1" max="365" placeholder="14" oninput="saveTierTarget('A',this.value)">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier B (days)</div>
+          <input class="tier-target-inp" id="tier-b-inp" type="number" min="1" max="365" placeholder="30" oninput="saveTierTarget('B',this.value)">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier C (days)</div>
+          <input class="tier-target-inp" id="tier-c-inp" type="number" min="1" max="365" placeholder="45" oninput="saveTierTarget('C',this.value)">
+        </div>
+      </div>
     </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">Dashboard Cards</div>
@@ -789,6 +855,13 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="msect-lbl">Competitor</div>
       <div id="m-comp-view" style="font-size:14px;color:var(--amber)"></div>
     </div>
+    <div class="msect" id="m-contacts-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">
+        Contacts
+        <button onclick="addContact(mC)" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>
+      </div>
+      <div id="m-contacts-list"></div>
+    </div>
     <div class="msect">
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
@@ -851,10 +924,10 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -890,7 +963,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();}
 }
 
 function smartGroup(){
@@ -978,7 +1051,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rNavBadge();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rNavBadge();
 }
 
 function rRoute(){
@@ -1239,7 +1312,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':'#f59e0b')+'">'+( l.type==='visited'?'Visited':'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -1455,7 +1528,9 @@ var DASH_CARDS=[
   {key:'trend',label:'Visit Trend Chart'},
   {key:'schedule',label:'This Week\'s Schedule'},
   {key:'quiet',label:'Going Quiet'},
-  {key:'comp',label:'Competitor Intel'}
+  {key:'comp',label:'Competitor Intel'},
+  {key:'tier',label:'Visit Cadence Overdue'},
+  {key:'weekplan',label:'Weekly Plan'}
 ];
 function dashCardHidden(key){
   var h=ST.hiddenCards||{};return !!h[key];
@@ -2008,6 +2083,21 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="d-quiet-list"></div>
       <button id="d-quiet-more" style="display:none;width:100%;margin-top:8px;padding:8px;background:transparent;border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Show all</button>
     </div>
+    <div class="card" id="d-plan-card" style="display:none">
+      <div class="card-hdr">
+        <div class="lbl" style="margin:0;color:var(--teal)">&#128197; Weekly Plan</div>
+        <button onclick="showWeekPlanner()" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Edit</button>
+      </div>
+      <div id="d-plan-body" class="wplan-grid" style="margin-top:10px"></div>
+    </div>
+    <div class="card" id="d-tier-card" style="display:none">
+      <div class="card-hdr">
+        <div class="lbl" style="margin:0;color:var(--red)">&#9888; Behind on Visit Cadence</div>
+        <span id="d-tier-count" style="background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers past their tier visit target</div>
+      <div id="d-tier-list"></div>
+    </div>
     <div class="card" id="d-sched-card" style="display:none">
       <div class="lbl" style="color:var(--blue)">&#128197; This Week's Schedule</div>
       <div id="d-sched-body"></div>
@@ -2060,6 +2150,9 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <button class="chip" data-f="tier_a">A Tier</button>
       <button class="chip" data-f="tier_b">B Tier</button>
       <button class="chip" data-f="tier_c">C Tier</button>
+    </div>
+    <div style="padding:0 16px 8px">
+      <button onclick="showNotesSearch()" style="width:100%;padding:9px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;text-align:left">&#128269; Search notes across all customers...</button>
     </div>
   </div>
   <div class="body">
@@ -2160,6 +2253,24 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       </div>
       <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Tap any customer to fill in the missing info</div>
       <div id="missing-list"></div>
+    </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">Visit Cadence Targets</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Days between visits per tier (default A=14, B=30, C=45)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier A (days)</div>
+          <input class="tier-target-inp" id="tier-a-inp" type="number" min="1" max="365" placeholder="14" oninput="saveTierTarget('A',this.value)">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier B (days)</div>
+          <input class="tier-target-inp" id="tier-b-inp" type="number" min="1" max="365" placeholder="30" oninput="saveTierTarget('B',this.value)">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier C (days)</div>
+          <input class="tier-target-inp" id="tier-c-inp" type="number" min="1" max="365" placeholder="45" oninput="saveTierTarget('C',this.value)">
+        </div>
+      </div>
     </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">Dashboard Cards</div>
@@ -2301,6 +2412,13 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="msect-lbl">Competitor</div>
       <div id="m-comp-view" style="font-size:14px;color:var(--amber)"></div>
     </div>
+    <div class="msect" id="m-contacts-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">
+        Contacts
+        <button onclick="addContact(mC)" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>
+      </div>
+      <div id="m-contacts-list"></div>
+    </div>
     <div class="msect">
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
@@ -2363,10 +2481,10 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -2402,7 +2520,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();}
 }
 
 function smartGroup(){
@@ -2490,7 +2608,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rNavBadge();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rNavBadge();
 }
 
 function rRoute(){
@@ -2751,7 +2869,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':'#f59e0b')+'">'+( l.type==='visited'?'Visited':'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -2967,7 +3085,9 @@ var DASH_CARDS=[
   {key:'trend',label:'Visit Trend Chart'},
   {key:'schedule',label:'This Week\'s Schedule'},
   {key:'quiet',label:'Going Quiet'},
-  {key:'comp',label:'Competitor Intel'}
+  {key:'comp',label:'Competitor Intel'},
+  {key:'tier',label:'Visit Cadence Overdue'},
+  {key:'weekplan',label:'Weekly Plan'}
 ];
 function dashCardHidden(key){
   var h=ST.hiddenCards||{};return !!h[key];
@@ -5226,6 +5346,252 @@ function showEOD(){
     if(navigator.clipboard){navigator.clipboard.writeText(sumText).then(function(){toast('Copied!');});}
     else{var ta=document.createElement('textarea');ta.value=sumText;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copied!');}
   });
+}
+
+/* ── TIER CADENCE ── */
+function getTierTarget(tier){
+  if(ST.tierTargets&&ST.tierTargets[tier])return parseInt(ST.tierTargets[tier]);
+  return tier==='A'?14:tier==='B'?30:45;
+}
+function saveTierTarget(tier,val){
+  if(!ST.tierTargets)ST.tierTargets={};
+  ST.tierTargets[tier]=val;
+  lSave();syncUp();rDash();
+}
+function initTierInputs(){
+  var ia=document.getElementById('tier-a-inp');
+  var ib=document.getElementById('tier-b-inp');
+  var ic=document.getElementById('tier-c-inp');
+  if(ia)ia.value=getTierTarget('A');
+  if(ib)ib.value=getTierTarget('B');
+  if(ic)ic.value=getTierTarget('C');
+}
+function rTierCard(){
+  var card=document.getElementById('d-tier-card');
+  var list=document.getElementById('d-tier-list');
+  var cnt=document.getElementById('d-tier-count');
+  if(!card||!list||!cnt)return;
+  if(dashCardHidden('tier')){card.style.display='none';return;}
+  var a=allC(),behind=[],today=new Date();
+  for(var i=0;i<a.length;i++){
+    var c=a[i];if(!c.tier)continue;
+    var visits=ST.visits[c.code]||[];
+    var lastVisit=null;
+    for(var j=visits.length-1;j>=0;j--){if(visits[j].type==='visited'){lastVisit=new Date(visits[j].date);break;}}
+    var target=getTierTarget(c.tier);
+    var daysSince=lastVisit?Math.floor((today-lastVisit)/(1000*60*60*24)):9999;
+    if(daysSince>=target)behind.push({c:c,daysSince:daysSince,target:target});
+  }
+  behind.sort(function(a,b){return b.daysSince-a.daysSince;});
+  cnt.textContent=behind.length;
+  if(!behind.length){card.style.display='none';return;}
+  card.style.display='block';
+  var h='';
+  var show=behind.slice(0,8);
+  for(var i=0;i<show.length;i++){
+    var b=show[i];
+    var over=b.daysSince===9999?'Never visited':(b.daysSince-b.target)+' days overdue';
+    h+='<div class="cadence-row" onclick="openM(\''+b.c.code+'\')">'
+     +'<div class="cadence-name">'+esc(b.c.name)+'</div>'
+     +'<div class="cadence-meta"><span style="background:var(--teal2);color:var(--teal);border-radius:20px;padding:1px 8px;font-size:10px;font-weight:700">'+b.c.tier+'</span></div>'
+     +'<div class="cadence-days tier-behind">'+over+'</div>'
+     +'</div>';
+  }
+  if(behind.length>8)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">+'+(behind.length-8)+' more</div>';
+  list.innerHTML=h;
+}
+
+/* ── WEEKLY PLANNER ── */
+function rWeekPlan(){
+  var card=document.getElementById('d-plan-card');
+  var body=document.getElementById('d-plan-body');
+  if(!card||!body)return;
+  if(dashCardHidden('weekplan')){card.style.display='none';return;}
+  var days=['Mon','Tue','Wed','Thu','Fri'];
+  var wp=ST.weekPlan||{};
+  var hasAny=false;for(var k in wp){if(wp[k]&&wp[k].length){hasAny=true;break;}}
+  card.style.display='block';
+  var h='';
+  for(var i=0;i<days.length;i++){
+    var d=days[i];
+    var groups=wp[d]||[];
+    var today=new Date().toLocaleDateString('en-US',{weekday:'short'}).replace('.','');
+    var isToday=(today===d);
+    h+='<div class="wplan-day'+(isToday?' today':'')+'">'
+     +'<div class="wplan-day-lbl">'+d+'</div>';
+    if(groups.length){
+      for(var j=0;j<groups.length;j++){
+        h+='<div class="wplan-grp" onclick="showGroupDetail('+groups[j]+')">Grp '+groups[j]+'</div>';
+      }
+    }else{
+      h+='<div class="wplan-grp empty">--</div>';
+    }
+    h+='</div>';
+  }
+  body.innerHTML=h;
+}
+function showWeekPlanner(){
+  var days=['Mon','Tue','Wed','Thu','Fri'];
+  var wp=ST.weekPlan||{};
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;display:flex;align-items:flex-end;justify-content:center';
+  var daysHtml='';
+  for(var i=0;i<days.length;i++){
+    var d=days[i];
+    var groups=wp[d]||[];
+    daysHtml+='<div style="margin-bottom:14px">'
+     +'<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px">'+d+'</div>'
+     +'<div id="wplan-'+d+'" style="display:flex;flex-wrap:wrap;gap:6px;min-height:32px;border:1px solid var(--border2);border-radius:var(--r2);padding:6px 8px">';
+    for(var j=0;j<groups.length;j++){
+      daysHtml+='<span style="background:var(--teal2);color:var(--teal);border-radius:20px;padding:2px 8px;font-size:12px;font-weight:700;cursor:pointer" onclick="removePlanGroup(\''+d+'\','+groups[j]+',this.parentElement)">Grp '+groups[j]+' &times;</span>';
+    }
+    daysHtml+='</div>'
+     +'<select onchange="addPlanGroup(\''+d+'\',this)" style="margin-top:6px;width:100%;padding:7px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:13px">'
+     +'<option value="">+ Add group...</option>';
+    for(var g=1;g<=61;g++){
+      daysHtml+='<option value="'+g+'">Group '+g+'</option>';
+    }
+    daysHtml+='</select></div>';
+  }
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:80vh;overflow-y:auto">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">&#128197; Weekly Planner</div>'
+   +daysHtml
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove();rDash();" style="width:100%;padding:12px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-top:8px">Done</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet){sheet.remove();rDash();}});
+  document.body.appendChild(sheet);
+}
+function addPlanGroup(day,sel){
+  var val=parseInt(sel.value);if(!val)return;
+  if(!ST.weekPlan)ST.weekPlan={};
+  if(!ST.weekPlan[day])ST.weekPlan[day]=[];
+  if(ST.weekPlan[day].indexOf(val)===-1)ST.weekPlan[day].push(val);
+  lSave();syncUp();
+  sel.value='';
+  var cont=document.getElementById('wplan-'+day);
+  if(cont){
+    var span=document.createElement('span');
+    span.style.cssText='background:var(--teal2);color:var(--teal);border-radius:20px;padding:2px 8px;font-size:12px;font-weight:700;cursor:pointer';
+    span.textContent='Grp '+val+' \xd7';
+    span.onclick=function(){removePlanGroup(day,val,cont);};
+    cont.appendChild(span);
+  }
+}
+function removePlanGroup(day,group,cont){
+  if(!ST.weekPlan||!ST.weekPlan[day])return;
+  ST.weekPlan[day]=ST.weekPlan[day].filter(function(g){return g!==group;});
+  lSave();syncUp();
+  if(cont){cont.innerHTML='';var g=ST.weekPlan[day]||[];for(var i=0;i<g.length;i++){var sp=document.createElement('span');sp.style.cssText='background:var(--teal2);color:var(--teal);border-radius:20px;padding:2px 8px;font-size:12px;font-weight:700;cursor:pointer';sp.textContent='Grp '+g[i]+' \xd7';(function(gv){sp.onclick=function(){removePlanGroup(day,gv,cont);};})(g[i]);cont.appendChild(sp);}}
+}
+
+/* ── CONTACTS ── */
+function rContacts(code){
+  var sect=document.getElementById('m-contacts-sect');
+  var list=document.getElementById('m-contacts-list');
+  if(!sect||!list)return;
+  var contacts=ST.contacts&&ST.contacts[code]?ST.contacts[code]:[];
+  if(!contacts.length){list.innerHTML='<div style="color:var(--sub);font-size:12px">No contacts added yet</div>';return;}
+  var h='';
+  for(var i=0;i<contacts.length;i++){
+    var ct=contacts[i];
+    h+='<div class="contact-card">'
+     +'<div class="contact-role">'+esc(ct.role||'Contact')+'</div>'
+     +'<div class="contact-name">'+esc(ct.name)+'</div>'
+     +'<div class="contact-links">';
+    if(ct.phone)h+='<a class="contact-link" href="tel:'+esc(ct.phone)+'">&#128222; '+esc(ct.phone)+'</a>';
+    if(ct.email)h+='<a class="contact-link" href="ms-outlook://compose?to='+esc(ct.email)+'">&#9993; '+esc(ct.email)+'</a>';
+    h+='</div>'
+     +'<button class="contact-del" onclick="deleteContact(\''+esc(code)+'\','+i+')">Remove</button>'
+     +'</div>';
+  }
+  list.innerHTML=h;
+}
+function addContact(code){
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">Add Contact</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Role (Buyer, Owner, AP, etc.)</div>'
+   +'<input id="ct-role" type="text" placeholder="e.g. Buyer" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Name</div>'
+   +'<input id="ct-name" type="text" placeholder="Full name" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Phone</div>'
+   +'<input id="ct-phone" type="tel" placeholder="Optional" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Email</div>'
+   +'<input id="ct-email" type="email" placeholder="Optional" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:14px;box-sizing:border-box">'
+   +'<button onclick="saveContact(\''+code+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save Contact</button>'
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+function saveContact(code){
+  var role=document.getElementById('ct-role');
+  var name=document.getElementById('ct-name');
+  var phone=document.getElementById('ct-phone');
+  var email=document.getElementById('ct-email');
+  if(!name||!name.value.trim()){toast('Name required');return;}
+  if(!ST.contacts)ST.contacts={};
+  if(!ST.contacts[code])ST.contacts[code]=[];
+  ST.contacts[code].push({role:(role?role.value.trim():''),name:name.value.trim(),phone:(phone?phone.value.trim():''),email:(email?email.value.trim():'')});
+  lSave();syncUp();
+  var sheet=document.querySelector('div[style*="z-index: 1100"],div[style*="z-index:1100"]');if(sheet)sheet.remove();
+  rContacts(code);toast('Contact saved');
+}
+function deleteContact(code,idx){
+  if(!ST.contacts||!ST.contacts[code])return;
+  ST.contacts[code].splice(idx,1);
+  lSave();syncUp();
+  rContacts(code);toast('Contact removed');
+}
+
+/* ── NOTES SEARCH ── */
+function showNotesSearch(){
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div id="nsrch-panel" style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:85vh;display:flex;flex-direction:column">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:10px">&#128269; Search Notes</div>'
+   +'<input id="nsrch-inp" type="search" placeholder="Search all customer notes..." style="width:100%;padding:10px 12px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:12px;box-sizing:border-box">'
+   +'<div id="nsrch-results" style="flex:1;overflow-y:auto"></div>'
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;margin-top:12px;flex-shrink:0">Close</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+  var inp=document.getElementById('nsrch-inp');
+  if(inp){inp.focus();inp.addEventListener('input',function(){runNotesSearch(this.value);});}
+}
+function runNotesSearch(q){
+  var res=document.getElementById('nsrch-results');if(!res)return;
+  if(!q||q.trim().length<2){res.innerHTML='<div style="color:var(--sub);font-size:13px;text-align:center;padding:20px">Type to search...</div>';return;}
+  var term=q.trim().toLowerCase();
+  var a=allC(),hits=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
+    var gn=ST.groupNotes&&ST.groupNotes[c.group]?ST.groupNotes[c.group]:'';
+    var combined=(note+' '+gn).toLowerCase();
+    if(combined.indexOf(term)!==-1){
+      var snippet=note||gn;
+      var idx=snippet.toLowerCase().indexOf(term);
+      var pre=snippet.substring(Math.max(0,idx-30),idx);
+      var match=snippet.substring(idx,idx+term.length);
+      var post=snippet.substring(idx+term.length,idx+term.length+40);
+      hits.push({c:c,pre:pre,match:match,post:post});
+    }
+  }
+  if(!hits.length){res.innerHTML='<div style="color:var(--sub);font-size:13px;text-align:center;padding:20px">No notes match "'+esc(q)+'"</div>';return;}
+  var h='';
+  for(var i=0;i<hits.length;i++){
+    var h2=hits[i];
+    h+='<div class="nsrch-row" onclick="this.closest(\'div[style*=fixed]\').remove();openM(\''+h2.c.code+'\')">'
+     +'<div class="nsrch-name">'+esc(h2.c.name)+'</div>'
+     +'<div class="nsrch-snippet">'+(h2.pre?'...':'')+esc(h2.pre)+'<span class="nsrch-highlight">'+esc(h2.match)+'</span>'+esc(h2.post)+(h2.post?'...':'')+'</div>'
+     +'</div>';
+  }
+  res.innerHTML=h;
 }
 
 lLoad();
