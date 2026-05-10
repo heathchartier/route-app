@@ -346,6 +346,31 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .nsrch-name{font-size:13px;font-weight:700}
 .nsrch-snippet{font-size:12px;color:var(--sub);margin-top:3px;line-height:1.4}
 .nsrch-highlight{background:rgba(0,229,184,.25);color:var(--teal);border-radius:3px;padding:0 2px}
+/* ── HEALTH SCORE ── */
+.health-badge{display:inline-block;font-size:10px;font-weight:800;border-radius:20px;padding:1px 7px;margin-left:5px;vertical-align:middle}
+.health-good{background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.health-mid{background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
+.health-low{background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3)}
+/* ── SAMPLE TRACKER ── */
+.sample-row{padding:9px 0;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px}
+.sample-row:last-child{border-bottom:none}
+.sample-item{flex:1;font-size:13px;font-weight:600;color:var(--text)}
+.sample-meta{font-size:11px;color:var(--sub)}
+.sample-status{font-size:10px;font-weight:700;border-radius:20px;padding:2px 8px}
+.ss-pending{background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
+.ss-ordered{background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.ss-no{background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3)}
+/* ── BEST TIME HINT ── */
+.besttime-hint{font-size:11px;color:var(--teal);background:var(--teal2);border:1px solid rgba(0,229,184,.2);border-radius:20px;padding:2px 9px;display:inline-block;margin-top:4px}
+/* ── MAP OVERLAY ── */
+#map-overlay{display:none;position:fixed;inset:0;z-index:950;background:var(--bg);flex-direction:column}
+#map-overlay.on{display:flex}
+#leaflet-map{flex:1;width:100%}
+.map-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 16px calc(8px);background:var(--bg2);border-bottom:1px solid var(--border2);padding-top:calc(16px + env(safe-area-inset-top,0px))}
+/* ── DUPE DETECTOR ── */
+.dupe-group{background:var(--bg3);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:12px;margin-bottom:10px}
+.dupe-item{font-size:13px;color:var(--text);padding:4px 0}
+.dupe-sub{font-size:11px;color:var(--sub)}
 /* ── UNDO TOAST ── */
 #toast-undo{display:none;position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:10px 8px 10px 18px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.5);align-items:center;gap:10px}
 #toast-undo.on{opacity:1;display:flex}
@@ -430,6 +455,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
 .fu-opt:last-child{border-bottom:none}
 .fu-opt:active{opacity:.7}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -478,6 +505,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="route-note-banner" id="d-route-note"></div>
       <div id="d-route"><div style="color:var(--sub);font-size:13px;padding:8px 0">Loading...</div></div>
       <button class="btn btn-t" id="btn-map">Open Route</button>
+      <button class="btn" onclick="showMapOverlay()" style="background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);margin-top:8px">&#128205; Map View</button>
       <button class="btn" id="btn-bulk-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25);margin-top:8px;display:none">Mark All Remaining N/A</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
@@ -526,7 +554,15 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="d-quiet-list"></div>
       <button id="d-quiet-more" style="display:none;width:100%;margin-top:8px;padding:8px;background:transparent;border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Show all</button>
     </div>
-    <div class="card" id="d-plan-card" style="display:none">
+    <div class="card" id="d-samples-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:var(--amber)">&#128230; Sample Follow-Ups</div>
+      <span id="d-samples-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Samples dropped 14+ days ago with no order</div>
+    <div id="d-samples-list"></div>
+  </div>
+  <div class="card" id="d-plan-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--teal)">&#128197; Weekly Plan</div>
         <button onclick="showWeekPlanner()" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Edit</button>
@@ -698,6 +734,13 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="missing-list"></div>
     </div>
     <div class="card" style="margin-top:4px">
+      <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Accounts with similar names or same phone</div>
+      <button onclick="runDupeDetector()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128270; Scan for Duplicates</button>
+      <div id="dupe-results" style="margin-top:12px"></div>
+    </div>
+    <div class="card" style="margin-top:4px">
       <div class="lbl">Visit Cadence Targets</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Days between visits per tier (default A=14, B=30, C=45)</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
@@ -787,6 +830,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div style="flex:1;min-width:0">
         <div class="mname" id="m-n"></div>
         <div class="mcode" id="m-c"></div>
+        <div id="m-besttime"></div>
+        <div id="m-health"></div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button id="m-prev" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);width:34px;height:34px;cursor:pointer;font-size:18px">&#8249;</button>
@@ -854,6 +899,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div class="msect" id="m-comp-sect" style="display:none">
       <div class="msect-lbl">Competitor</div>
       <div id="m-comp-view" style="font-size:14px;color:var(--amber)"></div>
+    </div>
+    <div class="msect" id="m-samples-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Samples / Drops<button onclick="logSample(mC)" style="background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Log</button></div>
+      <div id="m-samples-list"><div style="color:var(--sub);font-size:12px">No samples logged yet</div></div>
     </div>
     <div class="msect" id="m-contacts-sect">
       <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">
@@ -924,10 +973,10 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[]};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -963,7 +1012,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';}
 }
 
 function smartGroup(){
@@ -1051,7 +1100,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rNavBadge();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rNavBadge();
 }
 
 function rRoute(){
@@ -1312,7 +1361,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':'#f59e0b')+'">'+( l.type==='visited'?'Visited':'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -1530,7 +1579,8 @@ var DASH_CARDS=[
   {key:'quiet',label:'Going Quiet'},
   {key:'comp',label:'Competitor Intel'},
   {key:'tier',label:'Visit Cadence Overdue'},
-  {key:'weekplan',label:'Weekly Plan'}
+  {key:'weekplan',label:'Weekly Plan'},
+  {key:'samples',label:'Sample Follow-Ups'}
 ];
 function dashCardHidden(key){
   var h=ST.hiddenCards||{};return !!h[key];
@@ -1903,6 +1953,31 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 /* ── HOT LEAD TRACKER ── */
 .hot-card{background:linear-gradient(135deg,rgba(255,176,32,.1),rgba(255,176,32,.05));border:1px solid rgba(255,176,32,.35);border-radius:var(--r);padding:16px;margin-bottom:12px}
 
+/* ── HEALTH SCORE ── */
+.health-badge{display:inline-block;font-size:10px;font-weight:800;border-radius:20px;padding:1px 7px;margin-left:5px;vertical-align:middle}
+.health-good{background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.health-mid{background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
+.health-low{background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3)}
+/* ── SAMPLE TRACKER ── */
+.sample-row{padding:9px 0;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px}
+.sample-row:last-child{border-bottom:none}
+.sample-item{flex:1;font-size:13px;font-weight:600;color:var(--text)}
+.sample-meta{font-size:11px;color:var(--sub)}
+.sample-status{font-size:10px;font-weight:700;border-radius:20px;padding:2px 8px}
+.ss-pending{background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
+.ss-ordered{background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.ss-no{background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3)}
+/* ── BEST TIME HINT ── */
+.besttime-hint{font-size:11px;color:var(--teal);background:var(--teal2);border:1px solid rgba(0,229,184,.2);border-radius:20px;padding:2px 9px;display:inline-block;margin-top:4px}
+/* ── MAP OVERLAY ── */
+#map-overlay{display:none;position:fixed;inset:0;z-index:950;background:var(--bg);flex-direction:column}
+#map-overlay.on{display:flex}
+#leaflet-map{flex:1;width:100%}
+.map-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 16px calc(8px);background:var(--bg2);border-bottom:1px solid var(--border2);padding-top:calc(16px + env(safe-area-inset-top,0px))}
+/* ── DUPE DETECTOR ── */
+.dupe-group{background:var(--bg3);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:12px;margin-bottom:10px}
+.dupe-item{font-size:13px;color:var(--text);padding:4px 0}
+.dupe-sub{font-size:11px;color:var(--sub)}
 /* ── UNDO TOAST ── */
 #toast-undo{display:none;position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:10px 8px 10px 18px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.5);align-items:center;gap:10px}
 #toast-undo.on{opacity:1;display:flex}
@@ -1987,6 +2062,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
 .fu-opt:last-child{border-bottom:none}
 .fu-opt:active{opacity:.7}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -2035,6 +2112,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="route-note-banner" id="d-route-note"></div>
       <div id="d-route"><div style="color:var(--sub);font-size:13px;padding:8px 0">Loading...</div></div>
       <button class="btn btn-t" id="btn-map">Open Route</button>
+      <button class="btn" onclick="showMapOverlay()" style="background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);margin-top:8px">&#128205; Map View</button>
       <button class="btn" id="btn-bulk-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25);margin-top:8px;display:none">Mark All Remaining N/A</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
@@ -2083,7 +2161,15 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="d-quiet-list"></div>
       <button id="d-quiet-more" style="display:none;width:100%;margin-top:8px;padding:8px;background:transparent;border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Show all</button>
     </div>
-    <div class="card" id="d-plan-card" style="display:none">
+    <div class="card" id="d-samples-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:var(--amber)">&#128230; Sample Follow-Ups</div>
+      <span id="d-samples-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Samples dropped 14+ days ago with no order</div>
+    <div id="d-samples-list"></div>
+  </div>
+  <div class="card" id="d-plan-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--teal)">&#128197; Weekly Plan</div>
         <button onclick="showWeekPlanner()" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Edit</button>
@@ -2255,6 +2341,13 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="missing-list"></div>
     </div>
     <div class="card" style="margin-top:4px">
+      <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Accounts with similar names or same phone</div>
+      <button onclick="runDupeDetector()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128270; Scan for Duplicates</button>
+      <div id="dupe-results" style="margin-top:12px"></div>
+    </div>
+    <div class="card" style="margin-top:4px">
       <div class="lbl">Visit Cadence Targets</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Days between visits per tier (default A=14, B=30, C=45)</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
@@ -2344,6 +2437,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div style="flex:1;min-width:0">
         <div class="mname" id="m-n"></div>
         <div class="mcode" id="m-c"></div>
+        <div id="m-besttime"></div>
+        <div id="m-health"></div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button id="m-prev" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);width:34px;height:34px;cursor:pointer;font-size:18px">&#8249;</button>
@@ -2411,6 +2506,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div class="msect" id="m-comp-sect" style="display:none">
       <div class="msect-lbl">Competitor</div>
       <div id="m-comp-view" style="font-size:14px;color:var(--amber)"></div>
+    </div>
+    <div class="msect" id="m-samples-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Samples / Drops<button onclick="logSample(mC)" style="background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Log</button></div>
+      <div id="m-samples-list"><div style="color:var(--sub);font-size:12px">No samples logged yet</div></div>
     </div>
     <div class="msect" id="m-contacts-sect">
       <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">
@@ -2481,10 +2580,10 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[]};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -2520,7 +2619,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';}
 }
 
 function smartGroup(){
@@ -2608,7 +2707,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rNavBadge();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rNavBadge();
 }
 
 function rRoute(){
@@ -2869,7 +2968,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':'#f59e0b')+'">'+( l.type==='visited'?'Visited':'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -3087,7 +3186,8 @@ var DASH_CARDS=[
   {key:'quiet',label:'Going Quiet'},
   {key:'comp',label:'Competitor Intel'},
   {key:'tier',label:'Visit Cadence Overdue'},
-  {key:'weekplan',label:'Weekly Plan'}
+  {key:'weekplan',label:'Weekly Plan'},
+  {key:'samples',label:'Sample Follow-Ups'}
 ];
 function dashCardHidden(key){
   var h=ST.hiddenCards||{};return !!h[key];
@@ -4948,6 +5048,31 @@ function showGroupSheet(g){
   document.body.appendChild(sheet);
 }
 
+/* ── HEALTH SCORE ── */
+.health-badge{display:inline-block;font-size:10px;font-weight:800;border-radius:20px;padding:1px 7px;margin-left:5px;vertical-align:middle}
+.health-good{background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.health-mid{background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
+.health-low{background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3)}
+/* ── SAMPLE TRACKER ── */
+.sample-row{padding:9px 0;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px}
+.sample-row:last-child{border-bottom:none}
+.sample-item{flex:1;font-size:13px;font-weight:600;color:var(--text)}
+.sample-meta{font-size:11px;color:var(--sub)}
+.sample-status{font-size:10px;font-weight:700;border-radius:20px;padding:2px 8px}
+.ss-pending{background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3)}
+.ss-ordered{background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.ss-no{background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3)}
+/* ── BEST TIME HINT ── */
+.besttime-hint{font-size:11px;color:var(--teal);background:var(--teal2);border:1px solid rgba(0,229,184,.2);border-radius:20px;padding:2px 9px;display:inline-block;margin-top:4px}
+/* ── MAP OVERLAY ── */
+#map-overlay{display:none;position:fixed;inset:0;z-index:950;background:var(--bg);flex-direction:column}
+#map-overlay.on{display:flex}
+#leaflet-map{flex:1;width:100%}
+.map-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 16px calc(8px);background:var(--bg2);border-bottom:1px solid var(--border2);padding-top:calc(16px + env(safe-area-inset-top,0px))}
+/* ── DUPE DETECTOR ── */
+.dupe-group{background:var(--bg3);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:12px;margin-bottom:10px}
+.dupe-item{font-size:13px;color:var(--text);padding:4px 0}
+.dupe-sub{font-size:11px;color:var(--sub)}
 /* ── UNDO TOAST ── */
 function showUndoToast(code,type){
   var t=document.getElementById('toast-undo');if(!t)return;
@@ -5594,6 +5719,289 @@ function runNotesSearch(q){
   res.innerHTML=h;
 }
 
+/* ── BEST TIME TO VISIT ── */
+function rBestTime(code){
+  var el=document.getElementById('m-besttime');if(!el)return;
+  var visits=ST.visits[code]||[];
+  var dayCount={},hourBucket={morning:0,afternoon:0,evening:0};
+  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var goodVisits=visits.filter(function(v){return v.type==='visited';});
+  if(goodVisits.length<3){el.innerHTML='';return;}
+  goodVisits.forEach(function(v){
+    var d=new Date(v.date);
+    var day=days[d.getDay()];
+    dayCount[day]=(dayCount[day]||0)+1;
+    var h=d.getHours();
+    if(h>=6&&h<12)hourBucket.morning++;
+    else if(h>=12&&h<17)hourBucket.afternoon++;
+    else hourBucket.evening++;
+  });
+  var topDays=Object.keys(dayCount).sort(function(a,b){return dayCount[b]-dayCount[a];}).slice(0,2);
+  var bestTime='morning';
+  if(hourBucket.afternoon>hourBucket.morning&&hourBucket.afternoon>hourBucket.evening)bestTime='afternoon';
+  else if(hourBucket.evening>hourBucket.morning&&hourBucket.evening>hourBucket.afternoon)bestTime='evening';
+  el.innerHTML='<div class="besttime-hint">&#9201; Best: '+topDays.join(' & ')+' '+bestTime+'s</div>';
+}
+
+/* ── SAMPLE TRACKER ── */
+function logSample(code){
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">&#128230; Log Sample / Drop</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Item / Product</div>'
+   +'<input id="smp-item" type="text" placeholder="e.g. Baltic Birch 4x8, Maple samples" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Quantity / Notes (optional)</div>'
+   +'<input id="smp-qty" type="text" placeholder="e.g. 2 sheets, 3 pieces" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:14px;box-sizing:border-box">'
+   +'<button onclick="saveSample(\''+code+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--amber);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save Drop</button>'
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+function saveSample(code){
+  var item=document.getElementById('smp-item');
+  var qty=document.getElementById('smp-qty');
+  if(!item||!item.value.trim()){toast('Item required');return;}
+  if(!ST.samples)ST.samples={};
+  if(!ST.samples[code])ST.samples[code]=[];
+  ST.samples[code].push({item:item.value.trim(),qty:(qty?qty.value.trim():''),date:new Date().toISOString(),status:'pending'});
+  lSave();syncUp();
+  var sheet=document.querySelector('div[style*="z-index: 1100"],div[style*="z-index:1100"]');if(sheet)sheet.remove();
+  rSamples(code);rDash();toast('&#128230; Sample logged');
+}
+function markSampleStatus(code,idx,status){
+  if(!ST.samples||!ST.samples[code]||!ST.samples[code][idx])return;
+  ST.samples[code][idx].status=status;
+  lSave();syncUp();
+  rSamples(code);rDash();toast(status==='ordered'?'Ordered!':'Updated');
+}
+function rSamples(code){
+  var list=document.getElementById('m-samples-list');if(!list)return;
+  var samples=ST.samples&&ST.samples[code]?ST.samples[code]:[];
+  if(!samples.length){list.innerHTML='<div style="color:var(--sub);font-size:12px">No samples logged yet</div>';return;}
+  var h='';
+  for(var i=samples.length-1;i>=0;i--){
+    var s=samples[i];
+    var cls=s.status==='ordered'?'ss-ordered':s.status==='no_interest'?'ss-no':'ss-pending';
+    var lbl=s.status==='ordered'?'Ordered':s.status==='no_interest'?'No interest':'Pending';
+    h+='<div class="sample-row">'
+     +'<div style="flex:1">'
+     +'<div class="sample-item">'+esc(s.item)+(s.qty?' <span style="color:var(--sub);font-weight:400;font-size:12px">'+esc(s.qty)+'</span>':'')+'</div>'
+     +'<div class="sample-meta">'+new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+'</div>'
+     +'</div>'
+     +'<span class="sample-status '+cls+'">'+lbl+'</span>';
+    if(s.status==='pending'){
+      h+='<div style="display:flex;flex-direction:column;gap:4px">'
+       +'<button onclick="markSampleStatus(\''+esc(code)+'\','+i+',\'ordered\')" style="font-size:10px;padding:3px 7px;border-radius:var(--r3);background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.3);cursor:pointer;font-family:inherit;font-weight:700">Ordered</button>'
+       +'<button onclick="markSampleStatus(\''+esc(code)+'\','+i+',\'no_interest\')" style="font-size:10px;padding:3px 7px;border-radius:var(--r3);background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3);cursor:pointer;font-family:inherit;font-weight:700">No</button>'
+       +'</div>';
+    }
+    h+='</div>';
+  }
+  list.innerHTML=h;
+}
+function rSampleCard(){
+  var card=document.getElementById('d-samples-card');
+  var list=document.getElementById('d-samples-list');
+  var cnt=document.getElementById('d-samples-count');
+  if(!card||!list||!cnt)return;
+  if(dashCardHidden('samples')){card.style.display='none';return;}
+  var today=new Date(),cutoff=new Date(today-14*24*60*60*1000);
+  var pending=[];
+  var a=allC();
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    var samps=ST.samples&&ST.samples[c.code]?ST.samples[c.code]:[];
+    for(var j=0;j<samps.length;j++){
+      var s=samps[j];
+      if(s.status==='pending'&&new Date(s.date)<cutoff){
+        pending.push({c:c,s:s,idx:j});
+      }
+    }
+  }
+  cnt.textContent=pending.length;
+  if(!pending.length){card.style.display='none';return;}
+  card.style.display='block';
+  var h='';
+  pending.slice(0,6).forEach(function(p){
+    var daysAgo=Math.floor((today-new Date(p.s.date))/(1000*60*60*24));
+    h+='<div class="cadence-row" onclick="openM(\''+p.c.code+'\')">'
+     +'<div class="cadence-name">'+esc(p.c.name)+'</div>'
+     +'<div class="sample-meta">'+esc(p.s.item)+'</div>'
+     +'<div class="cadence-days tier-behind">'+daysAgo+'d ago</div>'
+     +'</div>';
+  });
+  if(pending.length>6)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">+'+(pending.length-6)+' more</div>';
+  list.innerHTML=h;
+}
+
+/* ── ACCOUNT HEALTH SCORE ── */
+function calcHealthScore(code,tier){
+  var score=0;
+  var visits=ST.visits[code]||[];
+  var today=new Date();
+  var goodVisits=visits.filter(function(v){return v.type==='visited';});
+  var lastGood=null;
+  for(var i=visits.length-1;i>=0;i--){if(visits[i].type==='visited'){lastGood=new Date(visits[i].date);break;}}
+  var target=tier?getTierTarget(tier):30;
+  if(lastGood){
+    var daysSince=Math.floor((today-lastGood)/(1000*60*60*24));
+    if(daysSince<=target)score+=35;
+    else if(daysSince<=target*2)score+=15;
+  }
+  var recent90=goodVisits.filter(function(v){return new Date(v.date)>(new Date(today-90*24*60*60*1000));}).length;
+  if(recent90>=4)score+=25;else if(recent90>=2)score+=15;else if(recent90>=1)score+=7;
+  if(ST.hot&&ST.hot[code])score+=15;
+  if(ST.notes&&ST.notes[code]&&ST.notes[code].trim().length>0)score+=10;
+  if(ST.scheduled&&ST.scheduled[code]){var sd=new Date(ST.scheduled[code]);if(sd>today)score+=15;}
+  return Math.min(100,score);
+}
+function rModalHealth(code){
+  var el=document.getElementById('m-health');if(!el)return;
+  var a=allC(),tier='';
+  for(var i=0;i<a.length;i++){if(a[i].code===code){tier=a[i].tier||'';break;}}
+  var score=calcHealthScore(code,tier);
+  var cls=score>=70?'health-good':score>=40?'health-mid':'health-low';
+  el.innerHTML='<span class="health-badge '+cls+'">Health '+score+'</span>';
+}
+
+/* ── MAP VIEW ── */
+var _leafletMap=null,_leafletMarkers=[];
+var CITY_LL={
+  'los angeles':[34.05,-118.24],'long beach':[33.77,-118.19],'compton':[33.90,-118.22],
+  'hawthorne':[33.92,-118.35],'torrance':[33.84,-118.34],'carson':[33.83,-118.27],
+  'gardena':[33.89,-118.31],'inglewood':[33.96,-118.35],'el segundo':[33.92,-118.42],
+  'redondo beach':[33.84,-118.39],'hermosa beach':[33.86,-118.40],'manhattan beach':[33.89,-118.41],
+  'culver city':[34.02,-118.40],'santa monica':[34.02,-118.49],'burbank':[34.18,-118.31],
+  'glendale':[34.14,-118.26],'pasadena':[34.15,-118.14],'alhambra':[34.10,-118.13],
+  'el monte':[34.07,-118.03],'pomona':[34.06,-117.75],'ontario':[34.06,-117.65],
+  'fontana':[34.09,-117.44],'riverside':[33.98,-117.37],'corona':[33.87,-117.57],
+  'anaheim':[33.83,-117.91],'santa ana':[33.75,-117.87],'orange':[33.79,-117.85],
+  'irvine':[33.68,-117.77],'costa mesa':[33.64,-117.92],'huntington beach':[33.66,-117.99],
+  'garden grove':[33.77,-117.94],'fullerton':[33.87,-117.92],'whittier':[33.98,-118.03],
+  'downey':[33.94,-118.13],'norwalk':[33.91,-118.08],'cerritos':[33.87,-118.06],
+  'lakewood':[33.85,-118.12],'bellflower':[33.89,-118.12],'south gate':[33.95,-118.21],
+  'lynwood':[33.93,-118.21],'paramount':[33.89,-118.16],'pico rivera':[33.98,-118.09],
+  'montebello':[34.01,-118.11],'commerce':[33.99,-118.16],'vernon':[34.00,-118.22],
+  'bell':[33.98,-118.19],'maywood':[33.99,-118.19],'cudahy':[33.96,-118.18],
+  'huntington park':[33.98,-118.22],'san fernando':[34.28,-118.44],'chatsworth':[34.26,-118.60],
+  'northridge':[34.23,-118.54],'van nuys':[34.19,-118.45],'sherman oaks':[34.15,-118.45],
+  'north hollywood':[34.19,-118.38],'san diego':[32.72,-117.16],'chula vista':[32.64,-117.08],
+  'escondido':[33.12,-117.09],'oceanside':[33.19,-117.38],'carlsbad':[33.16,-117.35],
+  'encinitas':[33.04,-117.29],'poway':[32.96,-117.04],'san gabriel':[34.10,-118.11],
+  'monterey park':[34.06,-118.12],'baldwin park':[34.09,-117.97],'la puente':[34.03,-117.95],
+  'industry':[34.01,-117.96],'diamond bar':[33.99,-117.81],'hacienda heights':[33.99,-117.97],
+  'la habra':[33.93,-117.95],'brea':[33.92,-117.90],'yorba linda':[33.88,-117.81],
+  'placentia':[33.87,-117.87],'tustin':[33.74,-117.82],'el cajon':[32.79,-116.96],
+  'national city':[32.68,-117.10],'vista':[33.20,-117.24],'san marcos':[33.14,-117.17],
+  'signal hill':[33.80,-118.17],'wilmington':[33.78,-118.27],'san pedro':[33.74,-118.29],
+  'harbor city':[33.80,-118.30],'rancho dominguez':[33.88,-118.22],'compton':[33.90,-118.22]
+};
+function getCityLL(city){
+  if(!city)return null;
+  var k=city.toLowerCase().trim();
+  return CITY_LL[k]||null;
+}
+function showMapOverlay(){
+  var overlay=document.getElementById('map-overlay');
+  if(overlay)overlay.className='on';
+  setTimeout(function(){initRouteMap();},100);
+}
+function closeMapOverlay(){
+  var overlay=document.getElementById('map-overlay');
+  if(overlay)overlay.className='';
+}
+function initRouteMap(){
+  var container=document.getElementById('leaflet-map');
+  if(!container)return;
+  if(_leafletMap){_leafletMap.remove();_leafletMap=null;}
+  if(typeof L==='undefined')return;
+  _leafletMap=L.map('leaflet-map').setView([33.85,-118.10],10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; OpenStreetMap',maxZoom:18
+  }).addTo(_leafletMap);
+  var a=allC();
+  var stops=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    var snz=ST.snoozed&&ST.snoozed[c.code];if(snz&&new Date(snz)>new Date())continue;
+    var visits=ST.visits[c.code]||[];
+    var alreadyVisited=visits.length&&visits[visits.length-1].type==='visited'&&ds(c.code)<1;
+    if(alreadyVisited)continue;
+    var gc=document.getElementById('g-lbl');
+    var grp=gc?parseInt(gc.textContent.replace('Grp ',''))||cG:cG;
+    if(c.group!==grp)continue;
+    stops.push(c);
+  }
+  var lls=[];
+  for(var i=0;i<stops.length;i++){
+    var c=stops[i];
+    var ll=getCityLL(c.city);
+    if(!ll)continue;
+    var jitter=[(Math.random()-0.5)*0.02,(Math.random()-0.5)*0.02];
+    var pos=[ll[0]+jitter[0],ll[1]+jitter[1]];
+    lls.push(pos);
+    var visits2=ST.visits[c.code]||[];
+    var dot=visits2.length?'visited':'never';
+    var color=dot==='visited'?'#10b981':'#4a9eff';
+    var marker=L.circleMarker(pos,{radius:10,fillColor:color,color:'#fff',weight:2,fillOpacity:0.9});
+    marker.bindPopup('<b>'+c.name+'</b><br><span style="font-size:12px;color:#666">'+c.city+'</span><br><button onclick="document.getElementById(\'map-overlay\').className=\'\';openM(\''+c.code+'\')" style="margin-top:6px;padding:5px 12px;background:#4a9eff;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700">Open</button>');
+    marker.addTo(_leafletMap);
+  }
+  if(lls.length)_leafletMap.fitBounds(lls,{padding:[30,30]});
+}
+
+/* ── DUPLICATE DETECTOR ── */
+function nameSimilar(a,b){
+  var wa=a.toLowerCase().replace(/[^a-z0-9 ]/g,'').split(' ').filter(Boolean);
+  var wb=b.toLowerCase().replace(/[^a-z0-9 ]/g,'').split(' ').filter(Boolean);
+  if(!wa.length||!wb.length)return false;
+  var matches=wa.filter(function(w){return w.length>2&&wb.indexOf(w)!==-1;});
+  return matches.length>=Math.min(2,Math.floor(Math.min(wa.length,wb.length)*0.6));
+}
+function runDupeDetector(){
+  var res=document.getElementById('dupe-results');if(!res)return;
+  res.innerHTML='<div style="color:var(--sub);font-size:13px">Scanning...</div>';
+  var a=allC();
+  var groups=[],checked={};
+  for(var i=0;i<a.length;i++){
+    if(checked[a[i].code])continue;
+    var group=[a[i]];
+    for(var j=i+1;j<a.length;j++){
+      if(checked[a[j].code])continue;
+      var sameName=nameSimilar(a[i].name,a[j].name);
+      var samePhone=a[i].phone&&a[j].phone&&a[i].phone.replace(/\D/g,'')===a[j].phone.replace(/\D/g,'')&&a[i].phone.replace(/\D/g,'').length>=7;
+      if(sameName||samePhone){group.push(a[j]);checked[a[j].code]=1;}
+    }
+    if(group.length>1){
+      var dismissed=ST.dismissedDupes||[];
+      var key=group.map(function(c){return c.code;}).sort().join('|');
+      if(dismissed.indexOf(key)===-1)groups.push({key:key,items:group});
+    }
+  }
+  if(!groups.length){res.innerHTML='<div style="color:#10b981;font-size:13px;padding:8px 0">No duplicates found!</div>';return;}
+  var h='<div style="font-size:12px;color:var(--sub);margin-bottom:10px">'+groups.length+' potential duplicate group'+(groups.length>1?'s':'')+' found</div>';
+  for(var k=0;k<groups.length;k++){
+    var g=groups[k];
+    h+='<div class="dupe-group">';
+    for(var m=0;m<g.items.length;m++){
+      var c=g.items[m];
+      h+='<div class="dupe-item" onclick="openM(\''+c.code+'\')">'+esc(c.name)+'<span class="dupe-sub"> — '+esc(c.city)+'  Code: '+esc(c.code)+'</span></div>';
+    }
+    h+='<button onclick="dismissDupe(\''+g.key+'\')" style="margin-top:8px;padding:5px 12px;border-radius:var(--r3);background:transparent;border:1px solid var(--border2);color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Not a duplicate</button>';
+    h+='</div>';
+  }
+  res.innerHTML=h;
+}
+function dismissDupe(key){
+  if(!ST.dismissedDupes)ST.dismissedDupes=[];
+  if(ST.dismissedDupes.indexOf(key)===-1)ST.dismissedDupes.push(key);
+  lSave();syncUp();
+  runDupeDetector();
+}
+
 lLoad();
 loadRolling();
 loadPricing();
@@ -5611,5 +6019,12 @@ rVend();
 renderCustomRoute();
 syncDown();
 </script>
+<div id="map-overlay">
+  <div class="map-hdr">
+    <div style="font-size:17px;font-weight:800">&#128205; Route Map</div>
+    <button onclick="closeMapOverlay()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Close</button>
+  </div>
+  <div id="leaflet-map"></div>
+</div>
 </body>
 </html>
