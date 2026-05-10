@@ -1235,7 +1235,7 @@ function openM(code){
   var mwz=document.getElementById('m-wz');if(mwz)mwz.href='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr);
   var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="https://www.google.com/maps/search/'+encodeURIComponent(addr)+'" target="_blank" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
   var mp=document.getElementById('m-p');if(mp)mp.innerHTML=c.phone?'<a href="tel:'+esc(c.phone)+'" style="color:var(--blue);text-decoration:none">'+esc(c.phone)+'</a><a href="sms:'+esc(c.phone)+'" style="margin-left:10px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;text-decoration:none">&#128172; SMS</a>':'No phone';
-  var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="mailto:'+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
+  var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':'#f59e0b')+'">'+( l.type==='visited'?'Visited':'Not Available')+'</div></div>';}
@@ -2747,7 +2747,7 @@ function openM(code){
   var mwz=document.getElementById('m-wz');if(mwz)mwz.href='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr);
   var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="https://www.google.com/maps/search/'+encodeURIComponent(addr)+'" target="_blank" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
   var mp=document.getElementById('m-p');if(mp)mp.innerHTML=c.phone?'<a href="tel:'+esc(c.phone)+'" style="color:var(--blue);text-decoration:none">'+esc(c.phone)+'</a><a href="sms:'+esc(c.phone)+'" style="margin-left:10px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;text-decoration:none">&#128172; SMS</a>':'No phone';
-  var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="mailto:'+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
+  var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent='Group '+c.group+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':'#f59e0b')+'">'+( l.type==='visited'?'Visited':'Not Available')+'</div></div>';}
@@ -4705,7 +4705,7 @@ function emailEOD(){
   }
   var subject=encodeURIComponent('Route Summary - '+dateStr);
   var encodedBody=encodeURIComponent(body);
-  window.location.href='mailto:?subject='+subject+'&body='+encodedBody;
+  window.location.href='ms-outlook://compose?subject='+subject+'&body='+encodedBody;
 }
 
 // ── WEEKLY GOAL ───────────────────────────────────────────────────────────
