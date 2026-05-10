@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -393,6 +393,17 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .comp-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),rgba(255,77,106,.6))}
 .comp-acct-row{padding:10px 0;border-bottom:1px solid var(--border2);cursor:pointer}
 .comp-acct-row:last-child{border-bottom:none}
+.hcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 12px 12px}
+.hcal-dayname{font-size:10px;color:var(--sub);text-align:center;padding:4px 0;font-weight:700}
+.hcal-cell{aspect-ratio:1;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.hcal-cell.empty{background:transparent;cursor:default}
+.hcal-cell.heat-0{background:var(--bg3);color:var(--sub)}
+.hcal-cell.heat-1{background:rgba(0,229,184,.25);color:var(--teal)}
+.hcal-cell.heat-2{background:rgba(0,229,184,.5);color:#000}
+.hcal-cell.heat-3{background:rgba(0,229,184,.9);color:#000}
+.hcal-cell.today-ring{outline:2px solid var(--teal);outline-offset:1px}
+.vb-call{background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r3);padding:5px 8px;font-size:14px;cursor:pointer;text-decoration:none;display:flex;align-items:center;flex-shrink:0}
+.notif-status{font-size:12px;padding:8px 12px;border-radius:var(--r2);margin-top:8px}
 /* ── UNDO TOAST ── */
 #toast-undo{display:none;position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:10px 8px 10px 18px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.5);align-items:center;gap:10px}
 #toast-undo.on{opacity:1;display:flex}
@@ -528,6 +539,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="d-route"><div style="color:var(--sub);font-size:13px;padding:8px 0">Loading...</div></div>
       <button class="btn btn-t" id="btn-map">Open Route</button>
       <button class="btn" onclick="showMapOverlay()" style="background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);margin-top:8px">&#128205; Map View</button>
+      <button class="btn" onclick="showHeatCalendar()" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);margin-top:8px">&#128197; Visit Calendar</button>
       <button class="btn" id="btn-bulk-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25);margin-top:8px;display:none">Mark All Remaining N/A</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
@@ -745,7 +757,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button id="btn-exp" style="padding:9px 16px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export CSV</button>
         <button id="btn-exp-notes" style="padding:9px 16px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export Notes</button>
-        <button onclick="showMonthlyReport()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
+        <button onclick="showMonthlyReportV2()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
         <button id="btn-clr" style="padding:9px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Visits</button>
         <button id="btn-rst" style="padding:9px 16px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All</button>
       </div>
@@ -760,7 +772,13 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     </div>
     <div class="card" style="margin-top:4px">
       <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
+      <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128276; Visit Reminders</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Get a daily notification showing overdue accounts and today's follow-ups</div>
+      <button onclick="requestNotifPermission()" id="notif-btn" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128276; Enable Notifications</button>
+      <div id="notif-status" class="notif-status"></div>
+    </div>
+    <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Accounts with similar names or same phone</div>
       <button onclick="runDupeDetector()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128270; Scan for Duplicates</button>
       <div id="dupe-results" style="margin-top:12px"></div>
@@ -1046,7 +1064,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();}
 }
 
 function smartGroup(){
@@ -1175,6 +1193,7 @@ function rRoute(){
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
       '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+tierBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+noteHtml+'</div>'+
       '<button class="btn-qnote" data-qn="'+c.code+'" style="background:transparent;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:2px 6px;flex-shrink:0">&#128221;</button>'+
+      (c.phone?'<a href="tel:'+c.phone+'" class="vb-call" onclick="setTimeout(function(){promptLogCall(''+c.code+'')},2000)">&#128222;</a>':'')+'
       '<div class="vbs">'+
       '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
       '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
@@ -2036,6 +2055,17 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .comp-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),rgba(255,77,106,.6))}
 .comp-acct-row{padding:10px 0;border-bottom:1px solid var(--border2);cursor:pointer}
 .comp-acct-row:last-child{border-bottom:none}
+.hcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 12px 12px}
+.hcal-dayname{font-size:10px;color:var(--sub);text-align:center;padding:4px 0;font-weight:700}
+.hcal-cell{aspect-ratio:1;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.hcal-cell.empty{background:transparent;cursor:default}
+.hcal-cell.heat-0{background:var(--bg3);color:var(--sub)}
+.hcal-cell.heat-1{background:rgba(0,229,184,.25);color:var(--teal)}
+.hcal-cell.heat-2{background:rgba(0,229,184,.5);color:#000}
+.hcal-cell.heat-3{background:rgba(0,229,184,.9);color:#000}
+.hcal-cell.today-ring{outline:2px solid var(--teal);outline-offset:1px}
+.vb-call{background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r3);padding:5px 8px;font-size:14px;cursor:pointer;text-decoration:none;display:flex;align-items:center;flex-shrink:0}
+.notif-status{font-size:12px;padding:8px 12px;border-radius:var(--r2);margin-top:8px}
 /* ── UNDO TOAST ── */
 #toast-undo{display:none;position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:10px 8px 10px 18px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,.5);align-items:center;gap:10px}
 #toast-undo.on{opacity:1;display:flex}
@@ -2171,6 +2201,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="d-route"><div style="color:var(--sub);font-size:13px;padding:8px 0">Loading...</div></div>
       <button class="btn btn-t" id="btn-map">Open Route</button>
       <button class="btn" onclick="showMapOverlay()" style="background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);margin-top:8px">&#128205; Map View</button>
+      <button class="btn" onclick="showHeatCalendar()" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);margin-top:8px">&#128197; Visit Calendar</button>
       <button class="btn" id="btn-bulk-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25);margin-top:8px;display:none">Mark All Remaining N/A</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
@@ -2388,7 +2419,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button id="btn-exp" style="padding:9px 16px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export CSV</button>
         <button id="btn-exp-notes" style="padding:9px 16px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export Notes</button>
-        <button onclick="showMonthlyReport()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
+        <button onclick="showMonthlyReportV2()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
         <button id="btn-clr" style="padding:9px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Visits</button>
         <button id="btn-rst" style="padding:9px 16px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All</button>
       </div>
@@ -2403,7 +2434,13 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     </div>
     <div class="card" style="margin-top:4px">
       <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
+      <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128276; Visit Reminders</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Get a daily notification showing overdue accounts and today's follow-ups</div>
+      <button onclick="requestNotifPermission()" id="notif-btn" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128276; Enable Notifications</button>
+      <div id="notif-status" class="notif-status"></div>
+    </div>
+    <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Accounts with similar names or same phone</div>
       <button onclick="runDupeDetector()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128270; Scan for Duplicates</button>
       <div id="dupe-results" style="margin-top:12px"></div>
@@ -2689,7 +2726,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();}
 }
 
 function smartGroup(){
@@ -2818,6 +2855,7 @@ function rRoute(){
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
       '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+tierBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+noteHtml+'</div>'+
       '<button class="btn-qnote" data-qn="'+c.code+'" style="background:transparent;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:2px 6px;flex-shrink:0">&#128221;</button>'+
+      (c.phone?'<a href="tel:'+c.phone+'" class="vb-call" onclick="setTimeout(function(){promptLogCall(''+c.code+'')},2000)">&#128222;</a>':'')+'
       '<div class="vbs">'+
       '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
       '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
@@ -5170,6 +5208,17 @@ function showGroupSheet(g){
 .comp-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),rgba(255,77,106,.6))}
 .comp-acct-row{padding:10px 0;border-bottom:1px solid var(--border2);cursor:pointer}
 .comp-acct-row:last-child{border-bottom:none}
+.hcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 12px 12px}
+.hcal-dayname{font-size:10px;color:var(--sub);text-align:center;padding:4px 0;font-weight:700}
+.hcal-cell{aspect-ratio:1;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.hcal-cell.empty{background:transparent;cursor:default}
+.hcal-cell.heat-0{background:var(--bg3);color:var(--sub)}
+.hcal-cell.heat-1{background:rgba(0,229,184,.25);color:var(--teal)}
+.hcal-cell.heat-2{background:rgba(0,229,184,.5);color:#000}
+.hcal-cell.heat-3{background:rgba(0,229,184,.9);color:#000}
+.hcal-cell.today-ring{outline:2px solid var(--teal);outline-offset:1px}
+.vb-call{background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r3);padding:5px 8px;font-size:14px;cursor:pointer;text-decoration:none;display:flex;align-items:center;flex-shrink:0}
+.notif-status{font-size:12px;padding:8px 12px;border-radius:var(--r2);margin-top:8px}
 /* ── UNDO TOAST ── */
 function showUndoToast(code,type){
   var t=document.getElementById('toast-undo');if(!t)return;
@@ -6362,6 +6411,218 @@ function showCompetitorIntel(){
   body.innerHTML=h;
 }
 
+/* ── QUICK DIAL ── */
+function promptLogCall(code){
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:calc(90px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border2);border-radius:30px;padding:10px 16px;z-index:999;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.5);white-space:nowrap';
+  t.innerHTML='Log this call? <button onclick="logCall(\''+code+'\');this.closest(\'div[style*=fixed]\').remove()" style="background:rgba(129,140,248,.2);color:#818cf8;border:1px solid rgba(129,140,248,.4);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Yes</button><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:transparent;border:none;color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Skip</button>';
+  document.body.appendChild(t);
+  setTimeout(function(){if(t.parentNode)t.remove();},6000);
+}
+
+/* ── HEAT CALENDAR ── */
+var _hcalYear=new Date().getFullYear(),_hcalMonth=new Date().getMonth();
+function showHeatCalendar(){
+  var ov=document.getElementById('heatcal-ov');
+  if(ov)ov.className='on';
+  _hcalYear=new Date().getFullYear();_hcalMonth=new Date().getMonth();
+  renderHeatCal();
+}
+function hcalNav(dir){
+  _hcalMonth+=dir;
+  if(_hcalMonth<0){_hcalMonth=11;_hcalYear--;}
+  if(_hcalMonth>11){_hcalMonth=0;_hcalYear++;}
+  renderHeatCal();
+}
+function renderHeatCal(){
+  var moNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var lbl=document.getElementById('hcal-month-lbl');
+  if(lbl)lbl.textContent=moNames[_hcalMonth]+' '+_hcalYear;
+  var namesEl=document.getElementById('hcal-daynames');
+  if(namesEl)namesEl.innerHTML=['Su','Mo','Tu','We','Th','Fr','Sa'].map(function(d){return'<div class="hcal-dayname">'+d+'</div>';}).join('');
+  var grid=document.getElementById('hcal-grid');if(!grid)return;
+  var today=new Date();
+  var first=new Date(_hcalYear,_hcalMonth,1);
+  var daysInMonth=new Date(_hcalYear,_hcalMonth+1,0).getDate();
+  var startDay=first.getDay();
+  // Build visit count per day
+  var dayCounts={};
+  var a=allC();
+  for(var i=0;i<a.length;i++){
+    var logs=ST.visits[a[i].code]||[];
+    for(var j=0;j<logs.length;j++){
+      var d=new Date(logs[j].date);
+      if(d.getFullYear()===_hcalYear&&d.getMonth()===_hcalMonth&&logs[j].type==='visited'){
+        var key=d.getDate();
+        dayCounts[key]=(dayCounts[key]||0)+1;
+      }
+    }
+  }
+  var h='';
+  for(var s=0;s<startDay;s++)h+='<div class="hcal-cell empty"></div>';
+  for(var day=1;day<=daysInMonth;day++){
+    var cnt=dayCounts[day]||0;
+    var heat=cnt===0?'heat-0':cnt<=2?'heat-1':cnt<=5?'heat-2':'heat-3';
+    var isToday=today.getFullYear()===_hcalYear&&today.getMonth()===_hcalMonth&&today.getDate()===day;
+    h+='<div class="hcal-cell '+heat+(isToday?' today-ring':'')+'" onclick="showHcalDay('+day+')" title="'+cnt+' visit'+(cnt!==1?'s':'')+'">'+day+'</div>';
+  }
+  grid.innerHTML=h;
+  document.getElementById('hcal-detail').innerHTML='<div style="color:var(--sub);font-size:12px;text-align:center">Tap a day to see who you visited</div>';
+}
+function showHcalDay(day){
+  var detail=document.getElementById('hcal-detail');if(!detail)return;
+  var a=allC(),visited=[];
+  for(var i=0;i<a.length;i++){
+    var logs=ST.visits[a[i].code]||[];
+    for(var j=0;j<logs.length;j++){
+      var d=new Date(logs[j].date);
+      if(d.getFullYear()===_hcalYear&&d.getMonth()===_hcalMonth&&d.getDate()===day&&logs[j].type==='visited'){
+        visited.push({c:a[i],time:d});break;
+      }
+    }
+  }
+  var moNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var dateStr=moNames[_hcalMonth]+' '+day+', '+_hcalYear;
+  if(!visited.length){detail.innerHTML='<div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:6px">'+dateStr+'</div><div style="color:var(--sub);font-size:12px">No visits logged this day</div>';return;}
+  var h='<div style="font-size:13px;font-weight:700;color:var(--teal);margin-bottom:10px">'+dateStr+' — '+visited.length+' visit'+(visited.length!==1?'s':'')+'</div>';
+  for(var i=0;i<visited.length;i++){
+    var v=visited[i];
+    h+='<div class="cadence-row" onclick="document.getElementById(\'heatcal-ov\').className=\'\';openM(\''+v.c.code+'\')">'
+     +'<div class="cadence-name">'+esc(v.c.name)+'</div>'
+     +'<div class="sample-meta">'+esc(v.c.city||'')+'</div>'
+     +'<div style="font-size:11px;color:var(--sub)">'+v.time.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+'</div>'
+     +'</div>';
+  }
+  detail.innerHTML=h;
+}
+
+/* ── MONTHLY REPORT ENHANCED ── */
+function showMonthlyReportV2(){
+  var now=new Date(),mo=now.getMonth(),yr=now.getFullYear();
+  var moNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var moStr=moNames[mo]+' '+yr;
+  var all=allC();
+  var visMap={},naMap={},callMap={},daySet={},groupCount={};
+  var compCount={};
+  all.forEach(function(c){
+    var logs=ST.visits[c.code]||[];
+    logs.forEach(function(l){
+      var d=new Date(l.date);
+      if(d.getMonth()!==mo||d.getFullYear()!==yr)return;
+      var dayKey=d.toDateString();
+      if(l.type==='visited'){visMap[c.code]=c;daySet[dayKey]=1;groupCount[c.group]=(groupCount[c.group]||0)+1;}
+      else if(l.type==='not_available'){naMap[c.code]=c;}
+      else if(l.type==='called'){callMap[c.code]=c;}
+    });
+    var comp=ST.competitors&&ST.competitors[c.code]?ST.competitors[c.code]:'';
+    if(comp){comp.split(/[,;\/]+/).forEach(function(n){n=n.trim();if(n){compCount[n]=(compCount[n]||0)+1;}});}
+  });
+  var daysWorked=Object.keys(daySet).length;
+  var totalVis=Object.keys(visMap).length;
+  var totalNA=Object.keys(naMap).length;
+  var totalCalls=Object.keys(callMap).length;
+  var avgPerDay=daysWorked?Math.round(totalVis/daysWorked*10)/10:0;
+  var bestGroup=Object.keys(groupCount).sort(function(a,b){return groupCount[b]-groupCount[a];})[0];
+  var topAccts=all.filter(function(c){return visMap[c.code];}).sort(function(a,b){return (groupCount[b.group]||0)-(groupCount[a.group]||0);}).slice(0,10);
+  var topComps=Object.keys(compCount).sort(function(a,b){return compCount[b]-compCount[a];}).slice(0,5);
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;display:flex;align-items:flex-end;justify-content:center';
+  var statBox=function(val,lbl,color){return'<div style="background:var(--bg3);border-radius:var(--r);padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:'+color+'">'+val+'</div><div style="font-size:11px;color:var(--sub);margin-top:2px">'+lbl+'</div></div>';};
+  var h='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;overflow-y:auto">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px"></div>'
+   +'<div style="font-size:20px;font-weight:800;margin-bottom:4px">&#128202; '+moStr+'</div>'
+   +'<div style="font-size:13px;color:var(--sub);margin-bottom:16px">Monthly Performance</div>'
+   +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">'
+   +statBox(totalVis,'Visited','var(--green)')
+   +statBox(totalNA,'Not Avail','var(--amber)')
+   +statBox(totalCalls,'Calls','#818cf8')
+   +'</div>'
+   +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">'
+   +statBox(daysWorked,'Days Out','var(--blue)')
+   +statBox(avgPerDay,'Avg/Day','var(--teal)')
+   +statBox(bestGroup?'Grp '+bestGroup:'—','Top Group','var(--sub)')
+   +'</div>';
+  if(topAccts.length){
+    h+='<div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;margin-bottom:8px">TOP ACCOUNTS VISITED</div>';
+    h+=topAccts.map(function(c,i){return'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:600">'+(i+1)+'. '+esc(c.name)+'</span><span style="font-size:12px;color:var(--sub)">'+esc(c.city||'')+'</span></div>';}).join('');
+  }
+  if(topComps.length){
+    h+='<div style="font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.5px;margin:14px 0 8px">TOP COMPETITORS THIS MONTH</div>';
+    h+=topComps.map(function(n){return'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:600;color:var(--red)">'+esc(n)+'</span><span style="font-size:12px;color:var(--sub)">'+compCount[n]+' account'+(compCount[n]>1?'s':'')+'</span></div>';}).join('');
+  }
+  h+='<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;margin-top:20px;padding:13px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+   +'</div>';
+  sheet.innerHTML=h;
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+
+/* ── PUSH NOTIFICATIONS ── */
+function rNotifStatus(){
+  var btn=document.getElementById('notif-btn');
+  var status=document.getElementById('notif-status');
+  if(!btn||!status)return;
+  if(!('Notification' in window)){
+    status.textContent='Notifications not supported on this browser';
+    status.style.cssText='background:var(--bg3);color:var(--sub);padding:8px 12px;border-radius:var(--r2);margin-top:8px;font-size:12px';
+    btn.style.display='none';return;
+  }
+  if(Notification.permission==='granted'){
+    status.textContent='Notifications are ON';
+    status.style.cssText='background:rgba(16,185,129,.15);color:#10b981;padding:8px 12px;border-radius:var(--r2);margin-top:8px;font-size:12px;font-weight:700';
+    btn.textContent='Test Notification';
+    btn.onclick=function(){sendTestNotification();};
+  }else if(Notification.permission==='denied'){
+    status.textContent='Notifications blocked — enable in your browser settings';
+    status.style.cssText='background:var(--red2);color:var(--red);padding:8px 12px;border-radius:var(--r2);margin-top:8px;font-size:12px';
+    btn.style.display='none';
+  }else{
+    status.textContent='Tap to enable — you will get a daily reminder with overdue accounts and follow-ups';
+    status.style.cssText='background:var(--bg3);color:var(--sub);padding:8px 12px;border-radius:var(--r2);margin-top:8px;font-size:12px';
+  }
+}
+function requestNotifPermission(){
+  if(!('Notification' in window)){toast('Not supported on this browser');return;}
+  if(Notification.permission==='granted'){sendTestNotification();return;}
+  Notification.requestPermission().then(function(perm){
+    rNotifStatus();
+    if(perm==='granted'){
+      sendTestNotification();
+      localStorage.setItem('hrt_notif','1');
+    }
+  });
+}
+function sendTestNotification(){
+  var overdue=0,followups=0;
+  var a=allC(),today=new Date();
+  for(var i=0;i<a.length;i++){
+    var c=a[i];if(!c.tier)continue;
+    var visits=ST.visits[c.code]||[];
+    var lastGood=null;
+    for(var j=visits.length-1;j>=0;j--){if(visits[j].type==='visited'){lastGood=new Date(visits[j].date);break;}}
+    var target=getTierTarget(c.tier);
+    var daysSince=lastGood?Math.floor((today-lastGood)/(1000*60*60*24)):9999;
+    if(daysSince>=target)overdue++;
+    if(ST.scheduled&&ST.scheduled[c.code]){
+      var sd=new Date(ST.scheduled[c.code]);
+      if(sd.toDateString()===today.toDateString())followups++;
+    }
+  }
+  var body='Overdue: '+overdue+' accounts';
+  if(followups)body+=' | Follow-ups today: '+followups;
+  new Notification('HC Routes — Daily Summary',{body:body,icon:'icon-192.png'});
+}
+function checkAndNotify(){
+  if(!('Notification' in window))return;
+  if(Notification.permission!=='granted')return;
+  var lastKey='hrt_last_notif';
+  var last=localStorage.getItem(lastKey);
+  var today=new Date().toDateString();
+  if(last===today)return;
+  localStorage.setItem(lastKey,today);
+  setTimeout(function(){sendTestNotification();},3000);
+}
+
 lLoad();
 loadRolling();
 loadPricing();
@@ -6378,6 +6639,7 @@ rGrps();
 rVend();
 renderCustomRoute();
 syncDown();
+checkAndNotify();
 </script>
 <div id="map-overlay">
   <div class="map-hdr">
@@ -6395,5 +6657,24 @@ syncDown();
     <div id="comp-intel-body"></div>
   </div>
 </div>
+<div id="heatcal-ov">
+  <div class="map-hdr">
+    <div>
+      <div style="font-size:17px;font-weight:800">&#128197; Visit Calendar</div>
+      <div id="hcal-month-lbl" style="font-size:12px;color:var(--sub);margin-top:2px"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="hcalNav(-1)" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);width:34px;height:34px;cursor:pointer;font-size:18px">&#8249;</button>
+      <button onclick="hcalNav(1)" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);width:34px;height:34px;cursor:pointer;font-size:18px">&#8250;</button>
+      <button onclick="document.getElementById('heatcal-ov').className=''" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Close</button>
+    </div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:12px 0">
+    <div class="hcal-grid" id="hcal-daynames"></div>
+    <div class="hcal-grid" id="hcal-grid"></div>
+    <div id="hcal-detail" style="padding:16px"></div>
+  </div>
+</div>
+
 </body>
 </html>
