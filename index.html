@@ -340,7 +340,9 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .contact-name{font-size:14px;font-weight:700;margin-bottom:4px}
 .contact-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
 .contact-link{font-size:12px;color:var(--blue);text-decoration:none}
-.contact-del{background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:2px 4px;float:right;margin-top:-2px}
+.contact-del{background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:11px;padding:2px 6px;font-family:inherit;font-weight:600}
+.contact-edit{background:transparent;border:none;color:var(--blue);cursor:pointer;font-size:11px;padding:2px 6px;font-family:inherit;font-weight:700}
+.contact-actions{display:flex;gap:4px;margin-top:6px;border-top:1px solid var(--border);padding-top:6px}
 
 /* ── NOTES SEARCH ── */
 .nsrch-row{display:flex;flex-direction:column;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer}
@@ -502,7 +504,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
   <div class="hdr">
     <div class="hdr-top">
       <div><h1 id="d-greet">Good morning, Heath</h1><div class="sub" id="d-date"></div></div>
-      <button onclick="showDashSearch()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0">&#128269;</button>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="showNotesSearch()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px" title="Search Notes">&#128203;</button>
+        <button onclick="showDashSearch()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px">&#128269;</button>
+      </div>
     </div>
   </div>
   <div class="body">
@@ -605,7 +610,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="lbl" style="margin:0;color:var(--amber)">&#128230; Sample Follow-Ups</div>
       <span id="d-samples-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
     </div>
-    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Samples dropped 14+ days ago with no order</div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Samples dropped 30+ days ago with no order</div>
     <div id="d-samples-list"></div>
   </div>
   <div class="card" id="d-plan-card" style="display:none">
@@ -2198,7 +2203,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
   <div class="hdr">
     <div class="hdr-top">
       <div><h1 id="d-greet">Good morning, Heath</h1><div class="sub" id="d-date"></div></div>
-      <button onclick="showDashSearch()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0">&#128269;</button>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="showNotesSearch()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px" title="Search Notes">&#128203;</button>
+        <button onclick="showDashSearch()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px">&#128269;</button>
+      </div>
     </div>
   </div>
   <div class="body">
@@ -2301,7 +2309,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="lbl" style="margin:0;color:var(--amber)">&#128230; Sample Follow-Ups</div>
       <span id="d-samples-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
     </div>
-    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Samples dropped 14+ days ago with no order</div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Samples dropped 30+ days ago with no order</div>
     <div id="d-samples-list"></div>
   </div>
   <div class="card" id="d-plan-card" style="display:none">
@@ -5812,7 +5820,10 @@ function rContacts(code){
     if(ct.phone)h+='<a class="contact-link" href="tel:'+esc(ct.phone)+'">&#128222; '+esc(ct.phone)+'</a>';
     if(ct.email)h+='<a class="contact-link" href="ms-outlook://compose?to='+esc(ct.email)+'">&#9993; '+esc(ct.email)+'</a>';
     h+='</div>'
-     +'<button class="contact-del" onclick="deleteContact(\''+esc(code)+'\','+i+')">Remove</button>'
+     +'<div class="contact-actions">'
+     +'<button class="contact-edit" onclick="editContact(\''+esc(code)+'\','+i+')">&#9998; Edit</button>'
+     +'<button class="contact-del" onclick="deleteContact(\''+esc(code)+'\','+i+')">&#128465; Remove</button>'
+     +'</div>'
      +'</div>';
   }
   list.innerHTML=h;
@@ -5855,6 +5866,41 @@ function deleteContact(code,idx){
   ST.contacts[code].splice(idx,1);
   lSave();syncUp();
   rContacts(code);toast('Contact removed');
+}
+function editContact(code,idx){
+  if(!ST.contacts||!ST.contacts[code]||!ST.contacts[code][idx])return;
+  var ct=ST.contacts[code][idx];
+  var inp='width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box';
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">Edit Contact</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Role</div>'
+   +'<input id="ct-role" type="text" value="'+esc(ct.role||'')+'" placeholder="e.g. Buyer" style="'+inp+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Name</div>'
+   +'<input id="ct-name" type="text" value="'+esc(ct.name||'')+'" placeholder="Full name" style="'+inp+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Phone</div>'
+   +'<input id="ct-phone" type="tel" value="'+esc(ct.phone||'')+'" placeholder="Optional" style="'+inp+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Email</div>'
+   +'<input id="ct-email" type="email" value="'+esc(ct.email||'')+'" placeholder="Optional" style="'+inp.replace('margin-bottom:10px','margin-bottom:14px')+'">'
+   +'<button onclick="updateContact(\''+esc(code)+'\','+idx+')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save Changes</button>'
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+function updateContact(code,idx){
+  var role=document.getElementById('ct-role');
+  var name=document.getElementById('ct-name');
+  var phone=document.getElementById('ct-phone');
+  var email=document.getElementById('ct-email');
+  if(!name||!name.value.trim()){toast('Name required');return;}
+  if(!ST.contacts||!ST.contacts[code]||!ST.contacts[code][idx])return;
+  ST.contacts[code][idx]={role:(role?role.value.trim():''),name:name.value.trim(),phone:(phone?phone.value.trim():''),email:(email?email.value.trim():'')};
+  lSave();syncUp();
+  var sheet=document.querySelector('div[style*="z-index: 1100"],div[style*="z-index:1100"]');if(sheet)sheet.remove();
+  rContacts(code);toast('Contact updated');
 }
 
 /* ── NOTES SEARCH ── */
@@ -5967,14 +6013,17 @@ function rSamples(code){
   var samples=ST.samples&&ST.samples[code]?ST.samples[code]:[];
   if(!samples.length){list.innerHTML='<div style="color:var(--sub);font-size:12px">No samples logged yet</div>';return;}
   var h='';
+  var today2=new Date();
   for(var i=samples.length-1;i>=0;i--){
     var s=samples[i];
     var cls=s.status==='ordered'?'ss-ordered':s.status==='no_interest'?'ss-no':'ss-pending';
     var lbl=s.status==='ordered'?'Ordered':s.status==='no_interest'?'No interest':'Pending';
+    var daysOld=Math.floor((today2-new Date(s.date))/(1000*60*60*24));
+    var ageTag=s.status==='pending'&&daysOld>=30?' <span style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700">'+daysOld+'d old</span>':'';
     h+='<div class="sample-row">'
      +'<div style="flex:1">'
      +'<div class="sample-item">'+esc(s.item)+(s.qty?' <span style="color:var(--sub);font-weight:400;font-size:12px">'+esc(s.qty)+'</span>':'')+'</div>'
-     +'<div class="sample-meta">'+new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+'</div>'
+     +'<div class="sample-meta">'+new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+ageTag+'</div>'
      +'</div>'
      +'<span class="sample-status '+cls+'">'+lbl+'</span>';
     if(s.status==='pending'){
@@ -5993,7 +6042,7 @@ function rSampleCard(){
   var cnt=document.getElementById('d-samples-count');
   if(!card||!list||!cnt)return;
   if(dashCardHidden('samples')){card.style.display='none';return;}
-  var today=new Date(),cutoff=new Date(today-14*24*60*60*1000);
+  var today=new Date(),cutoff=new Date(today-30*24*60*60*1000);
   var pending=[];
   var a=allC();
   for(var i=0;i<a.length;i++){
