@@ -580,6 +580,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="lbl">Visit Trend — Last 8 Weeks</div>
       <div class="trend-wrap" id="d-trend-bars"></div>
     </div>
+    <div class="card" id="d-pace-card" style="display:none"></div>
+    <div class="card" id="d-due-card" style="display:none"></div>
     <div class="card" id="d-quiet-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--red)">&#9888; Going Quiet</div>
@@ -2269,6 +2271,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="lbl">Visit Trend — Last 8 Weeks</div>
       <div class="trend-wrap" id="d-trend-bars"></div>
     </div>
+    <div class="card" id="d-pace-card" style="display:none"></div>
+    <div class="card" id="d-due-card" style="display:none"></div>
     <div class="card" id="d-quiet-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--red)">&#9888; Going Quiet</div>
@@ -2867,7 +2871,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rSalesPace();rComingDue();
 }
 
 function rRoute(){
@@ -2883,6 +2887,12 @@ function rRoute(){
   if(_routeSortMode==='gps'&&window._gpsPos){
     stops.sort(function(a,b){
       var da=stopDist(a,_gpsPos),db=stopDist(b,_gpsPos);return da-db;
+    });
+  } else if(_routeSortMode==='priority'){
+    stops.sort(function(a,b){
+      var sa=(ST.hot[a.code]?5000:0)+(ds(a.code)<1000000?ds(a.code)*10:5000)+(a.lifetimeSales/1000);
+      var sb=(ST.hot[b.code]?5000:0)+(ds(b.code)<1000000?ds(b.code)*10:5000)+(b.lifetimeSales/1000);
+      return sb-sa;
     });
   } else {
     stops.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
@@ -3345,6 +3355,8 @@ var DASH_CARDS=[
   {key:'hotleads',label:'Hot Leads Overdue'},
   {key:'winback',label:'Win-Back Targets'},
   {key:'trend',label:'Visit Trend Chart'},
+  {key:'pace',label:'Sales Pace'},
+  {key:'due',label:'Due Soon'},
   {key:'schedule',label:'This Week\'s Schedule'},
   {key:'quiet',label:'Going Quiet'},
   {key:'comp',label:'Competitor Intel'},
@@ -5324,9 +5336,9 @@ function rRouteNote(){
 /* ── GPS ROUTE SORT ── */
 var _routeSortMode='sales';
 function toggleRouteSort(){
-  _routeSortMode=_routeSortMode==='sales'?'gps':'sales';
+  _routeSortMode=_routeSortMode==='sales'?'priority':_routeSortMode==='priority'?'gps':'sales';
   var btn=document.getElementById('btn-rsort');
-  if(btn)btn.textContent=_routeSortMode==='gps'?'&#128205; GPS':'&#128197; Sales';
+  if(btn)btn.textContent=_routeSortMode==='gps'?'&#128205; GPS':_routeSortMode==='priority'?'&#11088; Priority':'&#128197; Sales';
   if(_routeSortMode==='gps'){
     getGPS(function(pos){window._gpsPos=pos;rRoute();});
   } else {
@@ -5611,9 +5623,10 @@ function showEOD(){
     +'</div>'
     +(vis.length?'<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Visited</div>'+vis.map(function(c){return'<div style="font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)">&#10003; '+esc(c.name)+'</div>';}).join('')+'</div>':'')
     +(naList.length?'<div style="margin-bottom:16px"><div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Not Available</div>'+naList.map(function(c){return'<div style="font-size:13px;padding:4px 0;border-bottom:1px solid var(--border);color:var(--amber)">&#8212; '+esc(c.name)+'</div>';}).join('')+'</div>':'')
-    +'<div style="display:flex;gap:8px">'
-    +'<button id="eod-share" style="flex:1;padding:12px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#128172; Share Summary</button>'
-    +'<button id="eod-copy" style="padding:12px 16px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Copy</button>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button id="eod-share" style="flex:1;padding:12px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#128172; Share</button>'
+    +'<button id="eod-email" style="padding:12px 14px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#128231; Email</button>'
+    +'<button id="eod-copy" style="padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Copy</button>'
     +'</div>'
     +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;margin-top:10px;padding:12px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
     +'</div>';
@@ -5627,6 +5640,11 @@ function showEOD(){
   document.getElementById('eod-copy').addEventListener('click',function(){
     if(navigator.clipboard){navigator.clipboard.writeText(sumText).then(function(){toast('Copied!');});}
     else{var ta=document.createElement('textarea');ta.value=sumText;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copied!');}
+  });
+  document.getElementById('eod-email').addEventListener('click',function(){
+    var subj=encodeURIComponent('HC Routes EOD - '+dateStr);
+    var body=encodeURIComponent(sumText);
+    window.location.href='mailto:?subject='+subj+'&body='+body;
   });
 }
 
@@ -6815,6 +6833,64 @@ function optimizeRouteByGPS(stops,callback){
     }
     callback(ordered);
   },function(){toast('Could not get GPS location');});
+}
+
+/* ── SALES PACE ── */
+function rSalesPace(){
+  var el=document.getElementById('d-pace-card');if(!el)return;
+  if(dashCardHidden('pace')){el.style.display='none';return;}
+  var a=allC(),ytd=0,ly=0;
+  for(var i=0;i<a.length;i++){ytd+=a[i].sales2526||0;ly+=a[i].sales2025||0;}
+  var fyStart=new Date('2025-07-01'),now=new Date();
+  var mo=Math.max(1,Math.min(12,(now-fyStart)/(1000*60*60*24*30.44)));
+  var proj=Math.round(ytd/mo*12);
+  var pct=ly>0?Math.round((proj-ly)/ly*100):0;
+  var upCol=pct>=0?'var(--green)':'var(--red)';
+  var arrow=pct>=0?'&#9650;':'&#9660;';
+  el.style.display='block';
+  el.innerHTML='<div class="card-hdr"><div class="lbl" style="margin:0">&#128200; Sales Pace</div>'
+    +'<span style="font-size:11px;color:var(--sub)">'+Math.round(mo)+'mo elapsed</span></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">'
+    +'<div style="background:var(--bg3);border-radius:var(--r2);padding:10px">'
+      +'<div style="font-size:10px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Projected Annual</div>'
+      +'<div style="font-size:20px;font-weight:800;color:var(--teal)">'+fmt(proj)+'</div>'
+      +'<div style="font-size:11px;margin-top:3px;color:'+upCol+'">'+arrow+' '+Math.abs(pct)+'% vs last yr</div>'
+    +'</div>'
+    +'<div style="background:var(--bg3);border-radius:var(--r2);padding:10px">'
+      +'<div style="font-size:10px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">YTD Actual</div>'
+      +'<div style="font-size:20px;font-weight:800">'+fmt(ytd)+'</div>'
+      +'<div style="font-size:11px;margin-top:3px;color:var(--sub)">Last yr: '+fmt(ly)+'</div>'
+    +'</div></div>';
+}
+
+/* ── COMING DUE SOON ── */
+function rComingDue(){
+  var el=document.getElementById('d-due-card');if(!el)return;
+  if(dashCardHidden('due')){el.style.display='none';return;}
+  var a=allC(),due=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i],d=ds(c.code);
+    if(d>=1000000)continue;
+    var tier=tierLabel(c);
+    var tgt=tier==='A'?getTierTarget('A'):tier==='B'?getTierTarget('B'):getTierTarget('C');
+    var left=tgt-d;
+    if(left>=0&&left<=7)due.push({c:c,left:left,d:d});
+  }
+  if(!due.length){el.style.display='none';return;}
+  due.sort(function(a,b){return a.left-b.left;});
+  el.style.display='block';
+  var h='<div class="card-hdr"><div class="lbl" style="margin:0;color:var(--amber)">&#9200; Due Soon</div>'
+    +'<span style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">'+due.length+'</span></div>'
+    +'<div style="font-size:11px;color:var(--sub);margin-bottom:10px">Visit before they go overdue</div>';
+  due.slice(0,6).forEach(function(item){
+    var uc=item.left<=2?'var(--red)':'var(--amber)';
+    var lbl=item.left===0?'Today!':item.left===1?'1 day':item.left+' days';
+    h+='<div class="row" data-code="'+item.c.code+'" data-action="open" style="padding:8px 0;border-bottom:1px solid var(--border)">'
+      +'<div class="dot" style="background:'+dc(item.c.code)+'"></div>'
+      +'<div class="ri"><div class="rn">'+esc(item.c.name)+'</div><div class="rm">'+esc(item.c.city||'')+'</div></div>'
+      +'<div style="font-size:11px;font-weight:700;color:'+uc+';flex-shrink:0">'+lbl+'</div></div>';
+  });
+  el.innerHTML=h;
 }
 
 lLoad();
