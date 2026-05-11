@@ -390,6 +390,8 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 /* ── COMPETITOR INTEL OVERLAY ── */
 #comp-intel-ov{display:none;position:fixed;inset:0;z-index:950;background:var(--bg);flex-direction:column}
 #comp-intel-ov.on{display:flex}
+#heatcal-ov{display:none;position:fixed;inset:0;z-index:950;background:var(--bg);flex-direction:column}
+#heatcal-ov.on{display:flex}
 .comp-bar-wrap{margin-bottom:10px}
 .comp-bar-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;display:flex;justify-content:space-between}
 .comp-bar-track{height:8px;border-radius:4px;background:var(--bg3);overflow:hidden}
@@ -491,6 +493,15 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
 .fu-opt{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .15s}
 .fu-opt:last-child{border-bottom:none}
 .fu-opt:active{opacity:.7}
+/* ── LOCK SCREEN ── */
+.lock-screen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px calc(60px + env(safe-area-inset-bottom,0px))}
+.pin-dots{display:flex;gap:14px;margin-bottom:20px}
+.pin-dot{width:15px;height:15px;border-radius:50%;border:2px solid var(--border2);background:transparent;transition:all .15s}
+.pin-dot.filled{background:var(--teal);border-color:var(--teal);transform:scale(1.1)}
+.pin-dot.err{background:var(--red)!important;border-color:var(--red)!important;transform:scale(1.15)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:280px;margin-top:8px}
+.pin-key{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;color:var(--text);font-size:24px;font-weight:700;padding:18px 10px;cursor:pointer;font-family:inherit;transition:background .1s;-webkit-tap-highlight-color:transparent;user-select:none;text-align:center}
+.pin-key:active{background:var(--bg3)}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -516,6 +527,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="stat"><div class="stat-n" style="color:var(--amber)">0</div><div class="stat-l">Not Avail</div></div>
       <div class="stat"><div class="stat-n" style="color:var(--red)">0</div><div class="stat-l">Overdue</div></div>
     </div>
+    <div id="d-birthday-alert" style="display:none"></div>
     <div id="d-followup-alert" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
@@ -833,6 +845,14 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       </div>
     </div>
     <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128274; App Security</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Protect your customer data with a PIN + Face ID</div>
+      <div id="sec-status" style="font-size:13px;color:var(--sub);margin-bottom:10px">No lock set — data is unprotected</div>
+      <button onclick="showPINSetup()" id="btn-set-pin" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-bottom:6px">&#128273; Set PIN</button>
+      <button onclick="showFaceIDSetup()" id="btn-faceid" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-bottom:6px">&#129661; Enable Face ID</button>
+      <button onclick="disableAppLock()" id="btn-dis-lock" style="display:none;width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">&#128275; Disable Lock</button>
+    </div>
+    <div class="card" style="margin-top:4px">
       <div class="lbl">Dashboard Cards</div>
       <div id="dash-toggles"></div>
     </div>
@@ -840,7 +860,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <button onclick="showHowToUse()" style="padding:10px 18px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="padding:10px 18px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
-    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v21 &bull; Southern California</div>
+    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v22 &bull; Southern California</div>
   </div>
 </div>
 
@@ -996,6 +1016,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       </div>
       <div id="m-contacts-list"></div>
     </div>
+    <div class="msect" id="m-orders-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Orders<button onclick="logOrder(mC)" style="background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Log</button></div>
+      <div id="m-orders-list"><div style="color:var(--sub);font-size:12px">No orders yet</div></div>
+    </div>
     <div class="msect">
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
@@ -1058,10 +1082,10 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1097,7 +1121,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();}
 }
 
 function smartGroup(){
@@ -1453,8 +1477,8 @@ function openM(code){
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
-  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?'&#128222; Called':'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
+  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -2089,6 +2113,8 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 /* ── COMPETITOR INTEL OVERLAY ── */
 #comp-intel-ov{display:none;position:fixed;inset:0;z-index:950;background:var(--bg);flex-direction:column}
 #comp-intel-ov.on{display:flex}
+#heatcal-ov{display:none;position:fixed;inset:0;z-index:950;background:var(--bg);flex-direction:column}
+#heatcal-ov.on{display:flex}
 .comp-bar-wrap{margin-bottom:10px}
 .comp-bar-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;display:flex;justify-content:space-between}
 .comp-bar-track{height:8px;border-radius:4px;background:var(--bg3);overflow:hidden}
@@ -2539,7 +2565,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <button onclick="showHowToUse()" style="padding:10px 18px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="padding:10px 18px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
-    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v21 &bull; Southern California</div>
+    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v22 &bull; Southern California</div>
   </div>
 </div>
 
@@ -2695,6 +2721,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       </div>
       <div id="m-contacts-list"></div>
     </div>
+    <div class="msect" id="m-orders-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Orders<button onclick="logOrder(mC)" style="background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Log</button></div>
+      <div id="m-orders-list"><div style="color:var(--sub);font-size:12px">No orders yet</div></div>
+    </div>
     <div class="msect">
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
@@ -2757,10 +2787,10 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -2796,7 +2826,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();}
 }
 
 function smartGroup(){
@@ -2884,7 +2914,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rSalesPace();rComingDue();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rSalesPace();rComingDue();
 }
 
 function rRoute(){
@@ -3158,8 +3188,8 @@ function openM(code){
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
-  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?'&#128222; Called':'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
+  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -5832,17 +5862,20 @@ function rContacts(code){
 function addContact(code){
   var sheet=document.createElement('div');
   sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:flex;align-items:flex-end;justify-content:center';
+  var fi='width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box';
   sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
    +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">Add Contact</div>'
    +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Role (Buyer, Owner, AP, etc.)</div>'
-   +'<input id="ct-role" type="text" placeholder="e.g. Buyer" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box">'
-   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Name</div>'
-   +'<input id="ct-name" type="text" placeholder="Full name" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box">'
+   +'<input id="ct-role" type="text" placeholder="e.g. Buyer" style="'+fi+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Name *</div>'
+   +'<input id="ct-name" type="text" placeholder="Full name" style="'+fi+'">'
    +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Phone</div>'
-   +'<input id="ct-phone" type="tel" placeholder="Optional" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box">'
+   +'<input id="ct-phone" type="tel" placeholder="Optional" style="'+fi+'">'
    +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Email</div>'
-   +'<input id="ct-email" type="email" placeholder="Optional" style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:14px;box-sizing:border-box">'
+   +'<input id="ct-email" type="email" placeholder="Optional" style="'+fi+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">&#127874; Birthday (MM-DD, optional)</div>'
+   +'<input id="ct-bday" type="text" inputmode="numeric" placeholder="e.g. 03-15" style="'+fi.replace('margin-bottom:10px','margin-bottom:14px')+'">'
    +'<button onclick="saveContact(\''+code+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save Contact</button>'
    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
    +'</div>';
@@ -5854,19 +5887,20 @@ function saveContact(code){
   var name=document.getElementById('ct-name');
   var phone=document.getElementById('ct-phone');
   var email=document.getElementById('ct-email');
+  var bday=document.getElementById('ct-bday');
   if(!name||!name.value.trim()){toast('Name required');return;}
   if(!ST.contacts)ST.contacts={};
   if(!ST.contacts[code])ST.contacts[code]=[];
-  ST.contacts[code].push({role:(role?role.value.trim():''),name:name.value.trim(),phone:(phone?phone.value.trim():''),email:(email?email.value.trim():'')});
+  ST.contacts[code].push({role:(role?role.value.trim():''),name:name.value.trim(),phone:(phone?phone.value.trim():''),email:(email?email.value.trim():''),birthday:(bday?bday.value.trim():'')});
   lSave();syncUp();
   var sheet=document.querySelector('div[style*="z-index: 1100"],div[style*="z-index:1100"]');if(sheet)sheet.remove();
-  rContacts(code);toast('Contact saved');
+  rContacts(code);rBirthdayAlert();toast('Contact saved');
 }
 function deleteContact(code,idx){
   if(!ST.contacts||!ST.contacts[code])return;
   ST.contacts[code].splice(idx,1);
   lSave();syncUp();
-  rContacts(code);toast('Contact removed');
+  rContacts(code);rBirthdayAlert();toast('Contact removed');
 }
 function editContact(code,idx){
   if(!ST.contacts||!ST.contacts[code]||!ST.contacts[code][idx])return;
@@ -5879,12 +5913,14 @@ function editContact(code,idx){
    +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">Edit Contact</div>'
    +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Role</div>'
    +'<input id="ct-role" type="text" value="'+esc(ct.role||'')+'" placeholder="e.g. Buyer" style="'+inp+'">'
-   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Name</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Name *</div>'
    +'<input id="ct-name" type="text" value="'+esc(ct.name||'')+'" placeholder="Full name" style="'+inp+'">'
    +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Phone</div>'
    +'<input id="ct-phone" type="tel" value="'+esc(ct.phone||'')+'" placeholder="Optional" style="'+inp+'">'
    +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Email</div>'
-   +'<input id="ct-email" type="email" value="'+esc(ct.email||'')+'" placeholder="Optional" style="'+inp.replace('margin-bottom:10px','margin-bottom:14px')+'">'
+   +'<input id="ct-email" type="email" value="'+esc(ct.email||'')+'" placeholder="Optional" style="'+inp+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">&#127874; Birthday (MM-DD, optional)</div>'
+   +'<input id="ct-bday" type="text" inputmode="numeric" value="'+esc(ct.birthday||'')+'" placeholder="e.g. 03-15" style="'+inp.replace('margin-bottom:10px','margin-bottom:14px')+'">'
    +'<button onclick="updateContact(\''+esc(code)+'\','+idx+')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save Changes</button>'
    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
    +'</div>';
@@ -5896,12 +5932,13 @@ function updateContact(code,idx){
   var name=document.getElementById('ct-name');
   var phone=document.getElementById('ct-phone');
   var email=document.getElementById('ct-email');
+  var bday=document.getElementById('ct-bday');
   if(!name||!name.value.trim()){toast('Name required');return;}
   if(!ST.contacts||!ST.contacts[code]||!ST.contacts[code][idx])return;
-  ST.contacts[code][idx]={role:(role?role.value.trim():''),name:name.value.trim(),phone:(phone?phone.value.trim():''),email:(email?email.value.trim():'')};
+  ST.contacts[code][idx]={role:(role?role.value.trim():''),name:name.value.trim(),phone:(phone?phone.value.trim():''),email:(email?email.value.trim():''),birthday:(bday?bday.value.trim():'')};
   lSave();syncUp();
   var sheet=document.querySelector('div[style*="z-index: 1100"],div[style*="z-index:1100"]');if(sheet)sheet.remove();
-  rContacts(code);toast('Contact updated');
+  rContacts(code);rBirthdayAlert();toast('Contact updated');
 }
 
 /* ── NOTES SEARCH ── */
@@ -6240,12 +6277,333 @@ function dismissDupe(key){
 /* ── CALL LOG ── */
 function logCall(code){
   if(!code)return;
+  window._cbDays=0;
+  var sheet=document.createElement('div');
+  sheet.id='call-sheet';
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1100;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var cbBt='padding:7px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--sub);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">&#128222; Log Call</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:16px">How did the call go?</div>'
+   +'<div style="display:flex;flex-direction:column;gap:8px">'
+   +'<button onclick="saveCall(\''+code+'\',\'reached\')" style="padding:14px;border-radius:var(--r2);background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left">&#9989;&nbsp; Reached — spoke with them</button>'
+   +'<button onclick="saveCall(\''+code+'\',\'voicemail\')" style="padding:14px;border-radius:var(--r2);background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left">&#128172;&nbsp; Left Voicemail</button>'
+   +'<button onclick="saveCall(\''+code+'\',\'noanswer\')" style="padding:14px;border-radius:var(--r2);background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left">&#128264;&nbsp; No Answer</button>'
+   +'</div>'
+   +'<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:8px">Schedule callback (optional)</div>'
+   +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+   +'<button id="cb1" style="'+cbBt+'" onclick="selectCbDays(1,this)">1 day</button>'
+   +'<button id="cb3" style="'+cbBt+'" onclick="selectCbDays(3,this)">3 days</button>'
+   +'<button id="cb7" style="'+cbBt+'" onclick="selectCbDays(7,this)">1 week</button>'
+   +'<button id="cb14" style="'+cbBt+'" onclick="selectCbDays(14,this)">2 weeks</button>'
+   +'</div>'
+   +'<div id="cb-lbl" style="font-size:12px;color:var(--teal);margin-top:8px;height:18px"></div>'
+   +'</div>'
+   +'<button onclick="document.getElementById(\'call-sheet\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;margin-top:12px">Cancel</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+function selectCbDays(d,btn){
+  window._cbDays=d;
+  var btns=document.querySelectorAll('#cb1,#cb3,#cb7,#cb14');
+  btns.forEach(function(b){b.style.background='var(--bg3)';b.style.borderColor='var(--border2)';b.style.color='var(--sub)';});
+  if(btn){btn.style.background='var(--teal2)';btn.style.borderColor='rgba(0,229,184,.3)';btn.style.color='var(--teal)';}
+  var lbl=document.getElementById('cb-lbl');if(lbl)lbl.textContent='Callback set: '+d+' day'+(d>1?'s':'');
+}
+function saveCall(code,outcome){
   mv(code,'called');
+  var vArr=ST.visits[code];if(vArr&&vArr.length)vArr[vArr.length-1].outcome=outcome;
+  if(window._cbDays>0){
+    if(!ST.followups)ST.followups={};
+    var cbDate=new Date();cbDate.setDate(cbDate.getDate()+window._cbDays);
+    ST.followups[code]=cbDate.toISOString();
+  }
   lSave();syncUp();
-  toast('&#128222; Call logged');
+  var sheet=document.getElementById('call-sheet');if(sheet)sheet.remove();
+  var outLbl=outcome==='reached'?'Reached':outcome==='voicemail'?'Voicemail':'No Answer';
+  toast('&#128222; '+outLbl+(window._cbDays>0?' — callback in '+window._cbDays+'d':''));
+  window._cbDays=0;
   rDash();rCust();
 }
 
+/* ── ORDER LOG ── */
+function logOrder(code){
+  if(!code)return;
+  var sheet=document.createElement('div');
+  sheet.id='order-sheet';
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1100;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var fi='width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;box-sizing:border-box';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">&#128230; Log Order</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Product / Items *</div>'
+   +'<input id="ord-item" type="text" placeholder="e.g. 4x4 Birch 3/4, OSB..." style="'+fi+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Amount (optional)</div>'
+   +'<input id="ord-amt" type="number" inputmode="decimal" placeholder="$0.00" step="0.01" style="'+fi+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Notes (PO#, delivery, etc.)</div>'
+   +'<input id="ord-note" type="text" placeholder="Optional..." style="'+fi.replace('margin-bottom:10px','margin-bottom:14px')+'">'
+   +'<button onclick="saveOrder(\''+code+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--green);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save Order</button>'
+   +'<button onclick="document.getElementById(\'order-sheet\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+  setTimeout(function(){var el=document.getElementById('ord-item');if(el)el.focus();},200);
+}
+function saveOrder(code){
+  var item=(document.getElementById('ord-item')||{}).value||'';
+  var amt=parseFloat((document.getElementById('ord-amt')||{}).value||'')||0;
+  var note=(document.getElementById('ord-note')||{}).value||'';
+  if(!item.trim()){toast('Enter product or items');return;}
+  if(!ST.orders)ST.orders={};
+  if(!ST.orders[code])ST.orders[code]=[];
+  ST.orders[code].push({date:new Date().toISOString(),item:item.trim(),amount:amt,note:note.trim()});
+  lSave();syncUp();
+  var sheet=document.getElementById('order-sheet');if(sheet)sheet.remove();
+  toast('&#128230; Order logged');
+  rOrders(code);
+}
+function rOrders(code){
+  var el=document.getElementById('m-orders-list');if(!el)return;
+  var orders=ST.orders&&ST.orders[code]?ST.orders[code]:[];
+  if(!orders.length){el.innerHTML='<div style="color:var(--sub);font-size:12px">No orders yet</div>';return;}
+  var h='';
+  var recent=orders.slice().reverse().slice(0,8);
+  for(var i=0;i<recent.length;i++){
+    var o=recent[i];
+    var d=new Date(o.date);
+    var dstr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    h+='<div style="padding:8px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
+        +'<div style="font-size:13px;font-weight:600;flex:1;color:var(--text)">'+esc(o.item)+'</div>'
+        +(o.amount?'<div style="font-size:13px;font-weight:800;color:var(--green);flex-shrink:0">$'+o.amount.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>':'')
+      +'</div>'
+      +(o.note?'<div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(o.note)+'</div>':'')
+      +'<div style="font-size:11px;color:var(--dim);margin-top:3px">'+dstr+'</div>'
+    +'</div>';
+  }
+  el.innerHTML=h;
+}
+
+/* ── BIRTHDAY / ANNIVERSARY ALERTS ── */
+function daysUntilDate(targetMM,targetDD){
+  var now=new Date();
+  var yr=now.getFullYear();
+  var target=new Date(yr,targetMM-1,targetDD);
+  target.setHours(0,0,0,0);
+  var today=new Date();today.setHours(0,0,0,0);
+  if(target<today)target=new Date(yr+1,targetMM-1,targetDD);
+  return Math.round((target-today)/864e5);
+}
+function rBirthdayAlert(){
+  var el=document.getElementById('d-birthday-alert');if(!el)return;
+  var alerts=[];
+  if(ST.contacts){
+    var a=allC();
+    for(var i=0;i<a.length;i++){
+      var c=a[i];
+      var contacts=ST.contacts[c.code]||[];
+      for(var j=0;j<contacts.length;j++){
+        var ct=contacts[j];
+        if(ct.birthday){
+          var parts=ct.birthday.split('-');
+          if(parts.length>=2){
+            var days=daysUntilDate(parseInt(parts[0]),parseInt(parts[1]));
+            if(days<=7)alerts.push({type:'birthday',name:ct.name,company:c.name,code:c.code,days:days});
+          }
+        }
+        if(ct.anniversary){
+          var parts2=ct.anniversary.split('-');
+          if(parts2.length>=2){
+            var days2=daysUntilDate(parseInt(parts2[0]),parseInt(parts2[1]));
+            if(days2<=7)alerts.push({type:'anniversary',name:ct.name,company:c.name,code:c.code,days:days2});
+          }
+        }
+      }
+    }
+  }
+  if(!alerts.length){el.style.display='none';return;}
+  el.style.display='block';
+  var h='<div style="background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px">'
+    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--amber);margin-bottom:6px">&#127881; Upcoming</div>';
+  alerts.forEach(function(al){
+    var icon=al.type==='birthday'?'&#127874;':'&#127941;';
+    var lbl=al.days===0?'Today!':al.days===1?'Tomorrow':'In '+al.days+' days';
+    h+='<div class="row" data-code="'+al.code+'" data-action="open" style="padding:6px 0;border-bottom:1px solid rgba(255,176,32,.15)">'
+      +'<div style="font-size:18px;flex-shrink:0;width:28px">'+icon+'</div>'
+      +'<div class="ri"><div class="rn" style="font-size:13px">'+esc(al.name)+' <span style="color:var(--sub);font-weight:400">at '+esc(al.company)+'</span></div>'
+      +'<div class="rm" style="color:var(--amber)">'+(al.type==='birthday'?'Birthday':'Anniversary')+' — '+lbl+'</div></div>'
+    +'</div>';
+  });
+  h+='</div>';
+  el.innerHTML=h;
+  el.querySelectorAll('[data-action="open"]').forEach(function(r){
+    r.addEventListener('click',function(){openM(this.getAttribute('data-code'));});
+  });
+}
+
+/* ── APP LOCK / SECURITY ── */
+var _pinBuf='';
+function initAppLock(){
+  var pin=localStorage.getItem('hrt_pin');
+  if(!pin)return;
+  if(sessionStorage.getItem('hrt_unlocked'))return;
+  showLockScreen();
+}
+function showLockScreen(){
+  var hasFaceID=!!localStorage.getItem('hrt_cred_id');
+  _pinBuf='';
+  var el=document.createElement('div');
+  el.id='lock-screen';
+  el.className='lock-screen';
+  el.innerHTML='<div style="font-size:52px;margin-bottom:10px">&#128274;</div>'
+    +'<div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px">HC Routes</div>'
+    +'<div style="font-size:13px;color:var(--sub);margin-bottom:28px;text-align:center">Enter your PIN to continue</div>'
+    +'<div class="pin-dots" id="pin-dots">'
+      +'<div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>'
+      +'<div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>'
+    +'</div>'
+    +'<div id="lock-msg" style="font-size:13px;color:var(--red);height:20px;margin-bottom:14px;text-align:center"></div>'
+    +'<div class="pin-pad">'
+      +'<button class="pin-key" onclick="enterPinDigit(\'1\')">1</button>'
+      +'<button class="pin-key" onclick="enterPinDigit(\'2\')">2</button>'
+      +'<button class="pin-key" onclick="enterPinDigit(\'3\')">3</button>'
+      +'<button class="pin-key" onclick="enterPinDigit(\'4\')">4</button>'
+      +'<button class="pin-key" onclick="enterPinDigit(\'5\')">5</button>'
+      +'<button class="pin-key" onclick="enterPinDigit(\'6\')">6</button>'
+      +'<button class="pin-key" onclick="enterPinDigit(\'7\')">7</button>'
+      +'<button class="pin-key" onclick="enterPinDigit(\'8\')">8</button>'
+      +'<button class="pin-key" onclick="enterPinDigit(\'9\')">9</button>'
+      +(hasFaceID?'<button class="pin-key" style="font-size:26px;background:transparent;border-color:rgba(0,229,184,.3);color:var(--teal)" onclick="tryFaceID()">&#129661;</button>':'<div></div>')
+      +'<button class="pin-key" onclick="enterPinDigit(\'0\')">0</button>'
+      +'<button class="pin-key" style="font-size:18px" onclick="deletePinDigit()">&#9003;</button>'
+    +'</div>';
+  document.body.appendChild(el);
+  updateSecurityStatus();
+  if(hasFaceID)setTimeout(function(){tryFaceID();},500);
+}
+function enterPinDigit(d){
+  if(_pinBuf.length>=4)return;
+  _pinBuf+=d;
+  updatePinDots();
+  if(_pinBuf.length===4)setTimeout(function(){verifyPIN(_pinBuf);},80);
+}
+function deletePinDigit(){
+  if(_pinBuf.length>0){_pinBuf=_pinBuf.slice(0,-1);updatePinDots();}
+}
+function updatePinDots(){
+  for(var i=0;i<4;i++){
+    var d=document.getElementById('pd'+i);
+    if(d){d.className='pin-dot'+(i<_pinBuf.length?' filled':'');}
+  }
+  var msg=document.getElementById('lock-msg');if(msg)msg.textContent='';
+}
+function verifyPIN(pin){
+  var stored=localStorage.getItem('hrt_pin');
+  if(btoa('hcr_'+pin+'_s7')===stored){
+    unlockApp();
+  } else {
+    _pinBuf='';
+    for(var i=0;i<4;i++){var d=document.getElementById('pd'+i);if(d)d.className='pin-dot err';}
+    var msg=document.getElementById('lock-msg');if(msg)msg.textContent='Incorrect PIN — try again';
+    setTimeout(function(){
+      for(var i=0;i<4;i++){var d=document.getElementById('pd'+i);if(d)d.className='pin-dot';}
+      var msg=document.getElementById('lock-msg');if(msg)msg.textContent='';
+    },1200);
+  }
+}
+function unlockApp(){
+  sessionStorage.setItem('hrt_unlocked','1');
+  var el=document.getElementById('lock-screen');
+  if(el){el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},300);}
+}
+function tryFaceID(){
+  var credId=localStorage.getItem('hrt_cred_id');
+  if(!credId)return;
+  try{
+    var credIdBytes=Uint8Array.from(atob(credId),function(c){return c.charCodeAt(0);});
+    navigator.credentials.get({
+      publicKey:{
+        challenge:crypto.getRandomValues(new Uint8Array(32)),
+        allowCredentials:[{id:credIdBytes,type:'public-key'}],
+        userVerification:'required',
+        timeout:60000
+      }
+    }).then(function(assertion){if(assertion)unlockApp();}).catch(function(){});
+  }catch(e){}
+}
+function showPINSetup(){
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var fi='width:100%;padding:12px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:22px;letter-spacing:8px;text-align:center;margin-bottom:10px;box-sizing:border-box';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+    +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">Set PIN</div>'
+    +'<div style="font-size:13px;color:var(--sub);margin-bottom:14px">4-digit PIN to lock the app on next open</div>'
+    +'<input id="pin-new1" type="tel" inputmode="numeric" maxlength="4" placeholder="New PIN" style="'+fi+'">'
+    +'<input id="pin-new2" type="tel" inputmode="numeric" maxlength="4" placeholder="Confirm PIN" style="'+fi.replace('margin-bottom:10px','margin-bottom:14px')+'">'
+    +'<button onclick="confirmNewPIN()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Set PIN</button>'
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+    +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+  setTimeout(function(){var el=document.getElementById('pin-new1');if(el)el.focus();},200);
+}
+function confirmNewPIN(){
+  var p1=(document.getElementById('pin-new1')||{}).value||'';
+  var p2=(document.getElementById('pin-new2')||{}).value||'';
+  if(!/^\d{4}$/.test(p1)){toast('PIN must be exactly 4 digits');return;}
+  if(p1!==p2){toast('PINs do not match');return;}
+  localStorage.setItem('hrt_pin',btoa('hcr_'+p1+'_s7'));
+  sessionStorage.setItem('hrt_unlocked','1');
+  var sheet=document.querySelector('div[style*="z-index: 9000"],div[style*="z-index:9000"]');
+  if(sheet)sheet.remove();
+  toast('&#128274; PIN set — app locks on next open');
+  updateSecurityStatus();
+}
+function showFaceIDSetup(){
+  if(!localStorage.getItem('hrt_pin')){toast('Set a PIN first');return;}
+  if(!window.PublicKeyCredential){toast('Face ID not supported on this device');return;}
+  navigator.credentials.create({
+    publicKey:{
+      challenge:crypto.getRandomValues(new Uint8Array(32)),
+      rp:{name:'HC Routes',id:location.hostname||'localhost'},
+      user:{id:new Uint8Array([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]),name:'heath',displayName:'Heath'},
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',requireResidentKey:false},
+      timeout:60000
+    }
+  }).then(function(cred){
+    if(cred){
+      var idB64=btoa(String.fromCharCode.apply(null,new Uint8Array(cred.rawId)));
+      localStorage.setItem('hrt_cred_id',idB64);
+      toast('&#129661; Face ID enabled!');
+      updateSecurityStatus();
+    }
+  }).catch(function(){toast('Face ID setup failed — make sure you have a passcode set on your iPhone');});
+}
+function disableAppLock(){
+  localStorage.removeItem('hrt_pin');
+  localStorage.removeItem('hrt_cred_id');
+  sessionStorage.removeItem('hrt_unlocked');
+  toast('&#128275; App lock disabled');
+  updateSecurityStatus();
+}
+function updateSecurityStatus(){
+  var el=document.getElementById('sec-status');if(!el)return;
+  var hasPin=!!localStorage.getItem('hrt_pin');
+  var hasFace=!!localStorage.getItem('hrt_cred_id');
+  var btnDis=document.getElementById('btn-dis-lock');
+  if(hasPin){
+    el.innerHTML='<span style="color:var(--teal)">&#10003; PIN set</span>'+(hasFace?' &bull; <span style="color:var(--blue)">&#129661; Face ID enabled</span>':'');
+    if(btnDis)btnDis.style.display='block';
+  } else {
+    el.textContent='No lock set — data is unprotected';
+    if(btnDis)btnDis.style.display='none';
+  }
+}
 /* ── ACCOUNT TAGS ── */
 var PRESET_TAGS=['Big Fish','New Account','Competitor Risk','Price Sensitive','Champion','Problem Account','Follow Up','Hot Opportunity','Dormant'];
 function rTags(code){
@@ -6976,6 +7334,8 @@ renderCustomRoute();
 syncDown();
 checkAndNotify();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+initAppLock();
+updateSecurityStatus();
 </script>
 <div id="map-overlay">
   <div class="map-hdr">
