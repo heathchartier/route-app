@@ -84,7 +84,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 /* ── VISIT BUTTONS ── */
 .vbs{display:flex;gap:5px;flex-shrink:0}
-.vb{padding:6px 11px;border-radius:var(--r3);border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s,opacity .15s;letter-spacing:.2px}
+.rte-acts{display:flex;align-items:center;gap:5px;margin-top:6px;flex-wrap:wrap}
+.vb{padding:5px 9px;border-radius:var(--r3);border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s,opacity .15s;letter-spacing:0}
 .vb:active{transform:scale(.93)}
 .bv{background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.25)}
 .bn{background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25)}
@@ -783,9 +784,6 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="missing-list"></div>
     </div>
     <div class="card" style="margin-top:4px">
-      <div class="card" style="margin-top:4px">
-      <div class="card" style="margin-top:4px">
-      <div class="card" style="margin-top:4px">
       <div class="lbl">&#128190; Backup &amp; Restore</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export all your visits, notes, tags, contacts, and samples to a file</div>
       <div style="display:flex;gap:8px">
@@ -799,12 +797,14 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Give your groups custom names</div>
       <button onclick="showGroupNameEditor()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9998; Edit Group Names</button>
     </div>
-    <div class="lbl">&#128276; Visit Reminders</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128276; Visit Reminders</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Get a daily notification showing overdue accounts and today's follow-ups</div>
       <button onclick="requestNotifPermission()" id="notif-btn" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128276; Enable Notifications</button>
       <div id="notif-status" class="notif-status"></div>
     </div>
-    <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Accounts with similar names or same phone</div>
       <button onclick="runDupeDetector()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128270; Scan for Duplicates</button>
       <div id="dupe-results" style="margin-top:12px"></div>
@@ -1206,7 +1206,7 @@ function rRoute(){
   var est=document.getElementById('d-route-est');
   if(est){
     if(!stops.length){est.textContent='';}
-    else{var mins=stops.length*25;var h=Math.floor(mins/60),m=mins%60;est.textContent='~'+(h?h+'h ':'')+(m?m+'m':'')+' · '+stops.length+' stop'+(stops.length!==1?'s':'');}
+    else{var mins=stops.length*25;var hr=Math.floor(mins/60),m=mins%60;est.textContent='~'+(hr?hr+'h ':'')+(m?m+'m':'')+' · '+stops.length+' stop'+(stops.length!==1?'s':'');}
   }
   var bbna2=document.getElementById('btn-bulk-na');
   if(bbna2)bbna2.style.display=stops.length?'block':'none';
@@ -1217,15 +1217,20 @@ function rRoute(){
     var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>55?note.slice(0,55)+'…':note)+'</div>':'';
     h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
-      '<div class="snum">'+( i+1)+'</div>'+
+      '<div class="snum">'+(i+1)+'</div>'+
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
-      '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+tierBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+noteHtml+'</div>'+
-      '<button class="btn-qnote" data-qn="'+c.code+'" style="background:transparent;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:2px 6px;flex-shrink:0">&#128221;</button>'+
+      '<div class="ri">'+
+        '<div class="rn">'+(ST.hot[c.code]?'&#9733; ':'')+esc(c.name)+tierBadge(c)+'</div>'+
+        '<div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+
+        noteHtml+
+        '<div class="rte-acts">'+
+          '<button class="vb bv" data-code="'+c.code+'" data-action="vis">&#10003; Done</button>'+
+          '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
+          '<button class="btn-qnote" data-qn="'+c.code+'">&#128221;</button>'+
+        '</div>'+
+      '</div>'+
       (c.phone?'<a href="tel:'+c.phone+'" data-dc="'+c.code+'" class="vb-call">&#128222;</a>':'')+
-      '<div class="vbs">'+
-      '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
-      '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
-      '</div></div>'+
+      '</div>'+
       '<div id="qnw-'+c.code+'" class="qnote-wrap"><input class="qnote-inp" type="text" placeholder="Quick note..."><button class="btn-qnsave" data-qns="'+c.code+'" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Save</button></div>';
   }
   el.innerHTML=h;
@@ -1805,7 +1810,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 /* ── VISIT BUTTONS ── */
 .vbs{display:flex;gap:5px;flex-shrink:0}
-.vb{padding:6px 11px;border-radius:var(--r3);border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s,opacity .15s;letter-spacing:.2px}
+.rte-acts{display:flex;align-items:center;gap:5px;margin-top:6px;flex-wrap:wrap}
+.vb{padding:5px 9px;border-radius:var(--r3);border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s,opacity .15s;letter-spacing:0}
 .vb:active{transform:scale(.93)}
 .bv{background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.25)}
 .bn{background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25)}
@@ -2474,9 +2480,6 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="missing-list"></div>
     </div>
     <div class="card" style="margin-top:4px">
-      <div class="card" style="margin-top:4px">
-      <div class="card" style="margin-top:4px">
-      <div class="card" style="margin-top:4px">
       <div class="lbl">&#128190; Backup &amp; Restore</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export all your visits, notes, tags, contacts, and samples to a file</div>
       <div style="display:flex;gap:8px">
@@ -2490,12 +2493,14 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Give your groups custom names</div>
       <button onclick="showGroupNameEditor()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9998; Edit Group Names</button>
     </div>
-    <div class="lbl">&#128276; Visit Reminders</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128276; Visit Reminders</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Get a daily notification showing overdue accounts and today's follow-ups</div>
       <button onclick="requestNotifPermission()" id="notif-btn" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128276; Enable Notifications</button>
       <div id="notif-status" class="notif-status"></div>
     </div>
-    <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Accounts with similar names or same phone</div>
       <button onclick="runDupeDetector()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128270; Scan for Duplicates</button>
       <div id="dupe-results" style="margin-top:12px"></div>
@@ -2903,7 +2908,7 @@ function rRoute(){
   var est=document.getElementById('d-route-est');
   if(est){
     if(!stops.length){est.textContent='';}
-    else{var mins=stops.length*25;var h=Math.floor(mins/60),m=mins%60;est.textContent='~'+(h?h+'h ':'')+(m?m+'m':'')+' · '+stops.length+' stop'+(stops.length!==1?'s':'');}
+    else{var mins=stops.length*25;var hr=Math.floor(mins/60),m=mins%60;est.textContent='~'+(hr?hr+'h ':'')+(m?m+'m':'')+' · '+stops.length+' stop'+(stops.length!==1?'s':'');}
   }
   var bbna2=document.getElementById('btn-bulk-na');
   if(bbna2)bbna2.style.display=stops.length?'block':'none';
@@ -2914,15 +2919,20 @@ function rRoute(){
     var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>55?note.slice(0,55)+'…':note)+'</div>':'';
     h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
-      '<div class="snum">'+( i+1)+'</div>'+
+      '<div class="snum">'+(i+1)+'</div>'+
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
-      '<div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':''+esc(c.name))+tierBadge(c)+'</div><div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+noteHtml+'</div>'+
-      '<button class="btn-qnote" data-qn="'+c.code+'" style="background:transparent;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:2px 6px;flex-shrink:0">&#128221;</button>'+
+      '<div class="ri">'+
+        '<div class="rn">'+(ST.hot[c.code]?'&#9733; ':'')+esc(c.name)+tierBadge(c)+'</div>'+
+        '<div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+
+        noteHtml+
+        '<div class="rte-acts">'+
+          '<button class="vb bv" data-code="'+c.code+'" data-action="vis">&#10003; Done</button>'+
+          '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
+          '<button class="btn-qnote" data-qn="'+c.code+'">&#128221;</button>'+
+        '</div>'+
+      '</div>'+
       (c.phone?'<a href="tel:'+c.phone+'" data-dc="'+c.code+'" class="vb-call">&#128222;</a>':'')+
-      '<div class="vbs">'+
-      '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
-      '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
-      '</div></div>'+
+      '</div>'+
       '<div id="qnw-'+c.code+'" class="qnote-wrap"><input class="qnote-inp" type="text" placeholder="Quick note..."><button class="btn-qnsave" data-qns="'+c.code+'" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Save</button></div>';
   }
   el.innerHTML=h;
