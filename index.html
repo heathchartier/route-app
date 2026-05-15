@@ -534,6 +534,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div id="d-callbacks-alert" style="display:none"></div>
     <div id="d-orders-today" style="display:none"></div>
     <div id="d-quotes-alert" style="display:none"></div>
+    <div id="d-backup-alert" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -2307,6 +2308,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div id="d-callbacks-alert" style="display:none"></div>
     <div id="d-orders-today" style="display:none"></div>
     <div id="d-quotes-alert" style="display:none"></div>
+    <div id="d-backup-alert" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -2984,7 +2986,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rSalesPace();rComingDue();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rSalesPace();rComingDue();
 }
 
 function rRoute(){
@@ -8066,6 +8068,23 @@ function rQuoteAlert(){
   if(due.length>4)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(due.length-4)+' more</div>';
   h+='</div>';
   el.innerHTML=h;
+}
+
+function rBackupAlert(){
+  var el=document.getElementById('d-backup-alert');if(!el)return;
+  var today=new Date();
+  var last=ST.lastExportDate?new Date(ST.lastExportDate):null;
+  var daysSince=last?Math.floor((today-last)/(1000*60*60*24)):999;
+  if(daysSince<30){el.style.display='none';return;}
+  el.style.display='block';
+  var msg=last?('Last backup was '+daysSince+' days ago'):'You haven\'t exported your data yet';
+  el.innerHTML='<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px;display:flex;align-items:center;gap:10px">'
+    +'<div style="flex:1;min-width:0">'
+    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#ef4444;margin-bottom:3px">&#128190; Data Backup Overdue</div>'
+    +'<div style="font-size:12px;color:var(--fg)">'+msg+'. Export your data to keep a safe copy.</div>'
+    +'</div>'
+    +'<button onclick="doExport()" style="background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">Export Now</button>'
+    +'</div>';
 }
 
 function setQuoteOutcome(qid,status,reason){
