@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -119,7 +119,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .grp-pct-l{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 
 /* ── NAV ── */
-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,17,31,.97);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+nav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,17,31,.97);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);-webkit-transform:translateZ(0);transform:translateZ(0)}
 nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;color:var(--dim);font-size:10px;text-decoration:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;font-weight:600;transition:color .2s}
 nav a.on{color:var(--teal)}
 nav a svg{width:22px;height:22px;stroke-width:1.8}
@@ -1021,8 +1021,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Orders<button onclick="logOrder(mC)" style="background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Log</button></div>
       <div id="m-orders-list"><div style="color:var(--sub);font-size:12px">No orders yet</div></div>
     </div>
-    <div class="msect">
     <div class="msect" id="m-todos-sect"><div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">To-Dos<button onclick="addTodo(mC)" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button></div><div id="m-todos-list"><div style="color:var(--sub);font-size:12px">No tasks</div></div></div>
+    <div class="msect">
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
     </div>
@@ -1876,7 +1876,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .grp-pct-l{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 
 /* ── NAV ── */
-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,17,31,.97);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+nav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,17,31,.97);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);-webkit-transform:translateZ(0);transform:translateZ(0)}
 nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;color:var(--dim);font-size:10px;text-decoration:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;font-weight:600;transition:color .2s}
 nav a.on{color:var(--teal)}
 nav a svg{width:22px;height:22px;stroke-width:1.8}
@@ -2727,8 +2727,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Orders<button onclick="logOrder(mC)" style="background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Log</button></div>
       <div id="m-orders-list"><div style="color:var(--sub);font-size:12px">No orders yet</div></div>
     </div>
-    <div class="msect">
     <div class="msect" id="m-todos-sect"><div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">To-Dos<button onclick="addTodo(mC)" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button></div><div id="m-todos-list"><div style="color:var(--sub);font-size:12px">No tasks</div></div></div>
+    <div class="msect">
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
     </div>
@@ -3954,18 +3954,24 @@ function runXLSX(buf,fname,status){try{var wb=XLSX.read(buf,{type:'array'});var 
 var _epicorDiscrep=JSON.parse(localStorage.getItem('hrt_discrep')||'[]');
 
 function doImport(hdrs,rows,fname,status){
-  var COLS={code:['code','customercode','acct'],name:['name','customername','company'],
-    address:['address','addr'],city:['city'],zip:['zip','zipcode'],
-    phone:['phone','tel'],email:['email'],group:['group','route'],
-    lifetimeSales:['lifetimesales','lifetime'],sales2024:['sales2024','2024'],
-    sales2025:['sales2025','2025'],sales2526:['sales2526','ytd','2526']};
+function doImport(hdrs,rows,fname,status){
+  var COLS={code:['code','customercode','acct','custcode','custno','customerno','customernumber','accountno','accountnumber','cust'],
+    name:['name','customername','company','businessname','accountname','custname'],
+    address:['address','addr','street'],city:['city'],zip:['zip','zipcode','postalcode'],
+    phone:['phone','tel','telephone'],email:['email'],group:['group','route','routeno'],
+    lifetimeSales:['lifetimesales','lifetime','totalnetrevenue','totalrevenue','alltime'],
+    sales2024:['sales2024','2024','fy24','2324'],
+    sales2025:['sales2025','2025','fy25','2425'],
+    sales2526:['sales2526','ytd','2526','fy26','currentyear','thisyear','current']};
   var ci={};
   for(var f in COLS){ci[f]=-1;for(var i=0;i<COLS[f].length;i++){for(var j=0;j<hdrs.length;j++){if(hdrs[j]===COLS[f][i]||hdrs[j].indexOf(COLS[f][i])>=0){ci[f]=j;break;}}if(ci[f]>=0)break;}}
-  var added=0,skipped=0,flagged=0,a=allC(),newDiscrep=[];
+  var added=0,updated=0,skipped=0,flagged=0,a=allC(),newDiscrep=[];
   var importDate=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
+  function parseMoney(v){return parseFloat(String(v||'').replace(/[$,\s]/g,''))||0;}
+
   for(var i=0;i<rows.length;i++){
-    var row=rows[i];if(!row.some(function(v){return v;})){skipped++;continue;}
+    var row=rows[i];if(!row.some(function(v){return v;})){continue;}
     var code=ci.code>=0?row[ci.code].toString().toUpperCase().trim():'';
     var name=ci.name>=0?row[ci.name]:'';
     if(!code&&!name){skipped++;continue;}
@@ -3978,38 +3984,61 @@ function doImport(hdrs,rows,fname,status){
     }
 
     if(ex){
-      // Existing account — compare contact fields, flag differences for Epicor update
+      // Update financials via ST.edits
+      var finUpdated=false;
+      var salesFields=['lifetimeSales','sales2024','sales2025','sales2526'];
+      for(var k=0;k<salesFields.length;k++){
+        var fld=salesFields[k];
+        if(ci[fld]>=0){
+          var val=parseMoney(row[ci[fld]]);
+          if(val>0){
+            if(!ST.edits)ST.edits={};
+            if(!ST.edits[ex.code])ST.edits[ex.code]={};
+            ST.edits[ex.code][fld]=val;
+            finUpdated=true;
+          }
+        }
+      }
+      // Check contact discrepancies
       var contactFields=['name','address','city','zip','phone','email'];
       var fieldLabels={name:'Name',address:'Address',city:'City',zip:'Zip',phone:'Phone',email:'Email'};
       var diffs=[];
       for(var k=0;k<contactFields.length;k++){
-        var fld=contactFields[k];
-        if(ci[fld]<0)continue;
-        var epicorVal=String(row[ci[fld]]||'').trim();
-        var appVal=String((ST.edits&&ST.edits[ex.code]&&ST.edits[ex.code][fld]!=null?ST.edits[ex.code][fld]:ex[fld])||'').trim();
+        var fld2=contactFields[k];
+        if(ci[fld2]<0)continue;
+        var epicorVal=String(row[ci[fld2]]||'').trim();
+        var appVal=String((ST.edits&&ST.edits[ex.code]&&ST.edits[ex.code][fld2]!=null?ST.edits[ex.code][fld2]:ex[fld2])||'').trim();
         if(epicorVal&&epicorVal!==appVal){
-          diffs.push({field:fieldLabels[fld],app:appVal,epicor:epicorVal});
+          diffs.push({field:fieldLabels[fld2],app:appVal,epicor:epicorVal});
         }
       }
       if(diffs.length){
         newDiscrep.push({code:ex.code,name:ex.name,date:importDate,diffs:diffs});
         flagged++;
-      } else {skipped++;}
+      } else if(finUpdated){
+        updated++;
+      } else {
+        skipped++;
+      }
     } else {
-      // New account — add to app
+      // New account
       if(!name){skipped++;continue;}
       var nc={code:code||('IMP'+Date.now().toString().slice(-6)),name:name,
         group:ci.group>=0&&row[ci.group]?parseInt(row[ci.group])||61:61,
         stop:999,address:ci.address>=0?row[ci.address]:'',address2:'',
         city:ci.city>=0?row[ci.city]:'',state:'CA',zip:ci.zip>=0?row[ci.zip]:'',
         phone:ci.phone>=0?row[ci.phone]:'',email:ci.email>=0?row[ci.email]:'',
-        lifetimeSales:0,sales2024:0,sales2025:0,sales2526:0,distance:0};
+        lifetimeSales:ci.lifetimeSales>=0?parseMoney(row[ci.lifetimeSales]):0,
+        sales2024:ci.sales2024>=0?parseMoney(row[ci.sales2024]):0,
+        sales2025:ci.sales2025>=0?parseMoney(row[ci.sales2025]):0,
+        sales2526:ci.sales2526>=0?parseMoney(row[ci.sales2526]):0,
+        distance:0,addedAt:new Date().toISOString()};
       if(!ST.addedCustomers)ST.addedCustomers=[];
       ST.addedCustomers.push(nc);added++;
     }
   }
 
-  // Merge new discrepancies (by code — replace if re-imported)
+  // Merge discrepancies
   var dmap={};
   for(var i=0;i<_epicorDiscrep.length;i++)dmap[_epicorDiscrep[i].code]=_epicorDiscrep[i];
   for(var i=0;i<newDiscrep.length;i++)dmap[newDiscrep[i].code]=newDiscrep[i];
@@ -4017,11 +4046,14 @@ function doImport(hdrs,rows,fname,status){
   localStorage.setItem('hrt_discrep',JSON.stringify(_epicorDiscrep));
 
   lSave();syncUp();rCust();rDash();rGrps();rDiscrepCard();
-  status.style.color=flagged?'var(--amber)':'var(--teal)';
-  status.textContent=added+' new accounts added, '+flagged+' Epicor discrepancies flagged, '+skipped+' matched/skipped';
+  var parts=[];
+  if(added)parts.push(added+' new account'+(added!==1?'s':'')+' added');
+  if(updated)parts.push(updated+' financial'+(updated!==1?'s':'')+' updated');
+  if(flagged)parts.push(flagged+' Epicor discrepanc'+(flagged!==1?'ies':'y')+' flagged');
+  if(skipped)parts.push(skipped+' matched/unchanged');
+  status.style.color=flagged?'var(--amber)':(added||updated)?'var(--teal)':'var(--sub)';
+  status.textContent=parts.length?parts.join(' · '):'Nothing to update — all data matches';
 }
-
-function rDiscrepCard(){
   var card=document.getElementById('discrep-card');if(!card)return;
   if(!_epicorDiscrep.length){card.style.display='none';return;}
   card.style.display='block';
