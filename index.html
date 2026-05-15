@@ -536,6 +536,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div id="d-quotes-alert" style="display:none"></div>
     <div id="d-backup-alert" style="display:none"></div>
     <div id="d-route-summary" style="display:none"></div>
+    <div id="d-mileage" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -795,6 +796,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
         <button id="btn-exp" style="padding:9px 16px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export CSV</button>
         <button id="btn-exp-notes" style="padding:9px 16px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export Notes</button>
         <button onclick="showMonthlyReportV2()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
+        <button onclick="showMileageLog()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128663; Mileage Log</button>
         <button id="btn-clr" style="padding:9px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Visits</button>
         <button id="btn-rst" style="padding:9px 16px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All</button>
       </div>
@@ -1094,7 +1096,7 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};}catch(e){}}
@@ -2311,6 +2313,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div id="d-quotes-alert" style="display:none"></div>
     <div id="d-backup-alert" style="display:none"></div>
     <div id="d-route-summary" style="display:none"></div>
+    <div id="d-mileage" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -2570,6 +2573,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
         <button id="btn-exp" style="padding:9px 16px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export CSV</button>
         <button id="btn-exp-notes" style="padding:9px 16px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export Notes</button>
         <button onclick="showMonthlyReportV2()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
+        <button onclick="showMileageLog()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128663; Mileage Log</button>
         <button id="btn-clr" style="padding:9px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Visits</button>
         <button id="btn-rst" style="padding:9px 16px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All</button>
       </div>
@@ -2861,7 +2865,7 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};}catch(e){}}
@@ -2988,7 +2992,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rSalesPace();rComingDue();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rSalesPace();rComingDue();
 }
 
 function rRoute(){
@@ -7330,6 +7334,199 @@ function showHcalDay(day){
      +'</div>';
   }
   detail.innerHTML=h;
+}
+
+/* ── MILEAGE LOG ── */
+var MILEAGE_RATE=0.725;
+var _MILE_AREAS=['San Diego','Murrieta/Temecula','Orange County','Inland Empire','Los Angeles','Vista/Oceanside','Office/LA','Fontana/Ontario','Ontario/Pomona/Chino','Lake Elsinore'];
+
+function rMileageCard(){
+  var el=document.getElementById('d-mileage');if(!el)return;
+  if(!ST.mileage||!Object.keys(ST.mileage).length){el.style.display='none';return;}
+  var now=new Date();
+  var ym=now.getFullYear()+'-'+(now.getMonth()<9?'0':'')+(now.getMonth()+1);
+  var totalMiles=0,daysLogged=0;
+  Object.keys(ST.mileage).forEach(function(d){
+    if(d.startsWith(ym)){totalMiles+=ST.mileage[d].miles||0;daysLogged++;}
+  });
+  if(!totalMiles){el.style.display='none';return;}
+  var dollars=(totalMiles*MILEAGE_RATE).toFixed(2);
+  var mo=now.toLocaleDateString('en-US',{month:'long'});
+  el.style.display='block';
+  el.innerHTML='<div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px;cursor:pointer" onclick="showMileageLog()">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#fbbf24">&#128663; '+mo+' Mileage</div>'
+    +'<div style="font-size:11px;color:var(--sub)">'+daysLogged+' day'+(daysLogged!==1?'s':'')+' logged</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:12px">'
+    +'<div><div style="font-size:22px;font-weight:800;color:#fbbf24">'+totalMiles.toLocaleString()+'</div><div style="font-size:10px;color:var(--sub);font-weight:600">Miles</div></div>'
+    +'<div style="width:1px;background:var(--border2)"></div>'
+    +'<div><div style="font-size:22px;font-weight:800;color:var(--green)">$'+parseFloat(dollars).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div style="font-size:10px;color:var(--sub);font-weight:600">@ $'+MILEAGE_RATE+'/mi</div></div>'
+    +'<div style="margin-left:auto;display:flex;align-items:center">'
+    +'<button onclick="event.stopPropagation();showMileageLog()" style="background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);border-radius:var(--r2);padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Log / Export</button>'
+    +'</div>'
+    +'</div>'
+    +'</div>';
+}
+
+function showMileageLog(){
+  var now=new Date();
+  var selYear=now.getFullYear();
+  var selMonth=now.getMonth()+1;
+  function render(){
+    var ym=selYear+'-'+(selMonth<10?'0':'')+selMonth;
+    var entries=[];
+    if(ST.mileage){
+      Object.keys(ST.mileage).forEach(function(d){
+        if(d.startsWith(ym))entries.push({date:d,e:ST.mileage[d]});
+      });
+    }
+    entries.sort(function(a,b){return a.date.localeCompare(b.date);});
+    var totalMiles=entries.reduce(function(s,x){return s+(x.e.miles||0);},0);
+    var dollars=(totalMiles*MILEAGE_RATE).toFixed(2);
+    var moName=new Date(selYear,selMonth-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+    var lastEnd=0;
+    if(entries.length)lastEnd=entries[entries.length-1].e.odomEnd||0;
+    var todayStr=now.toISOString().split('T')[0];
+    var hasToday=!!ST.mileage[todayStr];
+    var areaChips=_MILE_AREAS.map(function(a){
+      return '<button onclick="document.getElementById(\'ml-desc\').value=\''+a.replace(/'/g,'&#39;')+'\'" style="padding:4px 9px;border-radius:12px;background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">'+a+'</button>';
+    }).join('');
+    var entryRows=entries.map(function(x){
+      var d=x.date;var e=x.e;
+      var dLabel=new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'numeric',day:'numeric'});
+      return '<div style="display:grid;grid-template-columns:60px 1fr 1fr 55px auto;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">'
+        +'<div style="font-size:12px;font-weight:600">'+dLabel+'</div>'
+        +'<div style="font-size:12px;color:var(--sub)">'+e.odomStart.toLocaleString()+' → '+e.odomEnd.toLocaleString()+'</div>'
+        +'<div style="font-size:11px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(e.desc||'')+'</div>'
+        +'<div style="font-size:13px;font-weight:700;color:#fbbf24;text-align:right">'+e.miles+' mi</div>'
+        +'<button onclick="deleteMileageEntry(\''+d+'\')" style="background:transparent;border:none;color:var(--sub);font-size:16px;cursor:pointer;padding:0 4px;line-height:1">&#215;</button>'
+        +'</div>';
+    }).join('');
+    var sheet=document.getElementById('ml-sheet');
+    if(!sheet){
+      sheet=document.createElement('div');
+      sheet.id='ml-sheet';
+      sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:900;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+      sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+      document.body.appendChild(sheet);
+    }
+    sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 16px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:92vh;overflow-y:auto">'
+      +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+      +'<div style="font-size:18px;font-weight:800">&#128663; Mileage Log</div>'
+      +'<div style="display:flex;align-items:center;gap:6px">'
+      +'<button onclick="if(window._mlM===1){window._mlM=12;window._mlY--;}else{window._mlM--;} window._mlM=window._mlM||selMonth;window._mlY=window._mlY||selYear;selMonth=window._mlM;selYear=window._mlY;render()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:5px 9px;font-size:14px;cursor:pointer;color:var(--fg);font-family:inherit">&#8249;</button>'
+      +'<div style="font-size:13px;font-weight:700;min-width:110px;text-align:center">'+moName+'</div>'
+      +'<button onclick="var nm=selMonth===12?1:selMonth+1;var ny=selMonth===12?selYear+1:selYear;selMonth=nm;selYear=ny;render()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:5px 9px;font-size:14px;cursor:pointer;color:var(--fg);font-family:inherit">&#8250;</button>'
+      +'</div>'
+      +'</div>'
+      // totals bar
+      +(totalMiles?'<div style="display:flex;gap:10px;margin-bottom:14px">'
+        +'<div style="flex:1;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);border-radius:var(--r2);padding:10px;text-align:center">'
+        +'<div style="font-size:20px;font-weight:800;color:#fbbf24">'+totalMiles.toLocaleString()+'</div>'
+        +'<div style="font-size:10px;color:var(--sub)">Total Miles</div>'
+        +'</div>'
+        +'<div style="flex:1;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:var(--r2);padding:10px;text-align:center">'
+        +'<div style="font-size:20px;font-weight:800;color:var(--green)">$'+parseFloat(dollars).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>'
+        +'<div style="font-size:10px;color:var(--sub)">Reimbursement</div>'
+        +'</div>'
+        +'<button onclick="exportMileageCSV('+selYear+','+selMonth+')" style="flex:1;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128190;<br>Export CSV</button>'
+        +'</div>':'')
+      // add entry form
+      +'<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:12px;margin-bottom:14px">'
+      +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);margin-bottom:10px">Log a Day</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">'
+      +'<div><div style="font-size:10px;color:var(--sub);margin-bottom:3px">Date</div><input id="ml-date" type="date" value="'+todayStr+'" style="width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--fg);border-radius:var(--r2);padding:7px 8px;font-size:13px;font-family:inherit;box-sizing:border-box"></div>'
+      +'<div><div style="font-size:10px;color:var(--sub);margin-bottom:3px">Odometer Start</div><input id="ml-start" type="number" placeholder="e.g. 51492" value="'+(lastEnd||'')+'" style="width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--fg);border-radius:var(--r2);padding:7px 8px;font-size:13px;font-family:inherit;box-sizing:border-box" oninput="calcMilesDiff()"></div>'
+      +'<div><div style="font-size:10px;color:var(--sub);margin-bottom:3px">Odometer End</div><input id="ml-end" type="number" placeholder="e.g. 51634" style="width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--fg);border-radius:var(--r2);padding:7px 8px;font-size:13px;font-family:inherit;box-sizing:border-box" oninput="calcMilesDiff()"></div>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">'
+      +'<div style="flex:1"><div style="font-size:10px;color:var(--sub);margin-bottom:3px">Area / Description</div><input id="ml-desc" type="text" placeholder="e.g. San Diego" style="width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--fg);border-radius:var(--r2);padding:7px 8px;font-size:13px;font-family:inherit;box-sizing:border-box"></div>'
+      +'<div style="flex-shrink:0;padding-top:16px"><div style="font-size:12px;color:var(--sub)">Miles: <span id="ml-calc" style="font-weight:800;color:#fbbf24">—</span></div></div>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'+areaChips+'</div>'
+      +'<button onclick="saveMileageEntry()" style="width:100%;padding:10px;border-radius:var(--r2);background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Save Entry</button>'
+      +'</div>'
+      // entry list
+      +(entries.length?'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);margin-bottom:6px">'+entries.length+' Entries</div>'+entryRows
+        :'<div style="text-align:center;color:var(--sub);font-size:13px;padding:20px 0">No entries for '+moName+'</div>')
+      +'<button onclick="document.getElementById(\'ml-sheet\').remove()" style="width:100%;margin-top:16px;padding:12px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+      +'</div>';
+    window._mlRender=render;
+    window._mlSelYear=selYear;
+    window._mlSelMonth=selMonth;
+  }
+  // initialize nav state on sheet
+  window._mlM=selMonth;
+  window._mlY=selYear;
+  render();
+}
+
+function calcMilesDiff(){
+  var s=parseFloat(document.getElementById('ml-start').value)||0;
+  var e=parseFloat(document.getElementById('ml-end').value)||0;
+  var el=document.getElementById('ml-calc');
+  if(el)el.textContent=(s&&e&&e>s)?(e-s)+' mi':'—';
+}
+
+function saveMileageEntry(){
+  var date=document.getElementById('ml-date').value;
+  var start=parseFloat(document.getElementById('ml-start').value)||0;
+  var end=parseFloat(document.getElementById('ml-end').value)||0;
+  var desc=(document.getElementById('ml-desc').value||'').trim();
+  if(!date){toast('Enter a date');return;}
+  if(!start||!end){toast('Enter both odometer readings');return;}
+  if(end<=start){toast('Ending odometer must be greater than starting');return;}
+  if(!ST.mileage)ST.mileage={};
+  ST.mileage[date]={odomStart:start,odomEnd:end,miles:Math.round(end-start),desc:desc};
+  lSave();syncUp();
+  toast('Miles saved — '+(end-start)+' mi');
+  rDash();
+  if(window._mlRender)window._mlRender();
+}
+
+function deleteMileageEntry(date){
+  if(!ST.mileage||!ST.mileage[date])return;
+  delete ST.mileage[date];
+  lSave();syncUp();rDash();
+  if(window._mlRender)window._mlRender();
+}
+
+function exportMileageCSV(year,month){
+  if(!ST.mileage){toast('No mileage data');return;}
+  var ym=year+'-'+(month<10?'0':'')+month;
+  var entries=[];
+  Object.keys(ST.mileage).forEach(function(d){
+    if(d.startsWith(ym))entries.push({date:d,e:ST.mileage[d]});
+  });
+  entries.sort(function(a,b){return a.date.localeCompare(b.date);});
+  if(!entries.length){toast('No entries for this month');return;}
+  var totalMiles=entries.reduce(function(s,x){return s+(x.e.miles||0);},0);
+  var dollars=(totalMiles*MILEAGE_RATE).toFixed(2);
+  function fmtDate(d){
+    var p=d.split('-');return p[1]+'/'+p[2]+'/'+p[0];
+  }
+  function q(v){return'"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
+  var rows=[];
+  rows.push(q('Name:')+','+q('Heath Chartier'));
+  rows.push('');
+  rows.push(q('Date')+','+q('Odometer Reading')+','+q('')+','+q('Miles Traveled')+','+q('Purpose/Description'));
+  rows.push(q('')+','+q('Beginning')+','+q('Ending'));
+  entries.forEach(function(x){
+    rows.push(q(fmtDate(x.date))+','+q(x.e.odomStart)+','+q(x.e.odomEnd)+','+q(x.e.miles)+','+q(x.e.desc||''));
+  });
+  // pad to 31 rows of data so format matches template
+  var blanksNeeded=Math.max(0,31-entries.length);
+  for(var i=0;i<blanksNeeded;i++)rows.push(',,,'+q(0.00)+',');
+  rows.push(q('Total Miles')+',,,'+q(totalMiles)+','+q('@')+','+q(MILEAGE_RATE)+','+q('=')+','+q('$ '+parseFloat(dollars).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})));
+  var csv=rows.join('\n');
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  var moName=new Date(year,month-1,1).toLocaleDateString('en-US',{month:'long'});
+  a.download='Mileage_'+moName+'_'+year+'.csv';
+  a.click();
+  toast('&#128190; Mileage exported — '+entries.length+' days, '+totalMiles+' miles');
 }
 
 /* ── MONTHLY REPORT ENHANCED ── */
