@@ -533,6 +533,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div id="d-followup-alert" style="display:none"></div>
     <div id="d-callbacks-alert" style="display:none"></div>
     <div id="d-orders-today" style="display:none"></div>
+    <div id="d-quotes-alert" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -1025,6 +1026,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="m-orders-list"><div style="color:var(--sub);font-size:12px">No orders yet</div></div>
     </div>
     <div class="msect" id="m-todos-sect"><div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">To-Dos<button onclick="addTodo(mC)" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button></div><div id="m-todos-list"><div style="color:var(--sub);font-size:12px">No tasks</div></div></div>
+    <div class="msect" id="m-quotes-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Quotes<button onclick="showQuoteBuilder(mC)" style="background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ New</button></div>
+      <div id="m-quotes-list"><div style="color:var(--sub);font-size:12px">No quotes yet</div></div>
+    </div>
     <div class="msect">
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
@@ -1087,7 +1092,7 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};}catch(e){}}
@@ -1485,7 +1490,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);rQuotesModal(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -2251,6 +2256,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div id="d-followup-alert" style="display:none"></div>
     <div id="d-callbacks-alert" style="display:none"></div>
     <div id="d-orders-today" style="display:none"></div>
+    <div id="d-quotes-alert" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -2735,6 +2741,10 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="m-orders-list"><div style="color:var(--sub);font-size:12px">No orders yet</div></div>
     </div>
     <div class="msect" id="m-todos-sect"><div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">To-Dos<button onclick="addTodo(mC)" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button></div><div id="m-todos-list"><div style="color:var(--sub);font-size:12px">No tasks</div></div></div>
+    <div class="msect" id="m-quotes-sect">
+      <div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">Quotes<button onclick="showQuoteBuilder(mC)" style="background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ New</button></div>
+      <div id="m-quotes-list"><div style="color:var(--sub);font-size:12px">No quotes yet</div></div>
+    </div>
     <div class="msect">
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
@@ -2797,7 +2807,7 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};}catch(e){}}
@@ -2924,7 +2934,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rSalesPace();rComingDue();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rSalesPace();rComingDue();
 }
 
 function rRoute(){
@@ -3201,7 +3211,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);rQuotesModal(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -7580,6 +7590,330 @@ function rComingDue(){
       +'<div style="font-size:11px;font-weight:700;color:'+uc+';flex-shrink:0">'+lbl+'</div></div>';
   });
   el.innerHTML=h;
+}
+
+/* ── QUOTE SYSTEM ── */
+var _qCode=null,_qItems=[];
+
+function showQuoteBuilder(code){
+  var existing=document.getElementById('quote-builder');if(existing)existing.remove();
+  _qCode=code||null;
+  _qItems=[{name:'',qty:1,price:0}];
+  var custName=_qCode?(function(){var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===_qCode)return a[i].name;}return 'Unknown';})():'Tap to select customer';
+  var sh=document.createElement('div');sh.id='quote-builder';
+  sh.style.cssText='position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;margin:0 auto;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch">'
+    +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">&#128203; New Quote</div>'
+    +'<div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Customer</div>'
+    +'<div onclick="showQCustPicker()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:11px 12px;margin-bottom:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">'
+    +'<span id="qb-cust-name" style="font-size:14px;font-weight:600;color:'+(_qCode?'var(--text)':'var(--sub)')+'">'+esc(custName)+'</span>'
+    +'<span style="color:var(--sub);font-size:13px">&#9660;</span>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Items</div>'
+    +'<div id="qb-rows"></div>'
+    +'<button onclick="addQRow()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px dashed var(--border2);color:var(--teal);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px">+ Add Item</button>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg3);border-radius:var(--r2);margin-bottom:14px">'
+    +'<span style="font-size:14px;font-weight:700">Total</span>'
+    +'<span id="qb-total" style="font-size:18px;font-weight:800;color:var(--green)">$0</span></div>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Follow-up reminder</span>'
+    +'<select id="qb-fu" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);padding:7px 10px;font-family:inherit;font-size:13px">'
+    +'<option value="2">2 days</option><option value="3" selected>3 days</option><option value="5">5 days</option><option value="7">1 week</option><option value="0">No reminder</option>'
+    +'</select></div>'
+    +'<button onclick="saveNewQuote()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save &amp; Preview Card</button>'
+    +'<button onclick="document.getElementById(\'quote-builder\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+    +'</div>';
+  sh.addEventListener('click',function(e){if(e.target===sh)sh.remove();});
+  document.body.appendChild(sh);
+  _renderQRows();
+}
+
+function _renderQRows(){
+  var el=document.getElementById('qb-rows');if(!el)return;
+  var h='';
+  _qItems.forEach(function(item,i){
+    h+='<div class="qb-row" data-idx="'+i+'" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:10px;margin-bottom:8px">'
+      +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">'
+      +'<input type="text" class="qb-name" placeholder="Product / description" oninput="qNameChange('+i+',this.value)" style="flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:8px 9px;color:var(--text);font-family:inherit;font-size:13px">'
+      +'<button onclick="removeQRow('+i+')" style="background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25);border-radius:var(--r2);width:32px;height:32px;font-size:14px;cursor:pointer;flex-shrink:0">&#215;</button>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:72px 1fr auto;gap:6px;align-items:end">'
+      +'<div><div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Qty</div>'
+      +'<input type="number" inputmode="decimal" min="0.001" step="any" value="'+item.qty+'" oninput="qQtyChange('+i+',this.value)" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:7px 8px;color:var(--text);font-family:inherit;font-size:13px;box-sizing:border-box"></div>'
+      +'<div><div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Unit Price</div>'
+      +'<input type="number" inputmode="decimal" min="0" step="0.01" value="'+(item.price||'')+'" placeholder="$0.00" oninput="qPriceChange('+i+',this.value)" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:7px 8px;color:var(--text);font-family:inherit;font-size:13px;box-sizing:border-box"></div>'
+      +'<div style="text-align:right"><div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Line Total</div>'
+      +'<div class="qb-lt" style="padding:7px 0;font-size:14px;font-weight:800;color:var(--green)">'+fmt(item.qty*(item.price||0))+'</div>'
+      +'</div></div></div>';
+  });
+  el.innerHTML=h;
+  // set name values via JS to avoid HTML encoding issues
+  el.querySelectorAll('.qb-row').forEach(function(row,i){
+    var inp=row.querySelector('.qb-name');if(inp)inp.value=_qItems[i].name;
+  });
+  _updateQTotal();
+}
+
+function qNameChange(i,val){if(_qItems[i])_qItems[i].name=val;}
+function qQtyChange(i,val){if(!_qItems[i])return;_qItems[i].qty=Math.max(0.001,parseFloat(val)||1);_refreshQLine(i);}
+function qPriceChange(i,val){if(!_qItems[i])return;_qItems[i].price=parseFloat(val)||0;_refreshQLine(i);}
+function _refreshQLine(i){
+  var row=document.querySelector('.qb-row[data-idx="'+i+'"]');
+  if(row){var lt=row.querySelector('.qb-lt');if(lt)lt.textContent=fmt(_qItems[i].qty*(_qItems[i].price||0));}
+  _updateQTotal();
+}
+function _updateQTotal(){
+  var tot=_qItems.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+  var el=document.getElementById('qb-total');if(el)el.textContent=fmt(tot);
+}
+
+function addQRow(){
+  document.querySelectorAll('.qb-row').forEach(function(row){
+    var i=parseInt(row.getAttribute('data-idx'));
+    var inp=row.querySelector('.qb-name');
+    if(inp&&_qItems[i])_qItems[i].name=inp.value;
+  });
+  _qItems.push({name:'',qty:1,price:0});
+  _renderQRows();
+  setTimeout(function(){
+    var rows=document.querySelectorAll('.qb-row');
+    if(rows.length){var inp=rows[rows.length-1].querySelector('.qb-name');if(inp)inp.focus();}
+  },80);
+}
+
+function removeQRow(i){
+  if(_qItems.length<=1){toast('Need at least one item');return;}
+  document.querySelectorAll('.qb-row').forEach(function(row){
+    var idx=parseInt(row.getAttribute('data-idx'));
+    var inp=row.querySelector('.qb-name');
+    if(inp&&_qItems[idx])_qItems[idx].name=inp.value;
+  });
+  _qItems.splice(i,1);
+  _renderQRows();
+}
+
+function showQCustPicker(){
+  var existing=document.getElementById('q-cust-picker');if(existing)existing.remove();
+  var a=allC();a.sort(function(x,y){return x.name.localeCompare(y.name);});
+  var sh=document.createElement('div');sh.id='q-cust-picker';
+  sh.style.cssText='position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.7);display:flex;align-items:flex-end';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:500px;margin:0 auto;max-height:75vh;display:flex;flex-direction:column">'
+    +'<div style="padding:16px 16px 10px;flex-shrink:0">'
+    +'<div style="font-size:16px;font-weight:800;margin-bottom:10px">Select Customer</div>'
+    +'<input id="q-csrch" type="text" placeholder="Search..." oninput="filterQCusts(this.value)" autocomplete="off" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:10px 12px;color:var(--text);font-family:inherit;font-size:14px;box-sizing:border-box">'
+    +'</div>'
+    +'<div id="q-clist" style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1">'
+    +a.slice(0,150).map(function(c){return'<div onclick="selectQCust(\''+c.code+'\',\''+esc(c.name).replace(/'/g,'&#39;')+'\')" style="padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:space-between"><span style="font-size:14px;font-weight:500">'+esc(c.name)+'</span><span style="color:var(--sub);font-size:12px">'+esc(c.city||'')+'</span></div>';}).join('')
+    +'</div>'
+    +'<div style="padding:12px 16px;flex-shrink:0"><button onclick="document.getElementById(\'q-cust-picker\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button></div>'
+    +'</div>';
+  sh.addEventListener('click',function(e){if(e.target===sh)sh.remove();});
+  document.body.appendChild(sh);
+  setTimeout(function(){var si=document.getElementById('q-csrch');if(si)si.focus();},200);
+}
+
+function filterQCusts(val){
+  var el=document.getElementById('q-clist');if(!el)return;
+  var a=allC(),q=val.toLowerCase();
+  var filtered=!q?a:a.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0||((c.city||'').toLowerCase().indexOf(q)>=0);});
+  filtered.sort(function(x,y){return x.name.localeCompare(y.name);});
+  el.innerHTML=filtered.slice(0,100).map(function(c){return'<div onclick="selectQCust(\''+c.code+'\',\''+esc(c.name).replace(/'/g,'&#39;')+'\')" style="padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:space-between"><span style="font-size:14px;font-weight:500">'+esc(c.name)+'</span><span style="color:var(--sub);font-size:12px">'+esc(c.city||'')+'</span></div>';}).join('');
+}
+
+function selectQCust(code,name){
+  _qCode=code;
+  var el=document.getElementById('qb-cust-name');if(el){el.textContent=name;el.style.color='var(--text)';}
+  var picker=document.getElementById('q-cust-picker');if(picker)picker.remove();
+}
+
+function saveNewQuote(){
+  if(!_qCode){toast('Select a customer first');return;}
+  document.querySelectorAll('.qb-row').forEach(function(row){
+    var i=parseInt(row.getAttribute('data-idx'));
+    var inp=row.querySelector('.qb-name');
+    if(inp&&_qItems[i])_qItems[i].name=inp.value;
+  });
+  var valid=_qItems.filter(function(it){return it.name.trim();});
+  if(!valid.length){toast('Add at least one item');return;}
+  var fuDays=parseInt((document.getElementById('qb-fu')||{}).value||'3');
+  var qid='q_'+Date.now();
+  var fuDate=null;
+  if(fuDays>0){var d=new Date();d.setDate(d.getDate()+fuDays);fuDate=d.toISOString().split('T')[0];}
+  var q={id:qid,code:_qCode,date:new Date().toISOString(),items:valid.map(function(it){return{name:it.name.trim(),qty:it.qty,price:it.price};}),followupDate:fuDate,status:'open',lostReason:'',dismissed:false};
+  if(!ST.quotes)ST.quotes={};
+  ST.quotes[qid]=q;
+  lSave();syncUp();
+  var sh=document.getElementById('quote-builder');if(sh)sh.remove();
+  toast('&#128203; Quote saved');
+  showQuoteCard(qid,0);
+  rDash();
+}
+
+function showQuoteCard(qid,page){
+  if(!page)page=0;
+  var existing=document.getElementById('quote-card-ov');if(existing)existing.remove();
+  if(!ST.quotes||!ST.quotes[qid]){toast('Quote not found');return;}
+  var q=ST.quotes[qid];
+  var custName='Customer';
+  var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===q.code){custName=a[i].name;break;}}
+  var allItems=q.items;
+  var totalPages=allItems.length>6?2:1;
+  if(page>=totalPages)page=totalPages-1;
+  var splitAt=totalPages===2?Math.ceil(allItems.length/2):allItems.length;
+  var pageItems=page===0?allItems.slice(0,splitAt):allItems.slice(splitAt);
+  var grandTotal=allItems.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+  var dStr=new Date(q.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  var isLast=(page===totalPages-1);
+  var itemsH=pageItems.map(function(it){
+    var lineT=it.qty*(it.price||0);
+    return'<div style="display:flex;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07)">'
+      +'<div style="flex:1;min-width:0;padding-right:12px">'
+      +'<div style="font-size:13px;font-weight:600;color:#e8eaed;line-height:1.3">'+esc(it.name)+'</div>'
+      +(it.price?'<div style="font-size:11px;color:#6b7280;margin-top:2px">Qty '+it.qty+' &nbsp;&bull;&nbsp; '+fmt(it.price)+'/ea</div>':'<div style="font-size:11px;color:#6b7280;margin-top:2px">Qty '+it.qty+'</div>')
+      +'</div>'
+      +(lineT?'<div style="font-size:14px;font-weight:700;color:#34d399;flex-shrink:0;padding-top:1px">'+fmt(lineT)+'</div>':'')
+      +'</div>';
+  }).join('');
+  var pageLabel=totalPages>1?' <span style="background:rgba(0,229,184,.15);color:#00e5b8;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">Card '+(page+1)+' of '+totalPages+'</span>':'';
+  var cardH='<div id="qcard-inner" style="background:#111827;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px 20px 16px;width:100%;box-sizing:border-box">'
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">'
+    +'<div style="flex:1;min-width:0">'
+    +'<div style="font-size:10px;font-weight:800;letter-spacing:2px;color:#00e5b8;text-transform:uppercase;margin-bottom:4px">Quote'+pageLabel+'</div>'
+    +'<div style="font-size:20px;font-weight:800;color:#e8eaed;line-height:1.2">'+esc(custName)+'</div>'
+    +'</div>'
+    +'<div style="text-align:right;flex-shrink:0;padding-left:12px">'
+    +'<div style="font-size:12px;color:#6b7280">'+dStr+'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div style="height:1px;background:rgba(0,229,184,.25);margin-bottom:12px"></div>'
+    +itemsH
+    +(isLast&&grandTotal?'<div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;margin-top:4px;border-top:1px solid rgba(255,255,255,.08)">'
+      +'<div style="font-size:12px;font-weight:800;color:#9aa0a6;text-transform:uppercase;letter-spacing:.8px">Total</div>'
+      +'<div style="font-size:22px;font-weight:800;color:#34d399">'+fmt(grandTotal)+'</div>'
+      +'</div>':'')
+    +'<div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:#4b5563">Heath Chartier &nbsp;&bull;&nbsp; Royal Plywood</div>'
+    +'</div>';
+  var navH='';
+  if(totalPages>1){
+    navH='<div style="display:flex;gap:10px;margin-top:12px">';
+    if(page>0)navH+='<button onclick="document.getElementById(\'quote-card-ov\').remove();showQuoteCard(\''+qid+'\','+(page-1)+')" style="flex:1;padding:11px;border-radius:var(--r2);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#8592; Card '+(page)+'</button>';
+    if(page<totalPages-1)navH+='<button onclick="document.getElementById(\'quote-card-ov\').remove();showQuoteCard(\''+qid+'\','+(page+1)+')" style="flex:1;padding:11px;border-radius:var(--r2);background:rgba(0,229,184,.15);border:1px solid rgba(0,229,184,.3);color:#00e5b8;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Card '+(page+2)+' &#8594;</button>';
+    navH+='</div>';
+  }
+  var ov=document.createElement('div');ov.id='quote-card-ov';
+  ov.style.cssText='position:fixed;inset:0;z-index:5500;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow-y:auto';
+  ov.innerHTML='<div style="width:100%;max-width:380px">'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:12px">Screenshot to share &nbsp;&#183;&nbsp; Tap outside to close</div>'
+    +cardH
+    +navH
+    +'<button onclick="document.getElementById(\'quote-card-ov\').remove()" style="width:100%;padding:12px;border-radius:var(--r2);border:1px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.5);font-size:13px;cursor:pointer;font-family:inherit;margin-top:12px">Close</button>'
+    +'</div>';
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
+  document.body.appendChild(ov);
+}
+
+function rQuotesModal(code){
+  var el=document.getElementById('m-quotes-list');if(!el)return;
+  if(!ST.quotes){el.innerHTML='<div style="color:var(--sub);font-size:12px">No quotes yet</div>';return;}
+  var myQ=[];
+  Object.keys(ST.quotes).forEach(function(k){if(ST.quotes[k].code===code)myQ.push(ST.quotes[k]);});
+  if(!myQ.length){el.innerHTML='<div style="color:var(--sub);font-size:12px">No quotes yet</div>';return;}
+  myQ.sort(function(a,b){return b.date.localeCompare(a.date);});
+  var h='';
+  myQ.forEach(function(q){
+    var total=q.items.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+    var dStr=new Date(q.date).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    var sc=q.status==='won'?'var(--green)':q.status==='lost'?'var(--red)':'var(--amber)';
+    var slbl=q.status==='won'?'Won':q.status==='lost'?'Lost':'Open';
+    h+='<div style="padding:9px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<div style="flex:1;min-width:0;cursor:pointer" onclick="showQuoteCard(\''+q.id+'\',0)">'
+      +'<div style="font-size:13px;font-weight:600">'+(total?fmt(total)+' &mdash; ':'')+q.items.length+' item'+(q.items.length!==1?'s':'')+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+dStr+(q.followupDate&&q.status==='open'?' &bull; Follow-up '+q.followupDate.slice(5).replace('-','/'):'')+'</div>'
+      +'</div>'
+      +'<span style="font-size:11px;font-weight:700;color:'+sc+';flex-shrink:0">'+slbl+'</span>'
+      +'</div>'
+      +(q.status==='open'
+        ?'<div style="display:flex;gap:5px;margin-top:6px">'
+        +'<button onclick="setQuoteOutcome(\''+q.id+'\',\'won\')" style="flex:1;padding:5px;border-radius:var(--r2);background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#10003; Won</button>'
+        +'<button onclick="promptQuoteLoss(\''+q.id+'\')" style="flex:1;padding:5px;border-radius:var(--r2);background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#10007; Lost</button>'
+        +'<button onclick="showQuoteCard(\''+q.id+'\',0)" style="padding:5px 8px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:11px;cursor:pointer;font-family:inherit">View</button>'
+        +'<button onclick="deleteQuote(\''+q.id+'\')" style="padding:5px 8px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:11px;cursor:pointer;font-family:inherit">Del</button>'
+        +'</div>':'')
+      +(q.status==='lost'&&q.lostReason?'<div style="font-size:11px;color:var(--sub);margin-top:3px;font-style:italic">Reason: '+esc(q.lostReason)+'</div>':'')
+      +'</div>';
+  });
+  el.innerHTML=h;
+}
+
+function rQuoteAlert(){
+  var el=document.getElementById('d-quotes-alert');if(!el)return;
+  if(!ST.quotes){el.style.display='none';return;}
+  var today=new Date().toISOString().split('T')[0];
+  var a=allC(),due=[];
+  Object.keys(ST.quotes).forEach(function(k){
+    var q=ST.quotes[k];
+    if(q.status==='open'&&!q.dismissed&&q.followupDate&&q.followupDate<=today){
+      var cust=null;for(var i=0;i<a.length;i++){if(a[i].code===q.code){cust=a[i];break;}}
+      if(cust)due.push({q:q,c:cust});
+    }
+  });
+  if(!due.length){el.style.display='none';return;}
+  due.sort(function(a,b){return a.q.followupDate.localeCompare(b.q.followupDate);});
+  el.style.display='block';
+  var h='<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px">'
+    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#fbbf24;margin-bottom:6px">&#128203; Quote Follow-Ups Due</div>';
+  due.slice(0,4).forEach(function(item){
+    var q=item.q,c=item.c;
+    var total=q.items.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+    h+='<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid rgba(251,191,36,.12)">'
+      +'<div style="flex:1;min-width:0;cursor:pointer" onclick="openM(\''+c.code+'\')">'
+      +'<div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+(total?fmt(total)+' &bull; ':'')+q.items.length+' item'+(q.items.length!==1?'s':'')+'</div>'
+      +'</div>'
+      +'<button onclick="setQuoteOutcome(\''+q.id+'\',\'won\')" style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:var(--r2);padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">Won</button>'
+      +'<button onclick="promptQuoteLoss(\''+q.id+'\')" style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">Lost</button>'
+      +'<button onclick="ST.quotes[\''+q.id+'\'].dismissed=true;lSave();rDash()" style="background:transparent;border:1px solid var(--border2);border-radius:var(--r2);padding:4px 7px;font-size:12px;color:var(--sub);cursor:pointer;font-family:inherit;flex-shrink:0">&#215;</button>'
+      +'</div>';
+  });
+  if(due.length>4)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(due.length-4)+' more</div>';
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+function setQuoteOutcome(qid,status,reason){
+  if(!ST.quotes||!ST.quotes[qid])return;
+  ST.quotes[qid].status=status;
+  if(reason!==undefined)ST.quotes[qid].lostReason=reason||'';
+  lSave();syncUp();
+  toast(status==='won'?'&#127881; Sale won!':'Quote marked lost');
+  rQuotesModal(ST.quotes[qid].code);
+  rDash();
+}
+
+function promptQuoteLoss(qid){
+  var existing=document.getElementById('ql-sheet');if(existing)existing.remove();
+  var reasons=['Price too high','Went with competitor','No budget right now','Not ready to order','Other'];
+  var sh=document.createElement('div');sh.id='ql-sheet';
+  sh.style.cssText='position:fixed;inset:0;z-index:6500;background:rgba(0,0,0,.7);display:flex;align-items:flex-end';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;margin:0 auto">'
+    +'<div style="font-size:15px;font-weight:800;margin-bottom:4px">Why did you lose it?</div>'
+    +'<div style="font-size:12px;color:var(--sub);margin-bottom:14px">Optional — helps you track patterns</div>'
+    +reasons.map(function(r){return'<button onclick="setQuoteOutcome(\''+qid+'\',\'lost\',\''+r+'\');document.getElementById(\'ql-sheet\').remove()" style="width:100%;padding:11px;margin-bottom:8px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;text-align:left">'+r+'</button>';}).join('')
+    +'<button onclick="setQuoteOutcome(\''+qid+'\',\'lost\',\'\');document.getElementById(\'ql-sheet\').remove()" style="width:100%;padding:10px;border-radius:var(--r2);border:none;background:transparent;color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Skip reason &amp; mark lost</button>'
+    +'</div>';
+  sh.addEventListener('click',function(e){if(e.target===sh)sh.remove();});
+  document.body.appendChild(sh);
+}
+
+function deleteQuote(qid){
+  if(!ST.quotes||!ST.quotes[qid])return;
+  var code=ST.quotes[qid].code;
+  delete ST.quotes[qid];
+  lSave();syncUp();
+  toast('Quote deleted');
+  rQuotesModal(code);
+  rDash();
 }
 
 lLoad();
