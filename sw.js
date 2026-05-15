@@ -1,5 +1,9 @@
-const CACHE = 'hcroutes-v7';
-const ASSETS = ['/index.html', '/manifest.json', '/icon-180.png', '/icon-192.png', '/icon-512.png', '/icon.svg'];
+const CACHE = 'hcroutes-v8';
+const ASSETS = [
+  '/route-app/', '/route-app/index.html', '/route-app/manifest.json',
+  '/route-app/apple-touch-icon.png', '/route-app/icon-180.png',
+  '/route-app/icon-192.png', '/route-app/icon-512.png', '/route-app/icon.svg'
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -27,7 +31,7 @@ self.addEventListener('fetch', e => {
           caches.open(CACHE).then(c => c.put(e.request, clone));
         }
         return res;
-      }).catch(() => cached || caches.match('/index.html'));
+      }).catch(() => cached);
       return cached || net;
     })
   );
@@ -39,8 +43,8 @@ self.addEventListener('push', e => {
   e.waitUntil(
     self.registration.showNotification(data.title || 'HC Routes', {
       body: data.body || '',
-      icon: '/icon-192.png',
-      badge: '/icon-192.png'
+      icon: '/route-app/icon-192.png',
+      badge: '/route-app/icon-192.png'
     })
   );
 });
