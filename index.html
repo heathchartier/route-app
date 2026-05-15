@@ -3955,7 +3955,6 @@ function runXLSX(buf,fname,status){try{var wb=XLSX.read(buf,{type:'array'});var 
 var _epicorDiscrep=JSON.parse(localStorage.getItem('hrt_discrep')||'[]');
 
 function doImport(hdrs,rows,fname,status){
-function doImport(hdrs,rows,fname,status){
   var COLS={code:['code','customercode','acct','custcode','custno','customerno','customernumber','accountno','accountnumber','cust'],
     name:['name','customername','company','businessname','accountname','custname'],
     address:['address','addr','street'],city:['city'],zip:['zip','zipcode','postalcode'],
@@ -4055,6 +4054,7 @@ function doImport(hdrs,rows,fname,status){
   status.style.color=flagged?'var(--amber)':(added||updated)?'var(--teal)':'var(--sub)';
   status.textContent=parts.length?parts.join(' · '):'Nothing to update — all data matches';
 }
+function rDiscrepCard(){
   var card=document.getElementById('discrep-card');if(!card)return;
   if(!_epicorDiscrep.length){card.style.display='none';return;}
   card.style.display='block';
