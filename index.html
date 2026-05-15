@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="HC Routes">
-<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <title>HC Routes</title>
 <style>
@@ -1765,7 +1765,7 @@ function initSwipe(containerId){
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="HC Routes">
-<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <title>HC Routes</title>
 <style>
@@ -3956,6 +3956,13 @@ function handleImport(inp){
 function runXLSX(buf,fname,status){try{var wb=XLSX.read(buf,{type:'array'});var ws=wb.Sheets[wb.SheetNames[0]];var data=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});var hdrs=data[0].map(function(h){return String(h||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');});doImport(hdrs,data.slice(1).map(function(r){return r.map(function(v){return String(v==null?'':v).trim();});}),fname,status);}catch(e){status.style.color='#ef4444';status.textContent='Error: '+e.message;}}
 var _epicorDiscrep=JSON.parse(localStorage.getItem('hrt_discrep')||'[]');
 
+function guessGroup(zip){
+  var z=String(zip||'').trim().slice(0,5);if(!z)return 61;
+  var counts={};
+  for(var i=0;i<CUSTOMERS_BASE.length;i++){var cz=String(CUSTOMERS_BASE[i].zip||'').trim().slice(0,5);if(cz===z)counts[CUSTOMERS_BASE[i].group]=(counts[CUSTOMERS_BASE[i].group]||0)+1;}
+  var best=null,bv=0;for(var g in counts){if(counts[g]>bv){bv=counts[g];best=parseInt(g);}}
+  return best||61;
+}
 function doImport(hdrs,rows,fname,status){
   var COLS={code:['code','customercode','acct','custcode','custno','customerno','customernumber','accountno','accountnumber','cust'],
     name:['name','customername','company','businessname','accountname','custname'],
@@ -4025,8 +4032,9 @@ function doImport(hdrs,rows,fname,status){
     } else {
       // New account
       if(!name){skipped++;continue;}
+      var importZip=ci.zip>=0?row[ci.zip]:'';
       var nc={code:code||('IMP'+Date.now().toString().slice(-6)),name:name,
-        group:ci.group>=0&&row[ci.group]?parseInt(row[ci.group])||61:61,
+        group:ci.group>=0&&row[ci.group]?parseInt(row[ci.group])||guessGroup(importZip):guessGroup(importZip),
         stop:999,address:ci.address>=0?row[ci.address]:'',address2:'',
         city:ci.city>=0?row[ci.city]:'',state:'CA',zip:ci.zip>=0?row[ci.zip]:'',
         phone:ci.phone>=0?row[ci.phone]:'',email:ci.email>=0?row[ci.email]:'',
@@ -5796,7 +5804,7 @@ function showHowToUse(){
   var sections=[
     {icon:'&#127968;',title:'Dashboard',body:'Your home base. Shows today\'s route, weekly goal, streak, hot leads, win-back targets, and a morning brief. Swipe right on any row to mark Visited.'},
     {icon:'&#128197;',title:'Today\'s Route',body:'Auto-picks the top customers in your active group who are overdue (15+ days). Tap the group arrows to switch groups. Hit "GPS" to sort by distance from you. Tap any row to open the customer. Swipe right = Visited.'},
-    {icon:'&#128269;',title:'Dashboard Search',body:'Tap the magnifying glass in the top-right of the Home tab to search all 610 customers instantly by name, city, or code.'},
+    {icon:'&#128269;',title:'Dashboard Search',body:'Tap the magnifying glass in the top-right of the Home tab to search all your customers instantly by name, city, or code.'},
     {icon:'&#128101;',title:'Customer Modal',body:'Tap any customer to open their card. Log visits, set a follow-up, mark as Hot Lead, add a competitor note, save a contact vCard, or view visit history.'},
     {icon:'&#9733;',title:'Hot Leads',body:'Star any customer as a Hot Lead in their modal. They show up in the Hot Leads card on your dashboard and are highlighted on the route.'},
     {icon:'&#128203;',title:'Notes & Follow-Ups',body:'Write a note in any customer modal — it shows as a pre-visit reminder next time you open them. Schedule a follow-up date and they\'ll appear in your schedule card.'},
