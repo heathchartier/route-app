@@ -531,6 +531,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div id="d-birthday-alert" style="display:none"></div>
     <div id="d-todo-alert" style="display:none"></div>
     <div id="d-followup-alert" style="display:none"></div>
+    <div id="d-callbacks-alert" style="display:none"></div>
+    <div id="d-orders-today" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -2247,6 +2249,8 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="stat"><div class="stat-n" style="color:var(--red)">0</div><div class="stat-l">Overdue</div></div>
     </div>
     <div id="d-followup-alert" style="display:none"></div>
+    <div id="d-callbacks-alert" style="display:none"></div>
+    <div id="d-orders-today" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -2920,7 +2924,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rSalesPace();rComingDue();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rSalesPace();rComingDue();
 }
 
 function rRoute(){
@@ -4495,6 +4499,75 @@ function rTodoAlert(){
   h+='</div>';
   el.innerHTML=h;
   el.querySelectorAll('[onclick]').forEach(function(r){});
+}
+
+/* ── CALLBACKS DUE ALERT ── */
+function rCallbacksAlert(){
+  var el=document.getElementById('d-callbacks-alert');if(!el)return;
+  if(!ST.followups){el.style.display='none';return;}
+  var today=new Date().toISOString().split('T')[0];
+  var a=allC(),due=[];
+  a.forEach(function(c){
+    var fu=ST.followups[c.code];
+    if(fu&&fu.split('T')[0]<=today)due.push({c:c,date:fu.split('T')[0]});
+  });
+  if(!due.length){el.style.display='none';return;}
+  due.sort(function(a,b){return a.date.localeCompare(b.date);});
+  el.style.display='block';
+  var h='<div style="background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px">'
+    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#fb923c;margin-bottom:6px">&#128222; Callbacks Due</div>';
+  due.slice(0,5).forEach(function(item){
+    var c=item.c;
+    var overdue=item.date<today;
+    var lbl=overdue?'Overdue':'Today';
+    var lblCol=overdue?'var(--red)':'#fb923c';
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(251,146,60,.15);cursor:pointer" onclick="openM(\''+c.code+'\')">'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+esc(c.city||'')+' &bull; Grp '+c.group+'</div></div>'
+      +'<span style="font-size:11px;font-weight:700;color:'+lblCol+';flex-shrink:0">'+lbl+'</span>'
+      +'<button onclick="event.stopPropagation();delete ST.followups[\''+c.code+'\'];lSave();syncUp();rDash();" style="background:transparent;border:1px solid var(--border2);border-radius:var(--r2);padding:4px 8px;font-size:11px;color:var(--sub);cursor:pointer;font-family:inherit;flex-shrink:0">Dismiss</button>'
+      +'</div>';
+  });
+  if(due.length>5)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(due.length-5)+' more</div>';
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+/* ── TODAY'S ORDERS CARD ── */
+function rTodaysOrders(){
+  var el=document.getElementById('d-orders-today');if(!el)return;
+  if(!ST.orders){el.style.display='none';return;}
+  var today=new Date().toISOString().split('T')[0];
+  var a=allC(),todayOrders=[],total=0,count=0;
+  a.forEach(function(c){
+    var ords=ST.orders[c.code]||[];
+    ords.forEach(function(o){
+      if(o.date&&o.date.split('T')[0]===today){
+        todayOrders.push({c:c,o:o});
+        total+=o.amount||0;
+        count++;
+      }
+    });
+  });
+  if(!count){el.style.display='none';return;}
+  todayOrders.sort(function(a,b){return(b.o.amount||0)-(a.o.amount||0);});
+  el.style.display='block';
+  var h='<div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--green)">&#128230; Today\'s Orders</div>'
+    +'<div style="font-size:13px;font-weight:800;color:var(--green)">'+fmt(total)+'</div>'
+    +'</div>';
+  todayOrders.slice(0,5).forEach(function(item){
+    var c=item.c,o=item.o;
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(16,185,129,.15);cursor:pointer" onclick="openM(\''+c.code+'\')">'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+esc(o.item||'')+'</div></div>'
+      +(o.amount?'<span style="font-size:12px;font-weight:700;color:var(--green);flex-shrink:0">'+fmt(o.amount)+'</span>':'')
+      +'</div>';
+  });
+  if(count>5)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(count-5)+' more</div>';
+  h+='</div>';
+  el.innerHTML=h;
 }
 
 /* ── CUSTOM ROUTE FILL ── */
