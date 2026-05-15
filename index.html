@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="HC Routes">
-<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
 <title>HC Routes</title>
 <style>
@@ -505,6 +505,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" async></script>
 </head>
 <body>
 
@@ -1763,7 +1764,7 @@ function initSwipe(containerId){
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="HC Routes">
-<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
 <title>HC Routes</title>
 <style>
@@ -7513,8 +7514,8 @@ checkAndNotify();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 initAppLock();
 updateSecurityStatus();
-document.addEventListener('visibilitychange',function(){if(!document.hidden){rDash();}});
-window.addEventListener('pageshow',function(e){if(e.persisted){rDash();}});
+function _onResume(){var dp=document.getElementById('p-dash');if(dp&&dp.style.display!=='none')rDash();}document.addEventListener('visibilitychange',function(){if(!document.hidden)_onResume();});window.addEventListener('pageshow',function(e){if(e.persisted)_onResume();});window.addEventListener('focus',function(){_onResume();});
+
 </script>
 <div id="map-overlay">
   <div class="map-hdr">
