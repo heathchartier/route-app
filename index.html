@@ -1625,9 +1625,59 @@ function addCust(){
 }
 
 function doExport(){
-  var a=allC(),csv='Code,Name,City,Group,Last Visit,Type,Visits,Hot,Notes\n';
-  for(var i=0;i<a.length;i++){var c=a[i],logs=ST.visits[c.code]||[],lv=logs[logs.length-1];csv+='"'+c.code+'","'+ c.name+'","'+(c.city||'')+'",'+c.group+',"'+(lv?new Date(lv.date).toLocaleDateString():'')+'",'+(lv?lv.type:'')+','+logs.length+','+(ST.hot[c.code]?'Yes':'No')+',"'+ ((ST.notes&&ST.notes[c.code])||'').replace(/"/g,"'")+'"\n';}
-  var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='hc_routes_'+new Date().toISOString().split('T')[0]+'.csv';a2.click();toast('Exported');
+  var a=allC();
+  var today=new Date();
+  var todayStr=today.toISOString().split('T')[0];
+  function csvQ(v){return'"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
+  var cols=['Code','Name','Address','City','Zip','Phone','Group','Tier','Hot Lead',
+    'YTD Sales','Prior Year Sales','Lifetime Sales',
+    'Last Visit Date','Last Visit Type','Total Visits','Days Since Last Visit',
+    'Last Order Date','Order Count','Total Order Value ($)',
+    'Latest Note','Tags','Competitor Intel',
+    'Scheduled Visit','Callback Due','Open To-Dos','Open Quotes','Open Quote Value ($)'];
+  var rows=[cols.join(',')];
+  for(var i=0;i<a.length;i++){
+    var c=a[i],code=c.code;
+    var visits=ST.visits&&ST.visits[code]||[];
+    var lv=visits.length?visits[visits.length-1]:null;
+    var lvDate=lv?new Date(lv.date).toLocaleDateString('en-US'):'';
+    var daysSince=lv?Math.floor((today-new Date(lv.date))/(86400000)):'';
+    var orders=ST.orders&&ST.orders[code]||[];
+    var orderTotal=orders.reduce(function(s,o){return s+(o.amount||0);},0);
+    var lo=orders.length?orders.slice().sort(function(a,b){return b.date.localeCompare(a.date);})[0]:null;
+    var loDate=lo?new Date(lo.date).toLocaleDateString('en-US'):'';
+    var noteHist=ST.noteHistory&&ST.noteHistory[code]||[];
+    var latestNote=noteHist.length?noteHist[noteHist.length-1].text:(ST.notes&&ST.notes[code]||'');
+    var tags=ST.tags&&ST.tags[code]||[];
+    var tagStr=Array.isArray(tags)?tags.join('; '):'';
+    var comp=(ST.competitors&&ST.competitors[code])||'';
+    var sched=ST.scheduled&&ST.scheduled[code];
+    var schedDate=sched&&sched.date?sched.date:'';
+    var callback=ST.followups&&ST.followups[code]||'';
+    var callbackDate=callback?callback.split('T')[0]:'';
+    var todos=ST.todos&&ST.todos[code]||[];
+    var openTodos=todos.filter(function(t){return !t.done;}).length;
+    var myQ=ST.quotes?Object.keys(ST.quotes).filter(function(k){return ST.quotes[k].code===code&&ST.quotes[k].status==='open';}).map(function(k){return ST.quotes[k];}):[];
+    var openQVal=myQ.reduce(function(s,q){return s+qGrandTotal(q);},0);
+    var addr=[c.address,c.address2].filter(Boolean).join(' ');
+    rows.push([
+      code,c.name||'',addr,c.city||'',c.zip||'',c.phone||'',c.group||'',getTier(c),
+      ST.hot&&ST.hot[code]?'Yes':'No',
+      Math.round(c.sales2526||0),Math.round(c.sales2025||0),Math.round(c.lifetimeSales||0),
+      lvDate,lv?lv.type:'',visits.length,daysSince,
+      loDate,orders.length,Math.round(orderTotal),
+      latestNote.replace(/\n/g,' ').slice(0,250),tagStr,comp,
+      schedDate,callbackDate,openTodos,myQ.length,Math.round(openQVal)
+    ].map(csvQ).join(','));
+  }
+  var blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  var link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);
+  link.download='hc_routes_export_'+todayStr+'.csv';
+  link.click();
+  ST.lastExportDate=todayStr;
+  lSave();
+  toast('&#128229; Export downloaded — '+a.length+' customers');
 }
 
 // ── YTD LEADERBOARD ───────────────────────────────────────────────────────
@@ -3346,9 +3396,59 @@ function addCust(){
 }
 
 function doExport(){
-  var a=allC(),csv='Code,Name,City,Group,Last Visit,Type,Visits,Hot,Notes\n';
-  for(var i=0;i<a.length;i++){var c=a[i],logs=ST.visits[c.code]||[],lv=logs[logs.length-1];csv+='"'+c.code+'","'+ c.name+'","'+(c.city||'')+'",'+c.group+',"'+(lv?new Date(lv.date).toLocaleDateString():'')+'",'+(lv?lv.type:'')+','+logs.length+','+(ST.hot[c.code]?'Yes':'No')+',"'+ ((ST.notes&&ST.notes[c.code])||'').replace(/"/g,"'")+'"\n';}
-  var a2=document.createElement('a');a2.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a2.download='hc_routes_'+new Date().toISOString().split('T')[0]+'.csv';a2.click();toast('Exported');
+  var a=allC();
+  var today=new Date();
+  var todayStr=today.toISOString().split('T')[0];
+  function csvQ(v){return'"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
+  var cols=['Code','Name','Address','City','Zip','Phone','Group','Tier','Hot Lead',
+    'YTD Sales','Prior Year Sales','Lifetime Sales',
+    'Last Visit Date','Last Visit Type','Total Visits','Days Since Last Visit',
+    'Last Order Date','Order Count','Total Order Value ($)',
+    'Latest Note','Tags','Competitor Intel',
+    'Scheduled Visit','Callback Due','Open To-Dos','Open Quotes','Open Quote Value ($)'];
+  var rows=[cols.join(',')];
+  for(var i=0;i<a.length;i++){
+    var c=a[i],code=c.code;
+    var visits=ST.visits&&ST.visits[code]||[];
+    var lv=visits.length?visits[visits.length-1]:null;
+    var lvDate=lv?new Date(lv.date).toLocaleDateString('en-US'):'';
+    var daysSince=lv?Math.floor((today-new Date(lv.date))/(86400000)):'';
+    var orders=ST.orders&&ST.orders[code]||[];
+    var orderTotal=orders.reduce(function(s,o){return s+(o.amount||0);},0);
+    var lo=orders.length?orders.slice().sort(function(a,b){return b.date.localeCompare(a.date);})[0]:null;
+    var loDate=lo?new Date(lo.date).toLocaleDateString('en-US'):'';
+    var noteHist=ST.noteHistory&&ST.noteHistory[code]||[];
+    var latestNote=noteHist.length?noteHist[noteHist.length-1].text:(ST.notes&&ST.notes[code]||'');
+    var tags=ST.tags&&ST.tags[code]||[];
+    var tagStr=Array.isArray(tags)?tags.join('; '):'';
+    var comp=(ST.competitors&&ST.competitors[code])||'';
+    var sched=ST.scheduled&&ST.scheduled[code];
+    var schedDate=sched&&sched.date?sched.date:'';
+    var callback=ST.followups&&ST.followups[code]||'';
+    var callbackDate=callback?callback.split('T')[0]:'';
+    var todos=ST.todos&&ST.todos[code]||[];
+    var openTodos=todos.filter(function(t){return !t.done;}).length;
+    var myQ=ST.quotes?Object.keys(ST.quotes).filter(function(k){return ST.quotes[k].code===code&&ST.quotes[k].status==='open';}).map(function(k){return ST.quotes[k];}):[];
+    var openQVal=myQ.reduce(function(s,q){return s+qGrandTotal(q);},0);
+    var addr=[c.address,c.address2].filter(Boolean).join(' ');
+    rows.push([
+      code,c.name||'',addr,c.city||'',c.zip||'',c.phone||'',c.group||'',getTier(c),
+      ST.hot&&ST.hot[code]?'Yes':'No',
+      Math.round(c.sales2526||0),Math.round(c.sales2025||0),Math.round(c.lifetimeSales||0),
+      lvDate,lv?lv.type:'',visits.length,daysSince,
+      loDate,orders.length,Math.round(orderTotal),
+      latestNote.replace(/\n/g,' ').slice(0,250),tagStr,comp,
+      schedDate,callbackDate,openTodos,myQ.length,Math.round(openQVal)
+    ].map(csvQ).join(','));
+  }
+  var blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  var link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);
+  link.download='hc_routes_export_'+todayStr+'.csv';
+  link.click();
+  ST.lastExportDate=todayStr;
+  lSave();
+  toast('&#128229; Export downloaded — '+a.length+' customers');
 }
 
 // ── YTD LEADERBOARD ───────────────────────────────────────────────────────
