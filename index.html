@@ -535,6 +535,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div id="d-orders-today" style="display:none"></div>
     <div id="d-quotes-alert" style="display:none"></div>
     <div id="d-backup-alert" style="display:none"></div>
+    <div id="d-route-summary" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -2309,6 +2310,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
     <div id="d-orders-today" style="display:none"></div>
     <div id="d-quotes-alert" style="display:none"></div>
     <div id="d-backup-alert" style="display:none"></div>
+    <div id="d-route-summary" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -2986,7 +2988,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rSalesPace();rComingDue();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rSalesPace();rComingDue();
 }
 
 function rRoute(){
@@ -8067,6 +8069,59 @@ function rQuoteAlert(){
   });
   if(due.length>4)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(due.length-4)+' more</div>';
   h+='</div>';
+  el.innerHTML=h;
+}
+
+function rRouteSummary(){
+  var el=document.getElementById('d-route-summary');if(!el)return;
+  var today=new Date().toDateString();
+  var visited=0,na=0,orderTotal=0;
+  for(var code in ST.visits){
+    var logs=ST.visits[code]||[];
+    for(var i=0;i<logs.length;i++){
+      if(new Date(logs[i].date).toDateString()===today){
+        if(logs[i].type==='visited')visited++;
+        else if(logs[i].type==='not_available')na++;
+      }
+    }
+  }
+  var total=visited+na;
+  if(total<8){el.style.display='none';return;}
+  var todayStr=new Date().toISOString().split('T')[0];
+  if(ST.orders){
+    var a=allC();
+    a.forEach(function(c){
+      (ST.orders[c.code]||[]).forEach(function(o){
+        if(o.date&&o.date.split('T')[0]===todayStr)orderTotal+=o.amount||0;
+      });
+    });
+  }
+  var streak=calcStreak();
+  el.style.display='block';
+  var h='<div style="background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);border-radius:var(--r2);padding:12px;margin-bottom:12px">'
+    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#818cf8;margin-bottom:10px">&#127937; Route in Progress &mdash; '+total+' Stops Today</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">'
+    +'<div style="background:rgba(99,102,241,.12);border-radius:var(--r2);padding:8px 4px">'
+    +'<div style="font-size:20px;font-weight:800;color:#818cf8">'+visited+'</div>'
+    +'<div style="font-size:10px;color:var(--sub);font-weight:600">Visited</div>'
+    +'</div>'
+    +'<div style="background:rgba(99,102,241,.12);border-radius:var(--r2);padding:8px 4px">'
+    +'<div style="font-size:20px;font-weight:800;color:var(--sub)">'+na+'</div>'
+    +'<div style="font-size:10px;color:var(--sub);font-weight:600">N/A</div>'
+    +'</div>'
+    +(orderTotal?'<div style="background:rgba(16,185,129,.1);border-radius:var(--r2);padding:8px 4px">'
+    +'<div style="font-size:16px;font-weight:800;color:var(--green)">'+fmt(orderTotal)+'</div>'
+    +'<div style="font-size:10px;color:var(--sub);font-weight:600">Orders</div>'
+    +'</div>':'<div style="background:rgba(99,102,241,.06);border-radius:var(--r2);padding:8px 4px">'
+    +'<div style="font-size:20px;font-weight:800;color:var(--sub)">—</div>'
+    +'<div style="font-size:10px;color:var(--sub);font-weight:600">Orders</div>'
+    +'</div>')
+    +'<div style="background:rgba(251,191,36,.1);border-radius:var(--r2);padding:8px 4px">'
+    +'<div style="font-size:20px;font-weight:800;color:#fbbf24">'+streak+'</div>'
+    +'<div style="font-size:10px;color:var(--sub);font-weight:600">Day Streak</div>'
+    +'</div>'
+    +'</div>'
+    +'</div>';
   el.innerHTML=h;
 }
 
