@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3947,7 +3947,7 @@ function handleImport(inp){
   status.style.display='block';status.textContent='Reading...';inp.value='';
   var ext=file.name.split('.').pop().toLowerCase();
   if(ext==='csv'){var r=new FileReader();r.onload=function(e){var lines=e.target.result.trim().split(/\r?\n/);var hdrs=lines[0].split(',').map(function(h){return h.replace(/"/g,'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');});doImport(hdrs,lines.slice(1).map(function(l){return l.split(',').map(function(v){return v.replace(/"/g,'').trim();});}),file.name,status);};r.readAsText(file);}
-  else if(ext==='xlsx'){var r2=new FileReader();r2.onload=function(e){if(typeof XLSX==='undefined'){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=function(){runXLSX(e.target.result,file.name,status);};document.head.appendChild(s);}else runXLSX(e.target.result,file.name,status);};r2.readAsArrayBuffer(file);}
+  else if(ext==='xlsx'){var r2=new FileReader();r2.onerror=function(){status.style.color='#ef4444';status.textContent='Could not read file.';}; r2.onload=function(e){var buf=e.target.result;if(typeof XLSX!=='undefined'){runXLSX(buf,file.name,status);return;}var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';var xlTimer=setTimeout(function(){if(typeof XLSX==='undefined'){status.style.color='#ef4444';status.textContent='Excel reader timed out — save as CSV and import that instead.';}},12000);s.onload=function(){clearTimeout(xlTimer);if(typeof XLSX==='undefined'){status.style.color='#ef4444';status.textContent='Excel reader failed — save as CSV and import that instead.';return;}runXLSX(buf,file.name,status);};s.onerror=function(){clearTimeout(xlTimer);status.style.color='#ef4444';status.textContent='Excel reader failed — save as CSV and import that instead.';};document.head.appendChild(s);};r2.readAsArrayBuffer(file);}
   else{status.style.color='#ef4444';status.textContent='Use .xlsx or .csv';}
 }
 function runXLSX(buf,fname,status){try{var wb=XLSX.read(buf,{type:'array'});var ws=wb.Sheets[wb.SheetNames[0]];var data=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});var hdrs=data[0].map(function(h){return String(h||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');});doImport(hdrs,data.slice(1).map(function(r){return r.map(function(v){return String(v==null?'':v).trim();});}),fname,status);}catch(e){status.style.color='#ef4444';status.textContent='Error: '+e.message;}}
@@ -7513,6 +7513,8 @@ checkAndNotify();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 initAppLock();
 updateSecurityStatus();
+document.addEventListener('visibilitychange',function(){if(!document.hidden){rDash();}});
+window.addEventListener('pageshow',function(e){if(e.persisted){rDash();}});
 </script>
 <div id="map-overlay">
   <div class="map-hdr">
