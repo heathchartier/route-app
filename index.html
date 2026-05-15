@@ -5991,18 +5991,27 @@ function showHowToUse(){
   var sheet=document.createElement('div');
   sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:900;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
   var sections=[
-    {icon:'&#127968;',title:'Dashboard',body:'Your home base. Shows today\'s route, weekly goal, streak, hot leads, win-back targets, and a morning brief. Swipe right on any row to mark Visited.'},
-    {icon:'&#128197;',title:'Today\'s Route',body:'Auto-picks the top customers in your active group who are overdue (15+ days). Tap the group arrows to switch groups. Hit "GPS" to sort by distance from you. Tap any row to open the customer. Swipe right = Visited.'},
-    {icon:'&#128269;',title:'Dashboard Search',body:'Tap the magnifying glass in the top-right of the Home tab to search all your customers instantly by name, city, or code.'},
-    {icon:'&#128101;',title:'Customer Modal',body:'Tap any customer to open their card. Log visits, set a follow-up, mark as Hot Lead, add a competitor note, save a contact vCard, or view visit history.'},
-    {icon:'&#9733;',title:'Hot Leads',body:'Star any customer as a Hot Lead in their modal. They show up in the Hot Leads card on your dashboard and are highlighted on the route.'},
-    {icon:'&#128203;',title:'Notes & Follow-Ups',body:'Write a note in any customer modal — it shows as a pre-visit reminder next time you open them. Schedule a follow-up date and they\'ll appear in your schedule card.'},
-    {icon:'&#128205;',title:'Groups',body:'10–12 customers per geographic group. Tap a group to see details. Add a group note (shows as a banner on your route). Tap "Route" to push a group to your nav app.'},
-    {icon:'&#128190;',title:'Custom Route',body:'In the Customers tab, scroll right on filter chips to find custom route builder. Search and add any mix of customers and vendors. Tap Done/N/A to log stops right from the list.'},
-    {icon:'&#128202;',title:'Monthly Report',body:'Settings → Monthly Report. See total visits, N/A counts, and your top accounts visited for the month.'},
-    {icon:'&#128229;',title:'Excel Import',body:'Settings → Import Excel or CSV. New accounts are added automatically. If your app info differs from Epicor, a discrepancy list is generated — export it as CSV for accounting.'},
+    {icon:'&#127968;',title:'Dashboard',body:'Your home base. Shows today\'s route, weekly goal, streak, hot leads, win-back targets, and a morning brief. Alert cards for birthdays, to-dos, callbacks, quotes, and orders appear automatically when there\'s something to act on.'},
+    {icon:'&#128197;',title:'Today\'s Route',body:'Auto-picks the top overdue customers in your active group. Tap the arrows to switch groups, "GPS" to sort by your current location, or "Next" to auto-load the rolling next stops. Swipe right on any row to mark Visited; swipe left for N/A.'},
+    {icon:'&#128269;',title:'Search',body:'Tap the magnifying glass in the Home tab to search all customers instantly by name, city, or code.'},
+    {icon:'&#128101;',title:'Customer Card',body:'Tap any customer to open their card. Log a visit, add a note, set a follow-up callback, mark as Hot Lead, add a tag, snooze, view visit history, save a vCard contact, track orders, manage to-dos, log samples, or build a quote.'},
+    {icon:'&#9733;',title:'Hot Leads',body:'Star any customer as a Hot Lead inside their card. They show on the dashboard Hot Leads card and are highlighted on your route list.'},
+    {icon:'&#128203;',title:'Notes & Callbacks',body:'Write a note — it shows as a reminder the next time you open that customer. Set a callback date and they\'ll appear in the Callbacks Due dashboard alert on that day.'},
+    {icon:'&#128176;',title:'Orders',body:'Log an order inside any customer card with a dollar amount and optional description. Orders appear in the Today\'s Orders dashboard card and are included in your data export.'},
+    {icon:'&#128203;',title:'Quotes',body:'Tap "+ New" in the Quotes section of any customer card to build a multi-item quote. Add up to any number of line items (long quotes auto-split to two screenshot cards). Includes tax by zip code, delivery fee, and a resale-exempt toggle. Tap the quote card to screenshot and send to the customer. Mark quotes Won or Lost — lost quotes ask for a reason. Open quotes with a follow-up date trigger a dashboard alert.'},
+    {icon:'&#9989;',title:'To-Dos',body:'Add to-do items per customer (e.g. "bring sample", "send price sheet"). Check them off when done. Open to-dos count shows in the data export.'},
+    {icon:'&#128205;',title:'Groups',body:'10–12 customers per geographic group. Tap a group to see details and add a group note (shown as a route banner). Tap "Route" to push all addresses to your nav app at once.'},
+    {icon:'&#127981;',title:'Custom Route',body:'In the Customers tab, scroll the filter chips to find Custom Route. Search and add any mix of customers and vendors. Tap Done/N/A to log stops without leaving the list.'},
+    {icon:'&#128203;',title:'Tags',body:'Add custom tags to any customer (e.g. "lumber", "millwork", "new account"). Filter the customer list by tag to find your segment instantly.'},
+    {icon:'&#128477;',title:'Snooze',body:'Snooze a customer for a set number of days to hide them from overdue alerts and route suggestions while you wait.'},
+    {icon:'&#129302;',title:'Competitor Intel',body:'Log competitor info on any customer card (competitor name + notes). The Competitor Card on the dashboard shows your intel summary across the territory.'},
+    {icon:'&#128202;',title:'Tier Cadence (A/B/C)',body:'Customers are auto-tiered: A = $50K+ lifetime, B = $10K+, C = under $10K. Each tier has a visit cadence target (editable in Settings). The Tier Cadence dashboard card shows who\'s falling behind.'},
+    {icon:'&#128202;',title:'Monthly Report',body:'Settings → Monthly Report. See total visits, N/A counts, and your top accounts for any month.'},
+    {icon:'&#128229;',title:'Excel Import',body:'Settings → Import Excel or CSV. New accounts are added automatically with the correct group assigned by zip code. Financials update; notes and history are never overwritten. Epicor discrepancies are flagged for export.'},
+    {icon:'&#128190;',title:'Data Export',body:'Settings → Export Data. Downloads a CSV of all 600+ customers with visit history, notes, financials, tags, orders, quotes, and more. A red banner appears on the dashboard if you haven\'t exported in 30+ days.'},
+    {icon:'&#128272;',title:'Security',body:'Set a PIN in Settings to lock the app. You can also enable Face ID / Touch ID so you unlock with biometrics instead of typing your PIN every time.'},
+    {icon:'&#9889;',title:'Rolling Route (Tesla Mode)',body:'Opens 4 stops in Maps, then when you return it loads the next batch automatically. Best for all-day routing when you want continuous navigation.'},
     {icon:'&#128194;',title:'Pricing Tab',body:'Upload your Epicor price sheet (Excel or CSV). Set your margin % and sell prices calculate instantly. Search by item code or description.'},
-    {icon:'&#9889;',title:'Tesla / Rolling Route',body:'Opens 4 stops in Maps, then when you return it loads the next 3+3 automatically. Best for all-day routes.'},
   ];
   var html='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;overflow-y:auto">'
     +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px"></div>'
