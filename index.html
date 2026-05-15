@@ -1388,7 +1388,8 @@ function rCust(){
     f.push(c);
   }
   fc=f;
-  var el=document.getElementById('c-lbl');if(el)el.textContent=f.length+' of '+a.length+' customers';
+  var addedC=(ST.addedCustomers||[]).length;
+  var el=document.getElementById('c-lbl');if(el)el.textContent=f.length+' of '+a.length+' customers'+(addedC?' (+'+addedC+' imported)':'');
   rCPage();
 }
 
@@ -3101,7 +3102,8 @@ function rCust(){
     f.push(c);
   }
   fc=f;
-  var el=document.getElementById('c-lbl');if(el)el.textContent=f.length+' of '+a.length+' customers';
+  var addedC=(ST.addedCustomers||[]).length;
+  var el=document.getElementById('c-lbl');if(el)el.textContent=f.length+' of '+a.length+' customers'+(addedC?' (+'+addedC+' imported)':'');
   rCPage();
 }
 
