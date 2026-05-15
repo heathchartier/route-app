@@ -7592,6 +7592,56 @@ function rComingDue(){
   el.innerHTML=h;
 }
 
+/* ── CA SALES TAX BY ZIP PREFIX ── */
+var _CA_TAX={
+  '900':10.25,'901':10.25,'902':10.25,'903':10.25,'904':10.25,
+  '905':10.25,'906':10.25,'907':10.25,'908':10.25,'909':8.75,
+  '910':10.25,'911':10.25,'912':10.25,'913':10.25,'914':10.25,
+  '915':10.25,'916':10.25,'917':10.25,'918':10.25,'919':10.25,
+  '920':8.75,'921':7.75,'922':7.75,'923':7.75,'924':7.75,
+  '925':8.75,'926':7.75,'927':7.75,'928':7.75,'929':7.75,
+  '930':7.25,'931':7.25,'932':8.25,'933':10.25,'934':7.25,'935':7.25
+};
+function getTaxByZip(zip){
+  if(!zip)return null;
+  var z=String(zip).replace(/\D/g,'');
+  if(z.length<3)return null;
+  var r=_CA_TAX[z.slice(0,3)];
+  return r!=null?r:null;
+}
+function qGrandTotal(q){
+  var sub=(q.items||[]).reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+  var del=q.deliveryFee||0;
+  var tax=q.isResale?0:(sub+del)*(q.taxRate||0)/100;
+  return sub+del+tax;
+}
+function qCardTotals(q,items){
+  var sub=items.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+  var del=q.deliveryFee||0;
+  var preTax=sub+del;
+  var taxAmt=q.isResale?0:preTax*(q.taxRate||0)/100;
+  var grand=preTax+taxAmt;
+  if(!preTax)return '';
+  var h='<div style="margin-top:8px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)">';
+  if(del>0){
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#9aa0a6">Items</span><span style="font-size:12px;color:#9aa0a6">'+fmt(sub)+'</span></div>';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#9aa0a6">Delivery</span><span style="font-size:12px;color:#9aa0a6">'+fmt(del)+'</span></div>';
+  }
+  h+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#9aa0a6">Subtotal (excl. tax)</span><span style="font-size:13px;font-weight:700;color:#d1d5db">'+fmt(preTax)+'</span></div>';
+  if(q.isResale){
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:#9aa0a6">Tax</span><span style="font-size:12px;color:#6b7280;font-style:italic">Resale &mdash; Exempt</span></div>';
+  }else if(q.taxRate){
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:#9aa0a6">Tax ('+q.taxRate+'%)</span><span style="font-size:12px;color:#9aa0a6">'+fmt(taxAmt)+'</span></div>';
+  }else{
+    h+='<div style="font-size:10px;color:#6b7280;text-align:right;margin-bottom:8px">Tax not included</div>';
+  }
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)">'
+    +'<div style="font-size:12px;font-weight:800;color:#9aa0a6;text-transform:uppercase;letter-spacing:.8px">Total'+(q.isResale?' (Tax Exempt)':q.taxRate?' (incl. tax)':'')+'</div>'
+    +'<div style="font-size:22px;font-weight:800;color:#34d399">'+fmt(grand)+'</div>'
+    +'</div></div>';
+  return h;
+}
+
 /* ── QUOTE SYSTEM ── */
 var _qCode=null,_qItems=[];
 
@@ -7599,7 +7649,8 @@ function showQuoteBuilder(code){
   var existing=document.getElementById('quote-builder');if(existing)existing.remove();
   _qCode=code||null;
   _qItems=[{name:'',qty:1,price:0}];
-  var custName=_qCode?(function(){var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===_qCode)return a[i].name;}return 'Unknown';})():'Tap to select customer';
+  var custName='Tap to select customer',_initTax=0,_initTaxZip='';
+  if(_qCode){var _qa=allC();for(var _qi=0;_qi<_qa.length;_qi++){if(_qa[_qi].code===_qCode){custName=_qa[_qi].name;var _qr=getTaxByZip(_qa[_qi].zip);if(_qr!==null){_initTax=_qr;_initTaxZip=_qa[_qi].zip;}break;}}}
   var sh=document.createElement('div');sh.id='quote-builder';
   sh.style.cssText='position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end';
   sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;margin:0 auto;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch">'
@@ -7612,9 +7663,27 @@ function showQuoteBuilder(code){
     +'<div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Items</div>'
     +'<div id="qb-rows"></div>'
     +'<button onclick="addQRow()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px dashed var(--border2);color:var(--teal);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px">+ Add Item</button>'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg3);border-radius:var(--r2);margin-bottom:14px">'
-    +'<span style="font-size:14px;font-weight:700">Total</span>'
-    +'<span id="qb-total" style="font-size:18px;font-weight:800;color:var(--green)">$0</span></div>'
+    +'<div style="background:var(--bg3);border-radius:var(--r2);padding:12px;margin-bottom:14px">'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:var(--sub)">Items Subtotal</span><span id="qb-subtotal" style="font-size:12px;font-weight:700">$0</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Delivery Fee</span>'
+    +'<input type="number" id="qb-delivery" inputmode="decimal" min="0" step="0.01" placeholder="$0.00" oninput="_updateQSummary()" style="width:90px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:5px 8px;color:var(--text);font-family:inherit;font-size:13px;text-align:right">'
+    +'</div>'
+    +'<div style="display:flex;align-items:center;margin-bottom:8px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Resale / Tax Exempt</span>'
+    +'<label class="tog"><input type="checkbox" id="qb-resale" onchange="_updateQSummary()"><span class="tog-sl"></span></label>'
+    +'</div>'
+    +'<div id="qb-taxrow" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Tax Rate <span id="qb-taxzip" style="font-size:10px;color:var(--teal)">'+(_initTaxZip?'('+_initTaxZip+')':'')+'</span></span>'
+    +'<div style="display:flex;align-items:center;gap:4px">'
+    +'<input type="number" id="qb-taxrate" inputmode="decimal" min="0" max="30" step="0.01" value="'+_initTax+'" oninput="_updateQSummary()" style="width:58px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:5px 8px;color:var(--text);font-family:inherit;font-size:13px;text-align:right">'
+    +'<span style="font-size:12px;color:var(--sub)">%</span>'
+    +'<span id="qb-taxamt" style="font-size:13px;font-weight:700;min-width:56px;text-align:right">$0</span>'
+    +'</div></div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border2)">'
+    +'<span style="font-size:14px;font-weight:800">Total</span>'
+    +'<span id="qb-total" style="font-size:18px;font-weight:800;color:var(--green)">$0</span>'
+    +'</div></div>'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
     +'<span style="font-size:13px;color:var(--sub);flex:1">Follow-up reminder</span>'
     +'<select id="qb-fu" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);padding:7px 10px;font-family:inherit;font-size:13px">'
@@ -7651,7 +7720,7 @@ function _renderQRows(){
   el.querySelectorAll('.qb-row').forEach(function(row,i){
     var inp=row.querySelector('.qb-name');if(inp)inp.value=_qItems[i].name;
   });
-  _updateQTotal();
+  _updateQSummary();
 }
 
 function qNameChange(i,val){if(_qItems[i])_qItems[i].name=val;}
@@ -7660,11 +7729,19 @@ function qPriceChange(i,val){if(!_qItems[i])return;_qItems[i].price=parseFloat(v
 function _refreshQLine(i){
   var row=document.querySelector('.qb-row[data-idx="'+i+'"]');
   if(row){var lt=row.querySelector('.qb-lt');if(lt)lt.textContent=fmt(_qItems[i].qty*(_qItems[i].price||0));}
-  _updateQTotal();
+  _updateQSummary();
 }
-function _updateQTotal(){
-  var tot=_qItems.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
-  var el=document.getElementById('qb-total');if(el)el.textContent=fmt(tot);
+function _updateQSummary(){
+  var sub=_qItems.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+  var del=parseFloat((document.getElementById('qb-delivery')||{}).value||0)||0;
+  var resale=!!(document.getElementById('qb-resale')&&document.getElementById('qb-resale').checked);
+  var rate=parseFloat((document.getElementById('qb-taxrate')||{}).value||0)||0;
+  var taxAmt=resale?0:(sub+del)*rate/100;
+  var grand=sub+del+taxAmt;
+  var taxrow=document.getElementById('qb-taxrow');if(taxrow)taxrow.style.display=resale?'none':'flex';
+  var subEl=document.getElementById('qb-subtotal');if(subEl)subEl.textContent=fmt(sub);
+  var taxEl=document.getElementById('qb-taxamt');if(taxEl)taxEl.textContent=fmt(taxAmt);
+  var totEl=document.getElementById('qb-total');if(totEl)totEl.textContent=fmt(grand);
 }
 
 function addQRow(){
@@ -7723,6 +7800,17 @@ function filterQCusts(val){
 function selectQCust(code,name){
   _qCode=code;
   var el=document.getElementById('qb-cust-name');if(el){el.textContent=name;el.style.color='var(--text)';}
+  var a=allC();for(var i=0;i<a.length;i++){
+    if(a[i].code===code){
+      var r=getTaxByZip(a[i].zip);
+      if(r!==null){
+        var tr=document.getElementById('qb-taxrate');if(tr)tr.value=r;
+        var zl=document.getElementById('qb-taxzip');if(zl)zl.textContent='('+a[i].zip+')';
+      }
+      break;
+    }
+  }
+  _updateQSummary();
   var picker=document.getElementById('q-cust-picker');if(picker)picker.remove();
 }
 
@@ -7736,10 +7824,13 @@ function saveNewQuote(){
   var valid=_qItems.filter(function(it){return it.name.trim();});
   if(!valid.length){toast('Add at least one item');return;}
   var fuDays=parseInt((document.getElementById('qb-fu')||{}).value||'3');
+  var delivery=parseFloat((document.getElementById('qb-delivery')||{}).value||0)||0;
+  var isResale=!!(document.getElementById('qb-resale')&&document.getElementById('qb-resale').checked);
+  var taxRate=isResale?0:(parseFloat((document.getElementById('qb-taxrate')||{}).value||0)||0);
   var qid='q_'+Date.now();
   var fuDate=null;
   if(fuDays>0){var d=new Date();d.setDate(d.getDate()+fuDays);fuDate=d.toISOString().split('T')[0];}
-  var q={id:qid,code:_qCode,date:new Date().toISOString(),items:valid.map(function(it){return{name:it.name.trim(),qty:it.qty,price:it.price};}),followupDate:fuDate,status:'open',lostReason:'',dismissed:false};
+  var q={id:qid,code:_qCode,date:new Date().toISOString(),items:valid.map(function(it){return{name:it.name.trim(),qty:it.qty,price:it.price};}),followupDate:fuDate,status:'open',lostReason:'',dismissed:false,deliveryFee:delivery,taxRate:taxRate,isResale:isResale};
   if(!ST.quotes)ST.quotes={};
   ST.quotes[qid]=q;
   lSave();syncUp();
@@ -7761,7 +7852,6 @@ function showQuoteCard(qid,page){
   if(page>=totalPages)page=totalPages-1;
   var splitAt=totalPages===2?Math.ceil(allItems.length/2):allItems.length;
   var pageItems=page===0?allItems.slice(0,splitAt):allItems.slice(splitAt);
-  var grandTotal=allItems.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
   var dStr=new Date(q.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   var isLast=(page===totalPages-1);
   var itemsH=pageItems.map(function(it){
@@ -7787,10 +7877,7 @@ function showQuoteCard(qid,page){
     +'</div>'
     +'<div style="height:1px;background:rgba(0,229,184,.25);margin-bottom:12px"></div>'
     +itemsH
-    +(isLast&&grandTotal?'<div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;margin-top:4px;border-top:1px solid rgba(255,255,255,.08)">'
-      +'<div style="font-size:12px;font-weight:800;color:#9aa0a6;text-transform:uppercase;letter-spacing:.8px">Total</div>'
-      +'<div style="font-size:22px;font-weight:800;color:#34d399">'+fmt(grandTotal)+'</div>'
-      +'</div>':'')
+    +(isLast?qCardTotals(q,allItems):'')
     +'<div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:#4b5563">Heath Chartier &nbsp;&bull;&nbsp; Royal Plywood</div>'
     +'</div>';
   var navH='';
@@ -7821,7 +7908,7 @@ function rQuotesModal(code){
   myQ.sort(function(a,b){return b.date.localeCompare(a.date);});
   var h='';
   myQ.forEach(function(q){
-    var total=q.items.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+    var total=qGrandTotal(q);
     var dStr=new Date(q.date).toLocaleDateString('en-US',{month:'short',day:'numeric'});
     var sc=q.status==='won'?'var(--green)':q.status==='lost'?'var(--red)':'var(--amber)';
     var slbl=q.status==='won'?'Won':q.status==='lost'?'Lost':'Open';
@@ -7865,7 +7952,7 @@ function rQuoteAlert(){
     +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#fbbf24;margin-bottom:6px">&#128203; Quote Follow-Ups Due</div>';
   due.slice(0,4).forEach(function(item){
     var q=item.q,c=item.c;
-    var total=q.items.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+    var total=qGrandTotal(q);
     h+='<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid rgba(251,191,36,.12)">'
       +'<div style="flex:1;min-width:0;cursor:pointer" onclick="openM(\''+c.code+'\')">'
       +'<div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
