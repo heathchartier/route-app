@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -528,6 +528,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div class="stat"><div class="stat-n" style="color:var(--red)">0</div><div class="stat-l">Overdue</div></div>
     </div>
     <div id="d-birthday-alert" style="display:none"></div>
+    <div id="d-todo-alert" style="display:none"></div>
     <div id="d-followup-alert" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
@@ -729,7 +730,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
   <div class="body" style="padding-top:16px">
     <div class="card">
       <div class="lbl" style="color:var(--teal)">Import Excel or CSV</div>
-      <div class="drop" onclick="document.getElementById('xl-input').click())">
+      <div class="drop" onclick="document.getElementById('xl-input').click()">
         <div style="font-size:36px;margin-bottom:8px">&#128202;</div>
         <div style="font-weight:700;font-size:15px;color:var(--text)">Tap to choose file</div>
         <div style="font-size:12px;color:var(--sub);margin-top:5px">.xlsx or .csv accepted</div>
@@ -1021,6 +1022,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="m-orders-list"><div style="color:var(--sub);font-size:12px">No orders yet</div></div>
     </div>
     <div class="msect">
+    <div class="msect" id="m-todos-sect"><div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">To-Dos<button onclick="addTodo(mC)" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button></div><div id="m-todos-list"><div style="color:var(--sub);font-size:12px">No tasks</div></div></div>
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
     </div>
@@ -1082,7 +1084,7 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};}catch(e){}}
@@ -1478,7 +1480,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -2442,7 +2444,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
   <div class="body" style="padding-top:16px">
     <div class="card">
       <div class="lbl" style="color:var(--teal)">Import Excel or CSV</div>
-      <div class="drop" onclick="document.getElementById('xl-input').click())">
+      <div class="drop" onclick="document.getElementById('xl-input').click()">
         <div style="font-size:36px;margin-bottom:8px">&#128202;</div>
         <div style="font-weight:700;font-size:15px;color:var(--text)">Tap to choose file</div>
         <div style="font-size:12px;color:var(--sub);margin-top:5px">.xlsx or .csv accepted</div>
@@ -2726,6 +2728,7 @@ input:checked+.tog-sl:before{transform:translateX(18px);background:#000}
       <div id="m-orders-list"><div style="color:var(--sub);font-size:12px">No orders yet</div></div>
     </div>
     <div class="msect">
+    <div class="msect" id="m-todos-sect"><div class="msect-lbl" style="display:flex;align-items:center;justify-content:space-between">To-Dos<button onclick="addTodo(mC)" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button></div><div id="m-todos-list"><div style="color:var(--sub);font-size:12px">No tasks</div></div></div>
       <div class="msect-lbl">Visit History</div>
       <div id="m-log"></div>
     </div>
@@ -2787,10 +2790,10 @@ var VENDORS_BASE=[
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
 var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -2914,7 +2917,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rSalesPace();rComingDue();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rSalesPace();rComingDue();
 }
 
 function rRoute(){
@@ -3189,7 +3192,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?'Visited':l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -4347,16 +4350,158 @@ function renderCustomRoute(){
   });
 }
 
+
+/* ── CUSTOMER TO-DO LIST ── */
+function addTodo(code){
+  if(!code)return;
+  var sh=document.createElement('div');
+  sh.id='todo-sheet';
+  sh.style.cssText='position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.6);display:flex;align-items:flex-end';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;margin:0 auto">'
+    +'<div style="font-size:16px;font-weight:800;margin-bottom:14px">Add Task</div>'
+    +'<input id="todo-inp" class="fi" type="text" placeholder="e.g. Follow up on quote, Check on order..." style="font-size:15px">'
+    +'<div style="display:flex;gap:8px;margin-top:12px">'
+    +'<button onclick="saveTodo(\''+code+'\')" style="flex:1;padding:12px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">Save Task</button>'
+    +'<button onclick="document.getElementById(\'todo-sheet\').remove()" style="padding:12px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);font-family:inherit;font-size:14px;cursor:pointer">Cancel</button>'
+    +'</div></div>';
+  document.body.appendChild(sh);
+  setTimeout(function(){var inp=document.getElementById('todo-inp');if(inp)inp.focus();},100);
+}
+function saveTodo(code){
+  var inp=document.getElementById('todo-inp');
+  if(!inp)return;
+  var text=(inp.value||'').trim();
+  if(!text){toast('Enter a task');return;}
+  if(!ST.todos)ST.todos={};
+  if(!ST.todos[code])ST.todos[code]=[];
+  ST.todos[code].push({text:text,date:new Date().toISOString(),done:false});
+  lSave();syncUp();
+  var sh=document.getElementById('todo-sheet');if(sh)sh.remove();
+  rTodos(code);rTodoAlert();rNavBadge();
+  toast('Task added');
+}
+function completeTodo(code,idx){
+  if(!ST.todos||!ST.todos[code])return;
+  ST.todos[code][idx].done=true;
+  ST.todos[code][idx].completedDate=new Date().toISOString();
+  lSave();syncUp();rTodos(code);rTodoAlert();rNavBadge();
+}
+function deleteTodo(code,idx){
+  if(!ST.todos||!ST.todos[code])return;
+  ST.todos[code].splice(idx,1);
+  lSave();syncUp();rTodos(code);rTodoAlert();rNavBadge();
+}
+function rTodos(code){
+  var el=document.getElementById('m-todos-list');if(!el)return;
+  var todos=ST.todos&&ST.todos[code]?ST.todos[code]:[];
+  var open=todos.filter(function(t,i){t._i=i;return !t.done;});
+  var done=todos.filter(function(t,i){t._i=i;return t.done;}).slice(-3);
+  if(!todos.length){el.innerHTML='<div style="color:var(--sub);font-size:12px">No tasks</div>';return;}
+  var h='';
+  // open tasks
+  todos.forEach(function(t,i){
+    if(t.done)return;
+    h+='<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">'
+      +'<button onclick="completeTodo(\''+code+'\','+i+')" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--teal);background:transparent;cursor:pointer;flex-shrink:0;margin-top:1px" title="Mark done"></button>'
+      +'<div style="flex:1;font-size:13px;color:var(--text)">'+esc(t.text)+'</div>'
+      +'<button onclick="deleteTodo(\''+code+'\','+i+')" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:14px;flex-shrink:0">&#10005;</button>'
+      +'</div>';
+  });
+  // recently completed (last 3)
+  var doneItems=todos.map(function(t,i){return {t:t,i:i};}).filter(function(x){return x.t.done;}).slice(-3);
+  if(doneItems.length){
+    h+='<div style="font-size:10px;color:var(--dim);margin-top:8px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Completed</div>';
+    doneItems.forEach(function(x){
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;opacity:.5">'
+        +'<div style="width:20px;height:20px;border-radius:50%;background:var(--green2);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:var(--green)">&#10003;</div>'
+        +'<div style="flex:1;font-size:12px;text-decoration:line-through;color:var(--sub)">'+esc(x.t.text)+'</div>'
+        +'<button onclick="deleteTodo(\''+code+'\','+x.i+')" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:13px;flex-shrink:0">&#10005;</button>'
+        +'</div>';
+    });
+  }
+  el.innerHTML=h;
+}
+function rTodoAlert(){
+  var el=document.getElementById('d-todo-alert');if(!el)return;
+  if(!ST.todos){el.style.display='none';return;}
+  var a=allC(),open=[];
+  a.forEach(function(c){
+    var todos=ST.todos[c.code]||[];
+    var openCount=todos.filter(function(t){return !t.done;}).length;
+    if(openCount>0)open.push({c:c,count:openCount});
+  });
+  if(!open.length){el.style.display='none';return;}
+  open.sort(function(a,b){return b.count-a.count;});
+  el.style.display='block';
+  var h='<div style="background:rgba(129,140,248,.1);border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px">'
+    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#818cf8;margin-bottom:6px">&#9745; Open Tasks</div>';
+  open.slice(0,5).forEach(function(item){
+    var c=item.c;
+    h+='<div onclick="openM(\''+c.code+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(129,140,248,.15);cursor:pointer">'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+esc(c.city||'')+' &bull; Grp '+c.group+'</div></div>'
+      +'<span style="background:rgba(129,140,248,.2);color:#818cf8;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700">'+item.count+'</span>'
+      +'</div>';
+  });
+  if(open.length>5)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(open.length-5)+' more</div>';
+  h+='</div>';
+  el.innerHTML=h;
+  el.querySelectorAll('[onclick]').forEach(function(r){});
+}
+
+/* ── CUSTOM ROUTE FILL ── */
 function runCustomRoute(){
   if(!customRoute.length){toast('No stops added');return;}
-  var waypoints=customRoute.map(function(s){return encodeURIComponent(s.addr);}).join('/');
+  var maxStops=10;
+  if(customRoute.length<maxStops){
+    var sh=document.createElement('div');
+    sh.id='cr-fill-sheet';
+    sh.style.cssText='position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.6);display:flex;align-items:flex-end';
+    sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;margin:0 auto">'
+      +'<div style="font-size:16px;font-weight:800;margin-bottom:6px">Launch Route</div>'
+      +'<div style="font-size:13px;color:var(--sub);margin-bottom:16px">You have '+customRoute.length+' stop'+(customRoute.length!==1?'s':'')+'. Fill the remaining '+(maxStops-customRoute.length)+' spot'+(maxStops-customRoute.length!==1?'s':'')+' with nearby overdue accounts?</div>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button onclick="fillAndLaunch()" style="flex:1;padding:12px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">Yes, Fill &amp; Go</button>'
+      +'<button onclick="document.getElementById(\'cr-fill-sheet\').remove();launchCustomRoute()" style="flex:1;padding:12px;border-radius:var(--r2);background:var(--bg3);color:var(--text);border:1px solid var(--border2);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">No, Go As-Is</button>'
+      +'</div></div>';
+    document.body.appendChild(sh);
+  } else {
+    launchCustomRoute();
+  }
+}
+function fillAndLaunch(){
+  var sh=document.getElementById('cr-fill-sheet');if(sh)sh.remove();
+  var maxStops=10;
+  var a=allC();
+  var routeIds={};
+  customRoute.forEach(function(s){routeIds[s.id]=true;});
+  var groups={};
+  customRoute.forEach(function(s){
+    for(var i=0;i<a.length;i++){if(a[i].code===s.id){groups[a[i].group]=true;break;}}
+  });
+  var groupNums=Object.keys(groups).map(Number);
+  if(!groupNums.length){launchCustomRoute();return;}
+  var candidates=a.filter(function(c){
+    if(routeIds[c.code])return false;
+    if(ST.archived&&ST.archived[c.code])return false;
+    if(ST.removed&&ST.removed[c.code])return false;
+    var d=ds(c.code);
+    return d>14&&groupNums.indexOf(c.group)>=0;
+  });
+  candidates.sort(function(a,b){return ds(b.code)-ds(a.code);});
+  var toAdd=candidates.slice(0,maxStops-customRoute.length);
+  toAdd.forEach(function(c){
+    var addr=[c.address,c.city||'','CA'].filter(function(x){return x;}).join(', ');
+    customRoute.push({id:c.code,type:'cust',name:c.name,addr:addr,city:c.city||''});
+  });
+  renderCustomRoute();
+  toast('Added '+toAdd.length+' nearby account'+(toAdd.length!==1?'s':''));
+  launchCustomRoute();
+}
+function launchCustomRoute(){
   var crStops=customRoute.map(function(s){return {address:s.addr,city:'',name:s.name};});
   showMapPicker(crStops);
 }
-
-
-
-
 function showMapPicker(stops){
   var ex=document.getElementById('map-picker');
   if(ex)ex.parentNode.removeChild(ex);
