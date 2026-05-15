@@ -3973,7 +3973,7 @@ function doImport(hdrs,rows,fname,status){
     lifetimeSales:['lifetimesales','lifetime','totalnetrevenue','totalrevenue','alltime'],
     sales2024:['sales2024','2024','fy24','2324'],
     sales2025:['sales2025','2025','fy25','2425'],
-    sales2526:['sales2526','ytd','2526','fy26','currentyear','thisyear','current']};
+    sales2526:['sales2526','20252026','ytd','2526','fy26','currentyear','thisyear','current']};
   var ci={};
   for(var f in COLS){ci[f]=-1;for(var i=0;i<COLS[f].length;i++){for(var j=0;j<hdrs.length;j++){if(hdrs[j]===COLS[f][i]||hdrs[j].indexOf(COLS[f][i])>=0){ci[f]=j;break;}}if(ci[f]>=0)break;}}
   var added=0,updated=0,skipped=0,flagged=0,a=allC(),newDiscrep=[],addedNames=[];
