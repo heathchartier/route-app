@@ -1367,7 +1367,8 @@ function rIdle(a){
 }
 
 function rCust(){
-  var a=allC(),f=[],q=cS.toLowerCase();
+  var a=allC();a.sort(function(x,y){return (isNew(y)?1:0)-(isNew(x)?1:0);});
+  var f=[],q=cS.toLowerCase();
   for(var i=0;i<a.length;i++){
     var c=a[i];
     if(q&&c.name.toLowerCase().indexOf(q)<0&&c.code.toLowerCase().indexOf(q)<0&&(c.city||'').toLowerCase().indexOf(q)<0)continue;
@@ -3079,7 +3080,8 @@ function rIdle(a){
 }
 
 function rCust(){
-  var a=allC(),f=[],q=cS.toLowerCase();
+  var a=allC();a.sort(function(x,y){return (isNew(y)?1:0)-(isNew(x)?1:0);});
+  var f=[],q=cS.toLowerCase();
   for(var i=0;i<a.length;i++){
     var c=a[i];
     if(q&&c.name.toLowerCase().indexOf(q)<0&&c.code.toLowerCase().indexOf(q)<0&&(c.city||'').toLowerCase().indexOf(q)<0)continue;
@@ -3965,7 +3967,7 @@ function doImport(hdrs,rows,fname,status){
     sales2526:['sales2526','ytd','2526','fy26','currentyear','thisyear','current']};
   var ci={};
   for(var f in COLS){ci[f]=-1;for(var i=0;i<COLS[f].length;i++){for(var j=0;j<hdrs.length;j++){if(hdrs[j]===COLS[f][i]||hdrs[j].indexOf(COLS[f][i])>=0){ci[f]=j;break;}}if(ci[f]>=0)break;}}
-  var added=0,updated=0,skipped=0,flagged=0,a=allC(),newDiscrep=[];
+  var added=0,updated=0,skipped=0,flagged=0,a=allC(),newDiscrep=[],addedNames=[];
   var importDate=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
   function parseMoney(v){return parseFloat(String(v||'').replace(/[$,\s]/g,''))||0;}
@@ -4034,7 +4036,7 @@ function doImport(hdrs,rows,fname,status){
         sales2526:ci.sales2526>=0?parseMoney(row[ci.sales2526]):0,
         distance:0,addedAt:new Date().toISOString()};
       if(!ST.addedCustomers)ST.addedCustomers=[];
-      ST.addedCustomers.push(nc);added++;
+      ST.addedCustomers.push(nc);added++;addedNames.push(nc.name);
     }
   }
 
@@ -4052,7 +4054,10 @@ function doImport(hdrs,rows,fname,status){
   if(flagged)parts.push(flagged+' Epicor discrepanc'+(flagged!==1?'ies':'y')+' flagged');
   if(skipped)parts.push(skipped+' matched/unchanged');
   status.style.color=flagged?'var(--amber)':(added||updated)?'var(--teal)':'var(--sub)';
-  status.textContent=parts.length?parts.join(' · '):'Nothing to update — all data matches';
+  var msg=parts.length?parts.join(' · '):'Nothing to update — all data matches';
+  if(addedNames.length)msg+='\nAdded: '+addedNames.join(', ')+' — search their names in Customers tab';
+  status.style.whiteSpace='pre-line';
+  status.textContent=msg;
 }
 function rDiscrepCard(){
   var card=document.getElementById('discrep-card');if(!card)return;
