@@ -553,6 +553,8 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div id="d-commission" style="display:none"></div>
     <div id="d-lost-accounts" style="display:none"></div>
     <div id="d-expenses-card" style="display:none"></div>
+    <div id="d-upsell" style="display:none"></div>
+    <div id="d-monthly-report" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -584,6 +586,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="btn" onclick="showMapOverlay()" style="background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);margin-top:8px">&#128205; Map View</button>
       <button class="btn" onclick="showHeatCalendar()" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);margin-top:8px">&#128197; Visit Calendar</button>
       <button class="btn" id="btn-bulk-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25);margin-top:8px;display:none">Mark All Remaining N/A</button>
+      <button class="btn" onclick="showChargerPicker()" style="background:rgba(232,33,39,.12);color:#e82127;border:1px solid rgba(232,33,39,.35);margin-top:8px">&#9889; Insert Supercharger Stop</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
     <div class="tesla-card" id="d-tesla" style="display:none">
@@ -815,6 +818,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
         <button onclick="showMileageLog()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128663; Mileage Log</button>
           <button onclick="showExpenseLog()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.3)">&#128181; Expense Log</button>
           <button onclick="showCommissionSettings()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(0,209,122,.12);color:var(--green);border:1px solid rgba(0,209,122,.3)">&#128176; Commission Rate</button>
+          <button onclick="showMonthlyReport()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3)">&#128202; Monthly Report</button>
         <button id="btn-clr" style="padding:9px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Visits</button>
         <button id="btn-rst" style="padding:9px 16px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All</button>
       </div>
@@ -2371,6 +2375,8 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div id="d-commission" style="display:none"></div>
     <div id="d-lost-accounts" style="display:none"></div>
     <div id="d-expenses-card" style="display:none"></div>
+    <div id="d-upsell" style="display:none"></div>
+    <div id="d-monthly-report" style="display:none"></div>
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
@@ -2402,6 +2408,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="btn" onclick="showMapOverlay()" style="background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);margin-top:8px">&#128205; Map View</button>
       <button class="btn" onclick="showHeatCalendar()" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);margin-top:8px">&#128197; Visit Calendar</button>
       <button class="btn" id="btn-bulk-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25);margin-top:8px;display:none">Mark All Remaining N/A</button>
+      <button class="btn" onclick="showChargerPicker()" style="background:rgba(232,33,39,.12);color:#e82127;border:1px solid rgba(232,33,39,.35);margin-top:8px">&#9889; Insert Supercharger Stop</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
     <div class="tesla-card" id="d-tesla" style="display:none">
@@ -2633,6 +2640,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
         <button onclick="showMileageLog()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128663; Mileage Log</button>
           <button onclick="showExpenseLog()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.3)">&#128181; Expense Log</button>
           <button onclick="showCommissionSettings()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(0,209,122,.12);color:var(--green);border:1px solid rgba(0,209,122,.3)">&#128176; Commission Rate</button>
+          <button onclick="showMonthlyReport()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3)">&#128202; Monthly Report</button>
         <button id="btn-clr" style="padding:9px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Visits</button>
         <button id="btn-rst" style="padding:9px 16px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All</button>
       </div>
@@ -3053,7 +3061,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCommission();rLostAccounts();rExpensesCard();
+  rRoute();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();
 }
 
 function rRoute(){
@@ -8987,6 +8995,292 @@ function deleteProductReq(code,idx){
   ST.productReqs[code].splice(idx,1);
   lSave();syncUp();
   rProductRequests(code);
+}
+
+/* ── UPSELL NUDGES ── */
+function rUpsellNudges(){
+  var el=document.getElementById('d-upsell');if(!el)return;
+  var a=allC(),nudges=[],now=Date.now();
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    if(ST.archived&&ST.archived[c.code])continue;
+    if(ST.removed&&ST.removed[c.code])continue;
+    var tags=ST.tags&&ST.tags[c.code]||[];
+    var ords=ST.orders&&ST.orders[c.code]||[];
+    var lastOrd=ords.length?new Date(ords[ords.length-1].date):null;
+    var daysSinceOrd=lastOrd?Math.floor((now-lastOrd)/864e5):9999;
+    var allQ=ST.quotes?Object.keys(ST.quotes).filter(function(k){return ST.quotes[k].code===c.code;}).map(function(k){return ST.quotes[k];}):[];
+    var lastQ=allQ.length?allQ.reduce(function(a,b){return new Date(a.date)>new Date(b.date)?a:b;}):null;
+    var daysSinceQ=lastQ?Math.floor((now-new Date(lastQ.date))/864e5):9999;
+    var lostQ=allQ.filter(function(q){return q.status==='lost';});
+    var reason='';var pri=0;
+    if(tags.indexOf('Big Fish')!==-1&&daysSinceQ>60){reason='Big Fish — no quote in '+daysSinceQ+'d';pri=5;}
+    else if(tags.indexOf('Hot Opportunity')!==-1&&daysSinceQ>30){reason='Hot Opportunity — follow up on quote';pri=4;}
+    else if(lostQ.length&&daysSinceQ>45){reason='Re-pitch: lost quote '+daysSinceQ+'d ago';pri=3;}
+    else if(tags.indexOf('Competitor Risk')!==-1&&ds(c.code)>30){reason='Competitor Risk — '+ds(c.code)+'d since visit';pri=3;}
+    else if(tags.indexOf('Champion')!==-1&&daysSinceOrd>60){reason='Champion — no order in '+daysSinceOrd+'d';pri=2;}
+    else if(tags.indexOf('Dormant')!==-1&&c.lifetimeSales>5000&&daysSinceOrd>60){reason='Dormant high-value — re-engage';pri=2;}
+    else if(daysSinceQ>90&&c.lifetimeSales>10000&&ds(c.code)<30){reason='High-value — due for a quote';pri=1;}
+    if(reason){nudges.push({c:c,reason:reason,pri:pri});}
+  }
+  if(!nudges.length){el.style.display='none';return;}
+  nudges.sort(function(a,b){return b.pri-a.pri;});
+  var shown=nudges.slice(0,5);
+  el.style.display='block';
+  var rows=shown.map(function(x){
+    return '<div class="row" onclick="openM(\''+x.c.code+'\')">'+
+      '<div class="dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber)"></div>'+
+      '<div class="ri"><div class="rn">'+esc(x.c.name)+'</div>'+
+      '<div class="rm" style="color:var(--amber)">'+esc(x.reason)+'</div></div>'+
+      '<div style="font-size:18px">&#128161;</div></div>';
+  }).join('');
+  el.innerHTML='<div class="card" style="background:linear-gradient(135deg,rgba(255,176,32,.08),rgba(255,176,32,.03));border-color:rgba(255,176,32,.25)">'+
+    '<div class="card-hdr"><div class="lbl" style="color:var(--amber);margin:0">&#128161; Upsell Nudges</div>'+
+    '<div style="background:var(--amber);color:#000;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">'+nudges.length+'</div></div>'+
+    rows+(nudges.length>5?'<div style="font-size:12px;color:var(--sub);text-align:center;margin-top:8px">+' +(nudges.length-5)+' more</div>':'')+
+    '</div>';
+}
+
+/* ── MONTHLY REPORT CARD ── */
+function rMonthlyReport(){
+  var el=document.getElementById('d-monthly-report');if(!el)return;
+  var now=new Date(),y=now.getFullYear(),m=now.getMonth();
+  var a=allC(),vt=0,nt=0,ordAmt=0,ordCust=new Set(),topCust=[];
+  for(var code in ST.visits){
+    var logs=ST.visits[code]||[];
+    for(var i=0;i<logs.length;i++){
+      var d=new Date(logs[i].date);
+      if(d.getFullYear()===y&&d.getMonth()===m){
+        if(logs[i].type==='visited')vt++;else if(logs[i].type==='not_available')nt++;
+      }
+    }
+  }
+  for(var i=0;i<a.length;i++){
+    var ords=ST.orders[a[i].code]||[],cAmt=0;
+    for(var j=0;j<ords.length;j++){var od=new Date(ords[j].date);if(od.getFullYear()===y&&od.getMonth()===m){ordAmt+=ords[j].amount||0;cAmt+=ords[j].amount||0;ordCust.add(a[i].code);}}
+    if(cAmt>0)topCust.push({name:a[i].name,amt:cAmt});
+  }
+  if(vt===0&&ordAmt===0){el.style.display='none';return;}
+  topCust.sort(function(a,b){return b.amt-a.amt;});
+  var comm=ordAmt*(ST.commRate||3)/100;
+  var monthMiles=Object.keys(ST.mileage||{}).filter(function(k){var d=new Date(k);return d.getFullYear()===y&&d.getMonth()===m;}).reduce(function(s,k){return s+(ST.mileage[k].miles||0);},0);
+  var mn=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  el.style.display='block';
+  el.innerHTML='<div class="card" style="background:linear-gradient(135deg,rgba(74,158,255,.08),rgba(74,158,255,.03));border-color:rgba(74,158,255,.25)">'+
+    '<div class="card-hdr"><div class="lbl" style="color:var(--blue);margin:0">&#128202; '+mn+' Summary</div>'+
+    '<button onclick="showMonthlyReport()" style="font-size:11px;color:var(--blue);background:var(--blue2);border:1px solid rgba(74,158,255,.3);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-weight:600">Full Report</button></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+
+    '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center">'+
+      '<div style="font-size:22px;font-weight:800;color:var(--green)">'+vt+'</div>'+
+      '<div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Visits</div></div>'+
+    '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center">'+
+      '<div style="font-size:22px;font-weight:800;color:var(--blue)">'+fmt(ordAmt)+'</div>'+
+      '<div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Orders</div></div>'+
+    '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center">'+
+      '<div style="font-size:22px;font-weight:800;color:var(--teal)">'+fmt(comm)+'</div>'+
+      '<div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Comm</div></div>'+
+    '</div></div>';
+}
+function showMonthlyReport(){
+  var now=new Date();
+  if(window._mrY===undefined){window._mrY=now.getFullYear();window._mrM=now.getMonth();}
+  var y=window._mrY,m=window._mrM;
+  var a=allC(),vt=0,nt=0,ordAmt=0,topCust=[],qWon=0,qWonAmt=0,qLost=0,qLostAmt=0;
+  for(var code in ST.visits){var logs=ST.visits[code]||[];for(var i=0;i<logs.length;i++){var d=new Date(logs[i].date);if(d.getFullYear()===y&&d.getMonth()===m){if(logs[i].type==='visited')vt++;else if(logs[i].type==='not_available')nt++;}}}
+  for(var i=0;i<a.length;i++){var ords=ST.orders[a[i].code]||[],cAmt=0;for(var j=0;j<ords.length;j++){var od=new Date(ords[j].date);if(od.getFullYear()===y&&od.getMonth()===m){ordAmt+=ords[j].amount||0;cAmt+=ords[j].amount||0;}}if(cAmt>0)topCust.push({name:a[i].name,amt:cAmt});}
+  topCust.sort(function(a,b){return b.amt-a.amt;});
+  if(ST.quotes){Object.keys(ST.quotes).forEach(function(k){var q=ST.quotes[k],d=new Date(q.date);if(d.getFullYear()===y&&d.getMonth()===m){if(q.status==='won'){qWon++;qWonAmt+=q.amount||0;}else if(q.status==='lost'){qLost++;qLostAmt+=q.amount||0;}}});}
+  var comm=ordAmt*(ST.commRate||3)/100;
+  var monthMiles=Object.keys(ST.mileage||{}).filter(function(k){var d=new Date(k);return d.getFullYear()===y&&d.getMonth()===m;}).reduce(function(s,k){return s+(ST.mileage[k].miles||0);},0);
+  var mileAmt=monthMiles*0.725;
+  var monthExp=ST.expenses?ST.expenses.filter(function(e){var d=new Date(e.date);return d.getFullYear()===y&&d.getMonth()===m;}).reduce(function(s,e){return s+(e.amount||0);},0):0;
+  var mn=new Date(y,m,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  var topRows=topCust.slice(0,5).map(function(x,i){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><div style="font-size:13px;font-weight:600">'+esc(x.name)+'</div><div style="font-size:14px;font-weight:800;color:var(--blue)">'+fmt(x.amt)+'</div></div>';}).join('');
+  var shareText=_buildReportText(y,m,vt,nt,ordAmt,topCust,comm,qWon,qWonAmt,qLost,monthMiles,mileAmt,monthExp,mn);
+  var sh=document.createElement('div');
+  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'+
+    '<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'+
+      '<div style="font-size:18px;font-weight:800">Monthly Report</div>'+
+      '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:var(--bg3);border:1px solid var(--border);color:var(--sub);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px">✕</button>'+
+    '</div>'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">'+
+      '<button onclick="window._mrM--;if(window._mrM<0){window._mrM=11;window._mrY--;}var p=this.closest(\'div[style*=fixed]\');if(p)p.remove();showMonthlyReport();" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px">‹</button>'+
+      '<div style="flex:1;text-align:center;font-weight:800;font-size:15px">'+mn+'</div>'+
+      '<button onclick="window._mrM++;if(window._mrM>11){window._mrM=0;window._mrY++;}var p=this.closest(\'div[style*=fixed]\');if(p)p.remove();showMonthlyReport();" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px">›</button>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'+
+      '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px">'+
+        '<div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Visits</div>'+
+        '<div style="font-size:26px;font-weight:800;color:var(--green);letter-spacing:-1px;margin-top:4px">'+vt+'</div>'+
+        '<div style="font-size:11px;color:var(--sub);margin-top:2px">'+nt+' not available</div>'+
+      '</div>'+
+      '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px">'+
+        '<div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Orders</div>'+
+        '<div style="font-size:26px;font-weight:800;color:var(--blue);letter-spacing:-1px;margin-top:4px">'+fmt(ordAmt)+'</div>'+
+        '<div style="font-size:11px;color:var(--sub);margin-top:2px">'+topCust.length+' customers</div>'+
+      '</div>'+
+      '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px">'+
+        '<div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Commission</div>'+
+        '<div style="font-size:26px;font-weight:800;color:var(--teal);letter-spacing:-1px;margin-top:4px">'+fmt(comm)+'</div>'+
+        '<div style="font-size:11px;color:var(--sub);margin-top:2px">'+(ST.commRate||3)+'% rate</div>'+
+      '</div>'+
+      '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px">'+
+        '<div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Mileage</div>'+
+        '<div style="font-size:26px;font-weight:800;color:var(--amber);letter-spacing:-1px;margin-top:4px">'+fmt(mileAmt)+'</div>'+
+        '<div style="font-size:11px;color:var(--sub);margin-top:2px">'+Math.round(monthMiles)+'mi @ $0.725</div>'+
+      '</div>'+
+    '</div>'+
+    (qWon||qLost?'<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">'+
+      '<div style="font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:10px">Quotes</div>'+
+      '<div style="display:flex;gap:16px">'+
+        (qWon?'<div><div style="font-size:18px;font-weight:800;color:var(--green)">'+qWon+' Won</div><div style="font-size:11px;color:var(--sub)">'+fmt(qWonAmt)+'</div></div>':'')+
+        (qLost?'<div><div style="font-size:18px;font-weight:800;color:var(--red)">'+qLost+' Lost</div><div style="font-size:11px;color:var(--sub)">'+fmt(qLostAmt)+'</div></div>':'')+
+      '</div></div>':'')+
+    (topRows?'<div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:8px">Top Accounts</div>'+topRows+'<div style="height:16px"></div>':'')+
+    '<button onclick="copyMonthReport(\''+encodeURIComponent(shareText)+'\')" style="width:100%;padding:13px;border-radius:10px;border:none;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:8px">&#128203; Copy Report</button>'+
+    (navigator.share?'<button onclick="shareMonthReport(\''+encodeURIComponent(shareText)+'\')" style="width:100%;padding:13px;border-radius:10px;border:none;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">&#128279; Share</button>':'')+
+  '</div>';
+  document.body.appendChild(sh);
+  sh.addEventListener('click',function(ev){if(ev.target===sh)sh.remove();});
+}
+function _buildReportText(y,m,vt,nt,ordAmt,topCust,comm,qWon,qWonAmt,qLost,miles,mileAmt,expenses,mn){
+  var lines=['HC Routes — Monthly Report',''+mn,'────────────────'];
+  lines.push('Visits: '+vt+' ✓  |  '+nt+' N/A');
+  if(ordAmt)lines.push('Orders: '+fmt(ordAmt)+' ('+topCust.length+' customers)');
+  if(comm)lines.push('Commission: ~'+fmt(comm)+' ('+(window._ST&&window._ST.commRate||3)+'%)');
+  if(miles)lines.push('Miles: '+Math.round(miles)+'mi → '+fmt(mileAmt));
+  if(expenses)lines.push('Expenses: '+fmt(expenses));
+  if(qWon||qLost){lines.push('────────────────');if(qWon)lines.push('Quotes Won: '+qWon+' ('+fmt(qWonAmt)+')');if(qLost)lines.push('Quotes Lost: '+qLost);}
+  if(topCust.length){lines.push('────────────────');lines.push('Top Accounts:');topCust.slice(0,5).forEach(function(x,i){lines.push((i+1)+'. '+x.name+' — '+fmt(x.amt));});}
+  lines.push('────────────────');lines.push('Generated by HC Routes');
+  return lines.join('\n');
+}
+function copyMonthReport(enc){
+  var txt=decodeURIComponent(enc);
+  navigator.clipboard.writeText(txt).then(function(){toast('Report copied!');}).catch(function(){toast('Copy failed — try Share instead');});
+}
+function shareMonthReport(enc){
+  var txt=decodeURIComponent(enc);
+  if(navigator.share){navigator.share({title:'HC Routes Monthly Report',text:txt}).catch(function(){});}
+}
+
+/* ── TESLA SUPERCHARGER ── */
+var SUPERCHARGERS=[
+  {n:'Burbank',a:'1011 N 1st St, Burbank, CA',lat:34.1808,lng:-118.3089,stalls:16},
+  {n:'Glendale',a:'201 E Broadway, Glendale, CA',lat:34.1425,lng:-118.2551,stalls:12},
+  {n:'Pasadena',a:'475 S Raymond Ave, Pasadena, CA',lat:34.1478,lng:-118.0962,stalls:16},
+  {n:'Culver City',a:'National Blvd, Culver City, CA',lat:34.0212,lng:-118.3965,stalls:12},
+  {n:'Santa Monica',a:'1332 5th St, Santa Monica, CA',lat:34.0121,lng:-118.4912,stalls:20},
+  {n:'West Hollywood',a:'Sunset Strip, West Hollywood, CA',lat:34.0900,lng:-118.3617,stalls:8},
+  {n:'El Segundo',a:'400 N Sepulveda Blvd, El Segundo, CA',lat:33.9181,lng:-118.4092,stalls:20},
+  {n:'Hawthorne',a:'12415 Crenshaw Blvd, Hawthorne, CA',lat:33.9209,lng:-118.3485,stalls:40},
+  {n:'Torrance',a:'3525 W Carson St, Torrance, CA',lat:33.8354,lng:-118.3406,stalls:20},
+  {n:'Redondo Beach',a:'1601 Inglewood Ave, Redondo Beach, CA',lat:33.8493,lng:-118.3884,stalls:12},
+  {n:'Long Beach',a:'2451 N Bellflower Blvd, Long Beach, CA',lat:33.8360,lng:-118.1260,stalls:16},
+  {n:'Carson',a:'21323 Main St, Carson, CA',lat:33.8358,lng:-118.2556,stalls:12},
+  {n:'Cerritos',a:'12741 Towne Center Dr, Cerritos, CA',lat:33.8658,lng:-118.0617,stalls:20},
+  {n:'Northridge',a:'8800 Tampa Ave, Northridge, CA',lat:34.2281,lng:-118.5428,stalls:16},
+  {n:'Woodland Hills',a:'21821 Oxnard St, Woodland Hills, CA',lat:34.1682,lng:-118.6058,stalls:20},
+  {n:'Van Nuys',a:'6731 Sepulveda Blvd, Van Nuys, CA',lat:34.1893,lng:-118.4517,stalls:16},
+  {n:'Alhambra',a:'100 E Main St, Alhambra, CA',lat:34.0802,lng:-118.1271,stalls:12},
+  {n:'West Covina',a:'444 S Barranca Ave, West Covina, CA',lat:34.0555,lng:-117.9223,stalls:16},
+  {n:'El Monte',a:'3471 Peck Rd, El Monte, CA',lat:34.0686,lng:-118.0276,stalls:12},
+  {n:'Pomona',a:'101 W Mission Blvd, Pomona, CA',lat:34.0551,lng:-117.7500,stalls:20},
+  {n:'Palmdale',a:'39358 10th St W, Palmdale, CA',lat:34.5794,lng:-118.1165,stalls:20},
+  {n:'Lancaster',a:'44721 Date Ave, Lancaster, CA',lat:34.6868,lng:-118.1542,stalls:16},
+  {n:'Anaheim',a:'1500 S Harbor Blvd, Anaheim, CA',lat:33.8009,lng:-117.8851,stalls:20},
+  {n:'Buena Park',a:'8401 La Palma Ave, Buena Park, CA',lat:33.8589,lng:-117.9992,stalls:16},
+  {n:'Tustin',a:'2907 El Camino Real, Tustin, CA',lat:33.7429,lng:-117.8238,stalls:20},
+  {n:'Costa Mesa',a:'3333 Bristol St, Costa Mesa, CA',lat:33.6647,lng:-117.9120,stalls:20},
+  {n:'Irvine Spectrum',a:'71 Fortune Dr, Irvine, CA',lat:33.6496,lng:-117.7409,stalls:40},
+  {n:'Newport Beach',a:'400 Newport Center Dr, Newport Beach, CA',lat:33.6189,lng:-117.9289,stalls:12},
+  {n:'Mission Viejo',a:'25570 El Paseo, Mission Viejo, CA',lat:33.5997,lng:-117.6554,stalls:16},
+  {n:'Aliso Viejo',a:'26742 Aliso Viejo Pkwy, Aliso Viejo, CA',lat:33.5835,lng:-117.7249,stalls:16},
+  {n:'Rancho Cucamonga',a:'11218 Foothill Blvd, Rancho Cucamonga, CA',lat:34.1178,lng:-117.5931,stalls:20},
+  {n:'Ontario Mills',a:'1 Mills Cir, Ontario, CA',lat:34.0633,lng:-117.6509,stalls:24},
+  {n:'Fontana',a:'17301 Valley Blvd, Fontana, CA',lat:34.0922,lng:-117.4350,stalls:16},
+  {n:'Riverside',a:'3601 Market St, Riverside, CA',lat:33.9806,lng:-117.3755,stalls:20},
+  {n:'San Bernardino',a:'500 E Hospitality Ln, San Bernardino, CA',lat:34.1083,lng:-117.2898,stalls:16},
+  {n:'Murrieta',a:'40455 Murrieta Hot Springs Rd, Murrieta, CA',lat:33.5539,lng:-117.2139,stalls:20},
+  {n:'Temecula',a:'40818 Winchester Rd, Temecula, CA',lat:33.4936,lng:-117.1484,stalls:20},
+  {n:'Thousand Oaks',a:'540 N Moorpark Rd, Thousand Oaks, CA',lat:34.1706,lng:-118.8376,stalls:16},
+  {n:'Camarillo',a:'3250 Las Posas Rd, Camarillo, CA',lat:34.2164,lng:-119.0376,stalls:16},
+  {n:'Oxnard',a:'1601 Ventura Blvd, Oxnard, CA',lat:34.1975,lng:-119.1771,stalls:12},
+  {n:'Ventura',a:'1601 Spinnaker Dr, Ventura, CA',lat:34.2746,lng:-119.2290,stalls:16},
+  {n:'Santa Barbara',a:'3891 State St, Santa Barbara, CA',lat:34.4401,lng:-119.7600,stalls:20},
+  {n:'La Jolla',a:'8657 Villa La Jolla Dr, La Jolla, CA',lat:32.8328,lng:-117.2713,stalls:12},
+  {n:'San Diego UTC',a:'4225 La Jolla Village Dr, San Diego, CA',lat:32.8720,lng:-117.2100,stalls:20},
+  {n:'San Diego Mission Valley',a:'1640 Camino del Rio N, San Diego, CA',lat:32.7671,lng:-117.1506,stalls:24},
+  {n:'San Diego Sports Arena',a:'3500 Sports Arena Blvd, San Diego, CA',lat:32.7507,lng:-117.2050,stalls:16},
+  {n:'Kearny Mesa',a:'8011 Clairemont Mesa Blvd, San Diego, CA',lat:32.8185,lng:-117.1512,stalls:16},
+  {n:'Chula Vista',a:'555 Broadway, Chula Vista, CA',lat:32.6402,lng:-117.0842,stalls:16},
+  {n:'National City',a:'3030 Highland Ave, National City, CA',lat:32.6781,lng:-117.0997,stalls:12},
+  {n:'El Cajon',a:'395 N Magnolia Ave, El Cajon, CA',lat:32.7948,lng:-116.9625,stalls:16},
+  {n:'Escondido',a:'1717 Auto Park Way, Escondido, CA',lat:33.1192,lng:-117.0864,stalls:16},
+  {n:'Vista',a:'2150 Thibodo Rd, Vista, CA',lat:33.1984,lng:-117.2425,stalls:12},
+  {n:'Carlsbad',a:'2501 El Camino Real, Carlsbad, CA',lat:33.1581,lng:-117.3506,stalls:20},
+  {n:'Del Mar',a:'12925 El Camino Real, Del Mar, CA',lat:32.9595,lng:-117.2653,stalls:12},
+  {n:'Palm Springs',a:'500 S Farrell Dr, Palm Springs, CA',lat:33.8303,lng:-116.5453,stalls:24},
+  {n:'Cathedral City',a:'67750 E Palm Canyon Dr, Cathedral City, CA',lat:33.7797,lng:-116.5048,stalls:16}
+];
+function _scDist(lat1,lng1,lat2,lng2){
+  var R=3958.8,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function showChargerPicker(){
+  var doShow=function(pos){
+    var lat=pos?pos.coords.latitude:34.05,lng=pos?pos.coords.longitude:-118.25;
+    var sorted=SUPERCHARGERS.map(function(sc){return Object.assign({},sc,{dist:_scDist(lat,lng,sc.lat,sc.lng)});});
+    sorted.sort(function(a,b){return a.dist-b.dist;});
+    var nearest=sorted.slice(0,7);
+    var sh=document.createElement('div');
+    sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+    var rows=nearest.map(function(sc){
+      var mi=sc.dist.toFixed(1);
+      return '<div onclick="pickCharger(\''+encodeURIComponent(JSON.stringify(sc))+'\')" style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer">'+
+        '<div style="width:44px;height:44px;border-radius:12px;background:rgba(232,33,39,.12);border:1px solid rgba(232,33,39,.3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">&#9889;</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:15px;font-weight:700">'+esc(sc.n)+'</div>'+
+          '<div style="font-size:12px;color:var(--sub);margin-top:2px">'+sc.stalls+' stalls · '+mi+' mi away</div>'+
+        '</div>'+
+        '<div style="font-size:13px;font-weight:700;color:#e82127">'+mi+'mi</div>'+
+      '</div>';
+    }).join('');
+    sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'+
+      '<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
+        '<div style="font-size:18px;font-weight:800">&#9889; Nearest Superchargers</div>'+
+        '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:var(--bg3);border:1px solid var(--border);color:var(--sub);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px">✕</button>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--sub);margin-bottom:16px">'+(pos?'Based on your current location':'GPS unavailable — showing LA area')+'</div>'+
+      rows+
+    '</div>';
+    document.body.appendChild(sh);
+    sh.addEventListener('click',function(ev){if(ev.target===sh)sh.remove();});
+  };
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(doShow,function(){doShow(null);},{timeout:5000,maximumAge:60000});
+  } else {doShow(null);}
+}
+function pickCharger(enc){
+  var sc=JSON.parse(decodeURIComponent(enc));
+  // Close picker
+  var pickers=document.querySelectorAll('div[style*="z-index:600"]');
+  pickers.forEach(function(p){p.remove();});
+  // Open Apple Maps directions to supercharger
+  var url='https://maps.apple.com/?daddr='+sc.lat+','+sc.lng+'&dirflg=d&t=m';
+  window.open(url,'_blank');
+  // Show a banner on dashboard
+  toast('&#9889; Navigating to '+sc.n+' ('+sc.stalls+' stalls)');
+  // Store as today's charger stop
+  if(!ST.chargerStops)ST.chargerStops=[];
+  var today=new Date().toDateString();
+  ST.chargerStops=ST.chargerStops.filter(function(s){return s.date===today;});
+  ST.chargerStops.push({date:today,name:sc.n,stalls:sc.stalls,ts:new Date().toISOString()});
+  lSave();
 }
 
 lLoad();
