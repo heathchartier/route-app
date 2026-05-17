@@ -1636,42 +1636,51 @@ function openM(code){
 }
 function closeM(){var ov=document.getElementById('ov');if(ov)ov.className='ov';mC=null;}
 
+function _applyRemoteState(rem){
+  var mc={};
+  var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
+  for(var code in allCodes){
+    var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
+    var combined=loc.concat(rem2),seen={},deduped=[];
+    for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
+    deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    mc[code]=deduped;
+  }
+  ST.visits=mc;
+  ST.notes=Object.assign({},rem.notes||{},ST.notes);
+  ST.hot=Object.assign({},rem.hot||{},ST.hot);
+  ST.archived=Object.assign({},rem.archived||{},ST.archived);
+  ST.removed=Object.assign({},rem.removed||{},ST.removed);
+  ST.edits=Object.assign({},rem.edits||{},ST.edits);
+  ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
+  ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
+  ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
+  ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
+  var ra=rem.added_customers||[],am={};
+  for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
+  for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
+  ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
+}
 function syncDown(){
   if(!CURRENT_USER)return;
   var uid=CURRENT_USER.id;
   var sl=document.getElementById('sync-lbl');
+  function finish(){migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Synced';}
   sb.auth.getSession().then(function(res){
     var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
     fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
     .then(function(r){return r.json();}).then(function(rows){
-      if(rows&&rows.length>0){
-        var rem=rows[0],mc={};
-        var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
-        for(var code in allCodes){
-          var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
-          var combined=loc.concat(rem2),seen={},deduped=[];
-          for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
-          deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
-          mc[code]=deduped;
-        }
-        ST.visits=mc;
-        ST.notes=Object.assign({},rem.notes||{},ST.notes);
-        ST.hot=Object.assign({},rem.hot||{},ST.hot);
-        ST.archived=Object.assign({},rem.archived||{},ST.archived);
-        ST.removed=Object.assign({},rem.removed||{},ST.removed);
-        ST.edits=Object.assign({},rem.edits||{},ST.edits);
-        ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
-        ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
-        ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
-        ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
-        var ra=rem.added_customers||[],am={};
-        for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
-        for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
-        ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
+      if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
+      // If UUID row has no visit history, try legacy 'heath' row as one-time migration
+      if(Object.keys(ST.visits||{}).length===0){
+        fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
+        .then(function(r2){return r2.json();}).then(function(legacyRows){
+          if(legacyRows&&legacyRows.length>0)_applyRemoteState(legacyRows[0]);
+          finish();
+        }).catch(function(){finish();});
+      } else {
+        finish();
       }
-      migrateBaseCustomers();
-      lSave();rDash();rCust();rGrps();checkFirstRun();
-      if(sl)sl.textContent='Synced';
     }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
   });
 }
@@ -3474,42 +3483,51 @@ function openM(code){
 }
 function closeM(){var ov=document.getElementById('ov');if(ov)ov.className='ov';mC=null;}
 
+function _applyRemoteState(rem){
+  var mc={};
+  var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
+  for(var code in allCodes){
+    var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
+    var combined=loc.concat(rem2),seen={},deduped=[];
+    for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
+    deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+    mc[code]=deduped;
+  }
+  ST.visits=mc;
+  ST.notes=Object.assign({},rem.notes||{},ST.notes);
+  ST.hot=Object.assign({},rem.hot||{},ST.hot);
+  ST.archived=Object.assign({},rem.archived||{},ST.archived);
+  ST.removed=Object.assign({},rem.removed||{},ST.removed);
+  ST.edits=Object.assign({},rem.edits||{},ST.edits);
+  ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
+  ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
+  ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
+  ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
+  var ra=rem.added_customers||[],am={};
+  for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
+  for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
+  ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
+}
 function syncDown(){
   if(!CURRENT_USER)return;
   var uid=CURRENT_USER.id;
   var sl=document.getElementById('sync-lbl');
+  function finish(){migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Synced';}
   sb.auth.getSession().then(function(res){
     var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
     fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
     .then(function(r){return r.json();}).then(function(rows){
-      if(rows&&rows.length>0){
-        var rem=rows[0],mc={};
-        var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
-        for(var code in allCodes){
-          var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
-          var combined=loc.concat(rem2),seen={},deduped=[];
-          for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
-          deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
-          mc[code]=deduped;
-        }
-        ST.visits=mc;
-        ST.notes=Object.assign({},rem.notes||{},ST.notes);
-        ST.hot=Object.assign({},rem.hot||{},ST.hot);
-        ST.archived=Object.assign({},rem.archived||{},ST.archived);
-        ST.removed=Object.assign({},rem.removed||{},ST.removed);
-        ST.edits=Object.assign({},rem.edits||{},ST.edits);
-        ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
-        ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
-        ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
-        ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
-        var ra=rem.added_customers||[],am={};
-        for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
-        for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
-        ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
+      if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
+      // If UUID row has no visit history, try legacy 'heath' row as one-time migration
+      if(Object.keys(ST.visits||{}).length===0){
+        fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
+        .then(function(r2){return r2.json();}).then(function(legacyRows){
+          if(legacyRows&&legacyRows.length>0)_applyRemoteState(legacyRows[0]);
+          finish();
+        }).catch(function(){finish();});
+      } else {
+        finish();
       }
-      migrateBaseCustomers();
-      lSave();rDash();rCust();rGrps();checkFirstRun();
-      if(sl)sl.textContent='Synced';
     }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
   });
 }
@@ -9515,7 +9533,7 @@ function confirmImport(){
     ci[fd.key]=sel?parseInt(sel.value):-1;
   });
   ST.savedColMap=ci;lSave();
-  var sh=document.querySelector('div[style*="z-index:700"]');if(sh)sh.remove();
+  var sh=document.querySelector('div[style*="z-index:10000"]')||document.querySelector('div[style*="z-index:700"]');if(sh)sh.remove();
   var normHdrs=pi.hdrs.map(function(h){return h.toLowerCase().replace(/[^a-z0-9]/g,'');});
   window._importColOverride=ci;
   doImport(normHdrs,pi.rows,pi.fname,pi.statusEl);
@@ -9853,7 +9871,18 @@ function migrateBaseCustomers(){
   if(ST.baseCustomersMigrated&&(ST.addedCustomers||[]).length>50)return;
   if(!CUSTOMERS_BASE||!CUSTOMERS_BASE.length)return;
   var hasExistingData=Object.keys(ST.visits||{}).length>0||Object.keys(ST.notes||{}).length>0||Object.keys(ST.orders||{}).length>0;
-  if(!hasExistingData)return; // New user — don't mark done, let onboarding handle them
+  // Fallback: check old localStorage key on devices with original single-user app data
+  if(!hasExistingData){
+    try{
+      var old=JSON.parse(localStorage.getItem('heath_rt_v13')||'null');
+      if(old&&Object.keys(old.visits||{}).length>0){
+        ST.visits=Object.assign({},old.visits,ST.visits||{});
+        ST.notes=Object.assign({},old.notes||{},ST.notes||{});
+        hasExistingData=true;
+      }
+    }catch(e){}
+  }
+  if(!hasExistingData)return;
   if(!ST.addedCustomers)ST.addedCustomers=[];
   var existingCodes={};
   for(var i=0;i<ST.addedCustomers.length;i++)existingCodes[ST.addedCustomers[i].code]=1;
@@ -9863,6 +9892,7 @@ function migrateBaseCustomers(){
   ST.onboardingComplete=true;
   ST.baseCustomersMigrated=true;
   lSave();
+  syncUp();
 }
 
 function authForgot(){
