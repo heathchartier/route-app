@@ -9585,6 +9585,7 @@ function onLogin(user){
   if(!ST.userProfile.name)ST.userProfile.name=user.email.split('@')[0];
   var as=document.getElementById('auth-screen');
   if(as)as.style.display='none';
+  go('dash');
   var ul=document.getElementById('auth-user-lbl');
   if(ul)ul.textContent='Signed in as '+user.email;
   loadRolling();
