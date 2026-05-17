@@ -1668,7 +1668,8 @@ function syncDown(){
         for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
         for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
         ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
-        lSave();rDash();rCust();rGrps();
+        migrateBaseCustomers();
+        lSave();rDash();rCust();rGrps();checkFirstRun();
       }
       if(sl)sl.textContent='Synced';
     }).catch(function(){if(sl)sl.textContent='Offline mode';});
@@ -3505,7 +3506,8 @@ function syncDown(){
         for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
         for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
         ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
-        lSave();rDash();rCust();rGrps();
+        migrateBaseCustomers();
+        lSave();rDash();rCust();rGrps();checkFirstRun();
       }
       if(sl)sl.textContent='Synced';
     }).catch(function(){if(sl)sl.textContent='Offline mode';});
@@ -9568,7 +9570,6 @@ initApp();
 // ── ONBOARDING ──────────────────────────────────────────────────────────────
 function checkFirstRun(){
   if(ST.onboardingComplete)return;
-  if(ST.baseCustomersMigrated)return;
   var hasHistory=Object.keys(ST.visits||{}).length>0||Object.keys(ST.notes||{}).length>0||Object.keys(ST.orders||{}).length>0;
   if(hasHistory){ST.onboardingComplete=true;lSave();return;}
   if(allC().length===0){
@@ -9850,18 +9851,18 @@ function onLogin(user){
 }
 
 function migrateBaseCustomers(){
-  if(ST.baseCustomersMigrated)return;
-  if(!CUSTOMERS_BASE||!CUSTOMERS_BASE.length){ST.baseCustomersMigrated=true;lSave();return;}
+  // Re-run if flag was set but no customers actually landed (failed first run)
+  if(ST.baseCustomersMigrated&&(ST.addedCustomers||[]).length>50)return;
+  if(!CUSTOMERS_BASE||!CUSTOMERS_BASE.length)return;
   var hasExistingData=Object.keys(ST.visits||{}).length>0||Object.keys(ST.notes||{}).length>0||Object.keys(ST.orders||{}).length>0;
-  if(hasExistingData){
-    if(!ST.addedCustomers)ST.addedCustomers=[];
-    var existingCodes={};
-    for(var i=0;i<ST.addedCustomers.length;i++)existingCodes[ST.addedCustomers[i].code]=1;
-    for(var i=0;i<CUSTOMERS_BASE.length;i++){
-      if(!existingCodes[CUSTOMERS_BASE[i].code])ST.addedCustomers.push(CUSTOMERS_BASE[i]);
-    }
-    ST.onboardingComplete=true;
+  if(!hasExistingData)return; // New user — don't mark done, let onboarding handle them
+  if(!ST.addedCustomers)ST.addedCustomers=[];
+  var existingCodes={};
+  for(var i=0;i<ST.addedCustomers.length;i++)existingCodes[ST.addedCustomers[i].code]=1;
+  for(var i=0;i<CUSTOMERS_BASE.length;i++){
+    if(!existingCodes[CUSTOMERS_BASE[i].code])ST.addedCustomers.push(CUSTOMERS_BASE[i]);
   }
+  ST.onboardingComplete=true;
   ST.baseCustomersMigrated=true;
   lSave();
 }
