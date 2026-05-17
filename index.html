@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="HC Routes">
+<meta name="apple-mobile-web-app-title" content="FieldIQ">
 <link rel="apple-touch-icon" sizes="180x180" href="https://heathchartier.github.io/route-app/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<title>HC Routes</title>
+<title>FieldIQ</title>
 <style>
 :root{
   --bg:#07111f;
@@ -516,8 +516,34 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;overflow-y:auto">
+  <div style="width:100%;max-width:400px">
+    <div style="text-align:center;margin-bottom:40px">
+      <div style="font-size:38px;font-weight:900;color:var(--teal);letter-spacing:-1.5px">FieldIQ</div>
+      <div style="font-size:13px;color:var(--sub);margin-top:6px;letter-spacing:.3px">Outside Sales Intelligence</div>
+    </div>
+    <div style="display:flex;background:var(--bg2);border-radius:var(--r2);padding:4px;margin-bottom:24px">
+      <button id="auth-tab-signin" onclick="authTab('signin')" style="flex:1;padding:10px;border:none;border-radius:var(--r2);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;background:var(--teal);color:#000">Sign In</button>
+      <button id="auth-tab-signup" onclick="authTab('signup')" style="flex:1;padding:10px;border:none;border-radius:var(--r2);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;background:transparent;color:var(--sub)">Sign Up</button>
+    </div>
+    <div id="auth-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:12px;font-size:13px;margin-bottom:16px;line-height:1.4;color:#ef4444"></div>
+    <div id="auth-name-wrap" style="display:none">
+      <input id="auth-name" type="text" placeholder="Your full name" autocomplete="name" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
+      <input id="auth-company" type="text" placeholder="Company name" autocomplete="organization" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
+    </div>
+    <input id="auth-email" type="email" placeholder="Email address" autocomplete="email" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
+    <input id="auth-pass" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:20px;outline:none">
+    <button id="auth-btn" onclick="doAuth()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.2px">Sign In</button>
+    <div style="text-align:center;margin-top:16px">
+      <button onclick="authForgot()" style="background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;padding:4px 8px">Forgot password?</button>
+    </div>
+  </div>
+</div>
 
 <!-- PAGES - all visible by default, JS will hide non-active ones -->
 <div id="toast-undo"><span id="toast-undo-msg">Logged</span><button id="toast-undo-btn" onclick="undoLastVisit()">UNDO</button></div>
@@ -892,7 +918,12 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="showHowToUse()" style="padding:10px 18px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="padding:10px 18px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
-    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v22</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128274; Account</div>
+      <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:10px">—</div>
+      <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128275; Sign Out</button>
+    </div>
+    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">FieldIQ v23</div>
   </div>
 </div>
 
@@ -1127,8 +1158,11 @@ var VENDORS_BASE=[
 ];
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
-var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:''}};
+var sb=supabase.createClient(SURL,SKEY);
+var SK='';
+var CURRENT_USER=null;
+var AUTH_MODE='signin';
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:''}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:''};}catch(e){}}
@@ -1167,7 +1201,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;}
 }
 
 function smartGroup(){
@@ -1551,47 +1585,57 @@ function openM(code){
 function closeM(){var ov=document.getElementById('ov');if(ov)ov.className='ov';mC=null;}
 
 function syncDown(){
+  if(!CURRENT_USER)return;
+  var uid=CURRENT_USER.id;
   var sl=document.getElementById('sync-lbl');
-  fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY}})
-  .then(function(r){return r.json();}).then(function(rows){
-    if(rows&&rows.length>0){
-      var rem=rows[0],mc={};
-      var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
-      for(var code in allCodes){
-        var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
-        var combined=loc.concat(rem2),seen={},deduped=[];
-        for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
-        deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
-        mc[code]=deduped;
+  sb.auth.getSession().then(function(res){
+    var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
+    fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
+    .then(function(r){return r.json();}).then(function(rows){
+      if(rows&&rows.length>0){
+        var rem=rows[0],mc={};
+        var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
+        for(var code in allCodes){
+          var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
+          var combined=loc.concat(rem2),seen={},deduped=[];
+          for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
+          deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+          mc[code]=deduped;
+        }
+        ST.visits=mc;
+        ST.notes=Object.assign({},rem.notes||{},ST.notes);
+        ST.hot=Object.assign({},rem.hot||{},ST.hot);
+        ST.archived=Object.assign({},rem.archived||{},ST.archived);
+        ST.removed=Object.assign({},rem.removed||{},ST.removed);
+        ST.edits=Object.assign({},rem.edits||{},ST.edits);
+        ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
+        ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
+        ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
+        ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
+        var ra=rem.added_customers||[],am={};
+        for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
+        for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
+        ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
+        lSave();rDash();rCust();rGrps();
       }
-      ST.visits=mc;
-      ST.notes=Object.assign({},rem.notes||{},ST.notes);
-      ST.hot=Object.assign({},rem.hot||{},ST.hot);
-      ST.archived=Object.assign({},rem.archived||{},ST.archived);
-      ST.removed=Object.assign({},rem.removed||{},ST.removed);
-      ST.edits=Object.assign({},rem.edits||{},ST.edits);
-      ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
-      ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
-      ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
-      ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
-      var ra=rem.added_customers||[],am={};
-      for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
-      for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
-      ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
-      lSave();rDash();rCust();rGrps();
-    }
-    if(sl)sl.textContent='Synced';
-  }).catch(function(){if(sl)sl.textContent='Offline mode';});
+      if(sl)sl.textContent='Synced';
+    }).catch(function(){if(sl)sl.textContent='Offline mode';});
+  });
 }
 
 var syncTimer=null;
 function syncUp(){
+  if(!CURRENT_USER)return;
+  var uid=CURRENT_USER.id;
   clearTimeout(syncTimer);
   syncTimer=setTimeout(function(){
-    fetch(SURL+'/rest/v1/hc_state',{method:'POST',
-      headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({id:'heath',visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],scheduled:ST.scheduled||{},competitors:ST.competitors||{},updated_at:new Date().toISOString()})
-    }).catch(function(){});
+    sb.auth.getSession().then(function(res){
+      var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
+      fetch(SURL+'/rest/v1/hc_state',{method:'POST',
+        headers:{'apikey':SKEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+        body:JSON.stringify({id:uid,visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],scheduled:ST.scheduled||{},competitors:ST.competitors||{},updated_at:new Date().toISOString()})
+      }).catch(function(){});
+    });
   },1500);
 }
 
@@ -1872,10 +1916,10 @@ function initSwipe(containerId){
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="HC Routes">
+<meta name="apple-mobile-web-app-title" content="FieldIQ">
 <link rel="apple-touch-icon" sizes="180x180" href="https://heathchartier.github.io/route-app/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<title>HC Routes</title>
+<title>FieldIQ</title>
 <style>
 :root{
   --bg:#07111f;
@@ -2707,7 +2751,12 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="showHowToUse()" style="padding:10px 18px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="padding:10px 18px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
-    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">HC Routes v22</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128274; Account</div>
+      <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:10px">—</div>
+      <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128275; Sign Out</button>
+    </div>
+    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">FieldIQ v23</div>
   </div>
 </div>
 
@@ -2935,8 +2984,11 @@ var VENDORS_BASE=[
 ];
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
-var SK='heath_rt_v13';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:''}};
+var sb=supabase.createClient(SURL,SKEY);
+var SK='';
+var CURRENT_USER=null;
+var AUTH_MODE='signin';
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:''}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:''};}catch(e){}}
@@ -2975,7 +3027,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;}
 }
 
 function smartGroup(){
@@ -3365,47 +3417,57 @@ function openM(code){
 function closeM(){var ov=document.getElementById('ov');if(ov)ov.className='ov';mC=null;}
 
 function syncDown(){
+  if(!CURRENT_USER)return;
+  var uid=CURRENT_USER.id;
   var sl=document.getElementById('sync-lbl');
-  fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY}})
-  .then(function(r){return r.json();}).then(function(rows){
-    if(rows&&rows.length>0){
-      var rem=rows[0],mc={};
-      var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
-      for(var code in allCodes){
-        var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
-        var combined=loc.concat(rem2),seen={},deduped=[];
-        for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
-        deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
-        mc[code]=deduped;
+  sb.auth.getSession().then(function(res){
+    var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
+    fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
+    .then(function(r){return r.json();}).then(function(rows){
+      if(rows&&rows.length>0){
+        var rem=rows[0],mc={};
+        var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
+        for(var code in allCodes){
+          var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
+          var combined=loc.concat(rem2),seen={},deduped=[];
+          for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
+          deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+          mc[code]=deduped;
+        }
+        ST.visits=mc;
+        ST.notes=Object.assign({},rem.notes||{},ST.notes);
+        ST.hot=Object.assign({},rem.hot||{},ST.hot);
+        ST.archived=Object.assign({},rem.archived||{},ST.archived);
+        ST.removed=Object.assign({},rem.removed||{},ST.removed);
+        ST.edits=Object.assign({},rem.edits||{},ST.edits);
+        ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
+        ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
+        ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
+        ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
+        var ra=rem.added_customers||[],am={};
+        for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
+        for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
+        ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
+        lSave();rDash();rCust();rGrps();
       }
-      ST.visits=mc;
-      ST.notes=Object.assign({},rem.notes||{},ST.notes);
-      ST.hot=Object.assign({},rem.hot||{},ST.hot);
-      ST.archived=Object.assign({},rem.archived||{},ST.archived);
-      ST.removed=Object.assign({},rem.removed||{},ST.removed);
-      ST.edits=Object.assign({},rem.edits||{},ST.edits);
-      ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
-      ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
-      ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
-      ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
-      var ra=rem.added_customers||[],am={};
-      for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
-      for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
-      ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
-      lSave();rDash();rCust();rGrps();
-    }
-    if(sl)sl.textContent='Synced';
-  }).catch(function(){if(sl)sl.textContent='Offline mode';});
+      if(sl)sl.textContent='Synced';
+    }).catch(function(){if(sl)sl.textContent='Offline mode';});
+  });
 }
 
 var syncTimer=null;
 function syncUp(){
+  if(!CURRENT_USER)return;
+  var uid=CURRENT_USER.id;
   clearTimeout(syncTimer);
   syncTimer=setTimeout(function(){
-    fetch(SURL+'/rest/v1/hc_state',{method:'POST',
-      headers:{'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({id:'heath',visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],scheduled:ST.scheduled||{},competitors:ST.competitors||{},updated_at:new Date().toISOString()})
-    }).catch(function(){});
+    sb.auth.getSession().then(function(res){
+      var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
+      fetch(SURL+'/rest/v1/hc_state',{method:'POST',
+        headers:{'apikey':SKEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+        body:JSON.stringify({id:uid,visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],scheduled:ST.scheduled||{},competitors:ST.competitors||{},updated_at:new Date().toISOString()})
+      }).catch(function(){});
+    });
   },1500);
 }
 
@@ -6131,7 +6193,7 @@ function showHowToUse(){
   ];
   var html='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;overflow-y:auto">'
     +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px"></div>'
-    +'<div style="font-size:20px;font-weight:800;margin-bottom:16px">&#128214; How to Use HC Routes</div>'
+    +'<div style="font-size:20px;font-weight:800;margin-bottom:16px">&#128214; How to Use FieldIQ</div>'
     +sections.map(function(s){
       return '<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">'
         +'<div style="font-size:22px;flex-shrink:0;width:30px;text-align:center">'+s.icon+'</div>'
@@ -6159,7 +6221,7 @@ function showEOD(){
     else naList.push(c);
   });
   var dateStr=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-  var summary='HC Routes - EOD Summary\n'+dateStr+'\n\n'
+  var summary='FieldIQ - EOD Summary\n'+dateStr+'\n\n'
     +'Visited ('+vis.length+'): '+vis.map(function(c){return c.name;}).join(', ')+'\n\n'
     +'Not Available ('+naList.length+'): '+naList.map(function(c){return c.name;}).join(', ')+'\n\n'
     +'Total stops: '+(vis.length+naList.length)+' | Goal: '+(localStorage.getItem('hrt_wg')||30)+'/wk';
@@ -6187,7 +6249,7 @@ function showEOD(){
   document.body.appendChild(sheet);
   var sumText=summary;
   document.getElementById('eod-share').addEventListener('click',function(){
-    if(navigator.share){navigator.share({title:'HC Routes EOD',text:sumText}).catch(function(){});}
+    if(navigator.share){navigator.share({title:'FieldIQ EOD',text:sumText}).catch(function(){});}
     else{navigator.clipboard&&navigator.clipboard.writeText(sumText);toast('Copied to clipboard');}
   });
   document.getElementById('eod-copy').addEventListener('click',function(){
@@ -6195,7 +6257,7 @@ function showEOD(){
     else{var ta=document.createElement('textarea');ta.value=sumText;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copied!');}
   });
   document.getElementById('eod-email').addEventListener('click',function(){
-    var subj=encodeURIComponent('HC Routes EOD - '+dateStr);
+    var subj=encodeURIComponent('FieldIQ EOD - '+dateStr);
     var body=encodeURIComponent(sumText);
     window.location.href='mailto:?subject='+subj+'&body='+body;
   });
@@ -6964,7 +7026,7 @@ function showLockScreen(){
   el.id='lock-screen';
   el.className='lock-screen';
   el.innerHTML='<div style="font-size:52px;margin-bottom:10px">&#128274;</div>'
-    +'<div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px">HC Routes</div>'
+    +'<div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px">FieldIQ</div>'
     +'<div style="font-size:13px;color:var(--sub);margin-bottom:28px;text-align:center">Enter your PIN to continue</div>'
     +'<div class="pin-dots" id="pin-dots">'
       +'<div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>'
@@ -7074,7 +7136,7 @@ function showFaceIDSetup(){
   navigator.credentials.create({
     publicKey:{
       challenge:crypto.getRandomValues(new Uint8Array(32)),
-      rp:{name:'HC Routes',id:location.hostname||'localhost'},
+      rp:{name:'FieldIQ',id:location.hostname||'localhost'},
       user:{id:new Uint8Array([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]),name:'heath',displayName:'Heath'},
       pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
       authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',requireResidentKey:false},
@@ -7862,7 +7924,7 @@ function showWeekRecap(){
   }
   var streak=calcStreak();
   var weekStr=wb.mon.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' – '+wb.now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  var shareText='HC Routes – Week of '+weekStr+'\n\nVisited ('+visitedList.length+'): '+visitedList.map(function(c){return c.name;}).join(', ')+'\n\n'
+  var shareText='FieldIQ – Week of '+weekStr+'\n\nVisited ('+visitedList.length+'): '+visitedList.map(function(c){return c.name;}).join(', ')+'\n\n'
     +(naList.length?'N/A ('+naList.length+'): '+naList.map(function(c){return c.name;}).join(', ')+'\n\n':'')
     +'Total stops: '+(visitedList.length+naList.length)+(orderTotal?' | Orders: $'+Math.round(orderTotal).toLocaleString():'')+' | Streak: '+streak+' days';
   var sheet=document.createElement('div');
@@ -7888,7 +7950,7 @@ function showWeekRecap(){
   sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
   document.body.appendChild(sheet);
   document.getElementById('wk-share').addEventListener('click',function(){
-    if(navigator.share){navigator.share({title:'HC Routes Week Recap',text:shareText}).catch(function(){});}
+    if(navigator.share){navigator.share({title:'FieldIQ Week Recap',text:shareText}).catch(function(){});}
     else{navigator.clipboard&&navigator.clipboard.writeText(shareText);toast('Copied!');}
   });
   document.getElementById('wk-copy').addEventListener('click',function(){
@@ -8065,7 +8127,7 @@ function sendTestNotification(){
   var body='Today: '+grpName+' — '+grpCt+' accounts';
   if(overdue>0)body+='\n'+overdue+' overdue across territory';
   if(followups>0)body+='\n'+followups+' follow-up'+(followups>1?'s':'')+' scheduled today';
-  new Notification('HC Routes — Good morning, '+(ST.userProfile&&ST.userProfile.name?ST.userProfile.name.split(' ')[0]:'there')+',',{body:body,icon:'icon-192.png',badge:'icon-192.png'});
+  new Notification('FieldIQ — Good morning, '+(ST.userProfile&&ST.userProfile.name?ST.userProfile.name.split(' ')[0]:'there')+',',{body:body,icon:'icon-192.png',badge:'icon-192.png'});
 }
 function checkAndNotify(){
   if(!('Notification' in window))return;
@@ -9175,7 +9237,7 @@ function showMonthlyReport(){
   sh.addEventListener('click',function(ev){if(ev.target===sh)sh.remove();});
 }
 function _buildReportText(y,m,vt,nt,ordAmt,topCust,comm,qWon,qWonAmt,qLost,miles,mileAmt,expenses,mn){
-  var lines=['HC Routes — Monthly Report',''+mn,'────────────────'];
+  var lines=['FieldIQ — Monthly Report',''+mn,'────────────────'];
   lines.push('Visits: '+vt+' ✓  |  '+nt+' N/A');
   if(ordAmt)lines.push('Orders: '+fmt(ordAmt)+' ('+topCust.length+' customers)');
   if(comm)lines.push('Commission: ~'+fmt(comm)+' ('+(window._ST&&window._ST.commRate||3)+'%)');
@@ -9183,7 +9245,7 @@ function _buildReportText(y,m,vt,nt,ordAmt,topCust,comm,qWon,qWonAmt,qLost,miles
   if(expenses)lines.push('Expenses: '+fmt(expenses));
   if(qWon||qLost){lines.push('────────────────');if(qWon)lines.push('Quotes Won: '+qWon+' ('+fmt(qWonAmt)+')');if(qLost)lines.push('Quotes Lost: '+qLost);}
   if(topCust.length){lines.push('────────────────');lines.push('Top Accounts:');topCust.slice(0,5).forEach(function(x,i){lines.push((i+1)+'. '+x.name+' — '+fmt(x.amt));});}
-  lines.push('────────────────');lines.push('Generated by HC Routes');
+  lines.push('────────────────');lines.push('Generated by FieldIQ');
   return lines.join('\n');
 }
 function copyMonthReport(enc){
@@ -9192,7 +9254,7 @@ function copyMonthReport(enc){
 }
 function shareMonthReport(enc){
   var txt=decodeURIComponent(enc);
-  if(navigator.share){navigator.share({title:'HC Routes Monthly Report',text:txt}).catch(function(){});}
+  if(navigator.share){navigator.share({title:'FieldIQ Monthly Report',text:txt}).catch(function(){});}
 }
 
 /* ── TESLA SUPERCHARGER ── */
@@ -9441,27 +9503,143 @@ function saveProfileSettings(){
   rDash();
 }
 
-lLoad();
-loadRolling();
-loadPricing();
-rPendingEdits();
-rDiscrepCard();
-var teslaCont=document.getElementById('d-tesla-cont');
-if(teslaCont)teslaCont.addEventListener('click',continueRollingRoute);
-var sg=smartGroup();
-cG=sg;
-document.getElementById('g-lbl').textContent=getGroupName(sg);
-rDash();
-rCust();
-rGrps();
-rVend();
-renderCustomRoute();
-syncDown();
-checkAndNotify();
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
-initAppLock();
-updateSecurityStatus();
 function _onResume(){var dp=document.getElementById('p-dash');if(dp&&dp.style.display!=='none')rDash();}document.addEventListener('visibilitychange',function(){if(!document.hidden)_onResume();});window.addEventListener('pageshow',function(e){if(e.persisted)_onResume();});window.addEventListener('focus',function(){_onResume();});
+initApp();
+
+// ── AUTH ────────────────────────────────────────────────────────────────────
+function authTab(mode){
+  AUTH_MODE=mode;
+  var si=document.getElementById('auth-tab-signin');
+  var su=document.getElementById('auth-tab-signup');
+  var btn=document.getElementById('auth-btn');
+  var nw=document.getElementById('auth-name-wrap');
+  if(mode==='signin'){
+    si.style.background='var(--teal)';si.style.color='#000';
+    su.style.background='transparent';su.style.color='var(--sub)';
+    btn.textContent='Sign In';
+    if(nw)nw.style.display='none';
+  }else{
+    su.style.background='var(--teal)';su.style.color='#000';
+    si.style.background='transparent';si.style.color='var(--sub)';
+    btn.textContent='Create Account';
+    if(nw)nw.style.display='block';
+  }
+  var er=document.getElementById('auth-error');
+  if(er){er.style.display='none';}
+}
+
+function showAuthError(msg,isGood){
+  var er=document.getElementById('auth-error');
+  if(!er)return;
+  er.textContent=msg;
+  er.style.color=isGood?'var(--teal)':'#ef4444';
+  er.style.background=isGood?'rgba(0,229,184,.08)':'rgba(239,68,68,.12)';
+  er.style.border=isGood?'1px solid rgba(0,229,184,.25)':'1px solid rgba(239,68,68,.3)';
+  er.style.display='block';
+}
+
+function doAuth(){
+  var email=(document.getElementById('auth-email').value||'').trim();
+  var pass=document.getElementById('auth-pass').value||'';
+  var btn=document.getElementById('auth-btn');
+  if(!email||!pass){showAuthError('Please enter your email and password.');return;}
+  btn.disabled=true;
+  btn.textContent='Please wait...';
+  var er=document.getElementById('auth-error');
+  if(er)er.style.display='none';
+  if(AUTH_MODE==='signin'){
+    sb.auth.signInWithPassword({email:email,password:pass}).then(function(r){
+      btn.disabled=false;
+      if(r.error){showAuthError(r.error.message);authTab('signin');return;}
+      onLogin(r.data.user);
+    });
+  }else{
+    var name=(document.getElementById('auth-name').value||'').trim();
+    var company=(document.getElementById('auth-company').value||'').trim();
+    sb.auth.signUp({email:email,password:pass}).then(function(r){
+      btn.disabled=false;
+      if(r.error){showAuthError(r.error.message);authTab('signup');return;}
+      if(r.data&&r.data.user&&r.data.user.id){
+        if(name)ST.userProfile.name=name;
+        if(company)ST.userProfile.company=company;
+        onLogin(r.data.user);
+      }else{
+        showAuthError('Check your email to confirm your account, then sign in.',true);
+        authTab('signup');
+      }
+    });
+  }
+}
+
+function onLogin(user){
+  CURRENT_USER=user;
+  var newKey='fieldiq_'+user.id;
+  // Migrate Heath's legacy data on first login for this user
+  if(!localStorage.getItem(newKey)){
+    var old=localStorage.getItem('heath_rt_v13');
+    if(old)localStorage.setItem(newKey,old);
+  }
+  SK=newKey;
+  lLoad();
+  // Set display name from userProfile or email if not set
+  if(!ST.userProfile)ST.userProfile={};
+  if(!ST.userProfile.name)ST.userProfile.name=user.email;
+  var as=document.getElementById('auth-screen');
+  if(as)as.style.display='none';
+  var ul=document.getElementById('auth-user-lbl');
+  if(ul)ul.textContent='Signed in as '+user.email;
+  loadRolling();
+  loadPricing();
+  rPendingEdits();
+  rDiscrepCard();
+  var teslaCont=document.getElementById('d-tesla-cont');
+  if(teslaCont)teslaCont.addEventListener('click',continueRollingRoute);
+  var sg=smartGroup();
+  cG=sg;
+  var gl=document.getElementById('g-lbl');
+  if(gl)gl.textContent=getGroupName(sg);
+  rDash();rCust();rGrps();rVend();
+  renderCustomRoute();
+  syncDown();
+  checkAndNotify();
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+  initAppLock();
+  updateSecurityStatus();
+}
+
+function authForgot(){
+  var email=(document.getElementById('auth-email').value||'').trim();
+  if(!email){showAuthError('Enter your email above, then tap Forgot password.');return;}
+  sb.auth.resetPasswordForEmail(email).then(function(r){
+    if(r.error){showAuthError(r.error.message);}
+    else{showAuthError('Password reset email sent! Check your inbox.',true);}
+  });
+}
+
+function doSignOut(){
+  if(!confirm('Sign out of FieldIQ?'))return;
+  sb.auth.signOut().then(function(){
+    CURRENT_USER=null;
+    SK='';
+    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:''}};
+    var ep=document.getElementById('auth-email');if(ep)ep.value='';
+    var pp=document.getElementById('auth-pass').value='';
+    authTab('signin');
+    var as=document.getElementById('auth-screen');
+    if(as)as.style.display='flex';
+  });
+}
+
+function initApp(){
+  sb.auth.getSession().then(function(res){
+    if(res.data&&res.data.session&&res.data.session.user){
+      onLogin(res.data.session.user);
+    }else{
+      var as=document.getElementById('auth-screen');
+      if(as)as.style.display='flex';
+    }
+  });
+}
 
 </script>
 <div id="map-overlay">
