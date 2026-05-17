@@ -570,8 +570,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
           <div style="font-size:14px;font-weight:700;color:var(--text)">Customers per day</div>
           <div style="font-size:12px;color:var(--sub);margin-top:2px">How many stops can you make in a full day?</div>
         </div>
-        <input id="ob-spd" type="number" inputmode="numeric" min="3" max="30" value="10" style="width:64px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:10px 8px;font-size:16px;font-weight:700;font-family:inherit;text-align:center;outline:none">
+        <input id="ob-spd" type="number" inputmode="numeric" min="3" max="30" value="10" style="width:56px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:8px 6px;font-size:14px;font-weight:700;font-family:inherit;text-align:center;outline:none">
       </div>
+      <div id="ob-err" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:11px 14px;font-size:13px;color:#ef4444;margin-bottom:12px;line-height:1.4"></div>
       <button onclick="obSaveProfile()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit">Next &#8594;</button>
     </div>
     <div id="ob-step2" style="display:none">
@@ -842,6 +843,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
+      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds groups using your current "customers per day" setting. Run this after changing that setting in My Profile.</div>
     </div>
     <div class="card">
       <div class="lbl" style="color:var(--teal)">Import Excel or CSV</div>
@@ -2696,6 +2701,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
+      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds groups using your current "customers per day" setting. Run this after changing that setting in My Profile.</div>
     </div>
     <div class="card">
       <div class="lbl" style="color:var(--teal)">Import Excel or CSV</div>
@@ -9642,11 +9651,31 @@ function saveProfileSettings(){
   var spdEl=document.getElementById('prof-spd');
   var stopsPerDay=spdEl?Math.max(3,Math.min(30,parseInt(spdEl.value||'10',10)||10)):ST.userProfile.stopsPerDay||10;
   if(!stopsPerDay||stopsPerDay<3){toast('Enter how many customers you visit per day (3 or more)');return;}
+  var prevSpd=ST.userProfile.stopsPerDay||10;
   ST.userProfile={name:name,company:company,erpName:erpName||'Order System',territory:territory,homeZip:homeZip,homeAddress:homeAddress,stopsPerDay:stopsPerDay};
   lSave();syncUp();
   _closeProfileSheet();
-  toast('Profile saved!');
+  if(stopsPerDay!==prevSpd){toast('Profile saved! Go to Settings → Recalculate Route Groups to apply your new route size.');}
+  else{toast('Profile saved!');}
   rDash();
+}
+
+function confirmRecalcGroups(){
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+    +'<div style="font-size:17px;font-weight:800;margin-bottom:8px">Recalculate Route Groups?</div>'
+    +'<div style="font-size:14px;color:var(--sub);line-height:1.6;margin-bottom:20px">This will rebuild all groups using your current "customers per day" setting ('+((ST.userProfile&&ST.userProfile.stopsPerDay)||10)+' per day). Group names you\'ve customized will be kept.</div>'
+    +'<button onclick="this.closest(\'div[style*=z-index\\:600]\').remove();_doRecalcGroups()" style="width:100%;padding:14px;border-radius:var(--r2);border:none;background:var(--teal);color:#000;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:10px">Recalculate Now</button>'
+    +'<button onclick="this.closest(\'div[style*=z-index\\:600]\').remove()" style="width:100%;padding:13px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:14px;cursor:pointer;font-family:inherit">Cancel</button>'
+    +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+
+function _doRecalcGroups(){
+  toast('Recalculating groups...');
+  generateRouteGroups(function(){toast('Groups updated!');go('grps');});
 }
 
 function _onResume(){var dp=document.getElementById('p-dash');if(dp&&dp.style.display!=='none')rDash();}document.addEventListener('visibilitychange',function(){if(!document.hidden)_onResume();});window.addEventListener('pageshow',function(e){if(e.persisted)_onResume();});window.addEventListener('focus',function(){_onResume();});
@@ -9676,15 +9705,23 @@ function showOnboarding(){
   if(zEl&&ST.userProfile.homeZip)zEl.value=ST.userProfile.homeZip;
 }
 
+function _obErr(msg,fieldId){
+  var e=document.getElementById('ob-err');
+  if(e){e.textContent=msg;e.style.display='block';}
+  if(fieldId){
+    var f=document.getElementById(fieldId);
+    if(f){f.style.borderColor='#ef4444';f.focus();f.addEventListener('input',function(){f.style.borderColor='';var e2=document.getElementById('ob-err');if(e2)e2.style.display='none';},{once:true});}
+  }
+}
 function obSaveProfile(){
   var name=(document.getElementById('ob-name').value||'').trim();
   var company=(document.getElementById('ob-company').value||'').trim();
   var erp=(document.getElementById('ob-erp').value||'').trim();
   var zip=(document.getElementById('ob-zip').value||'').replace(/\D/g,'').slice(0,5);
   var spd=parseInt(document.getElementById('ob-spd').value||'0',10);
-  if(!name){toast('Enter your name to continue');return;}
-  if(!zip||zip.length!==5){toast('Enter a valid 5-digit zip code');return;}
-  if(isNaN(spd)||spd<3){toast('How many customers do you visit per day? (e.g. 10)');return;}
+  if(!name){_obErr('Please enter your full name to continue.','ob-name');return;}
+  if(!zip||zip.length!==5){_obErr('Please enter a valid 5-digit home zip code. This is used to sort your route groups by proximity.','ob-zip');return;}
+  if(isNaN(spd)||spd<3){_obErr('Please enter how many customers you visit per day (minimum 3).','ob-spd');return;}
   if(spd>30)spd=30;
   ST.userProfile.name=name;
   ST.userProfile.company=company;
@@ -9785,8 +9822,8 @@ function splitGroup(gid){
 
 function balanceClusterSizes(points,assignments,k){
   var _spd=(ST&&ST.userProfile&&ST.userProfile.stopsPerDay)||10;
-  var maxSize=_spd+3,minSize=Math.max(2,Math.floor(_spd/2)-1);
-  for(var iter=0;iter<200;iter++){
+  var maxSize=_spd+2,minSize=Math.max(3,_spd-2);
+  for(var iter=0;iter<500;iter++){
     var sizes=[],cLat=[],cLng=[];
     for(var c=0;c<k;c++){sizes.push(0);cLat.push(0);cLng.push(0);}
     for(var i=0;i<assignments.length;i++){var c=assignments[i];sizes[c]++;cLat[c]+=points[i].lat;cLng[c]+=points[i].lng;}
