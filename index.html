@@ -1671,7 +1671,10 @@ function syncDown(){
     fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
     .then(function(r){return r.json();}).then(function(rows){
       if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
-      finish();
+      if(Object.keys(ST.visits||{}).length===0&&localStorage.getItem('heath_rt_v13')){
+        fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
+        .then(function(r2){return r2.json();}).then(function(lr){if(lr&&lr.length>0)_applyRemoteState(lr[0]);finish();}).catch(function(){finish();});
+      }else{finish();}
     }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
   });
 }
@@ -3509,7 +3512,10 @@ function syncDown(){
     fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
     .then(function(r){return r.json();}).then(function(rows){
       if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
-      finish();
+      if(Object.keys(ST.visits||{}).length===0&&localStorage.getItem('heath_rt_v13')){
+        fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
+        .then(function(r2){return r2.json();}).then(function(lr){if(lr&&lr.length>0)_applyRemoteState(lr[0]);finish();}).catch(function(){finish();});
+      }else{finish();}
     }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
   });
 }
@@ -9504,8 +9510,9 @@ function showColumnMapper(hdrs,rows,fname,statusEl){
     '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'+
   '</div>';
   window._pendingImport={rows:rows,hdrs:hdrs,fname:fname,statusEl:statusEl};
+  window._colMapperSheet=sh;
   document.body.appendChild(sh);
-  sh.addEventListener('click',function(ev){if(ev.target===sh)sh.remove();});
+  sh.addEventListener('click',function(ev){if(ev.target===sh){sh.remove();window._colMapperSheet=null;}});
 }
 function confirmImport(){
   var pi=window._pendingImport;if(!pi)return;
@@ -9515,7 +9522,7 @@ function confirmImport(){
     ci[fd.key]=sel?parseInt(sel.value):-1;
   });
   ST.savedColMap=ci;lSave();
-  var sh=document.querySelector('div[style*="z-index:10000"]')||document.querySelector('div[style*="z-index:700"]');if(sh)sh.remove();
+  if(window._colMapperSheet){window._colMapperSheet.remove();window._colMapperSheet=null;}
   var normHdrs=pi.hdrs.map(function(h){return h.toLowerCase().replace(/[^a-z0-9]/g,'');});
   window._importColOverride=ci;
   doImport(normHdrs,pi.rows,pi.fname,pi.statusEl);
@@ -9660,6 +9667,30 @@ function kMeansClustering(points,k){
   return assignments;
 }
 
+function balanceClusterSizes(points,assignments,k){
+  var maxSize=14,minSize=4;
+  for(var iter=0;iter<100;iter++){
+    var sizes=[],cLat=[],cLng=[];
+    for(var c=0;c<k;c++){sizes.push(0);cLat.push(0);cLng.push(0);}
+    for(var i=0;i<assignments.length;i++){var c=assignments[i];sizes[c]++;cLat[c]+=points[i].lat;cLng[c]+=points[i].lng;}
+    for(var c=0;c<k;c++){if(sizes[c]>0){cLat[c]/=sizes[c];cLng[c]/=sizes[c];}}
+    var changed=false;
+    for(var i=0;i<assignments.length;i++){
+      var from=assignments[i];
+      if(sizes[from]<=maxSize)continue;
+      var best=-1,bestD=Infinity;
+      for(var c=0;c<k;c++){
+        if(c===from||sizes[c]>=maxSize)continue;
+        var dl=points[i].lat-cLat[c],dg=points[i].lng-cLng[c];
+        var d=dl*dl+dg*dg;
+        if(d<bestD){bestD=d;best=c;}
+      }
+      if(best>=0){sizes[from]--;sizes[best]++;assignments[i]=best;changed=true;}
+    }
+    if(!changed)break;
+  }
+  return assignments;
+}
 function generateRouteGroups(onDone){
   var customers=allC();
   if(!customers.length){IS_FIRST_RUN=false;if(onDone)onDone();return;}
@@ -9702,6 +9733,7 @@ function generateRouteGroups(onDone){
     if(geocoded.length>=3){
       var k=Math.max(3,Math.round(customers.length/10));k=Math.min(k,25);
       var asgn=kMeansClustering(geocoded,k);
+      asgn=balanceClusterSizes(geocoded,asgn,k);
       for(var i=0;i<geocoded.length;i++)groupAssignments[geocoded[i].code]=asgn[i]+1;
     }else{
       // Fallback: group by city
