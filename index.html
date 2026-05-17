@@ -1227,7 +1227,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 function allC(){
   var r=[];
-  var src=CUSTOMERS_BASE.concat(ST.addedCustomers||[]);
+  var src=ST.addedCustomers||[];
   for(var i=0;i<src.length;i++){
     var c=src[i];
     if(ST.archived[c.code]||(ST.removed&&ST.removed[c.code]))continue;
@@ -3058,7 +3058,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 function allC(){
   var r=[];
-  var src=CUSTOMERS_BASE.concat(ST.addedCustomers||[]);
+  var src=ST.addedCustomers||[];
   for(var i=0;i<src.length;i++){
     var c=src[i];
     if(ST.archived[c.code]||(ST.removed&&ST.removed[c.code]))continue;
@@ -9840,8 +9840,25 @@ function onLogin(user){
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
   initAppLock();
   updateSecurityStatus();
+  migrateBaseCustomers();
   checkFirstRun();
   go('dash');
+}
+
+function migrateBaseCustomers(){
+  if(ST.baseCustomersMigrated)return;
+  if(!CUSTOMERS_BASE||!CUSTOMERS_BASE.length){ST.baseCustomersMigrated=true;lSave();return;}
+  var hasExistingData=Object.keys(ST.visits||{}).length>0||Object.keys(ST.notes||{}).length>0||Object.keys(ST.orders||{}).length>0;
+  if(hasExistingData){
+    if(!ST.addedCustomers)ST.addedCustomers=[];
+    var existingCodes={};
+    for(var i=0;i<ST.addedCustomers.length;i++)existingCodes[ST.addedCustomers[i].code]=1;
+    for(var i=0;i<CUSTOMERS_BASE.length;i++){
+      if(!existingCodes[CUSTOMERS_BASE[i].code])ST.addedCustomers.push(CUSTOMERS_BASE[i]);
+    }
+  }
+  ST.baseCustomersMigrated=true;
+  lSave();
 }
 
 function authForgot(){
