@@ -1668,11 +1668,11 @@ function syncDown(){
         for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
         for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
         ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
-        migrateBaseCustomers();
-        lSave();rDash();rCust();rGrps();checkFirstRun();
       }
+      migrateBaseCustomers();
+      lSave();rDash();rCust();rGrps();checkFirstRun();
       if(sl)sl.textContent='Synced';
-    }).catch(function(){if(sl)sl.textContent='Offline mode';});
+    }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
   });
 }
 
@@ -3506,11 +3506,11 @@ function syncDown(){
         for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
         for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
         ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
-        migrateBaseCustomers();
-        lSave();rDash();rCust();rGrps();checkFirstRun();
       }
+      migrateBaseCustomers();
+      lSave();rDash();rCust();rGrps();checkFirstRun();
       if(sl)sl.textContent='Synced';
-    }).catch(function(){if(sl)sl.textContent='Offline mode';});
+    }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
   });
 }
 
@@ -9467,7 +9467,7 @@ function showColumnMapper(hdrs,rows,fname,statusEl){
   var ci=_autoDetectCols(hdrs);
   var preview=rows.slice(0,3);
   var sh=document.createElement('div');
-  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:700;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
   var coreFields=_FIELD_DEFS.slice(0,7);
   var salesFields=_FIELD_DEFS.slice(7);
   function colOpts(selectedIdx){
@@ -9845,7 +9845,6 @@ function onLogin(user){
   initAppLock();
   updateSecurityStatus();
   migrateBaseCustomers();
-  checkFirstRun();
   go('dash');
 }
 
