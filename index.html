@@ -37,7 +37,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;min-height:100vh;overscroll-behavior-y:contain}
 
 /* ── PAGES ── */
 .page{padding-bottom:90px;min-height:100vh}
@@ -561,7 +561,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <input id="ob-name" type="text" placeholder="Your full name" autocomplete="name" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
       <input id="ob-company" type="text" placeholder="Company name" autocomplete="organization" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
       <input id="ob-erp" type="text" placeholder="Order system / ERP (e.g. SAP, Epicor, Salesforce)" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
-      <input id="ob-zip" type="text" inputmode="numeric" placeholder="Home or office zip code" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:24px;outline:none">
+      <input id="ob-zip" type="text" inputmode="numeric" placeholder="Home zip code (for route grouping)" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
+      <div style="display:flex;align-items:center;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:14px 16px;margin-bottom:24px;gap:12px">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700;color:var(--text)">Customers per day</div>
+          <div style="font-size:12px;color:var(--sub);margin-top:2px">How many stops can you make in a full day?</div>
+        </div>
+        <input id="ob-spd" type="number" inputmode="numeric" min="3" max="30" value="10" style="width:64px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:10px 8px;font-size:16px;font-weight:700;font-family:inherit;text-align:center;outline:none">
+      </div>
       <button onclick="obSaveProfile()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit">Next &#8594;</button>
     </div>
     <div id="ob-step2" style="display:none">
@@ -1214,10 +1221,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:''}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:''};}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1561,7 +1568,8 @@ function rGrps(){
     var lastWorkedStr=grpLastWorked[g]?'Last: '+grpLastWorked[g].toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Never worked';
     var col=ov>gc.length*.5?'var(--red)':vis>gc.length*.5?'var(--green)':'var(--amber)';
     var pct=Math.round(vis/gc.length*100);
-    var sizeWarn=gc.length>=13?'<button onclick="event.stopPropagation();splitGroup(\''+g+'\')" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:6px">'+gc.length+' stops — tap to split</button>':'';
+    var _spdT=(ST.userProfile&&ST.userProfile.stopsPerDay)||10;
+    var sizeWarn=gc.length>=_spdT+3?'<button onclick="event.stopPropagation();splitGroup(\''+g+'\')" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:6px">'+gc.length+' stops — tap to split</button>':'';
     var sizeNote=gc.length<8?'<span style="background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - small group</span>':'';
     var gnote=(ST.groupNotes&&ST.groupNotes[g])||'';
     var gnoteBanner=gnote?'<div style="background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.25);border-radius:var(--r2);padding:6px 10px;font-size:12px;color:var(--amber);margin-top:6px;display:flex;align-items:center;gap:6px">&#128203; '+esc(gnote)+'</div>':'';
@@ -2005,7 +2013,7 @@ function initSwipe(containerId){
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;min-height:100vh;overscroll-behavior-y:contain}
 
 /* ── PAGES ── */
 .page{padding-bottom:90px;min-height:100vh}
@@ -3050,10 +3058,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:''}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:''};}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -3403,7 +3411,8 @@ function rGrps(){
     var lastWorkedStr=grpLastWorked[g]?'Last: '+grpLastWorked[g].toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Never worked';
     var col=ov>gc.length*.5?'var(--red)':vis>gc.length*.5?'var(--green)':'var(--amber)';
     var pct=Math.round(vis/gc.length*100);
-    var sizeWarn=gc.length>=13?'<button onclick="event.stopPropagation();splitGroup(\''+g+'\')" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:6px">'+gc.length+' stops — tap to split</button>':'';
+    var _spdT=(ST.userProfile&&ST.userProfile.stopsPerDay)||10;
+    var sizeWarn=gc.length>=_spdT+3?'<button onclick="event.stopPropagation();splitGroup(\''+g+'\')" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:6px">'+gc.length+' stops — tap to split</button>':'';
     var sizeNote=gc.length<8?'<span style="background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - small group</span>':'';
     var gnote=(ST.groupNotes&&ST.groupNotes[g])||'';
     var gnoteBanner=gnote?'<div style="background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.25);border-radius:var(--r2);padding:6px 10px;font-size:12px;color:var(--amber);margin-top:6px;display:flex;align-items:center;gap:6px">&#128203; '+esc(gnote)+'</div>':'';
@@ -4984,32 +4993,45 @@ function launchCustomRoute(){
   var crStops=customRoute.map(function(s){return {address:s.addr,city:'',name:s.name};});
   showMapPicker(crStops);
 }
-function showMapPicker(stops){
+function showMapPicker(stops,homeStart,homeEnd){
   var ex=document.getElementById('map-picker');
   if(ex)ex.parentNode.removeChild(ex);
 
-  // Build decoded address list (used by all three map apps)
-  var rawAddrs=stops.map(function(s){
+  homeStart=!!homeStart;homeEnd=!!homeEnd;
+  var homeAddr=(ST.userProfile&&ST.userProfile.homeAddress)||'';
+  var homeStop=homeAddr?{name:'Home',address:homeAddr,city:'',zip:'',code:'__HOME__'}:null;
+
+  // Apply home start/end
+  var effectiveStops=stops.slice();
+  if(homeStart&&homeStop)effectiveStops.unshift(homeStop);
+  if(homeEnd&&homeStop)effectiveStops.push(homeStop);
+
+  // Build decoded address list
+  var rawAddrs=effectiveStops.map(function(s){
     if(s.addr)return decodeURIComponent(s.addr);
     return [s.address,s.city,'CA'].filter(function(x){return x;}).join(', ');
   });
 
   // Google Maps: supports up to 10 waypoints via /dir/ URL
-  var googleUrl='https://www.google.com/maps/dir/My+Location/'+
-    rawAddrs.map(function(a){return encodeURIComponent(a);}).join('/');
+  var googleStart=homeStart&&homeAddr?encodeURIComponent(homeAddr):'My+Location';
+  var googleWaypoints=rawAddrs.slice(homeStart&&homeStop?1:0);
+  var googleUrl='https://www.google.com/maps/dir/'+googleStart+'/'+
+    googleWaypoints.map(function(a){return encodeURIComponent(a);}).join('/');
 
-  // Apple Maps: +to: chaining supports more stops than multiple &daddr= params
-  // iOS platform limit is ~4 stops regardless of format — be honest in the label
-  var APPLE_MAX=4;
-  var appleStops=rawAddrs.slice(0,APPLE_MAX);
-  var appleUrl='https://maps.apple.com/?dirflg=d&daddr='+
-    appleStops.map(function(a){return a.replace(/ /g,'+');}).join('+to:');
-  var appleStopNote=stops.length>APPLE_MAX
-    ? APPLE_MAX+' of '+stops.length+' stops (iOS limit)'
-    : stops.length+' stop'+(stops.length!==1?'s':'');
+  // Rolling route: batch sizes
+  var FIRST=4;
+  var n=effectiveStops.length;
+  var teslaAvail=n>1;
+  var teslaLabel=n<=FIRST?'Opens all '+n+' stops, sorted by GPS':'Rolling route — '+FIRST+' of '+n+' stops (Tesla limit)';
+  var appleLabel=n<=FIRST?'Opens all '+n+' stops, sorted by GPS':'Rolling route — '+FIRST+' of '+n+' stops (iOS limit)';
+  var wazeLabel='Rolling route — 1 of '+n+' stops (Waze limit)';
 
-  // Waze: URL scheme only supports a single destination
-  var wazeUrl='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(rawAddrs[0]);
+  var opts=[
+    {icon:'&#127758;',name:'Google Maps',sub:'All '+n+' stops'+(homeStart?' from home':' from your location'),url:googleUrl,bg:'rgba(66,133,244,.15)'},
+    {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple');},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail},
+    {icon:'&#9889;',name:'Tesla',sub:teslaLabel,handler:function(){startRollingRoute(effectiveStops,'apple');},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail},
+    {icon:'&#128663;',name:'Waze',sub:wazeLabel,handler:function(){startRollingRoute(effectiveStops,'waze');},bg:'rgba(255,176,32,.12)'}
+  ];
 
   var picker=document.createElement('div');
   picker.id='map-picker';picker.className='map-picker';
@@ -5023,16 +5045,24 @@ function showMapPicker(stops){
 
   var ttl=document.createElement('div');
   ttl.style.cssText='font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px';
-  ttl.textContent='Open '+stops.length+'-stop route with';
+  ttl.textContent='Open '+n+'-stop route with';
   inner.appendChild(ttl);
 
-  var teslaAvail=stops.length>1;
-  var opts=[
-    {icon:'&#127758;',name:'Google Maps',sub:'All '+stops.length+' stops from your location',url:googleUrl,bg:'rgba(66,133,244,.15)'},
-    {icon:'&#63743;',name:'Apple Maps',sub:appleStopNote,url:appleUrl,bg:'rgba(0,212,170,.12)'},
-    {icon:'&#9889;',name:'Tesla / CarPlay',sub:'Rolling route — 4 now, then 3+3, sorted by GPS',handler:function(){startTeslaRoute(stops);},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail},
-    {icon:'&#128663;',name:'Waze',sub:'First stop only — '+esc(stops[0].name),url:wazeUrl,bg:'rgba(255,176,32,.12)'}
-  ];
+  // Home toggles (only shown if homeAddress is set in profile)
+  if(homeAddr){
+    var homeRow=document.createElement('div');
+    homeRow.style.cssText='display:flex;gap:8px;margin-bottom:10px';
+    var mkHomeBtn=function(label,active,onClick){
+      var btn=document.createElement('button');
+      btn.style.cssText='flex:1;padding:8px 6px;border-radius:var(--r2);border:1px solid '+(active?'rgba(0,229,184,.4)':'var(--border2)')+';background:'+(active?'var(--teal2)':'transparent')+';color:'+(active?'var(--teal)':'var(--sub)')+';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit';
+      btn.textContent=label;
+      btn.addEventListener('click',function(){picker.parentNode.removeChild(picker);onClick();});
+      return btn;
+    };
+    homeRow.appendChild(mkHomeBtn('🏠 Start from home',homeStart,function(){showMapPicker(stops,!homeStart,homeEnd);}));
+    homeRow.appendChild(mkHomeBtn('🏠 Return home',homeEnd,function(){showMapPicker(stops,homeStart,!homeEnd);}));
+    inner.appendChild(homeRow);
+  }
 
   for(var i=0;i<opts.length;i++){
     (function(opt){
@@ -5051,6 +5081,13 @@ function showMapPicker(stops){
         else{window.open(opt.url,'_blank');toast('Opening in '+opt.name);}
       });
       inner.appendChild(row);
+      // Supercharger note under Tesla option
+      if(opt.name==='Tesla'){
+        var scNote=document.createElement('div');
+        scNote.style.cssText='font-size:11px;color:var(--sub);padding:4px 10px 8px 50px;line-height:1.4';
+        scNote.textContent='If you need to charge mid-route, add a Supercharger in your Tesla\'s built-in nav between stops.';
+        inner.appendChild(scNote);
+      }
     })(opts[i]);
   }
 
@@ -5322,39 +5359,53 @@ function saveRolling(){
   }catch(e){}
 }
 
-function startTeslaRoute(stops){
+function startTeslaRoute(stops){startRollingRoute(stops,'apple');}
+
+function startRollingRoute(stops,type){
+  type=type||'apple';
+  var FIRST=type==='waze'?1:4;
   toast('Getting your location...');
   getGPS(function(gps){
     var sorted=sortByGPS(stops,gps);
-    var FIRST=4,REST=3;
     var batch=sorted.slice(0,FIRST);
     var remaining=sorted.slice(FIRST);
-    rollingRoute={remaining:remaining,batchNum:1,total:stops.length};
+    rollingRoute={remaining:remaining,batchNum:1,total:stops.length,type:type};
     saveRolling();
-    openAppleMapsRoute(batch);
+    if(type==='waze')openWazeRoute(batch[0]);
+    else openAppleMapsRoute(batch);
     rRolling();
     if(!gps)toast('GPS unavailable — using group order');
-    else toast('⚡ Tesla Route started — '+batch.length+' stops');
+    else if(type==='waze')toast('🚗 Waze Route — stop 1 of '+stops.length);
+    else toast('⚡ Rolling Route started — '+batch.length+' stops');
   });
 }
 
 function continueRollingRoute(){
   if(!rollingRoute||!rollingRoute.remaining.length){clearRollingRoute();return;}
+  var type=rollingRoute.type||'apple';
+  var REST=type==='waze'?1:3;
   toast('Getting your location...');
   getGPS(function(gps){
-    var REST=3;
     var sorted=sortByGPS(rollingRoute.remaining,gps);
     var batch=sorted.slice(0,REST);
     var remaining=sorted.slice(REST);
     rollingRoute.remaining=remaining;
     rollingRoute.batchNum++;
     saveRolling();
-    openAppleMapsRoute(batch);
+    if(type==='waze')openWazeRoute(batch[0]);
+    else openAppleMapsRoute(batch);
     rRolling();
     if(!gps)toast('GPS unavailable — using last order');
+    else if(type==='waze')toast('🚗 Stop '+rollingRoute.batchNum+' of '+rollingRoute.total);
     else toast('⚡ Batch '+rollingRoute.batchNum+' — '+batch.length+' stops');
-    if(!remaining.length){toast('Last batch — route complete after these stops!');}
+    if(!remaining.length)toast('Last stop — route complete after this!');
   });
+}
+
+function openWazeRoute(stop){
+  if(!stop)return;
+  var addr=[stop.address,stop.city,'CA'].filter(function(x){return x;}).join(', ');
+  window.open('https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr),'_blank');
 }
 
 function clearRollingRoute(){
@@ -5381,18 +5432,22 @@ function rRolling(){
   if(!card)return;
   if(!rollingRoute){card.style.display='none';return;}
   card.style.display='block';
+  var type=rollingRoute.type||'apple';
+  var REST=type==='waze'?1:3;
+  var mapName=type==='waze'?'Waze':'Apple Maps';
+  var lblEl=card.querySelector('.tesla-lbl');
+  if(lblEl)lblEl.textContent=type==='waze'?'🚗 Waze Route Active':'⚡ Rolling Route Active';
   var rem=rollingRoute.remaining.length;
-  var done=rollingRoute.total-rem;
-  batchEl.textContent='Batch '+rollingRoute.batchNum+' of '+(rollingRoute.batchNum+Math.ceil(rem/3));
+  batchEl.textContent='Batch '+rollingRoute.batchNum+' of '+(rollingRoute.batchNum+Math.ceil(rem/REST));
   if(rem===0){
     stopsEl.innerHTML='<div style="color:#e82127;font-size:13px;font-weight:600">All '+rollingRoute.total+' stops routed ✓</div>';
     contBtn.style.display='none';
   }else{
-    var nextBatch=rollingRoute.remaining.slice(0,3);
-    stopsEl.innerHTML='<div style="font-size:12px;color:var(--sub);margin-bottom:6px">'+rem+' stop'+(rem!==1?'s':'')+' remaining — next '+Math.min(3,rem)+':</div>'+
+    var nextBatch=rollingRoute.remaining.slice(0,REST);
+    stopsEl.innerHTML='<div style="font-size:12px;color:var(--sub);margin-bottom:6px">'+rem+' stop'+(rem!==1?'s':'')+' remaining — next '+Math.min(REST,rem)+':</div>'+
       nextBatch.map(function(s){return'<div style="font-size:13px;font-weight:600;padding:3px 0">'+esc(s.name)+' <span style="color:var(--sub);font-weight:400">· '+esc(s.city||'')+'</span></div>';}).join('');
     contBtn.style.display='block';
-    contBtn.textContent='Continue — Next '+Math.min(3,rem)+' Stops in Apple Maps';
+    contBtn.textContent='Continue — Next '+Math.min(REST,rem)+' Stop'+(Math.min(REST,rem)!==1?'s':'')+' in '+mapName;
   }
 }
 // ─────────────────────────────────────────────────────────────────────────────
@@ -6247,7 +6302,7 @@ function showHowToUse(){
     {icon:'&#128176;',title:'Orders',body:'Log an order inside any customer card with a dollar amount and optional description. Orders appear in the Today\'s Orders dashboard card and are included in your data export.'},
     {icon:'&#128203;',title:'Quotes',body:'Tap "+ New" in the Quotes section of any customer card to build a multi-item quote. Add up to any number of line items (long quotes auto-split to two screenshot cards). Includes tax by zip code, delivery fee, and a resale-exempt toggle. Tap the quote card to screenshot and send to the customer. Mark quotes Won or Lost — lost quotes ask for a reason. Open quotes with a follow-up date trigger a dashboard alert.'},
     {icon:'&#9989;',title:'To-Dos',body:'Add to-do items per customer (e.g. "bring sample", "send price sheet"). Check them off when done. Open to-dos count shows in the data export.'},
-    {icon:'&#128205;',title:'Groups',body:'10–12 customers per geographic group. Tap a group to see details and add a group note (shown as a route banner). Tap "Route" to push all addresses to your nav app at once.'},
+    {icon:'&#128205;',title:'Groups',body:'Groups are sized to match your "customers per day" setting (default 10). Tap a group to see its details and add a group note. Groups over the size limit show a "tap to split" button — tap it to auto-split into two even groups by zip code. Tap "Route" to open the full group in your nav app.'},
     {icon:'&#127981;',title:'Custom Route',body:'In the Customers tab, scroll the filter chips to find Custom Route. Search and add any mix of customers and vendors. Tap Done/N/A to log stops without leaving the list.'},
     {icon:'&#128203;',title:'Tags',body:'Add custom tags to any customer (e.g. "lumber", "millwork", "new account"). Filter the customer list by tag to find your segment instantly.'},
     {icon:'&#128477;',title:'Snooze',body:'Snooze a customer for a set number of days to hide them from overdue alerts and route suggestions while you wait.'},
@@ -6257,12 +6312,15 @@ function showHowToUse(){
     {icon:'&#128229;',title:'Excel Import',body:'Settings → Import Excel or CSV. New accounts are added automatically with the correct group assigned by zip code. Financials update; notes and history are never overwritten. order system discrepancies are flagged for export.'},
     {icon:'&#128190;',title:'Data Export',body:'Settings → Export Data. Downloads a CSV of all 600+ customers with visit history, notes, financials, tags, orders, quotes, and more. A red banner appears on the dashboard if you haven\'t exported in 30+ days.'},
     {icon:'&#128272;',title:'Security',body:'Set a PIN in Settings to lock the app. You can also enable Face ID / Touch ID so you unlock with biometrics instead of typing your PIN every time.'},
-    {icon:'&#9889;',title:'Rolling Route (Tesla Mode)',body:'Opens 4 stops in Maps, then when you return it loads the next batch automatically. Best for all-day routing when you want continuous navigation.'},
+    {icon:'&#9889;',title:'Rolling Route (Apple, Tesla & Waze)',body:'Tap "Route" on any group to pick your nav app. Apple Maps and Tesla both use rolling batches of 4 stops at a time — when you return to FieldIQ, tap "Continue" to load the next batch. Waze uses a rolling 1-stop-at-a-time approach. Google Maps loads all stops at once. Set your home address in My Profile to add "Start from home" and "Return home" toggles to any route.'},
     {icon:'&#128194;',title:'Pricing Tab',body:'Upload your order system price sheet (Excel or CSV). Set your margin % and sell prices calculate instantly. Search by item code or description.'},
   ];
   var html='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;overflow-y:auto">'
-    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px"></div>'
-    +'<div style="font-size:20px;font-weight:800;margin-bottom:16px">&#128214; How to Use FieldIQ</div>'
+    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'
+      +'<div style="font-size:20px;font-weight:800">&#128214; How to Use FieldIQ</div>'
+      +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:var(--bg3);border:1px solid var(--border);color:var(--sub);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px;flex-shrink:0">&#x2715;</button>'
+    +'</div>'
     +sections.map(function(s){
       return '<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">'
         +'<div style="font-size:22px;flex-shrink:0;width:30px;text-align:center">'+s.icon+'</div>'
@@ -9552,6 +9610,13 @@ function showProfileSettings(){
     '<input id="prof-territory" class="fi" value="'+esc(p.territory||'')+'" placeholder="e.g. Southern California">'+
     '<div class="fl">Home Zip Code</div>'+
     '<input id="prof-zip" class="fi" value="'+esc(p.homeZip||'')+'" placeholder="e.g. 92101" inputmode="numeric">'+
+    '<div class="fl">Home Address <span style="color:var(--sub);font-weight:400">(optional — used for routing)</span></div>'+
+    '<input id="prof-homeaddr" class="fi" value="'+esc(p.homeAddress||'')+'" placeholder="e.g. 123 Main St, Fullerton, CA 92832">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
+      '<div class="fl" style="margin-bottom:0">Customers per day</div>'+
+      '<input id="prof-spd" type="number" inputmode="numeric" min="3" max="30" value="'+(p.stopsPerDay||10)+'" style="width:64px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:8px;font-size:16px;font-weight:700;font-family:inherit;text-align:center;outline:none">'+
+    '</div>'+
+    '<div style="font-size:12px;color:var(--sub);margin-bottom:14px">Controls group size targets and split suggestions</div>'+
     '<button onclick="saveProfileSettings()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-top:4px">Save Profile</button>'+
   '</div>';
   document.body.appendChild(sh);
@@ -9564,9 +9629,12 @@ function saveProfileSettings(){
   var erpName=(document.getElementById('prof-erp').value||'').trim();
   var territory=(document.getElementById('prof-territory').value||'').trim();
   var homeZip=(document.getElementById('prof-zip').value||'').trim();
+  var homeAddress=(document.getElementById('prof-homeaddr').value||'').trim();
+  var spdEl=document.getElementById('prof-spd');
+  var stopsPerDay=spdEl?Math.max(3,Math.min(30,parseInt(spdEl.value||'10',10)||10)):ST.userProfile.stopsPerDay||10;
   if(!name){toast('Please enter your name');return;}
   if(!company){toast('Please enter your company name');return;}
-  ST.userProfile={name:name,company:company,erpName:erpName||'Order System',territory:territory,homeZip:homeZip};
+  ST.userProfile={name:name,company:company,erpName:erpName||'Order System',territory:territory,homeZip:homeZip,homeAddress:homeAddress,stopsPerDay:stopsPerDay};
   lSave();syncUp();
   var sh=document.querySelector('div[style*="z-index:500"]');if(sh)sh.remove();
   toast('Profile saved!');
@@ -9607,10 +9675,13 @@ function obSaveProfile(){
   var zip=(document.getElementById('ob-zip').value||'').replace(/\D/g,'').slice(0,5);
   if(!name){toast('Enter your name to continue');return;}
   if(!zip||zip.length!==5){toast('Enter a valid 5-digit zip code');return;}
+  var spd=parseInt(document.getElementById('ob-spd').value||'10',10);
+  if(isNaN(spd)||spd<3)spd=3;if(spd>30)spd=30;
   ST.userProfile.name=name;
   ST.userProfile.company=company;
   ST.userProfile.erpName=erp;
   ST.userProfile.homeZip=zip;
+  ST.userProfile.stopsPerDay=spd;
   lSave();
   // Update greeting immediately
   var dg=document.getElementById('d-greet');
@@ -9788,7 +9859,8 @@ function generateRouteGroups(onDone){
     }
     var groupAssignments={};
     if(geocoded.length>=3){
-      var k=Math.max(3,Math.round(customers.length/10));k=Math.min(k,25);
+      var _spd=ST.userProfile&&ST.userProfile.stopsPerDay?Math.max(3,ST.userProfile.stopsPerDay):10;
+      var k=Math.max(3,Math.round(customers.length/_spd));k=Math.min(k,Math.ceil(customers.length/4));
       var asgn=kMeansClustering(geocoded,k);
       asgn=balanceClusterSizes(geocoded,asgn,k);
       for(var i=0;i<geocoded.length;i++)groupAssignments[geocoded[i].code]=asgn[i]+1;
@@ -9912,6 +9984,7 @@ function onLogin(user){
   lLoad();
   if(!ST.userProfile)ST.userProfile={};
   if(!ST.userProfile.name)ST.userProfile.name=user.email.split('@')[0];
+  document.body.style.overflow='';
   var as=document.getElementById('auth-screen');
   if(as)as.style.display='none';
   var ul=document.getElementById('auth-user-lbl');
@@ -9979,10 +10052,11 @@ function doSignOut(){
   sb.auth.signOut().then(function(){
     CURRENT_USER=null;
     SK='';
-    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:''}};
+    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
     authTab('signin');
+    document.body.style.overflow='hidden';
     var as=document.getElementById('auth-screen');
     if(as)as.style.display='flex';
   });
