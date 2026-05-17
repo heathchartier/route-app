@@ -567,7 +567,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
           <div style="font-size:14px;font-weight:700;color:var(--text)">Customers per day</div>
           <div style="font-size:12px;color:var(--sub);margin-top:2px">How many stops can you make in a full day?</div>
         </div>
-        <input id="ob-spd" type="number" inputmode="numeric" min="3" max="30" value="10" style="width:64px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:10px 8px;font-size:16px;font-weight:700;font-family:inherit;text-align:center;outline:none">
+        <input id="ob-spd" type="number" inputmode="numeric" min="3" max="30" placeholder="e.g. 10" style="width:64px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:10px 8px;font-size:16px;font-weight:700;font-family:inherit;text-align:center;outline:none">
       </div>
       <button onclick="obSaveProfile()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit">Next &#8594;</button>
     </div>
@@ -837,6 +837,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
+      <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
+    </div>
     <div class="card">
       <div class="lbl" style="color:var(--teal)">Import Excel or CSV</div>
       <div class="drop" onclick="document.getElementById('xl-input').click()">
@@ -970,10 +974,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="card" style="margin-top:4px">
       <div class="lbl">Dashboard Cards</div>
       <div id="dash-toggles"></div>
-    </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding-top:16px">
-      <button onclick="showHowToUse()" style="padding:10px 18px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
-      <button onclick="showEOD()" style="padding:10px 18px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128274; Account</div>
@@ -2689,6 +2689,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
+      <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
+    </div>
     <div class="card">
       <div class="lbl" style="color:var(--teal)">Import Excel or CSV</div>
       <div class="drop" onclick="document.getElementById('xl-input').click()">
@@ -2814,10 +2818,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="card" style="margin-top:4px">
       <div class="lbl">Dashboard Cards</div>
       <div id="dash-toggles"></div>
-    </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding-top:16px">
-      <button onclick="showHowToUse()" style="padding:10px 18px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
-      <button onclick="showEOD()" style="padding:10px 18px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128274; Account</div>
@@ -5026,10 +5026,11 @@ function showMapPicker(stops,homeStart,homeEnd){
   var appleLabel=n<=FIRST?'Opens all '+n+' stops, sorted by GPS':'Rolling route — '+FIRST+' of '+n+' stops (iOS limit)';
   var wazeLabel='Rolling route — 1 of '+n+' stops (Waze limit)';
 
+  var isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
   var opts=[
     {icon:'&#127758;',name:'Google Maps',sub:'All '+n+' stops'+(homeStart?' from home':' from your location'),url:googleUrl,bg:'rgba(66,133,244,.15)'},
-    {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple');},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail},
-    {icon:'&#9889;',name:'Tesla',sub:teslaLabel,handler:function(){startRollingRoute(effectiveStops,'apple');},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail},
+    {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple');},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail||!isIOS},
+    {icon:'&#9889;',name:'Tesla',sub:teslaLabel,note:'Low on charge? Add a Supercharger in your Tesla\'s built-in nav between stops.',handler:function(){startRollingRoute(effectiveStops,'apple');},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail||!isIOS},
     {icon:'&#128663;',name:'Waze',sub:wazeLabel,handler:function(){startRollingRoute(effectiveStops,'waze');},bg:'rgba(255,176,32,.12)'}
   ];
 
@@ -5071,9 +5072,9 @@ function showMapPicker(stops,homeStart,homeEnd){
       var ico=document.createElement('div');ico.className='map-icon';
       ico.style.background=opt.bg;ico.innerHTML=opt.icon;
       var inf=document.createElement('div');
-      inf.innerHTML='<div class="map-name">'+opt.name+'</div><div class="map-sub">'+opt.sub+'</div>';
+      inf.innerHTML='<div class="map-name">'+opt.name+'</div><div class="map-sub">'+opt.sub+'</div>'+(opt.note?'<div style="font-size:11px;color:var(--dim);margin-top:3px;line-height:1.4">'+opt.note+'</div>':'');
       var arr=document.createElement('div');
-      arr.style.cssText='margin-left:auto;color:var(--sub);font-size:20px;font-weight:300';arr.textContent='›';
+      arr.style.cssText='margin-left:auto;color:var(--sub);font-size:20px;font-weight:300;flex-shrink:0';arr.textContent='›';
       row.appendChild(ico);row.appendChild(inf);row.appendChild(arr);
       row.addEventListener('click',function(){
         picker.parentNode.removeChild(picker);
@@ -5081,13 +5082,6 @@ function showMapPicker(stops,homeStart,homeEnd){
         else{window.open(opt.url,'_blank');toast('Opening in '+opt.name);}
       });
       inner.appendChild(row);
-      // Supercharger note under Tesla option
-      if(opt.name==='Tesla'){
-        var scNote=document.createElement('div');
-        scNote.style.cssText='font-size:11px;color:var(--sub);padding:4px 10px 8px 50px;line-height:1.4';
-        scNote.textContent='If you need to charge mid-route, add a Supercharger in your Tesla\'s built-in nav between stops.';
-        inner.appendChild(scNote);
-      }
     })(opts[i]);
   }
 
@@ -5350,7 +5344,15 @@ var ROLLING_KEY='hrt_rolling';
 var rollingRoute=null; // {remaining:[...], batchNum:N, total:N}
 
 function loadRolling(){
-  try{var s=localStorage.getItem(ROLLING_KEY);if(s)rollingRoute=JSON.parse(s);}catch(e){}
+  try{
+    var s=localStorage.getItem(ROLLING_KEY);
+    if(s){
+      var r=JSON.parse(s);
+      var uid=CURRENT_USER?CURRENT_USER.id:'';
+      if(r&&(!r.userId||r.userId===uid))rollingRoute=r;
+      else{localStorage.removeItem(ROLLING_KEY);}
+    }
+  }catch(e){}
 }
 function saveRolling(){
   try{
@@ -5364,42 +5366,33 @@ function startTeslaRoute(stops){startRollingRoute(stops,'apple');}
 function startRollingRoute(stops,type){
   type=type||'apple';
   var FIRST=type==='waze'?1:4;
-  toast('Getting your location...');
-  getGPS(function(gps){
-    var sorted=sortByGPS(stops,gps);
-    var batch=sorted.slice(0,FIRST);
-    var remaining=sorted.slice(FIRST);
-    rollingRoute={remaining:remaining,batchNum:1,total:stops.length,type:type};
-    saveRolling();
-    if(type==='waze')openWazeRoute(batch[0]);
-    else openAppleMapsRoute(batch);
-    rRolling();
-    if(!gps)toast('GPS unavailable — using group order');
-    else if(type==='waze')toast('🚗 Waze Route — stop 1 of '+stops.length);
-    else toast('⚡ Rolling Route started — '+batch.length+' stops');
-  });
+  var batch=stops.slice(0,FIRST);
+  var remaining=stops.slice(FIRST);
+  var uid=CURRENT_USER?CURRENT_USER.id:'';
+  rollingRoute={remaining:remaining,batchNum:1,total:stops.length,type:type,userId:uid};
+  saveRolling();
+  if(type==='waze')openWazeRoute(batch[0]);
+  else openAppleMapsRoute(batch);
+  rRolling();
+  if(type==='waze')toast('🚗 Waze Route started — stop 1 of '+stops.length);
+  else toast('⚡ Rolling Route started — '+batch.length+' stops');
 }
 
 function continueRollingRoute(){
   if(!rollingRoute||!rollingRoute.remaining.length){clearRollingRoute();return;}
   var type=rollingRoute.type||'apple';
   var REST=type==='waze'?1:3;
-  toast('Getting your location...');
-  getGPS(function(gps){
-    var sorted=sortByGPS(rollingRoute.remaining,gps);
-    var batch=sorted.slice(0,REST);
-    var remaining=sorted.slice(REST);
-    rollingRoute.remaining=remaining;
-    rollingRoute.batchNum++;
-    saveRolling();
-    if(type==='waze')openWazeRoute(batch[0]);
-    else openAppleMapsRoute(batch);
-    rRolling();
-    if(!gps)toast('GPS unavailable — using last order');
-    else if(type==='waze')toast('🚗 Stop '+rollingRoute.batchNum+' of '+rollingRoute.total);
-    else toast('⚡ Batch '+rollingRoute.batchNum+' — '+batch.length+' stops');
-    if(!remaining.length)toast('Last stop — route complete after this!');
-  });
+  var batch=rollingRoute.remaining.slice(0,REST);
+  var remaining=rollingRoute.remaining.slice(REST);
+  rollingRoute.remaining=remaining;
+  rollingRoute.batchNum++;
+  saveRolling();
+  if(type==='waze')openWazeRoute(batch[0]);
+  else openAppleMapsRoute(batch);
+  rRolling();
+  if(type==='waze')toast('🚗 Stop '+rollingRoute.batchNum+' of '+rollingRoute.total);
+  else toast('⚡ Batch '+rollingRoute.batchNum+' — '+batch.length+' stops');
+  if(!remaining.length)toast('Last batch — route complete after these stops!');
 }
 
 function openWazeRoute(stop){
@@ -9590,15 +9583,18 @@ function confirmImport(){
 }
 
 /* ── PROFILE SETTINGS ── */
+function _closeProfileSheet(){document.body.style.overflow='';var s=document.getElementById('prof-settings-sheet');if(s)s.remove();}
 function showProfileSettings(){
   var p=ST.userProfile||{};
   var sh=document.createElement('div');
+  sh.id='prof-settings-sheet';
   sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
-  sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'+
+  document.body.style.overflow='hidden';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:85vh;overflow-y:auto">'+
     '<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">'+
       '<div style="font-size:18px;font-weight:800">&#128100; My Profile</div>'+
-      '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:var(--bg3);border:1px solid var(--border);color:var(--sub);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px">&#x2715;</button>'+
+      '<button onclick="_closeProfileSheet()" style="background:var(--bg3);border:1px solid var(--border);color:var(--sub);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px">&#x2715;</button>'+
     '</div>'+
     '<div class="fl">Your Name</div>'+
     '<input id="prof-name" class="fi" value="'+esc(p.name||'')+'" placeholder="e.g. Heath Chartier">'+
@@ -9614,13 +9610,13 @@ function showProfileSettings(){
     '<input id="prof-homeaddr" class="fi" value="'+esc(p.homeAddress||'')+'" placeholder="e.g. 123 Main St, Fullerton, CA 92832">'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
       '<div class="fl" style="margin-bottom:0">Customers per day</div>'+
-      '<input id="prof-spd" type="number" inputmode="numeric" min="3" max="30" value="'+(p.stopsPerDay||10)+'" style="width:64px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:8px;font-size:16px;font-weight:700;font-family:inherit;text-align:center;outline:none">'+
+      '<input id="prof-spd" type="number" inputmode="numeric" min="3" max="30" placeholder="e.g. 10" value="'+(p.stopsPerDay||'')+'" style="width:64px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:8px;font-size:16px;font-weight:700;font-family:inherit;text-align:center;outline:none">'+
     '</div>'+
     '<div style="font-size:12px;color:var(--sub);margin-bottom:14px">Controls group size targets and split suggestions</div>'+
     '<button onclick="saveProfileSettings()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-top:4px">Save Profile</button>'+
   '</div>';
   document.body.appendChild(sh);
-  sh.addEventListener('click',function(ev){if(ev.target===sh)sh.remove();});
+  sh.addEventListener('click',function(ev){if(ev.target===sh)_closeProfileSheet();});
 }
 function saveProfileSettings(){
   if(!ST.userProfile)ST.userProfile={};
@@ -9632,11 +9628,10 @@ function saveProfileSettings(){
   var homeAddress=(document.getElementById('prof-homeaddr').value||'').trim();
   var spdEl=document.getElementById('prof-spd');
   var stopsPerDay=spdEl?Math.max(3,Math.min(30,parseInt(spdEl.value||'10',10)||10)):ST.userProfile.stopsPerDay||10;
-  if(!name){toast('Please enter your name');return;}
-  if(!company){toast('Please enter your company name');return;}
+  if(!stopsPerDay||stopsPerDay<3){toast('Enter how many customers you visit per day (3 or more)');return;}
   ST.userProfile={name:name,company:company,erpName:erpName||'Order System',territory:territory,homeZip:homeZip,homeAddress:homeAddress,stopsPerDay:stopsPerDay};
   lSave();syncUp();
-  var sh=document.querySelector('div[style*="z-index:500"]');if(sh)sh.remove();
+  _closeProfileSheet();
   toast('Profile saved!');
   rDash();
 }
@@ -9673,10 +9668,11 @@ function obSaveProfile(){
   var company=(document.getElementById('ob-company').value||'').trim();
   var erp=(document.getElementById('ob-erp').value||'').trim();
   var zip=(document.getElementById('ob-zip').value||'').replace(/\D/g,'').slice(0,5);
+  var spd=parseInt(document.getElementById('ob-spd').value||'0',10);
   if(!name){toast('Enter your name to continue');return;}
   if(!zip||zip.length!==5){toast('Enter a valid 5-digit zip code');return;}
-  var spd=parseInt(document.getElementById('ob-spd').value||'10',10);
-  if(isNaN(spd)||spd<3)spd=3;if(spd>30)spd=30;
+  if(isNaN(spd)||spd<3){toast('How many customers do you visit per day? (e.g. 10)');return;}
+  if(spd>30)spd=30;
   ST.userProfile.name=name;
   ST.userProfile.company=company;
   ST.userProfile.erpName=erp;
@@ -9886,6 +9882,25 @@ function generateRouteGroups(onDone){
       }
       groupAssignments[ungeocodable[i].code]=best;
     }
+    // Reorder group numbers by distance from homeZip (Group 1 = closest)
+    if(zipCoords[homeZip]){
+      var homeCoords=zipCoords[homeZip];
+      var gLat={},gLng={},gCnt={};
+      for(var i=0;i<geocoded.length;i++){
+        var gid=groupAssignments[geocoded[i].code];if(!gid)continue;
+        if(!gLat[gid]){gLat[gid]=0;gLng[gid]=0;gCnt[gid]=0;}
+        gLat[gid]+=geocoded[i].lat;gLng[gid]+=geocoded[i].lng;gCnt[gid]++;
+      }
+      var gIds=Object.keys(gLat).map(Number);
+      for(var i=0;i<gIds.length;i++){var g=gIds[i];if(gCnt[g]>0){gLat[g]/=gCnt[g];gLng[g]/=gCnt[g];}}
+      gIds.sort(function(a,b){
+        var da=(gLat[a]-homeCoords.lat)*(gLat[a]-homeCoords.lat)+(gLng[a]-homeCoords.lng)*(gLng[a]-homeCoords.lng);
+        var db=(gLat[b]-homeCoords.lat)*(gLat[b]-homeCoords.lat)+(gLng[b]-homeCoords.lng)*(gLng[b]-homeCoords.lng);
+        return da-db;
+      });
+      var remap={};for(var i=0;i<gIds.length;i++)remap[gIds[i]]=i+1;
+      for(var code in groupAssignments){if(remap[groupAssignments[code]])groupAssignments[code]=remap[groupAssignments[code]];}
+    }
     // Build group names from dominant city per group
     var groupCityCount={};
     for(var i=0;i<customers.length;i++){
@@ -10052,6 +10067,7 @@ function doSignOut(){
   sb.auth.signOut().then(function(){
     CURRENT_USER=null;
     SK='';
+    rollingRoute=null;saveRolling();
     ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
