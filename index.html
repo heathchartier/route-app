@@ -787,7 +787,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
 </div>
 
-<div id="p-cust" style="display:none;padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px))">
+<div id="p-cust" style="display:none;padding-bottom:calc(120px + env(safe-area-inset-bottom, 0px))">
   <div class="hdr">
     <h1>Customers</h1>
     <div class="sub" id="c-lbl">Loading...</div>
@@ -816,7 +816,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
   <div class="body">
     <div id="c-list"></div>
-    <button class="btn btn-g" id="c-more" style="display:none">Load more</button>
+    <button class="btn btn-g" id="c-more" style="display:none;margin-bottom:16px">Load more</button>
   </div>
 </div>
 
@@ -2645,7 +2645,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
 </div>
 
-<div id="p-cust" style="display:none;padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px))">
+<div id="p-cust" style="display:none;padding-bottom:calc(120px + env(safe-area-inset-bottom, 0px))">
   <div class="hdr">
     <h1>Customers</h1>
     <div class="sub" id="c-lbl">Loading...</div>
@@ -2674,7 +2674,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
   <div class="body">
     <div id="c-list"></div>
-    <button class="btn btn-g" id="c-more" style="display:none">Load more</button>
+    <button class="btn btn-g" id="c-more" style="display:none;margin-bottom:16px">Load more</button>
   </div>
 </div>
 
@@ -5021,14 +5021,14 @@ function showMapPicker(stops,homeStart,homeEnd){
   // homeEnd: added as final stop for rolling routes
   var effectiveStops=stops.slice();
   if(homeEnd&&homeStop)effectiveStops.push(homeStop);
-  // Remove stops with no valid street address (must have digits; business names get skipped)
+  // Remove stops with no address at all
   var skippedCount=0;
   effectiveStops=effectiveStops.filter(function(s){
     if(s.code==='__HOME__')return true;
-    if(_routeAddr(s))return true;
+    if((s.address||'').trim())return true;
     skippedCount++;return false;
   });
-  if(skippedCount)setTimeout(function(){toast(skippedCount+' stop'+(skippedCount>1?'s':'')+' skipped — no valid street address');},400);
+  if(skippedCount)toast(skippedCount+' stop'+(skippedCount>1?'s':'')+' skipped — no address on file');
   var rollingStart=homeStart&&homeAddr?homeAddr:null;
 
   // Build decoded address list
@@ -5059,7 +5059,7 @@ function showMapPicker(stops,homeStart,homeEnd){
     {icon:'&#127758;',name:'Google Maps',sub:'All '+n+' stops'+(homeStart?' from home':' from your location'),url:googleUrl,bg:'rgba(66,133,244,.15)',store:googleStore,storeNote:'Don\'t have Google Maps?'},
     {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail||!isIOS},
     {icon:'&#9889;',name:'Tesla',sub:teslaLabel,note:'Opens Apple Maps → shows on Tesla via CarPlay automatically.',handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail||!isIOS},
-    {icon:'&#128663;',name:'Waze',sub:wazeLabel,handler:function(){startRollingRoute(effectiveStops,'waze',rollingStart);},bg:'rgba(255,176,32,.12)',store:wazeStore,storeNote:'Don\'t have Waze?'}
+    {icon:'&#128663;',name:'Waze',sub:wazeLabel,note:'Waze always navigates from your current GPS location. To start from home, use Google Maps or Apple Maps.',handler:function(){startRollingRoute(effectiveStops,'waze',rollingStart);},bg:'rgba(255,176,32,.12)',store:wazeStore,storeNote:'Don\'t have Waze?'}
   ];
 
   var picker=document.createElement('div');
@@ -5427,7 +5427,7 @@ function continueRollingRoute(){
 function _routeAddr(s){
   if(!s)return null;
   var a=(s.address||'').replace(/\b(suite|ste\.?|unit|apt\.?|building|bldg\.?|floor|fl\.?|dept\.?)\b\.?\s+[\w.-]+/gi,'').replace(/#\s*[\w.-]+/g,'').trim().replace(/[,\s]+$/,'');
-  if(!a||!/\d/.test(a))return null; // No digits = business name, not a street address
+  if(!a)return null;
   return[a,s.city,'CA'].filter(function(x){return x&&x.trim();}).join(', ');
 }
 
