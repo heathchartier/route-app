@@ -787,7 +787,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
 </div>
 
-<div id="p-cust" style="display:none;padding-bottom:80px">
+<div id="p-cust" style="display:none;padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px))">
   <div class="hdr">
     <h1>Customers</h1>
     <div class="sub" id="c-lbl">Loading...</div>
@@ -2645,7 +2645,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
 </div>
 
-<div id="p-cust" style="display:none;padding-bottom:80px">
+<div id="p-cust" style="display:none;padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px))">
   <div class="hdr">
     <h1>Customers</h1>
     <div class="sub" id="c-lbl">Loading...</div>
@@ -5021,13 +5021,21 @@ function showMapPicker(stops,homeStart,homeEnd){
   // homeEnd: added as final stop for rolling routes
   var effectiveStops=stops.slice();
   if(homeEnd&&homeStop)effectiveStops.push(homeStop);
+  // Remove stops with no valid street address (must have digits; business names get skipped)
+  var skippedCount=0;
+  effectiveStops=effectiveStops.filter(function(s){
+    if(s.code==='__HOME__')return true;
+    if(_routeAddr(s))return true;
+    skippedCount++;return false;
+  });
+  if(skippedCount)setTimeout(function(){toast(skippedCount+' stop'+(skippedCount>1?'s':'')+' skipped — no valid street address');},400);
   var rollingStart=homeStart&&homeAddr?homeAddr:null;
 
   // Build decoded address list
   var rawAddrs=effectiveStops.map(function(s){
     if(s.addr)return decodeURIComponent(s.addr);
-    return _routeAddr(s)||[s.address,s.city,'CA'].filter(function(x){return x;}).join(', ');
-  });
+    return _routeAddr(s)||'';
+  }).filter(Boolean);
 
   // Google Maps: supports up to 10 waypoints via /dir/ URL
   var googleStart=homeStart&&homeAddr?encodeURIComponent(homeAddr):'My+Location';
@@ -5041,7 +5049,7 @@ function showMapPicker(stops,homeStart,homeEnd){
   var teslaAvail=n>1;
   var teslaLabel=n<=FIRST?'Opens all '+n+' stops, sorted by GPS':'Rolling route — '+FIRST+' of '+n+' stops (Tesla limit)';
   var appleLabel=n<=FIRST?'Opens all '+n+' stops, sorted by GPS':'Rolling route — '+FIRST+' of '+n+' stops (iOS limit)';
-  var wazeLabel='Rolling route — 1 of '+n+' stops (Waze limit)'+(homeStart?' · starts from GPS':'');
+  var wazeLabel=homeStart?'Waze always navigates from GPS — "Start from home" only works in Google/Apple Maps':'Rolling route — 1 of '+n+' stops (Waze limit)';
 
   var isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
   var isAndroid=/Android/.test(navigator.userAgent);
@@ -5392,7 +5400,7 @@ function startRollingRoute(stops,type,saddr){
   var uid=CURRENT_USER?CURRENT_USER.id:'';
   rollingRoute={remaining:remaining,batchNum:1,total:stops.length,type:type,userId:uid};
   saveRolling();
-  if(type==='waze')openWazeRoute(batch[0],saddr||null);
+  if(type==='waze')openWazeRoute(batch[0]);
   else openAppleMapsRoute(batch,saddr||null);
   rRolling();
   if(type==='waze')toast('🚗 Waze Route started — stop 1 of '+stops.length);
@@ -5419,19 +5427,15 @@ function continueRollingRoute(){
 function _routeAddr(s){
   if(!s)return null;
   var a=(s.address||'').replace(/\b(suite|ste\.?|unit|apt\.?|building|bldg\.?|floor|fl\.?|dept\.?)\b\.?\s+[\w.-]+/gi,'').replace(/#\s*[\w.-]+/g,'').trim().replace(/[,\s]+$/,'');
+  if(!a||!/\d/.test(a))return null; // No digits = business name, not a street address
   return[a,s.city,'CA'].filter(function(x){return x&&x.trim();}).join(', ');
 }
 
-function openWazeRoute(stop,saddr){
+function openWazeRoute(stop){
   if(!stop)return;
   var addr=_routeAddr(stop);
-  var url;
-  if(saddr&&ST.userProfile&&ST.userProfile.homeZipLat){
-    url='https://waze.com/ul?navigate=yes&from=ll:'+ST.userProfile.homeZipLat+','+ST.userProfile.homeZipLng+'&q='+encodeURIComponent(addr);
-  }else{
-    url='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr);
-  }
-  window.open(url,'_blank');
+  if(!addr)return;
+  window.open('https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr),'_blank');
 }
 
 function clearRollingRoute(){
