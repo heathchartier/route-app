@@ -669,7 +669,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="btn" onclick="showMapOverlay()" style="background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);margin-top:8px">&#128205; Map View</button>
       <button class="btn" onclick="showHeatCalendar()" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);margin-top:8px">&#128197; Visit Calendar</button>
       <button class="btn" id="btn-bulk-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25);margin-top:8px;display:none">Mark All Remaining N/A</button>
-      <button class="btn" onclick="showChargerPicker()" style="background:rgba(232,33,39,.12);color:#e82127;border:1px solid rgba(232,33,39,.35);margin-top:8px">&#9889; Insert Supercharger Stop</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
     <div class="tesla-card" id="d-tesla" style="display:none">
@@ -2521,7 +2520,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="btn" onclick="showMapOverlay()" style="background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);margin-top:8px">&#128205; Map View</button>
       <button class="btn" onclick="showHeatCalendar()" style="background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3);margin-top:8px">&#128197; Visit Calendar</button>
       <button class="btn" id="btn-bulk-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.25);margin-top:8px;display:none">Mark All Remaining N/A</button>
-      <button class="btn" onclick="showChargerPicker()" style="background:rgba(232,33,39,.12);color:#e82127;border:1px solid rgba(232,33,39,.35);margin-top:8px">&#9889; Insert Supercharger Stop</button>
       <button class="btn" id="btn-next-stop" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);margin-top:8px;display:none">Next Stop &#8250;</button>
     </div>
     <div class="tesla-card" id="d-tesla" style="display:none">
@@ -5002,9 +5000,11 @@ function showMapPicker(stops,homeStart,homeEnd){
   var homeStop=homeAddr?{name:'Home',address:homeAddr,city:'',zip:'',code:'__HOME__'}:null;
 
   // Apply home start/end
+  // homeStart: used as saddr (origin) for Apple Maps, NOT as a first stop
+  // homeEnd: added as final stop for rolling routes
   var effectiveStops=stops.slice();
-  if(homeStart&&homeStop)effectiveStops.unshift(homeStop);
   if(homeEnd&&homeStop)effectiveStops.push(homeStop);
+  var rollingStart=homeStart&&homeAddr?homeAddr:null;
 
   // Build decoded address list
   var rawAddrs=effectiveStops.map(function(s){
@@ -5029,8 +5029,8 @@ function showMapPicker(stops,homeStart,homeEnd){
   var isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
   var opts=[
     {icon:'&#127758;',name:'Google Maps',sub:'All '+n+' stops'+(homeStart?' from home':' from your location'),url:googleUrl,bg:'rgba(66,133,244,.15)'},
-    {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple');},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail||!isIOS},
-    {icon:'&#9889;',name:'Tesla',sub:teslaLabel,note:'Low on charge? Add a Supercharger in your Tesla\'s built-in nav between stops.',handler:function(){startRollingRoute(effectiveStops,'apple');},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail||!isIOS},
+    {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail||!isIOS},
+    {icon:'&#9889;',name:'Tesla',sub:teslaLabel,note:'Low on charge? Add a Supercharger in your Tesla\'s built-in nav between stops.',handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail||!isIOS},
     {icon:'&#128663;',name:'Waze',sub:wazeLabel,handler:function(){startRollingRoute(effectiveStops,'waze');},bg:'rgba(255,176,32,.12)'}
   ];
 
@@ -5363,7 +5363,7 @@ function saveRolling(){
 
 function startTeslaRoute(stops){startRollingRoute(stops,'apple');}
 
-function startRollingRoute(stops,type){
+function startRollingRoute(stops,type,saddr){
   type=type||'apple';
   var FIRST=type==='waze'?1:4;
   var batch=stops.slice(0,FIRST);
@@ -5372,7 +5372,7 @@ function startRollingRoute(stops,type){
   rollingRoute={remaining:remaining,batchNum:1,total:stops.length,type:type,userId:uid};
   saveRolling();
   if(type==='waze')openWazeRoute(batch[0]);
-  else openAppleMapsRoute(batch);
+  else openAppleMapsRoute(batch,saddr||null);
   rRolling();
   if(type==='waze')toast('🚗 Waze Route started — stop 1 of '+stops.length);
   else toast('⚡ Rolling Route started — '+batch.length+' stops');
@@ -5408,12 +5408,13 @@ function clearRollingRoute(){
   toast('Tesla Route cleared');
 }
 
-function openAppleMapsRoute(stops){
+function openAppleMapsRoute(stops,saddr){
   var addrs=stops.map(function(s){
     return [s.address,s.city,'CA'].filter(function(x){return x;}).join(', ');
   });
   var url='https://maps.apple.com/?dirflg=d&daddr='+
-    addrs.map(function(a){return a.replace(/ /g,'+');}).join('+to:');
+    addrs.map(function(a){return encodeURIComponent(a);}).join('+to:');
+  if(saddr)url+='&saddr='+encodeURIComponent(saddr);
   window.open(url,'_blank');
 }
 
@@ -9771,7 +9772,8 @@ function splitGroup(gid){
 }
 
 function balanceClusterSizes(points,assignments,k){
-  var maxSize=14,minSize=4;
+  var _spd=(ST&&ST.userProfile&&ST.userProfile.stopsPerDay)||10;
+  var maxSize=_spd+3,minSize=Math.max(2,Math.floor(_spd/2)-1);
   for(var iter=0;iter<200;iter++){
     var sizes=[],cLat=[],cLng=[];
     for(var c=0;c<k;c++){sizes.push(0);cLat.push(0);cLng.push(0);}
