@@ -1213,6 +1213,7 @@ var SK='';
 var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
+var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
 var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:''}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
@@ -1560,7 +1561,7 @@ function rGrps(){
     var lastWorkedStr=grpLastWorked[g]?'Last: '+grpLastWorked[g].toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Never worked';
     var col=ov>gc.length*.5?'var(--red)':vis>gc.length*.5?'var(--green)':'var(--amber)';
     var pct=Math.round(vis/gc.length*100);
-    var sizeWarn=gc.length>=13?'<span style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - consider splitting</span>':'';
+    var sizeWarn=gc.length>=13?'<button onclick="event.stopPropagation();splitGroup(\''+g+'\')" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:6px">'+gc.length+' stops — tap to split</button>':'';
     var sizeNote=gc.length<8?'<span style="background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - small group</span>':'';
     var gnote=(ST.groupNotes&&ST.groupNotes[g])||'';
     var gnoteBanner=gnote?'<div style="background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.25);border-radius:var(--r2);padding:6px 10px;font-size:12px;color:var(--amber);margin-top:6px;display:flex;align-items:center;gap:6px">&#128203; '+esc(gnote)+'</div>':'';
@@ -1671,7 +1672,7 @@ function syncDown(){
     fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
     .then(function(r){return r.json();}).then(function(rows){
       if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
-      if(Object.keys(ST.visits||{}).length===0&&localStorage.getItem('heath_rt_v13')){
+      if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
         fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
         .then(function(r2){return r2.json();}).then(function(lr){if(lr&&lr.length>0)_applyRemoteState(lr[0]);finish();}).catch(function(){finish();});
       }else{finish();}
@@ -3048,6 +3049,7 @@ var SK='';
 var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
+var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
 var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:''}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
@@ -3401,7 +3403,7 @@ function rGrps(){
     var lastWorkedStr=grpLastWorked[g]?'Last: '+grpLastWorked[g].toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Never worked';
     var col=ov>gc.length*.5?'var(--red)':vis>gc.length*.5?'var(--green)':'var(--amber)';
     var pct=Math.round(vis/gc.length*100);
-    var sizeWarn=gc.length>=13?'<span style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - consider splitting</span>':'';
+    var sizeWarn=gc.length>=13?'<button onclick="event.stopPropagation();splitGroup(\''+g+'\')" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;margin-left:6px">'+gc.length+' stops — tap to split</button>':'';
     var sizeNote=gc.length<8?'<span style="background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px">'+gc.length+' stops - small group</span>':'';
     var gnote=(ST.groupNotes&&ST.groupNotes[g])||'';
     var gnoteBanner=gnote?'<div style="background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.25);border-radius:var(--r2);padding:6px 10px;font-size:12px;color:var(--amber);margin-top:6px;display:flex;align-items:center;gap:6px">&#128203; '+esc(gnote)+'</div>':'';
@@ -3512,7 +3514,7 @@ function syncDown(){
     fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
     .then(function(r){return r.json();}).then(function(rows){
       if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
-      if(Object.keys(ST.visits||{}).length===0&&localStorage.getItem('heath_rt_v13')){
+      if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
         fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
         .then(function(r2){return r2.json();}).then(function(lr){if(lr&&lr.length>0)_applyRemoteState(lr[0]);finish();}).catch(function(){finish();});
       }else{finish();}
@@ -9667,14 +9669,49 @@ function kMeansClustering(points,k){
   return assignments;
 }
 
+function splitGroup(gid){
+  var a=allC(),members=[];
+  for(var i=0;i<a.length;i++){if(String(a[i].group)===String(gid))members.push(a[i]);}
+  if(members.length<2)return;
+  var half=Math.ceil(members.length/2);
+  var gname=getGroupName(+gid)||('Grp '+gid);
+  if(!confirm('Split "'+gname+'" ('+members.length+' stops) into two groups of ~'+half+' each?\n\nCustomers will be divided by zip code geography.'))return;
+  members.sort(function(a,b){return (a.zip||'').localeCompare(b.zip||'');});
+  var movers=members.slice(half);
+  var allGroups={};var ac2=allC();for(var i=0;i<ac2.length;i++)allGroups[ac2[i].group]=1;
+  var newGid=+gid+1;
+  while(allGroups[newGid])newGid++;
+  for(var i=0;i<movers.length;i++){
+    var code=movers[i].code;
+    var inAdded=false;
+    for(var j=0;j<(ST.addedCustomers||[]).length;j++){
+      if(ST.addedCustomers[j].code===code){ST.addedCustomers[j].group=newGid;inAdded=true;break;}
+    }
+    if(!inAdded){
+      if(!ST.edits)ST.edits={};
+      if(!ST.edits[code])ST.edits[code]={};
+      ST.edits[code].group=newGid;
+    }
+  }
+  var cityCount={};
+  for(var i=0;i<movers.length;i++){var ct=movers[i].city||'';if(ct)cityCount[ct]=(cityCount[ct]||0)+1;}
+  var bestCity='',bestCount=0;
+  for(var ct in cityCount){if(cityCount[ct]>bestCount){bestCount=cityCount[ct];bestCity=ct;}}
+  if(bestCity){if(!ST.groupNames)ST.groupNames={};ST.groupNames[newGid]=bestCity;}
+  lSave();
+  syncUp();
+  rGrps();rCust();rDash();
+}
+
 function balanceClusterSizes(points,assignments,k){
   var maxSize=14,minSize=4;
-  for(var iter=0;iter<100;iter++){
+  for(var iter=0;iter<200;iter++){
     var sizes=[],cLat=[],cLng=[];
     for(var c=0;c<k;c++){sizes.push(0);cLat.push(0);cLng.push(0);}
     for(var i=0;i<assignments.length;i++){var c=assignments[i];sizes[c]++;cLat[c]+=points[i].lat;cLng[c]+=points[i].lng;}
     for(var c=0;c<k;c++){if(sizes[c]>0){cLat[c]/=sizes[c];cLng[c]/=sizes[c];}}
     var changed=false;
+    // Pass 1: shrink oversized clusters
     for(var i=0;i<assignments.length;i++){
       var from=assignments[i];
       if(sizes[from]<=maxSize)continue;
@@ -9686,6 +9723,26 @@ function balanceClusterSizes(points,assignments,k){
         if(d<bestD){bestD=d;best=c;}
       }
       if(best>=0){sizes[from]--;sizes[best]++;assignments[i]=best;changed=true;}
+    }
+    // Pass 2: grow undersized clusters by stealing nearest point from a donor
+    for(var small=0;small<k;small++){
+      if(sizes[small]>=minSize)continue;
+      var donor=-1,donorD=Infinity;
+      for(var c=0;c<k;c++){
+        if(c===small||sizes[c]<=minSize+1)continue;
+        var dl=cLat[small]-cLat[c],dg=cLng[small]-cLng[c];
+        var d=dl*dl+dg*dg;
+        if(d<donorD){donorD=d;donor=c;}
+      }
+      if(donor<0)continue;
+      var bestPt=-1,bestPD=Infinity;
+      for(var i=0;i<assignments.length;i++){
+        if(assignments[i]!==donor)continue;
+        var dl=points[i].lat-cLat[small],dg=points[i].lng-cLng[small];
+        var d=dl*dl+dg*dg;
+        if(d<bestPD){bestPD=d;bestPt=i;}
+      }
+      if(bestPt>=0){sizes[donor]--;sizes[small]++;assignments[bestPt]=small;changed=true;}
     }
     if(!changed)break;
   }
@@ -9881,11 +9938,10 @@ function onLogin(user){
 }
 
 function migrateBaseCustomers(){
-  // Re-run if flag was set but no customers actually landed (failed first run)
+  if(!CURRENT_USER||CURRENT_USER.email!==LEGACY_ADMIN_EMAIL)return;
   if(ST.baseCustomersMigrated&&(ST.addedCustomers||[]).length>50)return;
   if(!CUSTOMERS_BASE||!CUSTOMERS_BASE.length)return;
   var hasExistingData=Object.keys(ST.visits||{}).length>0||Object.keys(ST.notes||{}).length>0||Object.keys(ST.orders||{}).length>0;
-  // Fallback: check old localStorage key on devices with original single-user app data
   if(!hasExistingData){
     try{
       var old=JSON.parse(localStorage.getItem('heath_rt_v13')||'null');
