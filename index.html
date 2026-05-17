@@ -570,7 +570,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
           <div style="font-size:14px;font-weight:700;color:var(--text)">Customers per day</div>
           <div style="font-size:12px;color:var(--sub);margin-top:2px">How many stops can you make in a full day?</div>
         </div>
-        <input id="ob-spd" type="number" inputmode="numeric" min="3" max="30" value="10" style="width:56px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:8px 6px;font-size:14px;font-weight:700;font-family:inherit;text-align:center;outline:none">
+        <input id="ob-spd" type="number" inputmode="numeric" min="3" max="30" placeholder="10" style="width:56px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:8px 6px;font-size:14px;font-weight:700;font-family:inherit;text-align:center;outline:none">
       </div>
       <div id="ob-err" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:11px 14px;font-size:13px;color:#ef4444;margin-bottom:12px;line-height:1.4"></div>
       <button onclick="obSaveProfile()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit">Next &#8594;</button>
@@ -5026,7 +5026,7 @@ function showMapPicker(stops,homeStart,homeEnd){
   // Build decoded address list
   var rawAddrs=effectiveStops.map(function(s){
     if(s.addr)return decodeURIComponent(s.addr);
-    return [s.address,s.city,'CA'].filter(function(x){return x;}).join(', ');
+    return _routeAddr(s)||[s.address,s.city,'CA'].filter(function(x){return x;}).join(', ');
   });
 
   // Google Maps: supports up to 10 waypoints via /dir/ URL
@@ -5051,7 +5051,7 @@ function showMapPicker(stops,homeStart,homeEnd){
     {icon:'&#127758;',name:'Google Maps',sub:'All '+n+' stops'+(homeStart?' from home':' from your location'),url:googleUrl,bg:'rgba(66,133,244,.15)',store:googleStore,storeNote:'Don\'t have Google Maps?'},
     {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail||!isIOS},
     {icon:'&#9889;',name:'Tesla',sub:teslaLabel,note:'Opens Apple Maps → shows on Tesla via CarPlay automatically.',handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail||!isIOS},
-    {icon:'&#128663;',name:'Waze',sub:wazeLabel,handler:function(){startRollingRoute(effectiveStops,'waze');},bg:'rgba(255,176,32,.12)',store:wazeStore,storeNote:'Don\'t have Waze?'}
+    {icon:'&#128663;',name:'Waze',sub:wazeLabel,handler:function(){startRollingRoute(effectiveStops,'waze',rollingStart);},bg:'rgba(255,176,32,.12)',store:wazeStore,storeNote:'Don\'t have Waze?'}
   ];
 
   var picker=document.createElement('div');
@@ -5392,7 +5392,7 @@ function startRollingRoute(stops,type,saddr){
   var uid=CURRENT_USER?CURRENT_USER.id:'';
   rollingRoute={remaining:remaining,batchNum:1,total:stops.length,type:type,userId:uid};
   saveRolling();
-  if(type==='waze')openWazeRoute(batch[0]);
+  if(type==='waze')openWazeRoute(batch[0],saddr||null);
   else openAppleMapsRoute(batch,saddr||null);
   rRolling();
   if(type==='waze')toast('🚗 Waze Route started — stop 1 of '+stops.length);
@@ -5416,10 +5416,22 @@ function continueRollingRoute(){
   if(!remaining.length)toast('Last batch — route complete after these stops!');
 }
 
-function openWazeRoute(stop){
+function _routeAddr(s){
+  if(!s)return null;
+  var a=(s.address||'').replace(/\b(suite|ste\.?|unit|apt\.?|building|bldg\.?|floor|fl\.?|dept\.?)\b\.?\s+[\w.-]+/gi,'').replace(/#\s*[\w.-]+/g,'').trim().replace(/[,\s]+$/,'');
+  return[a,s.city,'CA'].filter(function(x){return x&&x.trim();}).join(', ');
+}
+
+function openWazeRoute(stop,saddr){
   if(!stop)return;
-  var addr=[stop.address,stop.city,'CA'].filter(function(x){return x;}).join(', ');
-  window.open('https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr),'_blank');
+  var addr=_routeAddr(stop);
+  var url;
+  if(saddr&&ST.userProfile&&ST.userProfile.homeZipLat){
+    url='https://waze.com/ul?navigate=yes&from=ll:'+ST.userProfile.homeZipLat+','+ST.userProfile.homeZipLng+'&q='+encodeURIComponent(addr);
+  }else{
+    url='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr);
+  }
+  window.open(url,'_blank');
 }
 
 function clearRollingRoute(){
@@ -5430,9 +5442,7 @@ function clearRollingRoute(){
 }
 
 function openAppleMapsRoute(stops,saddr){
-  var addrs=stops.map(function(s){
-    return [s.address,s.city,'CA'].filter(function(x){return x;}).join(', ');
-  });
+  var addrs=stops.map(function(s){return _routeAddr(s);}).filter(function(a){return a;});
   var url='https://maps.apple.com/?dirflg=d&daddr='+
     addrs.map(function(a){return encodeURIComponent(a);}).join('+to:');
   if(saddr)url+='&saddr='+encodeURIComponent(saddr);
@@ -9652,8 +9662,21 @@ function saveProfileSettings(){
   var stopsPerDay=spdEl?Math.max(3,Math.min(30,parseInt(spdEl.value||'10',10)||10)):ST.userProfile.stopsPerDay||10;
   if(!stopsPerDay||stopsPerDay<3){toast('Enter how many customers you visit per day (3 or more)');return;}
   var prevSpd=ST.userProfile.stopsPerDay||10;
-  ST.userProfile={name:name,company:company,erpName:erpName||'Order System',territory:territory,homeZip:homeZip,homeAddress:homeAddress,stopsPerDay:stopsPerDay};
+  var prevHomeZip=ST.userProfile.homeZip||'';
+  ST.userProfile={name:name,company:company,erpName:erpName||'Order System',territory:territory,homeZip:homeZip,homeAddress:homeAddress,stopsPerDay:stopsPerDay,homeZipLat:ST.userProfile.homeZipLat,homeZipLng:ST.userProfile.homeZipLng};
   lSave();syncUp();
+  if(sb&&CURRENT_USER)sb.auth.updateUser({data:{userProfile:ST.userProfile,groupNames:ST.groupNames||{}}}).catch(function(){});
+  // Geocode home zip if it changed
+  if(homeZip&&homeZip.length===5&&homeZip!==prevHomeZip){
+    fetch('https://api.zippopotam.us/us/'+homeZip).then(function(r){return r.ok?r.json():null;}).then(function(d){
+      if(d&&d.places&&d.places[0]){
+        ST.userProfile.homeZipLat=parseFloat(d.places[0].latitude);
+        ST.userProfile.homeZipLng=parseFloat(d.places[0].longitude);
+        lSave();
+        if(sb&&CURRENT_USER)sb.auth.updateUser({data:{userProfile:ST.userProfile,groupNames:ST.groupNames||{}}}).catch(function(){});
+      }
+    }).catch(function(){});
+  }
   _closeProfileSheet();
   if(stopsPerDay!==prevSpd){toast('Profile saved! Go to Settings → Recalculate Route Groups to apply your new route size.');}
   else{toast('Profile saved!');}
@@ -9718,10 +9741,10 @@ function obSaveProfile(){
   var company=(document.getElementById('ob-company').value||'').trim();
   var erp=(document.getElementById('ob-erp').value||'').trim();
   var zip=(document.getElementById('ob-zip').value||'').replace(/\D/g,'').slice(0,5);
-  var spd=parseInt(document.getElementById('ob-spd').value||'0',10);
+  var spd=parseInt(document.getElementById('ob-spd').value||'10',10)||10;
   if(!name){_obErr('Please enter your full name to continue.','ob-name');return;}
   if(!zip||zip.length!==5){_obErr('Please enter a valid 5-digit home zip code. This is used to sort your route groups by proximity.','ob-zip');return;}
-  if(isNaN(spd)||spd<3){_obErr('Please enter how many customers you visit per day (minimum 3).','ob-spd');return;}
+  if(isNaN(spd)||spd<3)spd=10;
   if(spd>30)spd=30;
   ST.userProfile.name=name;
   ST.userProfile.company=company;
@@ -9894,6 +9917,11 @@ function generateRouteGroups(onDone){
     clearInterval(window._obBuildTimer);
     var zipCoords={};
     for(var i=0;i<results.length;i++){if(results[i])zipCoords[results[i].zip]=results[i];}
+    // Store home zip coordinates for Waze "start from home"
+    if(homeZip&&zipCoords[homeZip]&&ST.userProfile){
+      ST.userProfile.homeZipLat=zipCoords[homeZip].lat;
+      ST.userProfile.homeZipLng=zipCoords[homeZip].lng;
+    }
     // Map customers to geocoded points
     var geocoded=[],ungeocodable=[];
     for(var i=0;i<customers.length;i++){
@@ -9907,10 +9935,27 @@ function generateRouteGroups(onDone){
     var groupAssignments={};
     if(geocoded.length>=3){
       var _spd=ST.userProfile&&ST.userProfile.stopsPerDay?Math.max(3,ST.userProfile.stopsPerDay):10;
-      var k=Math.max(3,Math.round(customers.length/_spd));k=Math.min(k,Math.ceil(customers.length/4));
-      var asgn=kMeansClustering(geocoded,k);
-      asgn=balanceClusterSizes(geocoded,asgn,k);
-      for(var i=0;i<geocoded.length;i++)groupAssignments[geocoded[i].code]=asgn[i]+1;
+      // Detect geographic outliers (>350 miles from centroid) → "Out of Territory" group
+      var cLat=0,cLng=0;
+      for(var i=0;i<geocoded.length;i++){cLat+=geocoded[i].lat;cLng+=geocoded[i].lng;}
+      cLat/=geocoded.length;cLng/=geocoded.length;
+      var inTerritory=[],outTerritory=[];
+      for(var i=0;i<geocoded.length;i++){
+        var dlat=geocoded[i].lat-cLat,dlng=geocoded[i].lng-cLng;
+        var miles=Math.sqrt(dlat*dlat*4761+dlng*dlng*2916);// approx: 69mi/deg lat, 54mi/deg lng at 36°N
+        if(miles>350)outTerritory.push(geocoded[i]);
+        else inTerritory.push(geocoded[i]);
+      }
+      var k=Math.max(3,Math.round(inTerritory.length/_spd));k=Math.min(k,Math.ceil(inTerritory.length/4));
+      var clusterSrc=inTerritory.length>=3?inTerritory:geocoded;
+      var asgn=kMeansClustering(clusterSrc,k);
+      asgn=balanceClusterSizes(clusterSrc,asgn,k);
+      for(var i=0;i<clusterSrc.length;i++)groupAssignments[clusterSrc[i].code]=asgn[i]+1;
+      // Assign out-of-territory customers to group k+1
+      var outGroup=k+1;
+      for(var i=0;i<outTerritory.length;i++)groupAssignments[outTerritory[i].code]=outGroup;
+      if(outTerritory.length>0&&!ST.groupNames)ST.groupNames={};
+      if(outTerritory.length>0&&ST.groupNames&&!ST.groupNames[outGroup])ST.groupNames[outGroup]='Out of Territory';
     }else{
       // Fallback: group by city
       var cityMap={},cityNum=1;
@@ -10056,6 +10101,15 @@ function onLogin(user){
   SK='fieldiq_'+user.id;
   lLoad();
   if(!ST.userProfile)ST.userProfile={};
+  // Restore profile from auth metadata if localStorage was cleared
+  var meta=user.user_metadata||{};
+  if(meta.userProfile&&(!ST.userProfile.name||ST.userProfile.name===user.email.split('@')[0])){
+    ST.userProfile=Object.assign({},meta.userProfile,ST.userProfile.name&&ST.userProfile.name!==user.email.split('@')[0]?{name:ST.userProfile.name}:{});
+    if(!ST.userProfile.name)ST.userProfile.name=meta.userProfile.name||user.email.split('@')[0];
+  }
+  if(meta.groupNames&&(!ST.groupNames||!Object.keys(ST.groupNames).length)){
+    ST.groupNames=meta.groupNames;
+  }
   if(!ST.userProfile.name)ST.userProfile.name=user.email.split('@')[0];
   document.body.style.overflow='';
   var as=document.getElementById('auth-screen');
