@@ -9815,19 +9815,12 @@ function doAuth(){
 
 function onLogin(user){
   CURRENT_USER=user;
-  var newKey='fieldiq_'+user.id;
-  // Migrate legacy data BEFORE lLoad so the migrated data is what loads
-  if(!localStorage.getItem(newKey)){
-    var old=localStorage.getItem('heath_rt_v13');
-    if(old)localStorage.setItem(newKey,old);
-  }
-  SK=newKey;
+  SK='fieldiq_'+user.id;
   lLoad();
   if(!ST.userProfile)ST.userProfile={};
   if(!ST.userProfile.name)ST.userProfile.name=user.email.split('@')[0];
   var as=document.getElementById('auth-screen');
   if(as)as.style.display='none';
-  go('dash');
   var ul=document.getElementById('auth-user-lbl');
   if(ul)ul.textContent='Signed in as '+user.email;
   loadRolling();
@@ -9842,12 +9835,13 @@ function onLogin(user){
   if(gl)gl.textContent=getGroupName(sg);
   rDash();rCust();rGrps();rVend();
   renderCustomRoute();
-  checkFirstRun();
   syncDown();
   checkAndNotify();
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
   initAppLock();
   updateSecurityStatus();
+  checkFirstRun();
+  go('dash');
 }
 
 function authForgot(){
