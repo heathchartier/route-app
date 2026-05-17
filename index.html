@@ -1671,16 +1671,7 @@ function syncDown(){
     fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
     .then(function(r){return r.json();}).then(function(rows){
       if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
-      // If UUID row has no visit history, try legacy 'heath' row as one-time migration
-      if(Object.keys(ST.visits||{}).length===0){
-        fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
-        .then(function(r2){return r2.json();}).then(function(legacyRows){
-          if(legacyRows&&legacyRows.length>0)_applyRemoteState(legacyRows[0]);
-          finish();
-        }).catch(function(){finish();});
-      } else {
-        finish();
-      }
+      finish();
     }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
   });
 }
@@ -3518,16 +3509,7 @@ function syncDown(){
     fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
     .then(function(r){return r.json();}).then(function(rows){
       if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
-      // If UUID row has no visit history, try legacy 'heath' row as one-time migration
-      if(Object.keys(ST.visits||{}).length===0){
-        fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
-        .then(function(r2){return r2.json();}).then(function(legacyRows){
-          if(legacyRows&&legacyRows.length>0)_applyRemoteState(legacyRows[0]);
-          finish();
-        }).catch(function(){finish();});
-      } else {
-        finish();
-      }
+      finish();
     }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
   });
 }
