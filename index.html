@@ -9567,7 +9567,11 @@ initApp();
 
 // ── ONBOARDING ──────────────────────────────────────────────────────────────
 function checkFirstRun(){
-  if(allC().length===0&&!(ST.onboardingComplete)){
+  if(ST.onboardingComplete)return;
+  if(ST.baseCustomersMigrated)return;
+  var hasHistory=Object.keys(ST.visits||{}).length>0||Object.keys(ST.notes||{}).length>0||Object.keys(ST.orders||{}).length>0;
+  if(hasHistory){ST.onboardingComplete=true;lSave();return;}
+  if(allC().length===0){
     showOnboarding();
   }
 }
@@ -9856,6 +9860,7 @@ function migrateBaseCustomers(){
     for(var i=0;i<CUSTOMERS_BASE.length;i++){
       if(!existingCodes[CUSTOMERS_BASE[i].code])ST.addedCustomers.push(CUSTOMERS_BASE[i]);
     }
+    ST.onboardingComplete=true;
   }
   ST.baseCustomersMigrated=true;
   lSave();
