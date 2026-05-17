@@ -9574,16 +9574,15 @@ function doAuth(){
 function onLogin(user){
   CURRENT_USER=user;
   var newKey='fieldiq_'+user.id;
-  // Migrate Heath's legacy data on first login for this user
+  // Migrate legacy data BEFORE lLoad so the migrated data is what loads
   if(!localStorage.getItem(newKey)){
     var old=localStorage.getItem('heath_rt_v13');
     if(old)localStorage.setItem(newKey,old);
   }
   SK=newKey;
   lLoad();
-  // Set display name from userProfile or email if not set
   if(!ST.userProfile)ST.userProfile={};
-  if(!ST.userProfile.name)ST.userProfile.name=user.email;
+  if(!ST.userProfile.name)ST.userProfile.name=user.email.split('@')[0];
   var as=document.getElementById('auth-screen');
   if(as)as.style.display='none';
   var ul=document.getElementById('auth-user-lbl');
