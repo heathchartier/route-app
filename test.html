@@ -36,8 +36,9 @@
   --r3:8px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{background:var(--bg)}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;min-height:100vh;overscroll-behavior-y:contain}
+html{background:var(--bg);height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;height:100%;position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden}
+[id^="p-"]{height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 
 /* ── PAGES ── */
 .page{padding-bottom:90px;min-height:100vh}
@@ -540,7 +541,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <input id="auth-company" type="text" placeholder="Company name" autocomplete="organization" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
     </div>
     <input id="auth-email" type="email" placeholder="Email address" autocomplete="email" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
-    <input id="auth-pass" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:20px;outline:none">
+    <input id="auth-pass" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:6px;outline:none">
+    <div id="auth-pass-hint" style="display:none;font-size:12px;color:var(--sub);margin-bottom:16px;padding:0 2px">Minimum 6 characters required</div>
+    <div id="auth-pass-spacer" style="height:14px"></div>
     <button id="auth-btn" onclick="doAuth()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.2px">Sign In</button>
     <div style="text-align:center;margin-top:16px">
       <button onclick="authForgot()" style="background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;padding:4px 8px">Forgot password?</button>
@@ -567,7 +570,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
           <div style="font-size:14px;font-weight:700;color:var(--text)">Customers per day</div>
           <div style="font-size:12px;color:var(--sub);margin-top:2px">How many stops can you make in a full day?</div>
         </div>
-        <input id="ob-spd" type="number" inputmode="numeric" min="3" max="30" placeholder="e.g. 10" style="width:64px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:10px 8px;font-size:16px;font-weight:700;font-family:inherit;text-align:center;outline:none">
+        <input id="ob-spd" type="number" inputmode="numeric" min="3" max="30" value="10" style="width:64px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:10px 8px;font-size:16px;font-weight:700;font-family:inherit;text-align:center;outline:none">
       </div>
       <button onclick="obSaveProfile()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit">Next &#8594;</button>
     </div>
@@ -819,7 +822,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 <div id="p-grps" style="display:none;padding-bottom:80px">
   <div class="hdr">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div><h1>Route Groups</h1><div class="sub">61 route groups</div></div>
+      <div><h1>Route Groups</h1><div class="sub grp-count-sub">61 route groups</div></div>
       <div class="view-toggle">
         <button class="vtab on" id="vt-list" onclick="setGrpView('list')">List</button>
         <button class="vtab" id="vt-map" onclick="setGrpView('map')">Map</button>
@@ -1546,6 +1549,8 @@ function rGrps(){
   var a=allC(),groups={};
   for(var i=0;i<a.length;i++){var c=a[i];if(!groups[c.group])groups[c.group]=[];groups[c.group].push(c);}
   var keys=Object.keys(groups);keys.sort(function(a,b){return+a-+b;});
+  var gcl=document.querySelectorAll('.grp-count-sub');
+  for(var gi=0;gi<gcl.length;gi++)gcl[gi].textContent=keys.length+' route group'+(keys.length!==1?'s':'');
   var h='';
   // Build group last-worked dates from visit history
   var grpLastWorked={};
@@ -2011,8 +2016,9 @@ function initSwipe(containerId){
   --r3:8px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{background:var(--bg)}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;min-height:100vh;overscroll-behavior-y:contain}
+html{background:var(--bg);height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;height:100%;position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden}
+[id^="p-"]{height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 
 /* ── PAGES ── */
 .page{padding-bottom:90px;min-height:100vh}
@@ -2670,7 +2676,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 <div id="p-grps" style="display:none;padding-bottom:80px">
   <div class="hdr">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div><h1>Route Groups</h1><div class="sub">61 route groups</div></div>
+      <div><h1>Route Groups</h1><div class="sub grp-count-sub">61 route groups</div></div>
       <div class="view-toggle">
         <button class="vtab on" id="vt-list" onclick="setGrpView('list')">List</button>
         <button class="vtab" id="vt-map" onclick="setGrpView('map')">Map</button>
@@ -3388,6 +3394,8 @@ function rGrps(){
   var a=allC(),groups={};
   for(var i=0;i<a.length;i++){var c=a[i];if(!groups[c.group])groups[c.group]=[];groups[c.group].push(c);}
   var keys=Object.keys(groups);keys.sort(function(a,b){return+a-+b;});
+  var gcl=document.querySelectorAll('.grp-count-sub');
+  for(var gi=0;gi<gcl.length;gi++)gcl[gi].textContent=keys.length+' route group'+(keys.length!==1?'s':'');
   var h='';
   // Build group last-worked dates from visit history
   var grpLastWorked={};
@@ -5024,14 +5032,17 @@ function showMapPicker(stops,homeStart,homeEnd){
   var teslaAvail=n>1;
   var teslaLabel=n<=FIRST?'Opens all '+n+' stops, sorted by GPS':'Rolling route — '+FIRST+' of '+n+' stops (Tesla limit)';
   var appleLabel=n<=FIRST?'Opens all '+n+' stops, sorted by GPS':'Rolling route — '+FIRST+' of '+n+' stops (iOS limit)';
-  var wazeLabel='Rolling route — 1 of '+n+' stops (Waze limit)';
+  var wazeLabel='Rolling route — 1 of '+n+' stops (Waze limit)'+(homeStart?' · starts from GPS':'');
 
   var isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  var isAndroid=/Android/.test(navigator.userAgent);
+  var googleStore=isIOS?'https://apps.apple.com/app/id585027354':'https://play.google.com/store/apps/details?id=com.google.android.apps.maps';
+  var wazeStore=isIOS?'https://apps.apple.com/app/id323229106':'https://play.google.com/store/apps/details?id=com.waze';
   var opts=[
-    {icon:'&#127758;',name:'Google Maps',sub:'All '+n+' stops'+(homeStart?' from home':' from your location'),url:googleUrl,bg:'rgba(66,133,244,.15)'},
+    {icon:'&#127758;',name:'Google Maps',sub:'All '+n+' stops'+(homeStart?' from home':' from your location'),url:googleUrl,bg:'rgba(66,133,244,.15)',store:googleStore,storeNote:'Don\'t have Google Maps?'},
     {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail||!isIOS},
-    {icon:'&#9889;',name:'Tesla',sub:teslaLabel,note:'Low on charge? Add a Supercharger in your Tesla\'s built-in nav between stops.',handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail||!isIOS},
-    {icon:'&#128663;',name:'Waze',sub:wazeLabel,handler:function(){startRollingRoute(effectiveStops,'waze');},bg:'rgba(255,176,32,.12)'}
+    {icon:'&#9889;',name:'Tesla',sub:teslaLabel,note:'Opens Apple Maps → shows on Tesla via CarPlay automatically.',handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(232,33,39,.12)',hidden:!teslaAvail||!isIOS},
+    {icon:'&#128663;',name:'Waze',sub:wazeLabel,handler:function(){startRollingRoute(effectiveStops,'waze');},bg:'rgba(255,176,32,.12)',store:wazeStore,storeNote:'Don\'t have Waze?'}
   ];
 
   var picker=document.createElement('div');
@@ -5072,7 +5083,8 @@ function showMapPicker(stops,homeStart,homeEnd){
       var ico=document.createElement('div');ico.className='map-icon';
       ico.style.background=opt.bg;ico.innerHTML=opt.icon;
       var inf=document.createElement('div');
-      inf.innerHTML='<div class="map-name">'+opt.name+'</div><div class="map-sub">'+opt.sub+'</div>'+(opt.note?'<div style="font-size:11px;color:var(--dim);margin-top:3px;line-height:1.4">'+opt.note+'</div>':'');
+      var storeLink=opt.store?'<span style="display:inline-block;margin-top:4px;font-size:11px;color:var(--teal);text-decoration:underline;cursor:pointer" onclick="event.stopPropagation();window.open(\''+opt.store+'\',\'_blank\')">'+opt.storeNote+' Get it →</span>':'';
+      inf.innerHTML='<div class="map-name">'+opt.name+'</div><div class="map-sub">'+opt.sub+'</div>'+(opt.note?'<div style="font-size:11px;color:var(--dim);margin-top:3px;line-height:1.4">'+opt.note+'</div>':'')+storeLink;
       var arr=document.createElement('div');
       arr.style.cssText='margin-left:auto;color:var(--sub);font-size:20px;font-weight:300;flex-shrink:0';arr.textContent='›';
       row.appendChild(ico);row.appendChild(inf);row.appendChild(arr);
@@ -9937,16 +9949,22 @@ function authTab(mode){
   var su=document.getElementById('auth-tab-signup');
   var btn=document.getElementById('auth-btn');
   var nw=document.getElementById('auth-name-wrap');
+  var hint=document.getElementById('auth-pass-hint');
+  var spacer=document.getElementById('auth-pass-spacer');
   if(mode==='signin'){
     si.style.background='var(--teal)';si.style.color='#000';
     su.style.background='transparent';su.style.color='var(--sub)';
     btn.textContent='Sign In';
     if(nw)nw.style.display='none';
+    if(hint){hint.style.display='none';}
+    if(spacer)spacer.style.height='14px';
   }else{
     su.style.background='var(--teal)';su.style.color='#000';
     si.style.background='transparent';si.style.color='var(--sub)';
     btn.textContent='Create Account';
     if(nw)nw.style.display='block';
+    if(hint){hint.style.display='block';}
+    if(spacer)spacer.style.height='0';
   }
   var er=document.getElementById('auth-error');
   if(er){er.style.display='none';}
@@ -9967,6 +9985,7 @@ function doAuth(){
   var pass=document.getElementById('auth-pass').value||'';
   var btn=document.getElementById('auth-btn');
   if(!email||!pass){showAuthError('Please enter your email and password.');return;}
+  if(AUTH_MODE==='signup'&&pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
   btn.disabled=true;
   btn.textContent='Please wait...';
   var er=document.getElementById('auth-error');
