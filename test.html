@@ -9662,7 +9662,7 @@ function saveProfileSettings(){
   var stopsPerDay=spdEl?Math.max(3,Math.min(30,parseInt(spdEl.value||'10',10)||10)):ST.userProfile.stopsPerDay||10;
   if(!stopsPerDay||stopsPerDay<3){toast('Enter how many customers you visit per day (3 or more)');return;}
   var prevSpd=ST.userProfile.stopsPerDay||10;
-  var prevHomeZip=ST.userProfile.homeZip||'';
+  var prevHomeZip=(ST.userProfile.homeZip||'').replace(/\D/g,'').slice(0,5);
   ST.userProfile={name:name,company:company,erpName:erpName||'Order System',territory:territory,homeZip:homeZip,homeAddress:homeAddress,stopsPerDay:stopsPerDay,homeZipLat:ST.userProfile.homeZipLat,homeZipLng:ST.userProfile.homeZipLng};
   lSave();syncUp();
   if(sb&&CURRENT_USER)sb.auth.updateUser({data:{userProfile:ST.userProfile,groupNames:ST.groupNames||{}}}).catch(function(){});
@@ -9678,19 +9678,25 @@ function saveProfileSettings(){
     }).catch(function(){});
   }
   _closeProfileSheet();
-  if(stopsPerDay!==prevSpd){toast('Profile saved! Go to Settings → Recalculate Route Groups to apply your new route size.');}
-  else{toast('Profile saved!');}
+  var routingChanged=stopsPerDay!==prevSpd||homeZip!==prevHomeZip;
+  if(routingChanged){
+    var msg='Your routing settings changed. Rebuild your groups now so they reflect your new settings ('+stopsPerDay+' stops/day). Group names you\'ve customized will be kept.';
+    setTimeout(function(){confirmRecalcGroups(msg);},300);
+  }else{toast('Profile saved!');}
   rDash();
 }
 
-function confirmRecalcGroups(){
+function confirmRecalcGroups(msg){
+  var existing=document.getElementById('recalc-sheet');if(existing)existing.remove();
   var sheet=document.createElement('div');
+  sheet.id='recalc-sheet';
   sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var body=msg||'This will rebuild all groups using your current "customers per day" setting ('+((ST.userProfile&&ST.userProfile.stopsPerDay)||10)+' per day). Group names you\'ve customized will be kept.';
   sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
     +'<div style="font-size:17px;font-weight:800;margin-bottom:8px">Recalculate Route Groups?</div>'
-    +'<div style="font-size:14px;color:var(--sub);line-height:1.6;margin-bottom:20px">This will rebuild all groups using your current "customers per day" setting ('+((ST.userProfile&&ST.userProfile.stopsPerDay)||10)+' per day). Group names you\'ve customized will be kept.</div>'
-    +'<button onclick="this.closest(\'div[style*=z-index\\:600]\').remove();_doRecalcGroups()" style="width:100%;padding:14px;border-radius:var(--r2);border:none;background:var(--teal);color:#000;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:10px">Recalculate Now</button>'
-    +'<button onclick="this.closest(\'div[style*=z-index\\:600]\').remove()" style="width:100%;padding:13px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:14px;cursor:pointer;font-family:inherit">Cancel</button>'
+    +'<div style="font-size:14px;color:var(--sub);line-height:1.6;margin-bottom:20px">'+body+'</div>'
+    +'<button onclick="document.getElementById(\'recalc-sheet\').remove();_doRecalcGroups()" style="width:100%;padding:14px;border-radius:var(--r2);border:none;background:var(--teal);color:#000;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:10px">Recalculate Now</button>'
+    +'<button onclick="document.getElementById(\'recalc-sheet\').remove()" style="width:100%;padding:13px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:14px;cursor:pointer;font-family:inherit">Not Now</button>'
     +'</div>';
   sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
   document.body.appendChild(sheet);
