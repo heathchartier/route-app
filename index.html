@@ -9569,12 +9569,11 @@ initApp();
 
 // ── ONBOARDING ──────────────────────────────────────────────────────────────
 function checkFirstRun(){
-  if(ST.onboardingComplete)return;
+  var ob=document.getElementById('ob-overlay');
+  if(ST.onboardingComplete){if(ob)ob.style.display='none';return;}
   var hasHistory=Object.keys(ST.visits||{}).length>0||Object.keys(ST.notes||{}).length>0||Object.keys(ST.orders||{}).length>0;
-  if(hasHistory){ST.onboardingComplete=true;lSave();return;}
-  if(allC().length===0){
-    showOnboarding();
-  }
+  if(hasHistory){ST.onboardingComplete=true;lSave();if(ob)ob.style.display='none';return;}
+  if(allC().length===0){showOnboarding();}
 }
 
 function showOnboarding(){
