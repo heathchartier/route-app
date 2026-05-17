@@ -1,4 +1,4 @@
-const CACHE = 'hcroutes-v9';
+const CACHE = 'hcroutes-v10';
 const ASSETS = [
   '/route-app/', '/route-app/index.html', '/route-app/manifest.json',
   '/route-app/apple-touch-icon.png', '/route-app/icon-180.png',
@@ -41,10 +41,11 @@ self.addEventListener('push', e => {
   var data = {};
   try { data = e.data ? e.data.json() : {}; } catch(x) {}
   e.waitUntil(
-    self.registration.showNotification(data.title || 'HC Routes', {
+    self.registration.showNotification(data.title || 'FieldIQ', {
       body: data.body || '',
       icon: '/route-app/icon-192.png',
-      badge: '/route-app/icon-192.png'
+      badge: '/route-app/icon-192.png',
+      title: data.title || 'FieldIQ'
     })
   );
 });
