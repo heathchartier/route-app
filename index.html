@@ -4352,7 +4352,9 @@ function guessGroup(zip){
 function doImport(hdrs,rows,fname,status){
   var COLS={code:['code','customercode','acct','custcode','custno','customerno','customernumber','accountno','accountnumber','cust'],
     name:['name','customername','company','businessname','accountname','custname'],
-    address:['address','addr','street'],city:['city'],zip:['zip','zipcode','postalcode'],
+    address:['address','addr','street','address1','addr1'],
+    address2:['address2','addr2','suite','unit','apt','ste','addressline2'],
+    city:['city'],zip:['zip','zipcode','postalcode'],
     phone:['phone','tel','telephone'],email:['email'],group:['group','route','routeno'],
     lifetimeSales:['lifetimesales','lifetime','totalnetrevenue','totalrevenue','alltime'],
     sales2024:['sales2024','2024','fy24','2324'],
@@ -4364,7 +4366,7 @@ function doImport(hdrs,rows,fname,status){
   } else {
     for(var f in COLS){ci[f]=-1;for(var i=0;i<COLS[f].length;i++){for(var j=0;j<hdrs.length;j++){if(hdrs[j]===COLS[f][i]||hdrs[j].indexOf(COLS[f][i])>=0){ci[f]=j;break;}}if(ci[f]>=0)break;}
   }}
-  var added=0,updated=0,skipped=0,flagged=0,a=allC(),newDiscrep=[],addedNames=[];
+  var added=0,updated=0,skipped=0,flagged=0,badAddr=0,a=allC(),newDiscrep=[],addedNames=[];
   var importDate=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
   function parseMoney(v){return parseFloat(String(v||'').replace(/[$,\s]/g,''))||0;}
@@ -4423,9 +4425,13 @@ function doImport(hdrs,rows,fname,status){
       // New account
       if(!name){skipped++;continue;}
       var importZip=ci.zip>=0?row[ci.zip]:'';
+      var rawA1=ci.address>=0?String(row[ci.address]||'').trim():'';
+      var rawA2=ci.address2>=0?String(row[ci.address2]||'').trim():'';
+      var addrR=_resolveImportAddr(rawA1,rawA2);
+      if(addrR.needsFix)badAddr++;
       var nc={code:code||('IMP'+Date.now().toString().slice(-6)),name:name,
         group:ci.group>=0&&row[ci.group]?parseInt(row[ci.group])||guessGroup(importZip):guessGroup(importZip),
-        stop:999,address:ci.address>=0?row[ci.address]:'',address2:'',
+        stop:999,address:addrR.address,address2:addrR.address2,needsAddressFix:addrR.needsFix||undefined,
         city:ci.city>=0?row[ci.city]:'',state:'CA',zip:ci.zip>=0?row[ci.zip]:'',
         phone:ci.phone>=0?row[ci.phone]:'',email:ci.email>=0?row[ci.email]:'',
         lifetimeSales:ci.lifetimeSales>=0?parseMoney(row[ci.lifetimeSales]):0,
@@ -4446,11 +4452,13 @@ function doImport(hdrs,rows,fname,status){
   localStorage.setItem('hrt_discrep',JSON.stringify(_epicorDiscrep));
 
   lSave();syncUp();rCust();rDash();rGrps();rDiscrepCard();
+  if(badAddr>0){setTimeout(function(){toast(badAddr+' customer'+(badAddr>1?'s have':' has')+' no valid street address — placed in "Needs Address Fix" group so you can update them.');},1200);}
   if(IS_FIRST_RUN&&added>0){setTimeout(function(){generateRouteGroups(function(){var ob=document.getElementById('ob-overlay');if(ob)ob.style.display='none';go('dash');});},600);}
   var parts=[];
   if(added)parts.push(added+' new account'+(added!==1?'s':'')+' added');
   if(updated)parts.push(updated+' financial'+(updated!==1?'s':'')+' updated');
   if(flagged)parts.push(flagged+' order system discrepanc'+(flagged!==1?'ies':'y')+' flagged');
+  if(badAddr)parts.push(badAddr+' need address fix');
   if(skipped)parts.push(skipped+' matched/unchanged');
   status.style.color=flagged?'var(--amber)':(added||updated)?'var(--teal)':'var(--sub)';
   var msg=parts.length?parts.join(' · '):'Nothing to update — all data matches';
@@ -9531,10 +9539,29 @@ function pickCharger(enc){
 }
 
 /* ── COLUMN MAPPER ── */
+function _classifyAddr(a){
+  a=(a||'').trim();
+  if(!a)return 'empty';
+  if(/^p\.?\s*o\.?\s*box\b/i.test(a))return 'pobox';
+  if(/^\d+\s+\S/.test(a))return 'street'; // starts with house number = real address
+  if(/\d/.test(a)&&/\b(st|street|ave|avenue|blvd|boulevard|rd|road|dr|drive|ln|lane|ct|court|pl|place|way|hwy|highway|pkwy|parkway|cir|circle|ter|terrace)\b/i.test(a))return 'street';
+  if(/^(suite|ste\.?|unit|apt\.?|#\s*\w)/i.test(a))return 'suite';
+  return 'name'; // business name, no usable street
+}
+function _resolveImportAddr(a1,a2){
+  var c1=_classifyAddr(a1),c2=_classifyAddr(a2);
+  if(c1==='street'){return{address:a1.trim(),address2:(a2||'').trim(),needsFix:false};}
+  if(c2==='street'){
+    // addr2 has the real street; addr1 might be suite info
+    return{address:a2.trim(),address2:(c1==='suite'?a1:'').trim(),needsFix:false};
+  }
+  return{address:(a1||'').trim(),address2:(a2||'').trim(),needsFix:true,reason:c1};
+}
 var _FIELD_DEFS=[
   {key:'code',   label:'Customer Code / ID', aliases:['code','customercode','acct','custcode','custno','customerno','customernumber','accountno','accountnumber','cust','id']},
   {key:'name',   label:'Customer Name',      aliases:['name','customername','company','businessname','accountname','custname','account']},
-  {key:'address',label:'Address',            aliases:['address','addr','street','streetaddress']},
+  {key:'address',label:'Address 1 (Street)', aliases:['address','addr','street','streetaddress','address1','addr1','streetaddr']},
+  {key:'address2',label:'Address 2 / Suite', aliases:['address2','addr2','suite','unit','apt','ste','suiteunit','addressline2','addr2suite']},
   {key:'city',   label:'City',               aliases:['city']},
   {key:'zip',    label:'Zip Code',           aliases:['zip','zipcode','postalcode','postal']},
   {key:'phone',  label:'Phone',              aliases:['phone','tel','telephone','phonenumber']},
@@ -9563,8 +9590,8 @@ function showColumnMapper(hdrs,rows,fname,statusEl){
   var preview=rows.slice(0,3);
   var sh=document.createElement('div');
   sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
-  var coreFields=_FIELD_DEFS.slice(0,7);
-  var salesFields=_FIELD_DEFS.slice(7);
+  var coreFields=_FIELD_DEFS.slice(0,8);
+  var salesFields=_FIELD_DEFS.slice(8);
   function colOpts(selectedIdx){
     var o='<option value="-1">(not in file)</option>';
     hdrs.forEach(function(h,i){o+='<option value="'+i+'"'+(i===selectedIdx?' selected':'')+'>'+esc(h)+'</option>';});
@@ -9594,7 +9621,11 @@ function showColumnMapper(hdrs,rows,fname,statusEl){
     mapRows(coreFields)+
     '<div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:12px 0 4px">Sales Data</div>'+
     mapRows(salesFields)+
-    '<div style="height:16px"></div>'+
+    '<div style="margin:12px 0;padding:10px 12px;background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.3);border-radius:8px;font-size:12px;color:var(--text);line-height:1.6">'+
+      '<strong>&#9888; Address tip:</strong> Make sure Address 1 contains complete street addresses (e.g. "123 Main St"). '+
+      'PO Boxes and business names in that column can\'t be used for routing and will be placed in a <em>Needs Address Fix</em> group. '+
+      'If your file has a second address column (suite / unit), map it to Address 2 — we\'ll combine them automatically.'+
+    '</div>'+
     '<button onclick="confirmImport()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:8px">&#10003; Confirm &amp; Import</button>'+
     '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'+
   '</div>';
@@ -10006,6 +10037,15 @@ function generateRouteGroups(onDone){
       });
       var remap={};for(var i=0;i<gIds.length;i++)remap[gIds[i]]=i+1;
       for(var code in groupAssignments){if(remap[groupAssignments[code]])groupAssignments[code]=remap[groupAssignments[code]];}
+    }
+    // Move needs-address-fix customers to the very last group (sorted after distance reordering)
+    var needsFixCust=customers.filter(function(c){return c.needsAddressFix;});
+    if(needsFixCust.length){
+      var maxG=0;for(var code in groupAssignments){if(groupAssignments[code]>maxG)maxG=groupAssignments[code];}
+      var fixGroup=maxG+1;
+      if(!ST.groupNames)ST.groupNames={};
+      for(var i=0;i<needsFixCust.length;i++)groupAssignments[needsFixCust[i].code]=fixGroup;
+      ST.groupNames[fixGroup]='Needs Address Fix';
     }
     // Build group names from dominant city per group
     var groupCityCount={};
