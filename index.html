@@ -1656,6 +1656,8 @@ function closeM(){var ov=document.getElementById('ov');if(ov)ov.className='ov';m
 
 function _applyRemoteState(rem){
   var mc={};
+  // state_json holds all extended fields (added in v2 schema upgrade)
+  var ext=rem.state_json||{};
   var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
   for(var code in allCodes){
     var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
@@ -1672,26 +1674,28 @@ function _applyRemoteState(rem){
   ST.edits=Object.assign({},rem.edits||{},ST.edits);
   ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
   ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
-  ST.groupNotes=Object.assign({},rem.group_notes||rem.groupNotes||{},ST.groupNotes||{});
-  ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
-  ST.tags=Object.assign({},rem.tags||{},ST.tags||{});
-  ST.orders=Object.assign({},rem.orders||{},ST.orders||{});
-  ST.todos=Object.assign({},rem.todos||{},ST.todos||{});
-  ST.followups=Object.assign({},rem.followups||{},ST.followups||{});
-  ST.quotes=Object.assign({},rem.quotes||{},ST.quotes||{});
-  ST.mileage=Object.assign({},rem.mileage||{},ST.mileage||{});
-  if(!ST.expenses||!ST.expenses.length)ST.expenses=rem.expenses||[];
-  ST.contacts=Object.assign({},rem.contacts||{},ST.contacts||{});
-  ST.groupNames=Object.assign({},rem.group_names||rem.groupNames||{},ST.groupNames||{});
-  ST.salesTargets=Object.assign({},rem.sales_targets||{},ST.salesTargets||{});
-  ST.tierTargets=Object.assign({},rem.tier_targets||{},ST.tierTargets||{});
-  ST.productReqs=Object.assign({},rem.product_reqs||{},ST.productReqs||{});
-  ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
-  if(rem.comm_rate!==undefined&&ST.commRate===3)ST.commRate=rem.comm_rate;
-  if(rem.user_profile&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rem.user_profile,ST.userProfile||{});}
-  ST.hiddenCards=Object.assign({},rem.hidden_cards||{},ST.hiddenCards||{});
-  ST.vendorEdits=Object.assign({},rem.vendor_edits||{},ST.vendorEdits||{});
-  var remVendors=rem.added_vendors||[],avm={};
+  ST.groupNotes=Object.assign({},ext.group_notes||rem.group_notes||rem.groupNotes||{},ST.groupNotes||{});
+  ST.snoozed=Object.assign({},ext.snoozed||rem.snoozed||{},ST.snoozed||{});
+  ST.tags=Object.assign({},ext.tags||rem.tags||{},ST.tags||{});
+  ST.orders=Object.assign({},ext.orders||rem.orders||{},ST.orders||{});
+  ST.todos=Object.assign({},ext.todos||rem.todos||{},ST.todos||{});
+  ST.followups=Object.assign({},ext.followups||rem.followups||{},ST.followups||{});
+  ST.quotes=Object.assign({},ext.quotes||rem.quotes||{},ST.quotes||{});
+  ST.mileage=Object.assign({},ext.mileage||rem.mileage||{},ST.mileage||{});
+  if(!ST.expenses||!ST.expenses.length)ST.expenses=ext.expenses||rem.expenses||[];
+  ST.contacts=Object.assign({},ext.contacts||rem.contacts||{},ST.contacts||{});
+  ST.groupNames=Object.assign({},ext.group_names||rem.group_names||rem.groupNames||{},ST.groupNames||{});
+  ST.salesTargets=Object.assign({},ext.sales_targets||rem.sales_targets||{},ST.salesTargets||{});
+  ST.tierTargets=Object.assign({},ext.tier_targets||rem.tier_targets||{},ST.tierTargets||{});
+  ST.productReqs=Object.assign({},ext.product_reqs||rem.product_reqs||{},ST.productReqs||{});
+  ST.samples=Object.assign({},ext.samples||rem.samples||{},ST.samples||{});
+  var rcr=(ext.comm_rate!==undefined)?ext.comm_rate:rem.comm_rate;
+  if(rcr!==undefined&&ST.commRate===3)ST.commRate=rcr;
+  var rp=ext.user_profile||rem.user_profile;
+  if(rp&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rp,ST.userProfile||{});}
+  ST.hiddenCards=Object.assign({},ext.hidden_cards||rem.hidden_cards||{},ST.hiddenCards||{});
+  ST.vendorEdits=Object.assign({},ext.vendor_edits||rem.vendor_edits||{},ST.vendorEdits||{});
+  var remVendors=ext.added_vendors||rem.added_vendors||[],avm={};
   for(var i=0;i<(ST.addedVendors||[]).length;i++)avm[ST.addedVendors[i].code]=ST.addedVendors[i];
   for(var i=0;i<remVendors.length;i++){if(!avm[remVendors[i].code])avm[remVendors[i].code]=remVendors[i];}
   ST.addedVendors=Object.keys(avm).map(function(k){return avm[k];});
@@ -1702,19 +1706,23 @@ function _applyRemoteState(rem){
 }
 function syncDown(){
   if(!CURRENT_USER)return;
-  var uid=CURRENT_USER.id;
   var sl=document.getElementById('sync-lbl');
   function finish(){migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Synced';}
-  sb.auth.getSession().then(function(res){
-    var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
-    fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
-    .then(function(r){return r.json();}).then(function(rows){
-      if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
-      if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
-        fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
-        .then(function(r2){return r2.json();}).then(function(lr){if(lr&&lr.length>0)_applyRemoteState(lr[0]);finish();}).catch(function(){finish();});
-      }else{finish();}
-    }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
+  sb.from('hc_state').select('*').eq('id',CURRENT_USER.id).then(function(res){
+    if(res.error){
+      console.error('syncDown error:',res.error.message);
+      migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();
+      if(sl)sl.textContent='Offline mode';
+      return;
+    }
+    var rows=res.data||[];
+    if(rows.length>0){_applyRemoteState(rows[0]);}
+    if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
+      sb.from('hc_state').select('*').eq('id','heath').then(function(r2){
+        if(!r2.error&&r2.data&&r2.data.length>0)_applyRemoteState(r2.data[0]);
+        finish();
+      });
+    }else{finish();}
   });
 }
 
@@ -1724,47 +1732,40 @@ function syncUp(){
   var uid=CURRENT_USER.id;
   clearTimeout(syncTimer);
   syncTimer=setTimeout(function(){
-    sb.auth.getSession().then(function(res){
-      var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
-      var sl=document.getElementById('sync-lbl');
-      var fullPayload={
-        id:uid,
-        visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,
-        removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],
-        scheduled:ST.scheduled||{},competitors:ST.competitors||{},
-        group_notes:ST.groupNotes||{},snoozed:ST.snoozed||{},
-        tags:ST.tags||{},orders:ST.orders||{},todos:ST.todos||{},
-        followups:ST.followups||{},quotes:ST.quotes||{},
-        mileage:ST.mileage||{},expenses:ST.expenses||[],
-        contacts:ST.contacts||{},group_names:ST.groupNames||{},
-        sales_targets:ST.salesTargets||{},tier_targets:ST.tierTargets||{},
-        product_reqs:ST.productReqs||{},samples:ST.samples||{},
-        comm_rate:ST.commRate,user_profile:ST.userProfile||{},
-        added_vendors:ST.addedVendors||[],vendor_edits:ST.vendorEdits||{},
-        hidden_cards:ST.hiddenCards||{},
-        updated_at:new Date().toISOString()
-      };
-      var minPayload={
-        id:uid,visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,
-        removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],
-        scheduled:ST.scheduled||{},competitors:ST.competitors||{},
-        updated_at:new Date().toISOString()
-      };
-      var hdrs={'apikey':SKEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};
-      fetch(SURL+'/rest/v1/hc_state',{method:'POST',headers:hdrs,body:JSON.stringify(fullPayload)})
-      .then(function(r){
-        if(r.ok){if(sl)sl.textContent='Synced';}
-        else{
-          r.text().then(function(t){
-            console.warn('syncUp full payload failed ('+r.status+'), trying minimal:',t);
-            fetch(SURL+'/rest/v1/hc_state',{method:'POST',headers:hdrs,body:JSON.stringify(minPayload)})
-            .then(function(r2){
-              if(r2.ok){if(sl)sl.textContent='Synced (partial)';}
-              else{r2.text().then(function(t2){console.error('syncUp min failed',r2.status,t2);if(sl)sl.textContent='Sync error ('+r2.status+')';});}
-            }).catch(function(e2){console.error('syncUp min err',e2);if(sl)sl.textContent='Sync error';});
-          });
-        }
-      }).catch(function(err){console.error('syncUp failed',err);if(sl)sl.textContent='Sync error';});
+    var sl=document.getElementById('sync-lbl');
+    if(sl)sl.textContent='Syncing…';
+    // Extended fields packed into state_json JSONB column (run SQL to add: ALTER TABLE hc_state ADD COLUMN IF NOT EXISTS state_json jsonb;)
+    var stateJson={
+      group_notes:ST.groupNotes||{},snoozed:ST.snoozed||{},
+      tags:ST.tags||{},orders:ST.orders||{},todos:ST.todos||{},
+      followups:ST.followups||{},quotes:ST.quotes||{},
+      mileage:ST.mileage||{},expenses:ST.expenses||[],
+      contacts:ST.contacts||{},group_names:ST.groupNames||{},
+      sales_targets:ST.salesTargets||{},tier_targets:ST.tierTargets||{},
+      product_reqs:ST.productReqs||{},samples:ST.samples||{},
+      comm_rate:ST.commRate,user_profile:ST.userProfile||{},
+      added_vendors:ST.addedVendors||[],vendor_edits:ST.vendorEdits||{},
+      hidden_cards:ST.hiddenCards||{}
+    };
+    var payload={
+      id:uid,
+      visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,
+      removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],
+      scheduled:ST.scheduled||{},competitors:ST.competitors||{},
+      state_json:stateJson,
+      updated_at:new Date().toISOString()
+    };
+    sb.from('hc_state').upsert(payload,{onConflict:'id'}).then(function(res){
+      if(res.error){
+        // state_json column may not exist yet — retry without it
+        console.warn('syncUp (with state_json) failed:',res.error.message,'. Retrying without…');
+        var p2=Object.assign({},payload);
+        delete p2.state_json;
+        sb.from('hc_state').upsert(p2,{onConflict:'id'}).then(function(r2){
+          if(r2.error){console.error('syncUp fallback failed:',r2.error.message);if(sl)sl.textContent='Sync error';}
+          else{if(sl)sl.textContent='Synced';}
+        });
+      }else{if(sl)sl.textContent='Synced';}
     });
   },1500);
 }
@@ -3561,6 +3562,8 @@ function closeM(){var ov=document.getElementById('ov');if(ov)ov.className='ov';m
 
 function _applyRemoteState(rem){
   var mc={};
+  // state_json holds all extended fields (added in v2 schema upgrade)
+  var ext=rem.state_json||{};
   var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
   for(var code in allCodes){
     var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
@@ -3577,26 +3580,28 @@ function _applyRemoteState(rem){
   ST.edits=Object.assign({},rem.edits||{},ST.edits);
   ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
   ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
-  ST.groupNotes=Object.assign({},rem.group_notes||rem.groupNotes||{},ST.groupNotes||{});
-  ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
-  ST.tags=Object.assign({},rem.tags||{},ST.tags||{});
-  ST.orders=Object.assign({},rem.orders||{},ST.orders||{});
-  ST.todos=Object.assign({},rem.todos||{},ST.todos||{});
-  ST.followups=Object.assign({},rem.followups||{},ST.followups||{});
-  ST.quotes=Object.assign({},rem.quotes||{},ST.quotes||{});
-  ST.mileage=Object.assign({},rem.mileage||{},ST.mileage||{});
-  if(!ST.expenses||!ST.expenses.length)ST.expenses=rem.expenses||[];
-  ST.contacts=Object.assign({},rem.contacts||{},ST.contacts||{});
-  ST.groupNames=Object.assign({},rem.group_names||rem.groupNames||{},ST.groupNames||{});
-  ST.salesTargets=Object.assign({},rem.sales_targets||{},ST.salesTargets||{});
-  ST.tierTargets=Object.assign({},rem.tier_targets||{},ST.tierTargets||{});
-  ST.productReqs=Object.assign({},rem.product_reqs||{},ST.productReqs||{});
-  ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
-  if(rem.comm_rate!==undefined&&ST.commRate===3)ST.commRate=rem.comm_rate;
-  if(rem.user_profile&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rem.user_profile,ST.userProfile||{});}
-  ST.hiddenCards=Object.assign({},rem.hidden_cards||{},ST.hiddenCards||{});
-  ST.vendorEdits=Object.assign({},rem.vendor_edits||{},ST.vendorEdits||{});
-  var remVendors=rem.added_vendors||[],avm={};
+  ST.groupNotes=Object.assign({},ext.group_notes||rem.group_notes||rem.groupNotes||{},ST.groupNotes||{});
+  ST.snoozed=Object.assign({},ext.snoozed||rem.snoozed||{},ST.snoozed||{});
+  ST.tags=Object.assign({},ext.tags||rem.tags||{},ST.tags||{});
+  ST.orders=Object.assign({},ext.orders||rem.orders||{},ST.orders||{});
+  ST.todos=Object.assign({},ext.todos||rem.todos||{},ST.todos||{});
+  ST.followups=Object.assign({},ext.followups||rem.followups||{},ST.followups||{});
+  ST.quotes=Object.assign({},ext.quotes||rem.quotes||{},ST.quotes||{});
+  ST.mileage=Object.assign({},ext.mileage||rem.mileage||{},ST.mileage||{});
+  if(!ST.expenses||!ST.expenses.length)ST.expenses=ext.expenses||rem.expenses||[];
+  ST.contacts=Object.assign({},ext.contacts||rem.contacts||{},ST.contacts||{});
+  ST.groupNames=Object.assign({},ext.group_names||rem.group_names||rem.groupNames||{},ST.groupNames||{});
+  ST.salesTargets=Object.assign({},ext.sales_targets||rem.sales_targets||{},ST.salesTargets||{});
+  ST.tierTargets=Object.assign({},ext.tier_targets||rem.tier_targets||{},ST.tierTargets||{});
+  ST.productReqs=Object.assign({},ext.product_reqs||rem.product_reqs||{},ST.productReqs||{});
+  ST.samples=Object.assign({},ext.samples||rem.samples||{},ST.samples||{});
+  var rcr=(ext.comm_rate!==undefined)?ext.comm_rate:rem.comm_rate;
+  if(rcr!==undefined&&ST.commRate===3)ST.commRate=rcr;
+  var rp=ext.user_profile||rem.user_profile;
+  if(rp&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rp,ST.userProfile||{});}
+  ST.hiddenCards=Object.assign({},ext.hidden_cards||rem.hidden_cards||{},ST.hiddenCards||{});
+  ST.vendorEdits=Object.assign({},ext.vendor_edits||rem.vendor_edits||{},ST.vendorEdits||{});
+  var remVendors=ext.added_vendors||rem.added_vendors||[],avm={};
   for(var i=0;i<(ST.addedVendors||[]).length;i++)avm[ST.addedVendors[i].code]=ST.addedVendors[i];
   for(var i=0;i<remVendors.length;i++){if(!avm[remVendors[i].code])avm[remVendors[i].code]=remVendors[i];}
   ST.addedVendors=Object.keys(avm).map(function(k){return avm[k];});
@@ -3607,19 +3612,23 @@ function _applyRemoteState(rem){
 }
 function syncDown(){
   if(!CURRENT_USER)return;
-  var uid=CURRENT_USER.id;
   var sl=document.getElementById('sync-lbl');
   function finish(){migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Synced';}
-  sb.auth.getSession().then(function(res){
-    var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
-    fetch(SURL+'/rest/v1/hc_state?id=eq.'+encodeURIComponent(uid)+'&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
-    .then(function(r){return r.json();}).then(function(rows){
-      if(rows&&rows.length>0){_applyRemoteState(rows[0]);}
-      if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
-        fetch(SURL+'/rest/v1/hc_state?id=eq.heath&select=*',{headers:{'apikey':SKEY,'Authorization':'Bearer '+token}})
-        .then(function(r2){return r2.json();}).then(function(lr){if(lr&&lr.length>0)_applyRemoteState(lr[0]);finish();}).catch(function(){finish();});
-      }else{finish();}
-    }).catch(function(){migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Offline mode';});
+  sb.from('hc_state').select('*').eq('id',CURRENT_USER.id).then(function(res){
+    if(res.error){
+      console.error('syncDown error:',res.error.message);
+      migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();
+      if(sl)sl.textContent='Offline mode';
+      return;
+    }
+    var rows=res.data||[];
+    if(rows.length>0){_applyRemoteState(rows[0]);}
+    if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
+      sb.from('hc_state').select('*').eq('id','heath').then(function(r2){
+        if(!r2.error&&r2.data&&r2.data.length>0)_applyRemoteState(r2.data[0]);
+        finish();
+      });
+    }else{finish();}
   });
 }
 
@@ -3629,47 +3638,40 @@ function syncUp(){
   var uid=CURRENT_USER.id;
   clearTimeout(syncTimer);
   syncTimer=setTimeout(function(){
-    sb.auth.getSession().then(function(res){
-      var token=(res.data&&res.data.session)?res.data.session.access_token:SKEY;
-      var sl=document.getElementById('sync-lbl');
-      var fullPayload={
-        id:uid,
-        visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,
-        removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],
-        scheduled:ST.scheduled||{},competitors:ST.competitors||{},
-        group_notes:ST.groupNotes||{},snoozed:ST.snoozed||{},
-        tags:ST.tags||{},orders:ST.orders||{},todos:ST.todos||{},
-        followups:ST.followups||{},quotes:ST.quotes||{},
-        mileage:ST.mileage||{},expenses:ST.expenses||[],
-        contacts:ST.contacts||{},group_names:ST.groupNames||{},
-        sales_targets:ST.salesTargets||{},tier_targets:ST.tierTargets||{},
-        product_reqs:ST.productReqs||{},samples:ST.samples||{},
-        comm_rate:ST.commRate,user_profile:ST.userProfile||{},
-        added_vendors:ST.addedVendors||[],vendor_edits:ST.vendorEdits||{},
-        hidden_cards:ST.hiddenCards||{},
-        updated_at:new Date().toISOString()
-      };
-      var minPayload={
-        id:uid,visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,
-        removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],
-        scheduled:ST.scheduled||{},competitors:ST.competitors||{},
-        updated_at:new Date().toISOString()
-      };
-      var hdrs={'apikey':SKEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};
-      fetch(SURL+'/rest/v1/hc_state',{method:'POST',headers:hdrs,body:JSON.stringify(fullPayload)})
-      .then(function(r){
-        if(r.ok){if(sl)sl.textContent='Synced';}
-        else{
-          r.text().then(function(t){
-            console.warn('syncUp full payload failed ('+r.status+'), trying minimal:',t);
-            fetch(SURL+'/rest/v1/hc_state',{method:'POST',headers:hdrs,body:JSON.stringify(minPayload)})
-            .then(function(r2){
-              if(r2.ok){if(sl)sl.textContent='Synced (partial)';}
-              else{r2.text().then(function(t2){console.error('syncUp min failed',r2.status,t2);if(sl)sl.textContent='Sync error ('+r2.status+')';});}
-            }).catch(function(e2){console.error('syncUp min err',e2);if(sl)sl.textContent='Sync error';});
-          });
-        }
-      }).catch(function(err){console.error('syncUp failed',err);if(sl)sl.textContent='Sync error';});
+    var sl=document.getElementById('sync-lbl');
+    if(sl)sl.textContent='Syncing…';
+    // Extended fields packed into state_json JSONB column (run SQL to add: ALTER TABLE hc_state ADD COLUMN IF NOT EXISTS state_json jsonb;)
+    var stateJson={
+      group_notes:ST.groupNotes||{},snoozed:ST.snoozed||{},
+      tags:ST.tags||{},orders:ST.orders||{},todos:ST.todos||{},
+      followups:ST.followups||{},quotes:ST.quotes||{},
+      mileage:ST.mileage||{},expenses:ST.expenses||[],
+      contacts:ST.contacts||{},group_names:ST.groupNames||{},
+      sales_targets:ST.salesTargets||{},tier_targets:ST.tierTargets||{},
+      product_reqs:ST.productReqs||{},samples:ST.samples||{},
+      comm_rate:ST.commRate,user_profile:ST.userProfile||{},
+      added_vendors:ST.addedVendors||[],vendor_edits:ST.vendorEdits||{},
+      hidden_cards:ST.hiddenCards||{}
+    };
+    var payload={
+      id:uid,
+      visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,
+      removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],
+      scheduled:ST.scheduled||{},competitors:ST.competitors||{},
+      state_json:stateJson,
+      updated_at:new Date().toISOString()
+    };
+    sb.from('hc_state').upsert(payload,{onConflict:'id'}).then(function(res){
+      if(res.error){
+        // state_json column may not exist yet — retry without it
+        console.warn('syncUp (with state_json) failed:',res.error.message,'. Retrying without…');
+        var p2=Object.assign({},payload);
+        delete p2.state_json;
+        sb.from('hc_state').upsert(p2,{onConflict:'id'}).then(function(r2){
+          if(r2.error){console.error('syncUp fallback failed:',r2.error.message);if(sl)sl.textContent='Sync error';}
+          else{if(sl)sl.textContent='Synced';}
+        });
+      }else{if(sl)sl.textContent='Synced';}
     });
   },1500);
 }
@@ -7185,9 +7187,22 @@ function saveCall(code,outcome){
 
 /* ── ORDER LOG ── */
 var _orderItems=[];
+function _recalcOrderLine(i){
+  var it=_orderItems[i];
+  var q=parseFloat(it.qty)||0,p=parseFloat(it.unitPrice)||0;
+  it.lineTotal=(q&&p)?(q*p):0;
+  var el=document.getElementById('ord-lt-'+i);
+  if(el)el.textContent=it.lineTotal?('$'+it.lineTotal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})):'—';
+  _updateOrderTotal();
+}
+function _updateOrderTotal(){
+  var tot=_orderItems.reduce(function(s,it){return s+(parseFloat(it.lineTotal)||0);},0);
+  var el=document.getElementById('ord-total-amt');
+  if(el)el.textContent=tot?('$'+tot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})):'$0.00';
+}
 function logOrder(code){
   if(!code)return;
-  _orderItems=[{item:'',amount:''}];
+  _orderItems=[{item:'',qty:'',unit:'ea',unitPrice:'',lineTotal:0}];
   var sheet=document.createElement('div');
   sheet.id='order-sheet';
   sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1100;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
@@ -7198,23 +7213,38 @@ function logOrder(code){
 }
 function renderOrderSheet(code){
   var sheet=document.getElementById('order-sheet');if(!sheet)return;
-  var fi='width:100%;padding:10px;border-radius:var(--r2);background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;box-sizing:border-box';
+  var fi='padding:8px 10px;border-radius:var(--r2);background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:13px;box-sizing:border-box';
+  var UNITS=['ea','sqft','LF','BF','sheet','box','pallet','other'];
   var rows=_orderItems.map(function(it,i){
+    var lt=parseFloat(it.lineTotal)||0;
+    var ltStr=lt?('$'+lt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})):'—';
+    var unitOpts=UNITS.map(function(u){return '<option value="'+u+'"'+(it.unit===u?' selected':'')+'>'+u+'</option>';}).join('');
     return '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:10px;margin-bottom:8px">'
-      +'<input id="ord-item-'+i+'" type="text" placeholder="Item description" value="'+esc(it.item||'')+'" style="width:100%;'+fi+';margin-bottom:6px" oninput="_orderItems['+i+'].item=this.value">'
-      +'<div style="display:flex;gap:8px;align-items:center">'
-        +'<div style="font-size:11px;color:var(--sub);flex-shrink:0">Amount:</div>'
-        +'<input id="ord-amt-'+i+'" type="number" inputmode="decimal" placeholder="Optional $" step="0.01" value="'+(it.amount||'')+'" style="flex:1;'+fi+'" oninput="_orderItems['+i+'].amount=this.value">'
-        +(_orderItems.length>1?'<button onclick="_orderItems.splice('+i+',1);renderOrderSheet(\''+esc(code)+'\')" style="background:transparent;border:none;color:var(--red);font-size:15px;cursor:pointer;padding:0 4px;flex-shrink:0">Remove</button>':'')
+      +'<input id="ord-item-'+i+'" type="text" placeholder="Product / item description" value="'+esc(it.item||'')+'" style="width:100%;'+fi+';margin-bottom:7px" oninput="_orderItems['+i+'].item=this.value">'
+      +'<div style="display:flex;gap:5px;align-items:center;margin-bottom:6px">'
+        +'<input id="ord-qty-'+i+'" type="number" inputmode="decimal" placeholder="Qty" value="'+(it.qty||'')+'" style="width:58px;flex-shrink:0;'+fi+';text-align:center" oninput="_orderItems['+i+'].qty=this.value;_recalcOrderLine('+i+')">'
+        +'<select id="ord-unit-'+i+'" style="flex:1;min-width:56px;'+fi+'" onchange="_orderItems['+i+'].unit=this.value">'+unitOpts+'</select>'
+        +'<span style="font-size:11px;color:var(--sub);flex-shrink:0">@</span>'
+        +'<input id="ord-up-'+i+'" type="number" inputmode="decimal" placeholder="$/unit" value="'+(it.unitPrice||'')+'" style="width:74px;flex-shrink:0;'+fi+';text-align:right" oninput="_orderItems['+i+'].unitPrice=this.value;_recalcOrderLine('+i+')">'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+        +'<div style="font-size:12px;color:var(--sub)">Line total: <span id="ord-lt-'+i+'" style="color:var(--green);font-weight:700">'+ltStr+'</span></div>'
+        +(_orderItems.length>1?'<button onclick="_orderItems.splice('+i+',1);renderOrderSheet(\''+esc(code)+'\')" style="background:transparent;border:none;color:var(--red);font-size:12px;cursor:pointer;padding:0;font-family:inherit">Remove</button>':'')
       +'</div>'
     +'</div>';
   }).join('');
-  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:80vh;overflow-y:auto">'
+  var tot=_orderItems.reduce(function(s,it){return s+(parseFloat(it.lineTotal)||0);},0);
+  var totStr=tot?('$'+tot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})):'$0.00';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:82vh;overflow-y:auto">'
    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
-   +'<div style="font-size:17px;font-weight:800;margin-bottom:6px">&#128230; Log Order</div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">&#128230; Log Order</div>'
    +'<div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px">Items</div>'
    +rows
-   +'<button onclick="_orderItems.push({item:\'\',amount:\'\'});renderOrderSheet(\''+esc(code)+'\')" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:14px">+ Add Item</button>'
+   +'<button onclick="_orderItems.push({item:\'\',qty:\'\',unit:\'ea\',unitPrice:\'\',lineTotal:0});renderOrderSheet(\''+esc(code)+'\')" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px">+ Add Item</button>'
+   +'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg3);border-radius:var(--r2);border:1px solid var(--border2);margin-bottom:14px">'
+     +'<div style="font-size:13px;font-weight:700;color:var(--text)">Order Total</div>'
+     +'<div id="ord-total-amt" style="font-size:16px;font-weight:800;color:var(--green)">'+totStr+'</div>'
+   +'</div>'
    +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Notes (PO#, delivery details, etc.)</div>'
    +'<input id="ord-note" type="text" placeholder="Optional..." style="width:100%;padding:10px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:14px;box-sizing:border-box">'
    +'<button onclick="saveOrder(\''+esc(code)+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--green);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save Order</button>'
@@ -7225,11 +7255,20 @@ function saveOrder(code){
   var items=_orderItems.filter(function(it){return (it.item||'').trim();});
   if(!items.length){toast('Add at least one item');return;}
   var note=(document.getElementById('ord-note')||{}).value||'';
-  var totalAmt=items.reduce(function(s,it){return s+(parseFloat(it.amount)||0);},0);
-  var itemStr=items.map(function(it){return it.item.trim()+(it.amount?(' ($'+parseFloat(it.amount).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+')'):'' );}).join(', ');
+  var totalAmt=items.reduce(function(s,it){return s+(parseFloat(it.lineTotal)||0);},0);
+  var itemStr=items.map(function(it){
+    var base=it.item.trim();
+    var qty=parseFloat(it.qty)||0,up=parseFloat(it.unitPrice)||0,lt=parseFloat(it.lineTotal)||0;
+    if(qty&&it.unit){
+      base+=' ('+qty+' '+it.unit+(up?' @ $'+up.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'/'+it.unit:'')+(lt?' = $'+lt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'')+')';
+    }else if(lt){base+=' ($'+lt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+')';}
+    return base;
+  }).join(', ');
   if(!ST.orders)ST.orders={};
   if(!ST.orders[code])ST.orders[code]=[];
-  ST.orders[code].push({date:new Date().toISOString(),item:itemStr,amount:totalAmt,note:note.trim(),items:items.map(function(it){return {item:it.item.trim(),amount:parseFloat(it.amount)||0};})});
+  ST.orders[code].push({date:new Date().toISOString(),item:itemStr,amount:totalAmt,note:note.trim(),
+    items:items.map(function(it){return {item:it.item.trim(),qty:parseFloat(it.qty)||0,unit:it.unit||'ea',unitPrice:parseFloat(it.unitPrice)||0,lineTotal:parseFloat(it.lineTotal)||0};})
+  });
   lSave();syncUp();
   var sheet=document.getElementById('order-sheet');if(sheet)sheet.remove();
   toast('&#128230; Order logged');
