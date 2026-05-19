@@ -1762,8 +1762,10 @@ function syncUp(){
         var p2=Object.assign({},payload);
         delete p2.state_json;
         sb.from('hc_state').upsert(p2,{onConflict:'id'}).then(function(r2){
-          if(r2.error){console.error('syncUp fallback failed:',r2.error.message);if(sl)sl.textContent='Sync error';}
-          else{if(sl)sl.textContent='Synced';}
+          if(r2.error){
+            console.error('syncUp fallback failed:',r2.error.message);
+            if(sl)sl.textContent='Sync error: '+r2.error.message.slice(0,60);
+          }else{if(sl)sl.textContent='Synced';}
         });
       }else{if(sl)sl.textContent='Synced';}
     });
@@ -3668,8 +3670,10 @@ function syncUp(){
         var p2=Object.assign({},payload);
         delete p2.state_json;
         sb.from('hc_state').upsert(p2,{onConflict:'id'}).then(function(r2){
-          if(r2.error){console.error('syncUp fallback failed:',r2.error.message);if(sl)sl.textContent='Sync error';}
-          else{if(sl)sl.textContent='Synced';}
+          if(r2.error){
+            console.error('syncUp fallback failed:',r2.error.message);
+            if(sl)sl.textContent='Sync error: '+r2.error.message.slice(0,60);
+          }else{if(sl)sl.textContent='Synced';}
         });
       }else{if(sl)sl.textContent='Synced';}
     });
