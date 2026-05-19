@@ -1,7 +1,7 @@
 {
-  "name": "HC Routes",
-  "short_name": "HC Routes",
-  "description": "Sales route tracker for Heath Chartier - 610 customers across Southern California",
+  "name": "FieldIQ",
+  "short_name": "FieldIQ",
+  "description": "Outside Sales Intelligence — route planning, customer tracking, and field analytics",
   "start_url": "/route-app/",
   "display": "standalone",
   "background_color": "#0f1b2d",

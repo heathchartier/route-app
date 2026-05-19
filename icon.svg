@@ -18,7 +18,7 @@
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
 
   <!-- Teal glow ring (subtle) -->
-  <circle cx="256" cy="220" r="175" fill="none" stroke="#00e5b8" stroke-width="2" stroke-opacity="0.1"/>
+  <circle cx="256" cy="230" r="175" fill="none" stroke="#00e5b8" stroke-width="2" stroke-opacity="0.1"/>
 
   <!-- Route dots (top decoration) -->
   <circle cx="130" cy="105" r="14" fill="#00e5b8" opacity="0.7" filter="url(#glow)"/>
@@ -33,25 +33,25 @@
         stroke="url(#teal-grad)" stroke-width="5" fill="none"
         stroke-linecap="round" opacity="0.6"/>
 
-  <!-- HC letters -->
-  <text x="256" y="310"
+  <!-- "Field" label (white, above IQ) -->
+  <text x="256" y="258"
         text-anchor="middle"
         font-family="-apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
-        font-size="220"
+        font-size="86"
+        font-weight="700"
+        letter-spacing="1"
+        fill="#ffffff"
+        opacity="0.88">Field</text>
+
+  <!-- "IQ" main text (teal gradient) -->
+  <text x="256" y="392"
+        text-anchor="middle"
+        font-family="-apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
+        font-size="190"
         font-weight="800"
         letter-spacing="-8"
-        fill="#ffffff">HC</text>
+        fill="url(#teal-grad)">IQ</text>
 
   <!-- Teal underline accent -->
-  <rect x="118" y="342" width="276" height="12" rx="6" fill="url(#teal-grad)" opacity="0.95"/>
-
-  <!-- Tagline -->
-  <text x="256" y="410"
-        text-anchor="middle"
-        font-family="-apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
-        font-size="42"
-        font-weight="600"
-        letter-spacing="6"
-        fill="#00e5b8"
-        opacity="0.85">ROUTES</text>
+  <rect x="162" y="412" width="188" height="10" rx="5" fill="url(#teal-grad)" opacity="0.9"/>
 </svg>
