@@ -1729,7 +1729,13 @@ function syncDown(){
     clearTimeout(timer);
     if(res.error){offlineFinish(res.error.message);return;}
     var rows=res.data||[];
-    if(rows.length>0){try{_applyRemoteState(rows[0]);}catch(e){console.error('_applyRemoteState err:',e);}}
+    if(rows.length>0){
+      try{_applyRemoteState(rows[0]);}catch(e){console.error('_applyRemoteState err:',e);}
+      // Remote row exists but has no visits yet (e.g. created by diagnostic) — push local data up
+      var remVisitCount=rows[0].visits?Object.keys(rows[0].visits).length:0;
+      var localVisitCount=Object.keys(ST.visits||{}).length;
+      if(remVisitCount===0&&localVisitCount>0){syncUp();}
+    }
     else{syncUp();}  // no remote row yet — push local data up
     if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
       sb.from('hc_state').select('*').eq('id','heath').then(function(r2){
@@ -3651,7 +3657,13 @@ function syncDown(){
     clearTimeout(timer);
     if(res.error){offlineFinish(res.error.message);return;}
     var rows=res.data||[];
-    if(rows.length>0){try{_applyRemoteState(rows[0]);}catch(e){console.error('_applyRemoteState err:',e);}}
+    if(rows.length>0){
+      try{_applyRemoteState(rows[0]);}catch(e){console.error('_applyRemoteState err:',e);}
+      // Remote row exists but has no visits yet (e.g. created by diagnostic) — push local data up
+      var remVisitCount=rows[0].visits?Object.keys(rows[0].visits).length:0;
+      var localVisitCount=Object.keys(ST.visits||{}).length;
+      if(remVisitCount===0&&localVisitCount>0){syncUp();}
+    }
     else{syncUp();}  // no remote row yet — push local data up
     if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
       sb.from('hc_state').select('*').eq('id','heath').then(function(r2){
