@@ -1711,27 +1711,33 @@ function _applyRemoteState(rem){
 function syncDown(){
   if(!CURRENT_USER)return;
   var sl=document.getElementById('sync-lbl');
-  function finish(){migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Synced';}
+  var done=false;
+  function finish(){
+    if(done)return;done=true;
+    try{migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();}catch(e){console.error('syncDown finish err:',e);}
+    if(sl)sl.textContent='Synced';
+  }
+  function offlineFinish(reason){
+    if(done)return;done=true;
+    console.warn('syncDown offline:',reason);
+    try{migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();}catch(e){}
+    if(sl)sl.textContent='Offline mode';
+  }
+  // Safety net — if Supabase never responds, unfreeze the app after 12s
+  var timer=setTimeout(function(){offlineFinish('timeout');},12000);
   sb.from('hc_state').select('*').eq('id',CURRENT_USER.id).then(function(res){
-    if(res.error){
-      console.error('syncDown error:',res.error.message);
-      migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();
-      if(sl)sl.textContent='Offline mode';
-      return;
-    }
+    clearTimeout(timer);
+    if(res.error){offlineFinish(res.error.message);return;}
     var rows=res.data||[];
-    if(rows.length>0){_applyRemoteState(rows[0]);}
-    else{
-      // No remote row yet — push local data up immediately (first sync)
-      syncUp();
-    }
+    if(rows.length>0){try{_applyRemoteState(rows[0]);}catch(e){console.error('_applyRemoteState err:',e);}}
+    else{syncUp();}  // no remote row yet — push local data up
     if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
       sb.from('hc_state').select('*').eq('id','heath').then(function(r2){
-        if(!r2.error&&r2.data&&r2.data.length>0)_applyRemoteState(r2.data[0]);
+        if(!r2.error&&r2.data&&r2.data.length>0){try{_applyRemoteState(r2.data[0]);}catch(e){console.error(e);}}
         finish();
-      });
+      }).catch(function(){finish();});
     }else{finish();}
-  });
+  }).catch(function(err){clearTimeout(timer);offlineFinish(String(err));});
 }
 
 var syncTimer=null;
@@ -3627,27 +3633,33 @@ function _applyRemoteState(rem){
 function syncDown(){
   if(!CURRENT_USER)return;
   var sl=document.getElementById('sync-lbl');
-  function finish(){migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();if(sl)sl.textContent='Synced';}
+  var done=false;
+  function finish(){
+    if(done)return;done=true;
+    try{migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();}catch(e){console.error('syncDown finish err:',e);}
+    if(sl)sl.textContent='Synced';
+  }
+  function offlineFinish(reason){
+    if(done)return;done=true;
+    console.warn('syncDown offline:',reason);
+    try{migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();}catch(e){}
+    if(sl)sl.textContent='Offline mode';
+  }
+  // Safety net — if Supabase never responds, unfreeze the app after 12s
+  var timer=setTimeout(function(){offlineFinish('timeout');},12000);
   sb.from('hc_state').select('*').eq('id',CURRENT_USER.id).then(function(res){
-    if(res.error){
-      console.error('syncDown error:',res.error.message);
-      migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();
-      if(sl)sl.textContent='Offline mode';
-      return;
-    }
+    clearTimeout(timer);
+    if(res.error){offlineFinish(res.error.message);return;}
     var rows=res.data||[];
-    if(rows.length>0){_applyRemoteState(rows[0]);}
-    else{
-      // No remote row yet — push local data up immediately (first sync)
-      syncUp();
-    }
+    if(rows.length>0){try{_applyRemoteState(rows[0]);}catch(e){console.error('_applyRemoteState err:',e);}}
+    else{syncUp();}  // no remote row yet — push local data up
     if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
       sb.from('hc_state').select('*').eq('id','heath').then(function(r2){
-        if(!r2.error&&r2.data&&r2.data.length>0)_applyRemoteState(r2.data[0]);
+        if(!r2.error&&r2.data&&r2.data.length>0){try{_applyRemoteState(r2.data[0]);}catch(e){console.error(e);}}
         finish();
-      });
+      }).catch(function(){finish();});
     }else{finish();}
-  });
+  }).catch(function(err){clearTimeout(timer);offlineFinish(String(err));});
 }
 
 var syncTimer=null;
