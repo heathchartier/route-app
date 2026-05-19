@@ -840,9 +840,13 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button onclick="runSyncDiag()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128269; Sync Diagnostic</button>
+      <button onclick="forceCacheClear()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--red);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128260; Clear Cache + Reload</button>
     </div>
     <div style="margin-bottom:12px">
       <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
@@ -2757,9 +2761,13 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button onclick="runSyncDiag()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128269; Sync Diagnostic</button>
+      <button onclick="forceCacheClear()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--red);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128260; Clear Cache + Reload</button>
     </div>
     <div style="margin-bottom:12px">
       <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
@@ -8609,6 +8617,68 @@ function rTargetCard(){
   });
   if(behind.length>6)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:4px">+'+(behind.length-6)+' more</div>';
   list.innerHTML=h;
+}
+
+/* ── SYNC DIAGNOSTIC & CACHE CLEAR ── */
+function _showDiag(txt){
+  var el=document.getElementById('sync-diag-modal');
+  if(!el){
+    el=document.createElement('div');
+    el.id='sync-diag-modal';
+    el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+    el.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:20px 18px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+      +'<div style="font-size:15px;font-weight:800;margin-bottom:12px">&#128269; Sync Diagnostic</div>'
+      +'<pre id="sync-diag-txt" style="font-size:12px;color:var(--text);background:var(--bg3);padding:12px;border-radius:8px;white-space:pre-wrap;max-height:55vh;overflow-y:auto;font-family:monospace;border:1px solid var(--border2);line-height:1.6"></pre>'
+      +'<button onclick="document.getElementById(\'sync-diag-modal\').remove()" style="width:100%;margin-top:12px;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+      +'</div>';
+    document.body.appendChild(el);
+  }
+  var pre=document.getElementById('sync-diag-txt');
+  if(pre)pre.textContent=txt;
+}
+function runSyncDiag(){
+  var lines=['FieldIQ Sync Diagnostic\n'];
+  if(!CURRENT_USER){
+    lines.push('NOT SIGNED IN\nSign in first, then run diagnostic.');
+    _showDiag(lines.join('\n'));return;
+  }
+  lines.push('User:  '+CURRENT_USER.email);
+  lines.push('UID:   '+CURRENT_USER.id.slice(0,12)+'...\n');
+  lines.push('Running...');
+  _showDiag(lines.join('\n'));
+  // Step 1 — read
+  sb.from('hc_state').select('id,updated_at').eq('id',CURRENT_USER.id).then(function(r1){
+    lines.pop();
+    if(r1.error){lines.push('READ:  FAILED\n       '+r1.error.message);}
+    else{lines.push('READ:  OK ('+r1.data.length+' row'+(r1.data.length===1?'':'s')+' found)');}
+    _showDiag(lines.join('\n'));
+    // Step 2 — minimal write
+    sb.from('hc_state').upsert({id:CURRENT_USER.id,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(r2){
+      if(r2.error){lines.push('WRITE: FAILED\n       '+r2.error.message);}
+      else{lines.push('WRITE: OK');}
+      _showDiag(lines.join('\n'));
+      // Step 3 — state_json column
+      sb.from('hc_state').upsert({id:CURRENT_USER.id,state_json:{_diag:1}},{onConflict:'id'}).then(function(r3){
+        if(r3.error){
+          lines.push('EXT:   state_json column MISSING\n       Run SQL in Supabase:\n       ALTER TABLE hc_state ADD COLUMN\n       IF NOT EXISTS state_json jsonb;');
+        }else{lines.push('EXT:   state_json column OK');}
+        lines.push('\n--- Share this with support ---');
+        _showDiag(lines.join('\n'));
+      });
+    });
+  });
+}
+function forceCacheClear(){
+  if(!confirm('Clear app cache and reload? Fixes stale icons and stuck sync. Your data is NOT deleted.'))return;
+  var reload=function(){window.location.reload(true);};
+  if(!('serviceWorker' in navigator)||!('caches' in window)){reload();return;}
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    return Promise.all(regs.map(function(r){return r.unregister();}));
+  }).then(function(){
+    return caches.keys();
+  }).then(function(keys){
+    return Promise.all(keys.map(function(k){return caches.delete(k);}));
+  }).then(reload).catch(reload);
 }
 
 /* ── BACKUP & RESTORE ── */
