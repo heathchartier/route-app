@@ -631,11 +631,25 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="stat"><div class="stat-n" style="color:var(--amber)">0</div><div class="stat-l">Not Avail</div></div>
       <div class="stat"><div class="stat-n" style="color:var(--red)">0</div><div class="stat-l">Overdue</div></div>
     </div>
-    <div id="d-empty-state" style="display:none;padding:40px 16px;text-align:center">
-      <div style="font-size:52px;margin-bottom:16px">&#128205;</div>
-      <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px">No customers yet</div>
-      <div style="font-size:14px;color:var(--sub);margin-bottom:24px;line-height:1.5">Upload your customer list in Settings to start building routes</div>
-      <button onclick="go('set')" style="background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:13px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Go to Settings</button>
+    <div id="d-empty-state" style="display:none;padding:24px 16px 16px">
+      <div style="background:linear-gradient(135deg,rgba(0,229,184,.08),rgba(74,158,255,.06));border:1px solid rgba(0,229,184,.2);border-radius:var(--r);padding:24px 20px;text-align:center;margin-bottom:12px">
+        <div style="font-size:48px;margin-bottom:12px">&#128640;</div>
+        <div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:8px">Welcome to FieldIQ!</div>
+        <div style="font-size:13px;color:var(--sub);margin-bottom:20px;line-height:1.6">Let's get your customer list loaded so you can start building routes. It only takes a minute.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button onclick="downloadCustomerTemplate()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">&#128229; Step 1 — Download the Template</button>
+          <button onclick="go('set')" style="width:100%;padding:12px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">&#128202; Step 2 — Import Your Customer List</button>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px">
+        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">How it works</div>
+        <div style="font-size:12px;color:var(--sub);line-height:1.7">
+          <div>1&#65039;&#8419; Download the template &amp; fill in your customers in Excel</div>
+          <div>2&#65039;&#8419; Go to <strong style="color:var(--text)">Settings → Import Customer List</strong> and upload it</div>
+          <div>3&#65039;&#8419; FieldIQ auto-assigns route groups by zip code — you're done!</div>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--dim)">You can also add customers one at a time or scan a business card in Settings.</div>
+      </div>
     </div>
     <div id="d-birthday-alert" style="display:none"></div>
     <div id="d-todo-alert" style="display:none"></div>
@@ -866,10 +880,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="forceSyncUp()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.35);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9650; Force Upload My Data to Cloud</button>
     </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Customer Data</div>
-    <div style="margin-bottom:8px">
-      <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
-      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds route groups using your "customers per day" setting. Run this after changing that setting in My Profile.</div>
-    </div>
     <div class="card">
       <div class="lbl" style="color:var(--teal)">&#128229; Import Customer List</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.5">Upload your customer list from Excel or CSV. New accounts are added automatically and assigned to a route group by zip code. Existing accounts get their sales data updated — notes and history are <strong style="color:var(--text)">never overwritten</strong>.</div>
@@ -915,18 +925,12 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       </div>
       <div id="pend-list"></div>
     </div>
-    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Vendors</div>
-        <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:var(--blue)">Add Vendor</div>
-      <div class="fl">Name *</div><input class="fi" id="av-name" type="text" placeholder="Vendor name">
-      <div class="fl">Address</div><input class="fi" id="av-addr" type="text">
-      <div class="fl">City</div><input class="fi" id="av-city" type="text">
-      <div class="fl">State</div><input class="fi" id="av-state" type="text">
-      <div class="fl">Zip</div><input class="fi" id="av-zip" type="text">
-      <div class="fl">Phone</div><input class="fi" id="av-ph" type="tel">
-      <button class="btn btn-b" id="btn-add-vendor">Add Vendor</button>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--teal)">&#128229; Download Import Template</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Don't have an existing file? Download our blank template — all the right column headers are already set up. Fill it in and import.</div>
+      <button onclick="downloadCustomerTemplate()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Download Customer List Template (.csv)</button>
     </div>
-<div class="card">
+    <div class="card" style="margin-top:4px">
       <div class="lbl">&#10133; Add Customer Manually</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Add a single new customer by hand. For a large list, use <strong style="color:var(--teal)">Import Customer List</strong> above — it's much faster.</div>
       <div class="fl">Business Name *</div><input class="fi" id="a-name" type="text" placeholder="Company or customer name">
@@ -935,6 +939,22 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="fl">Phone</div><input class="fi" id="a-ph" type="tel">
       <div class="fl">Zip (route group auto-assigned)</div><input class="fi" id="a-zip" type="text" style="width:120px" placeholder="e.g. 92507">
       <button class="btn btn-b" id="btn-add">Add Customer</button>
+    </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:#c084fc">&#128247; Add Customer via Business Card</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Point your camera at a business card, then fill in the details. Saves instantly as a new customer — no manual typing required.</div>
+      <button onclick="showBizCardScanner()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Card &amp; Add New Customer</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Vendors</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--blue)">Add Vendor</div>
+      <div class="fl">Name *</div><input class="fi" id="av-name" type="text" placeholder="Vendor name">
+      <div class="fl">Address</div><input class="fi" id="av-addr" type="text">
+      <div class="fl">City</div><input class="fi" id="av-city" type="text">
+      <div class="fl">State</div><input class="fi" id="av-state" type="text">
+      <div class="fl">Zip</div><input class="fi" id="av-zip" type="text">
+      <div class="fl">Phone</div><input class="fi" id="av-ph" type="tel">
+      <button class="btn btn-b" id="btn-add-vendor">Add Vendor</button>
     </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">My Info &amp; Pay</div>
     <div class="card">
@@ -992,17 +1012,11 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export your scheduled follow-ups to any calendar app (Google, Apple, Outlook)</div>
       <button onclick="exportCalendarICS()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128197; Download Follow-Ups (.ics)</button>
     </div>
-    <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:var(--teal)">&#128229; Download Import Template</div>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Don't have an existing file? Download a blank template with all the right column headers already set up — just fill it in and import.</div>
-      <button onclick="downloadCustomerTemplate()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Download Customer List Template (.csv)</button>
-    </div>
-    <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:#c084fc">&#128247; Add Customer via Business Card</div>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Point your camera at a business card, then fill in the details. Saves instantly as a new customer in your list — no manual typing required.</div>
-      <button onclick="showBizCardScanner()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Card &amp; Add New Customer</button>
-    </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Route Settings</div>
+    <div style="margin-bottom:8px">
+      <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
+      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds route groups using your "customers per day" setting. Run this after changing that setting in My Profile.</div>
+    </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128205; Group Names</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Give your groups custom names</div>
@@ -1623,6 +1637,23 @@ function rCust(){
 
 function rCPage(){
   var shown=fc.slice(0,PG*(pg+1)),h='';
+  if(allC().length===0){
+    h='<div style="padding:24px 16px">'
+     +'<div style="background:linear-gradient(135deg,rgba(0,229,184,.08),rgba(74,158,255,.06));border:1px solid rgba(0,229,184,.2);border-radius:var(--r);padding:24px 20px;text-align:center;margin-bottom:12px">'
+     +'<div style="font-size:44px;margin-bottom:10px">&#128101;</div>'
+     +'<div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px">No customers yet</div>'
+     +'<div style="font-size:13px;color:var(--sub);margin-bottom:18px;line-height:1.6">Get started by downloading our template, filling in your customer list, then importing it in Settings.</div>'
+     +'<div style="display:flex;flex-direction:column;gap:10px">'
+     +'<button onclick="downloadCustomerTemplate()" style="width:100%;padding:12px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">&#128229; Download Customer Template</button>'
+     +'<button onclick="go(\'set\')" style="width:100%;padding:11px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#128202; Import Customer List (Settings)</button>'
+     +'<button onclick="showBizCardScanner()" style="width:100%;padding:11px;border-radius:var(--r2);background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);color:#c084fc;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#128247; Scan a Business Card</button>'
+     +'</div>'
+     +'</div>'
+     +'</div>';
+    var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
+    var cm=document.getElementById('c-more');if(cm)cm.style.display='none';
+    return;
+  }
   for(var i=0;i<shown.length;i++){
     var c=shown[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var meta=d>=1000000?'Never':(lv.type==='not_available'?'N/A':'Visited')+' '+d+'d';
@@ -2838,10 +2869,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="forceSyncUp()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.35);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9650; Force Upload My Data to Cloud</button>
     </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Customer Data</div>
-    <div style="margin-bottom:8px">
-      <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
-      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds route groups using your "customers per day" setting. Run this after changing that setting in My Profile.</div>
-    </div>
     <div class="card">
       <div class="lbl" style="color:var(--teal)">&#128229; Import Customer List</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.5">Upload your customer list from Excel or CSV. New accounts are added automatically and assigned to a route group by zip code. Existing accounts get their sales data updated — notes and history are <strong style="color:var(--text)">never overwritten</strong>.</div>
@@ -2887,18 +2914,12 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       </div>
       <div id="pend-list"></div>
     </div>
-    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Vendors</div>
-        <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:var(--blue)">Add Vendor</div>
-      <div class="fl">Name *</div><input class="fi" id="av-name" type="text" placeholder="Vendor name">
-      <div class="fl">Address</div><input class="fi" id="av-addr" type="text">
-      <div class="fl">City</div><input class="fi" id="av-city" type="text">
-      <div class="fl">State</div><input class="fi" id="av-state" type="text">
-      <div class="fl">Zip</div><input class="fi" id="av-zip" type="text">
-      <div class="fl">Phone</div><input class="fi" id="av-ph" type="tel">
-      <button class="btn btn-b" id="btn-add-vendor">Add Vendor</button>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--teal)">&#128229; Download Import Template</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Don't have an existing file? Download our blank template — all the right column headers are already set up. Fill it in and import.</div>
+      <button onclick="downloadCustomerTemplate()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Download Customer List Template (.csv)</button>
     </div>
-<div class="card">
+    <div class="card" style="margin-top:4px">
       <div class="lbl">&#10133; Add Customer Manually</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Add a single new customer by hand. For a large list, use <strong style="color:var(--teal)">Import Customer List</strong> above — it's much faster.</div>
       <div class="fl">Business Name *</div><input class="fi" id="a-name" type="text" placeholder="Company or customer name">
@@ -2907,6 +2928,22 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="fl">Phone</div><input class="fi" id="a-ph" type="tel">
       <div class="fl">Zip (route group auto-assigned)</div><input class="fi" id="a-zip" type="text" style="width:120px" placeholder="e.g. 92507">
       <button class="btn btn-b" id="btn-add">Add Customer</button>
+    </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:#c084fc">&#128247; Add Customer via Business Card</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Point your camera at a business card, then fill in the details. Saves instantly as a new customer — no manual typing required.</div>
+      <button onclick="showBizCardScanner()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Card &amp; Add New Customer</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Vendors</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--blue)">Add Vendor</div>
+      <div class="fl">Name *</div><input class="fi" id="av-name" type="text" placeholder="Vendor name">
+      <div class="fl">Address</div><input class="fi" id="av-addr" type="text">
+      <div class="fl">City</div><input class="fi" id="av-city" type="text">
+      <div class="fl">State</div><input class="fi" id="av-state" type="text">
+      <div class="fl">Zip</div><input class="fi" id="av-zip" type="text">
+      <div class="fl">Phone</div><input class="fi" id="av-ph" type="tel">
+      <button class="btn btn-b" id="btn-add-vendor">Add Vendor</button>
     </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">My Info &amp; Pay</div>
     <div class="card">
@@ -2964,17 +3001,11 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export your scheduled follow-ups to any calendar app (Google, Apple, Outlook)</div>
       <button onclick="exportCalendarICS()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128197; Download Follow-Ups (.ics)</button>
     </div>
-    <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:var(--teal)">&#128229; Download Import Template</div>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Don't have an existing file? Download a blank template with all the right column headers already set up — just fill it in and import.</div>
-      <button onclick="downloadCustomerTemplate()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Download Customer List Template (.csv)</button>
-    </div>
-    <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:#c084fc">&#128247; Add Customer via Business Card</div>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Point your camera at a business card, then fill in the details. Saves instantly as a new customer in your list — no manual typing required.</div>
-      <button onclick="showBizCardScanner()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Card &amp; Add New Customer</button>
-    </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Route Settings</div>
+    <div style="margin-bottom:8px">
+      <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
+      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds route groups using your "customers per day" setting. Run this after changing that setting in My Profile.</div>
+    </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128205; Group Names</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Give your groups custom names</div>
@@ -3585,6 +3616,23 @@ function rCust(){
 
 function rCPage(){
   var shown=fc.slice(0,PG*(pg+1)),h='';
+  if(allC().length===0){
+    h='<div style="padding:24px 16px">'
+     +'<div style="background:linear-gradient(135deg,rgba(0,229,184,.08),rgba(74,158,255,.06));border:1px solid rgba(0,229,184,.2);border-radius:var(--r);padding:24px 20px;text-align:center;margin-bottom:12px">'
+     +'<div style="font-size:44px;margin-bottom:10px">&#128101;</div>'
+     +'<div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px">No customers yet</div>'
+     +'<div style="font-size:13px;color:var(--sub);margin-bottom:18px;line-height:1.6">Get started by downloading our template, filling in your customer list, then importing it in Settings.</div>'
+     +'<div style="display:flex;flex-direction:column;gap:10px">'
+     +'<button onclick="downloadCustomerTemplate()" style="width:100%;padding:12px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">&#128229; Download Customer Template</button>'
+     +'<button onclick="go(\'set\')" style="width:100%;padding:11px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#128202; Import Customer List (Settings)</button>'
+     +'<button onclick="showBizCardScanner()" style="width:100%;padding:11px;border-radius:var(--r2);background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);color:#c084fc;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#128247; Scan a Business Card</button>'
+     +'</div>'
+     +'</div>'
+     +'</div>';
+    var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
+    var cm=document.getElementById('c-more');if(cm)cm.style.display='none';
+    return;
+  }
   for(var i=0;i<shown.length;i++){
     var c=shown[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var meta=d>=1000000?'Never':(lv.type==='not_available'?'N/A':'Visited')+' '+d+'d';
