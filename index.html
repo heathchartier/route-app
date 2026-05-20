@@ -955,6 +955,19 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <input type="file" id="backup-file" accept=".json" style="display:none" onchange="importBackup(this)">
     </div>
     <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--blue)">&#128197; Calendar Sync</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export your scheduled follow-ups to any calendar app (Google, Apple, Outlook)</div>
+      <button onclick="exportCalendarICS()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128197; Download Follow-Ups (.ics)</button>
+    </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--teal)">&#128229; Import Templates</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Download a blank template to format your data for import</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="downloadCustomerTemplate()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128101; Customer CSV</button>
+        <button onclick="showBizCardScanner()" style="flex:1;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Business Card</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:4px">
       <div class="lbl">&#128205; Group Names</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Give your groups custom names</div>
       <button onclick="showGroupNameEditor()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9998; Edit Group Names</button>
@@ -1155,6 +1168,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div id="m-note-hist" style="margin-top:8px"></div>
       <button class="abtn" id="m-followup" style="width:100%;margin-top:8px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3)">&#128197; Schedule Follow-Up</button>
       <button class="abtn" id="m-vcard" onclick="exportVCard(mC)" style="width:100%;margin-top:8px;background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)">&#128101; Save Contact (vCard)</button>
+      <button class="abtn" onclick="showEmailTemplates(mC)" style="width:100%;margin-top:8px;background:rgba(0,229,184,.1);color:var(--teal);border:1px solid rgba(0,229,184,.3)">&#9993; Email Templates</button>
       <button class="abtn" id="m-snooze" onclick="showSnoozeOptions(mC)" style="width:100%;margin-top:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--sub)">&#128164; Snooze Off Route</button>
       <button class="abtn" onclick="logCall(mC)" style="width:100%;margin-top:8px;background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3)">&#128222; Log Call</button>
     </div>
@@ -2872,6 +2886,19 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <input type="file" id="backup-file" accept=".json" style="display:none" onchange="importBackup(this)">
     </div>
     <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--blue)">&#128197; Calendar Sync</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export your scheduled follow-ups to any calendar app (Google, Apple, Outlook)</div>
+      <button onclick="exportCalendarICS()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128197; Download Follow-Ups (.ics)</button>
+    </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:var(--teal)">&#128229; Import Templates</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Download a blank template to format your data for import</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="downloadCustomerTemplate()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128101; Customer CSV</button>
+        <button onclick="showBizCardScanner()" style="flex:1;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Business Card</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:4px">
       <div class="lbl">&#128205; Group Names</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Give your groups custom names</div>
       <button onclick="showGroupNameEditor()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9998; Edit Group Names</button>
@@ -3064,6 +3091,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div id="m-note-hist" style="margin-top:8px"></div>
       <button class="abtn" id="m-followup" style="width:100%;margin-top:8px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3)">&#128197; Schedule Follow-Up</button>
       <button class="abtn" id="m-vcard" onclick="exportVCard(mC)" style="width:100%;margin-top:8px;background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)">&#128101; Save Contact (vCard)</button>
+      <button class="abtn" onclick="showEmailTemplates(mC)" style="width:100%;margin-top:8px;background:rgba(0,229,184,.1);color:var(--teal);border:1px solid rgba(0,229,184,.3)">&#9993; Email Templates</button>
       <button class="abtn" id="m-snooze" onclick="showSnoozeOptions(mC)" style="width:100%;margin-top:8px;background:var(--bg3);border:1px solid var(--border2);color:var(--sub)">&#128164; Snooze Off Route</button>
       <button class="abtn" onclick="logCall(mC)" style="width:100%;margin-top:8px;background:rgba(129,140,248,.15);color:#818cf8;border:1px solid rgba(129,140,248,.3)">&#128222; Log Call</button>
     </div>
@@ -10696,6 +10724,189 @@ function showTermsOfService(){
 function contactSupport(){
   var email=CURRENT_USER?CURRENT_USER.email:'';
   window.location.href='mailto:support@fieldiq.pro?subject=FieldIQ Support Request&body=Hi FieldIQ team,%0A%0AAccount: '+encodeURIComponent(email)+'%0A%0AIssue:%0A';
+}
+
+/* ── EMAIL TEMPLATES ── */
+var EMAIL_TEMPLATES=[
+  {label:'Follow-Up After Visit',subject:'Great talking with you today — {{name}}',body:'Hi {{contact}},\n\nIt was great stopping by {{name}} today. I just wanted to follow up and make sure I answered all your questions.\n\nIf there\'s anything else I can help with or any products you\'d like more info on, don\'t hesitate to reach out.\n\nThanks again for your time!\n\n{{rep}}\n{{company}}'},
+  {label:'Sending a Quote',subject:'Your quote from {{company}}',body:'Hi {{contact}},\n\nThank you for the opportunity — attached is your quote for {{name}}. Please review and let me know if you have any questions or would like any adjustments.\n\nI\'m happy to walk through the details whenever is convenient for you.\n\nBest,\n{{rep}}\n{{company}}'},
+  {label:'Check In',subject:'Checking in — {{name}}',body:'Hi {{contact}},\n\nI just wanted to check in and see how things are going. It\'s been a while since my last visit and I want to make sure we\'re still taking care of you.\n\nIs there anything you need or any upcoming projects I can help with?\n\nTalk soon,\n{{rep}}\n{{company}}'},
+  {label:'Product Information',subject:'Product info for {{name}}',body:'Hi {{contact}},\n\nAs promised, here\'s some additional information on the products we discussed. Please take a look and let me know if you have any questions.\n\nI can also schedule a quick call or stop by to go over everything in person — whatever works best for you.\n\nBest regards,\n{{rep}}\n{{company}}'},
+  {label:'Thank You',subject:'Thank you — {{name}}',body:'Hi {{contact}},\n\nThank you so much for your business and continued support. It means a lot to me and the whole team.\n\nIf there\'s ever anything I can do to make things easier or if you need anything at all, please don\'t hesitate to reach out.\n\nGrateful for the partnership,\n{{rep}}\n{{company}}'}
+];
+function showEmailTemplates(code){
+  if(!code){toast('No customer selected');return;}
+  var c=allC().find(function(x){return x.code===code;});
+  if(!c){toast('Customer not found');return;}
+  var custName=c.name||'';
+  var custEmail=(ST.edits&&ST.edits[code]&&ST.edits[code].email)||c.email||'';
+  var contacts=ST.contacts&&ST.contacts[code]||[];
+  var contactName=contacts.length>0?(contacts[0].name||custName):custName;
+  var repName=(ST.userProfile&&ST.userProfile.name)||'';
+  var repCo=(ST.userProfile&&ST.userProfile.company)||'FieldIQ';
+  function sub(s){return s.replace(/\{\{name\}\}/g,custName).replace(/\{\{contact\}\}/g,contactName).replace(/\{\{rep\}\}/g,repName).replace(/\{\{company\}\}/g,repCo);}
+  var ov=document.createElement('div');
+  ov.id='email-tmpl-ov';
+  ov.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:9000;display:flex;flex-direction:column;overflow:hidden';
+  var hdr='<div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px)+14px) 18px 12px;border-bottom:1px solid var(--border);background:rgba(7,17,31,.98);flex-shrink:0">'
+    +'<div><div style="font-size:17px;font-weight:800">&#9993; Email Templates</div><div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(custName)+'</div></div>'
+    +'<button onclick="document.getElementById(\'email-tmpl-ov\').remove()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Close</button>'
+    +'</div>';
+  if(!custEmail){
+    hdr+='<div style="padding:16px;background:rgba(255,176,32,.08);border-bottom:1px solid rgba(255,176,32,.2);font-size:13px;color:var(--amber)">&#9888; No email on file for this customer. Add one in their profile first.</div>';
+  }
+  var body='<div style="flex:1;overflow-y:auto;padding:12px 16px 40px">';
+  for(var i=0;i<EMAIL_TEMPLATES.length;i++){
+    var t=EMAIL_TEMPLATES[i];
+    var subj=sub(t.subject);
+    var bd=sub(t.body);
+    var href='mailto:'+encodeURIComponent(custEmail)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(bd);
+    body+='<div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:14px;margin-bottom:10px">'
+      +'<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">'+esc(t.label)+'</div>'
+      +'<div style="font-size:12px;color:var(--sub);margin-bottom:10px">Subject: '+esc(subj)+'</div>'
+      +'<a href="'+href+'" style="display:block;text-align:center;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:9px;font-size:13px;font-weight:700;text-decoration:none">&#9993; Open in Email App</a>'
+      +'</div>';
+  }
+  body+='</div>';
+  ov.innerHTML=hdr+body;
+  document.body.appendChild(ov);
+}
+
+/* ── CALENDAR SYNC (.ICS) ── */
+function exportCalendarICS(){
+  var sched=ST.scheduled||{};
+  var keys=Object.keys(sched);
+  if(!keys.length){toast('No follow-ups scheduled yet');return;}
+  var customers=allC();
+  var custMap={};
+  for(var i=0;i<customers.length;i++)custMap[customers[i].code]=customers[i];
+  var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//FieldIQ//FieldIQ//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+  var now=new Date();
+  var stamp=now.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  var count=0;
+  for(var j=0;j<keys.length;j++){
+    var code=keys[j];
+    var entry=sched[code];
+    if(!entry||!entry.date)continue;
+    var c=custMap[code];
+    var cname=c?c.name:code;
+    var caddr=c?((c.address||'')+' '+(c.city||'')+(c.state?' '+c.state:'')).trim():'';
+    var dateStr=entry.date.replace(/-/g,'');
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:fieldiq-'+code+'-'+dateStr+'@fieldiq.pro');
+    lines.push('DTSTAMP:'+stamp);
+    lines.push('DTSTART;VALUE=DATE:'+dateStr);
+    lines.push('DTEND;VALUE=DATE:'+dateStr);
+    lines.push('SUMMARY:Follow-Up: '+cname.replace(/[,;\\]/g,' '));
+    if(caddr)lines.push('LOCATION:'+caddr.replace(/[,;\\]/g,' '));
+    lines.push('DESCRIPTION:Scheduled follow-up visit via FieldIQ.');
+    lines.push('STATUS:CONFIRMED');
+    lines.push('END:VEVENT');
+    count++;
+  }
+  lines.push('END:VCALENDAR');
+  if(!count){toast('No valid follow-up dates found');return;}
+  var blob=new Blob([lines.join('\r\n')],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='fieldiq_followups.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  toast('Downloaded '+count+' follow-up'+(count===1?'':'s')+' as .ics');
+}
+
+/* ── CUSTOMER IMPORT TEMPLATE ── */
+function downloadCustomerTemplate(){
+  var headers=['Name','Code','Address','City','State','Zip','Phone','Email','Lifetime Sales','Group','Notes'];
+  var example=['Example Customer','CUST001','123 Main St','Los Angeles','CA','90001','555-555-5555','buyer@example.com','50000','1','Great account'];
+  var rows=[headers.join(','),example.map(function(v){return '"'+v+'"';}).join(',')].join('\r\n');
+  var blob=new Blob([rows],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='fieldiq_customer_import_template.csv';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  toast('Customer import template downloaded');
+}
+
+/* ── BUSINESS CARD SCANNER ── */
+function showBizCardScanner(){
+  var existing=document.getElementById('bizcard-ov');
+  if(existing)existing.remove();
+  var ov=document.createElement('div');
+  ov.id='bizcard-ov';
+  ov.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:9000;display:flex;flex-direction:column;overflow:hidden';
+  ov.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px)+14px) 18px 12px;border-bottom:1px solid var(--border);background:rgba(7,17,31,.98);flex-shrink:0">'
+    +'<div style="font-size:17px;font-weight:800">&#128247; Business Card Scanner</div>'
+    +'<button onclick="document.getElementById(\'bizcard-ov\').remove()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Close</button>'
+    +'</div>'
+    +'<div style="flex:1;overflow-y:auto;padding:20px 16px 40px">'
+    +'<div id="bizcard-photo-area" style="border:2px dashed var(--border2);border-radius:var(--r);min-height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;cursor:pointer;background:var(--bg2)" onclick="document.getElementById(\'bizcard-file\').click()">'
+    +'<div id="bizcard-photo-inner" style="text-align:center;padding:24px">'
+    +'<div style="font-size:48px;margin-bottom:8px">&#128247;</div>'
+    +'<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">Tap to take photo or choose from library</div>'
+    +'<div style="font-size:12px;color:var(--sub)">Camera opens on iPhone — point at business card</div>'
+    +'</div>'
+    +'</div>'
+    +'<input type="file" id="bizcard-file" accept="image/*" capture="environment" style="display:none" onchange="bizcardPhotoSelected(this)">'
+    +'<div id="bizcard-form" style="display:none">'
+    +'<div style="font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">Enter Card Details</div>'
+    +'<div class="fl">Business Name *</div><input class="fi" id="bc-name" type="text" placeholder="Company name">'
+    +'<div class="fl">Contact Name</div><input class="fi" id="bc-contact" type="text" placeholder="Full name">'
+    +'<div class="fl">Phone</div><input class="fi" id="bc-phone" type="tel" placeholder="Phone number">'
+    +'<div class="fl">Email</div><input class="fi" id="bc-email" type="email" placeholder="Email address">'
+    +'<div class="fl">Address</div><input class="fi" id="bc-addr" type="text" placeholder="Street address">'
+    +'<div class="fl">City</div><input class="fi" id="bc-city" type="text" placeholder="City">'
+    +'<div class="fl">State</div><input class="fi" id="bc-state" type="text" placeholder="State" style="max-width:80px">'
+    +'<div class="fl">Zip</div><input class="fi" id="bc-zip" type="text" placeholder="Zip code" style="max-width:120px">'
+    +'<div class="fl">Notes</div><textarea class="fi" id="bc-notes" placeholder="Notes from card or conversation..." rows="3" style="resize:none"></textarea>'
+    +'<button onclick="saveBizCardCustomer()" style="width:100%;padding:13px;border-radius:var(--r2);border:none;background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:4px">&#10003; Save as New Customer</button>'
+    +'</div>'
+    +'</div>';
+  document.body.appendChild(ov);
+}
+function bizcardPhotoSelected(input){
+  var file=input.files&&input.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var pa=document.getElementById('bizcard-photo-area');
+    if(pa){
+      pa.innerHTML='<img src="'+e.target.result+'" style="max-width:100%;max-height:220px;border-radius:var(--r2);object-fit:contain">';
+      pa.onclick=null;
+      pa.style.cursor='default';
+    }
+    var form=document.getElementById('bizcard-form');
+    if(form)form.style.display='block';
+    setTimeout(function(){
+      var nm=document.getElementById('bc-name');
+      if(nm)nm.focus();
+    },200);
+  };
+  reader.readAsDataURL(file);
+}
+function saveBizCardCustomer(){
+  var name=(document.getElementById('bc-name').value||'').trim();
+  if(!name){alert('Business name is required');return;}
+  var code='BC'+Date.now().toString(36).toUpperCase();
+  var contact=(document.getElementById('bc-contact').value||'').trim();
+  var phone=(document.getElementById('bc-phone').value||'').trim();
+  var email=(document.getElementById('bc-email').value||'').trim();
+  var addr=(document.getElementById('bc-addr').value||'').trim();
+  var city=(document.getElementById('bc-city').value||'').trim();
+  var state=(document.getElementById('bc-state').value||'').trim();
+  var zip=(document.getElementById('bc-zip').value||'').trim();
+  var notes=(document.getElementById('bc-notes').value||'').trim();
+  var newC={code:code,name:name,address:addr,city:city,state:state,zip:zip,phone:phone,email:email,group:1,lifetimeSales:0,ytdSales:0,lastYearSales:0};
+  if(!ST.addedCustomers)ST.addedCustomers=[];
+  ST.addedCustomers.push(newC);
+  if(contact){if(!ST.contacts)ST.contacts={};ST.contacts[code]=[{name:contact,phone:phone,email:email}];}
+  if(notes){if(!ST.notes)ST.notes={};ST.notes[code]=notes;}
+  lSave();syncUp();
+  var ov=document.getElementById('bizcard-ov');
+  if(ov)ov.remove();
+  toast('&#10003; '+name+' added as new customer!');
+  rCust();
 }
 
 function initApp(){
