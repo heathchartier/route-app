@@ -542,7 +542,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <input id="auth-email" type="email" placeholder="Email address" autocomplete="email" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
     <input id="auth-pass" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:6px;outline:none">
-    <div id="auth-pass-hint" style="display:none;font-size:12px;color:var(--sub);margin-bottom:16px;padding:0 2px">Minimum 6 characters required</div>
+    <div id="auth-pass-hint" style="display:none;font-size:12px;color:var(--sub);margin-bottom:8px;padding:0 2px">Minimum 6 characters required</div>
+    <div id="auth-pass2-wrap" style="display:none;margin-bottom:6px">
+      <input id="auth-pass2" type="password" placeholder="Confirm password" autocomplete="new-password" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;outline:none">
+    </div>
     <div id="auth-pass-spacer" style="height:14px"></div>
     <button id="auth-btn" onclick="doAuth()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.2px">Sign In</button>
     <div style="text-align:center;margin-top:16px">
@@ -991,10 +994,20 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128274; Account</div>
-      <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:10px">—</div>
-      <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128275; Sign Out</button>
+      <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:12px">—</div>
+      <button onclick="showChangePassword()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128273; Change Password</button>
+      <button onclick="showChangeEmail()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:12px;text-align:left;padding-left:14px">&#9993; Change Email</button>
+      <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-bottom:6px">&#128275; Sign Out</button>
+      <button onclick="confirmDeleteAccount()" style="width:100%;padding:8px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.18);color:rgba(239,68,68,.5);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600">Delete My Account</button>
     </div>
-    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">FieldIQ v23</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#8505;&#65039; About FieldIQ</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Version 1.0 &mdash; Outside Sales Intelligence</div>
+      <button onclick="showPrivacyPolicy()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128196; Privacy Policy</button>
+      <button onclick="showTermsOfService()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128203; Terms of Service</button>
+      <button onclick="contactSupport()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;text-align:left;padding-left:14px">&#128172; Contact Support</button>
+    </div>
+    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:11px;letter-spacing:.3px">&copy; 2025 FieldIQ. All rights reserved.</div>
   </div>
 </div>
 
@@ -2890,10 +2903,20 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128274; Account</div>
-      <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:10px">—</div>
-      <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128275; Sign Out</button>
+      <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:12px">—</div>
+      <button onclick="showChangePassword()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128273; Change Password</button>
+      <button onclick="showChangeEmail()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:12px;text-align:left;padding-left:14px">&#9993; Change Email</button>
+      <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-bottom:6px">&#128275; Sign Out</button>
+      <button onclick="confirmDeleteAccount()" style="width:100%;padding:8px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.18);color:rgba(239,68,68,.5);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600">Delete My Account</button>
     </div>
-    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:12px;letter-spacing:.5px">FieldIQ v23</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#8505;&#65039; About FieldIQ</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Version 1.0 &mdash; Outside Sales Intelligence</div>
+      <button onclick="showPrivacyPolicy()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128196; Privacy Policy</button>
+      <button onclick="showTermsOfService()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128203; Terms of Service</button>
+      <button onclick="contactSupport()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;text-align:left;padding-left:14px">&#128172; Contact Support</button>
+    </div>
+    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:11px;letter-spacing:.3px">&copy; 2025 FieldIQ. All rights reserved.</div>
   </div>
 </div>
 
@@ -10365,19 +10388,27 @@ function authTab(mode){
   var nw=document.getElementById('auth-name-wrap');
   var hint=document.getElementById('auth-pass-hint');
   var spacer=document.getElementById('auth-pass-spacer');
+  var p2w=document.getElementById('auth-pass2-wrap');
+  var p2=document.getElementById('auth-pass2');
+  var ap=document.getElementById('auth-pass');
   if(mode==='signin'){
     si.style.background='var(--teal)';si.style.color='#000';
     su.style.background='transparent';su.style.color='var(--sub)';
     btn.textContent='Sign In';
     if(nw)nw.style.display='none';
-    if(hint){hint.style.display='none';}
+    if(hint)hint.style.display='none';
+    if(p2w)p2w.style.display='none';
+    if(p2)p2.value='';
+    if(ap)ap.setAttribute('autocomplete','current-password');
     if(spacer)spacer.style.height='14px';
   }else{
     su.style.background='var(--teal)';su.style.color='#000';
     si.style.background='transparent';si.style.color='var(--sub)';
     btn.textContent='Create Account';
     if(nw)nw.style.display='block';
-    if(hint){hint.style.display='block';}
+    if(hint)hint.style.display='block';
+    if(p2w)p2w.style.display='block';
+    if(ap)ap.setAttribute('autocomplete','new-password');
     if(spacer)spacer.style.height='0';
   }
   var er=document.getElementById('auth-error');
@@ -10400,6 +10431,7 @@ function doAuth(){
   var btn=document.getElementById('auth-btn');
   if(!email||!pass){showAuthError('Please enter your email and password.');return;}
   if(AUTH_MODE==='signup'&&pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
+  if(AUTH_MODE==='signup'){var pass2=(document.getElementById('auth-pass2').value||'');if(pass!==pass2){showAuthError('Passwords do not match.');return;}}
   btn.disabled=true;
   btn.textContent='Please wait...';
   var er=document.getElementById('auth-error');
@@ -10525,6 +10557,123 @@ function doSignOut(){
     var as=document.getElementById('auth-screen');
     if(as)as.style.display='flex';
   });
+}
+
+/* ── ACCOUNT MANAGEMENT ── */
+function showChangePassword(){
+  var el=document.getElementById('chgpass-modal');
+  if(el)el.remove();
+  el=document.createElement('div');
+  el.id='chgpass-modal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+  el.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:24px 20px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+    +'<div style="font-size:16px;font-weight:800;margin-bottom:18px">&#128273; Change Password</div>'
+    +'<input id="chgpass-new" type="password" placeholder="New password (min 6 chars)" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:13px 16px;font-size:15px;font-family:inherit;margin-bottom:10px;outline:none">'
+    +'<input id="chgpass-new2" type="password" placeholder="Confirm new password" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:13px 16px;font-size:15px;font-family:inherit;margin-bottom:16px;outline:none">'
+    +'<div id="chgpass-err" style="display:none;color:#ef4444;font-size:13px;margin-bottom:12px"></div>'
+    +'<button onclick="doChangePassword()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:8px">Update Password</button>'
+    +'<button onclick="document.getElementById(\'chgpass-modal\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+    +'</div>';
+  document.body.appendChild(el);
+}
+function doChangePassword(){
+  var np=(document.getElementById('chgpass-new').value||'');
+  var np2=(document.getElementById('chgpass-new2').value||'');
+  var err=document.getElementById('chgpass-err');
+  if(np.length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}
+  if(np!==np2){err.textContent='Passwords do not match.';err.style.display='block';return;}
+  err.style.display='none';
+  sb.auth.updateUser({password:np}).then(function(r){
+    if(r.error){err.textContent=r.error.message;err.style.display='block';}
+    else{document.getElementById('chgpass-modal').remove();toast('Password updated ✓');}
+  });
+}
+function showChangeEmail(){
+  var el=document.getElementById('chgemail-modal');
+  if(el)el.remove();
+  el=document.createElement('div');
+  el.id='chgemail-modal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+  el.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:24px 20px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+    +'<div style="font-size:16px;font-weight:800;margin-bottom:6px">&#9993; Change Email</div>'
+    +'<div style="font-size:12px;color:var(--sub);margin-bottom:18px">A confirmation link will be sent to your new address.</div>'
+    +'<input id="chgemail-new" type="email" placeholder="New email address" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:13px 16px;font-size:15px;font-family:inherit;margin-bottom:16px;outline:none">'
+    +'<div id="chgemail-err" style="display:none;color:#ef4444;font-size:13px;margin-bottom:12px"></div>'
+    +'<button onclick="doChangeEmail()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:8px">Send Confirmation</button>'
+    +'<button onclick="document.getElementById(\'chgemail-modal\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+    +'</div>';
+  document.body.appendChild(el);
+}
+function doChangeEmail(){
+  var ne=(document.getElementById('chgemail-new').value||'').trim();
+  var err=document.getElementById('chgemail-err');
+  if(!ne||ne.indexOf('@')<0){err.textContent='Enter a valid email address.';err.style.display='block';return;}
+  err.style.display='none';
+  sb.auth.updateUser({email:ne}).then(function(r){
+    if(r.error){err.textContent=r.error.message;err.style.display='block';}
+    else{document.getElementById('chgemail-modal').remove();toast('Confirmation sent — check your new inbox');}
+  });
+}
+function confirmDeleteAccount(){
+  if(!CURRENT_USER)return;
+  if(!confirm('Delete your FieldIQ account?\n\nThis will permanently erase all your data including visits, notes, customers, and orders.\n\nThis cannot be undone.'))return;
+  if(!confirm('Are you absolutely sure? All data will be deleted.'))return;
+  var uid=CURRENT_USER.id;
+  // Delete data from Supabase
+  sb.from('hc_state').delete().eq('id',uid).then(function(){
+    sb.auth.signOut().then(function(){
+      CURRENT_USER=null;SK='';
+      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+      // Clear local storage
+      try{localStorage.removeItem('fieldiq_'+uid);}catch(e){}
+      authTab('signin');
+      var as=document.getElementById('auth-screen');
+      if(as)as.style.display='flex';
+      alert('Your data has been deleted. Your account sign-in has been removed from this device.\n\nIf you need complete account removal from our servers, email: support@fieldiq.app');
+    });
+  });
+}
+/* ── PRIVACY POLICY & TERMS ── */
+function _showLegalModal(title, html){
+  var el=document.getElementById('legal-modal');
+  if(el)el.remove();
+  el=document.createElement('div');
+  el.id='legal-modal';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
+  el.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:560px;padding:24px 20px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:85vh;display:flex;flex-direction:column">'
+    +'<div style="font-size:16px;font-weight:800;margin-bottom:14px;flex-shrink:0">'+title+'</div>'
+    +'<div style="overflow-y:auto;flex:1;font-size:13px;line-height:1.7;color:var(--sub)">'+html+'</div>'
+    +'<button onclick="document.getElementById(\'legal-modal\').remove()" style="width:100%;margin-top:16px;padding:12px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0">Close</button>'
+    +'</div>';
+  document.body.appendChild(el);
+}
+function showPrivacyPolicy(){
+  _showLegalModal('&#128196; Privacy Policy',
+    '<p><strong style="color:var(--text)">Last updated: May 2025</strong></p>'
+    +'<p>FieldIQ ("we", "us") is committed to protecting your privacy. This policy explains what data we collect and how we use it.</p>'
+    +'<p><strong style="color:var(--text)">What we collect</strong><br>• Your email address and password (used only for account authentication)<br>• Customer data you upload (names, addresses, sales history — your own business data)<br>• Visit logs, notes, orders, and other records you create in the app<br>• App usage data stored in your account to enable sync across devices</p>'
+    +'<p><strong style="color:var(--text)">How we store it</strong><br>Your data is stored securely using Supabase (supabase.com), a SOC 2 compliant cloud database. Data is encrypted in transit and at rest.</p>'
+    +'<p><strong style="color:var(--text)">What we never do</strong><br>• We never sell your data to third parties<br>• We never use your customer data for advertising<br>• We never share your data with anyone except as required by law</p>'
+    +'<p><strong style="color:var(--text)">Your rights</strong><br>You can export all your data at any time from Settings → Export. You can delete your account and all associated data from Settings → Account → Delete My Account.</p>'
+    +'<p><strong style="color:var(--text)">Contact</strong><br>Questions? Email us at <strong style="color:var(--teal)">support@fieldiq.app</strong></p>'
+  );
+}
+function showTermsOfService(){
+  _showLegalModal('&#128203; Terms of Service',
+    '<p><strong style="color:var(--text)">Last updated: May 2025</strong></p>'
+    +'<p>By using FieldIQ you agree to these terms.</p>'
+    +'<p><strong style="color:var(--text)">Use of the app</strong><br>FieldIQ is a tool for outside sales professionals to manage customer relationships and route planning. You agree to use it only for lawful business purposes.</p>'
+    +'<p><strong style="color:var(--text)">Your data</strong><br>You own all data you upload and create in FieldIQ. You are responsible for ensuring you have the right to store and use any customer data you upload. FieldIQ is a data processor acting on your behalf.</p>'
+    +'<p><strong style="color:var(--text)">Account</strong><br>You are responsible for keeping your login credentials secure. You may not share your account with others or create accounts on behalf of others without permission.</p>'
+    +'<p><strong style="color:var(--text)">No warranty</strong><br>FieldIQ is provided "as is" without warranty of any kind. We are not liable for any loss of data or business interruption.</p>'
+    +'<p><strong style="color:var(--text)">Subscription</strong><br>Subscription terms and pricing will be communicated before any charges are applied.</p>'
+    +'<p><strong style="color:var(--text)">Termination</strong><br>You may delete your account at any time from Settings. We reserve the right to suspend accounts that violate these terms.</p>'
+    +'<p><strong style="color:var(--text)">Contact</strong><br>Questions? Email <strong style="color:var(--teal)">support@fieldiq.app</strong></p>'
+  );
+}
+function contactSupport(){
+  var email=CURRENT_USER?CURRENT_USER.email:'';
+  window.location.href='mailto:support@fieldiq.app?subject=FieldIQ Support Request&body=Hi FieldIQ team,%0A%0AAccount: '+encodeURIComponent(email)+'%0A%0AIssue:%0A';
 }
 
 function initApp(){
