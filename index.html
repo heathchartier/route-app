@@ -1908,7 +1908,7 @@ function doExport(){
   var blob=new Blob([rows.join('\n')],{type:'text/csv'});
   var link=document.createElement('a');
   link.href=URL.createObjectURL(blob);
-  link.download='hc_routes_export_'+todayStr+'.csv';
+  link.download='fieldiq_export_'+todayStr+'.csv';
   link.click();
   ST.lastExportDate=todayStr;
   lSave();
@@ -3816,7 +3816,7 @@ function doExport(){
   var blob=new Blob([rows.join('\n')],{type:'text/csv'});
   var link=document.createElement('a');
   link.href=URL.createObjectURL(blob);
-  link.download='hc_routes_export_'+todayStr+'.csv';
+  link.download='fieldiq_export_'+todayStr+'.csv';
   link.click();
   ST.lastExportDate=todayStr;
   lSave();
@@ -6473,7 +6473,7 @@ function showHowToUse(){
     {icon:'&#128101;',title:'Customer Card',body:'Tap any customer to open their card. Log a visit, add a note, set a follow-up callback, mark as Hot Lead, add a tag, snooze, view visit history, save a vCard contact, track orders, manage to-dos, log samples, or build a quote.'},
     {icon:'&#9733;',title:'Hot Leads',body:'Star any customer as a Hot Lead inside their card. They show on the dashboard Hot Leads card and are highlighted on your route list.'},
     {icon:'&#128203;',title:'Notes & Callbacks',body:'Write a note — it shows as a reminder the next time you open that customer. Set a callback date and they\'ll appear in the Callbacks Due dashboard alert on that day.'},
-    {icon:'&#128176;',title:'Orders',body:'Log an order inside any customer card with a dollar amount and optional description. Orders appear in the Today\'s Orders dashboard card and are included in your data export.'},
+    {icon:'&#128176;',title:'Orders',body:'Log an order inside any customer card. Add line items with product name, quantity, unit type (ea, sqft, LF, BF, sheet, box, pallet), and unit price — the line total and order total calculate automatically. Orders appear in the Today\'s Orders dashboard card and are included in your data export.'},
     {icon:'&#128203;',title:'Quotes',body:'Tap "+ New" in the Quotes section of any customer card to build a multi-item quote. Add up to any number of line items (long quotes auto-split to two screenshot cards). Includes tax by zip code, delivery fee, and a resale-exempt toggle. Tap the quote card to screenshot and send to the customer. Mark quotes Won or Lost — lost quotes ask for a reason. Open quotes with a follow-up date trigger a dashboard alert.'},
     {icon:'&#9989;',title:'To-Dos',body:'Add to-do items per customer (e.g. "bring sample", "send price sheet"). Check them off when done. Open to-dos count shows in the data export.'},
     {icon:'&#128205;',title:'Groups',body:'Groups are sized to match your "customers per day" setting (default 10). Tap a group to see its details and add a group note. Groups over the size limit show a "tap to split" button — tap it to auto-split into two even groups by zip code. Tap "Route" to open the full group in your nav app.'},
@@ -6488,6 +6488,9 @@ function showHowToUse(){
     {icon:'&#128272;',title:'Security',body:'Set a PIN in Settings to lock the app. You can also enable Face ID / Touch ID so you unlock with biometrics instead of typing your PIN every time.'},
     {icon:'&#9889;',title:'Rolling Route (Apple, Tesla & Waze)',body:'Tap "Route" on any group to pick your nav app. Apple Maps and Tesla both use rolling batches of 4 stops at a time — when you return to FieldIQ, tap "Continue" to load the next batch. Waze uses a rolling 1-stop-at-a-time approach. Google Maps loads all stops at once. Set your home address in My Profile to add "Start from home" and "Return home" toggles to any route.'},
     {icon:'&#128194;',title:'Pricing Tab',body:'Upload your order system price sheet (Excel or CSV). Set your margin % and sell prices calculate instantly. Search by item code or description.'},
+    {icon:'&#128260;',title:'Cross-Device Sync',body:'Your data syncs automatically across all your devices — log a visit on your phone, see it on your laptop instantly. Sync status shows in the top bar. Use Settings → Force Upload if you ever need to manually push data to the cloud.'},
+    {icon:'&#128274;',title:'Account & Security',body:'Settings → Account lets you change your password or email address. Settings → App Security lets you set a PIN and enable Face ID. You can delete your account and all data from Settings → Account → Delete My Account.'},
+    {icon:'&#128196;',title:'Privacy & Legal',body:'Settings → About FieldIQ has the full Privacy Policy and Terms of Service. Contact support at support@fieldiq.pro for any help.'},
   ];
   var html='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:24px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;overflow-y:auto">'
     +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
@@ -8722,7 +8725,7 @@ function exportBackup(){
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
   a.href=url;
-  a.download='hc-routes-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.download='fieldiq-backup-'+new Date().toISOString().slice(0,10)+'.json';
   a.click();
   URL.revokeObjectURL(url);
   toast('Backup exported');
@@ -10648,7 +10651,7 @@ function confirmDeleteAccount(){
       authTab('signin');
       var as=document.getElementById('auth-screen');
       if(as)as.style.display='flex';
-      alert('Your data has been deleted. Your account sign-in has been removed from this device.\n\nIf you need complete account removal from our servers, email: support@fieldiq.app');
+      alert('Your data has been deleted. Your account sign-in has been removed from this device.\n\nIf you need complete account removal from our servers, email: support@fieldiq.pro');
     });
   });
 }
@@ -10674,7 +10677,7 @@ function showPrivacyPolicy(){
     +'<p><strong style="color:var(--text)">How we store it</strong><br>Your data is stored securely using Supabase (supabase.com), a SOC 2 compliant cloud database. Data is encrypted in transit and at rest.</p>'
     +'<p><strong style="color:var(--text)">What we never do</strong><br>• We never sell your data to third parties<br>• We never use your customer data for advertising<br>• We never share your data with anyone except as required by law</p>'
     +'<p><strong style="color:var(--text)">Your rights</strong><br>You can export all your data at any time from Settings → Export. You can delete your account and all associated data from Settings → Account → Delete My Account.</p>'
-    +'<p><strong style="color:var(--text)">Contact</strong><br>Questions? Email us at <strong style="color:var(--teal)">support@fieldiq.app</strong></p>'
+    +'<p><strong style="color:var(--text)">Contact</strong><br>Questions? Email us at <strong style="color:var(--teal)">support@fieldiq.pro</strong></p>'
   );
 }
 function showTermsOfService(){
@@ -10687,12 +10690,12 @@ function showTermsOfService(){
     +'<p><strong style="color:var(--text)">No warranty</strong><br>FieldIQ is provided "as is" without warranty of any kind. We are not liable for any loss of data or business interruption.</p>'
     +'<p><strong style="color:var(--text)">Subscription</strong><br>Subscription terms and pricing will be communicated before any charges are applied.</p>'
     +'<p><strong style="color:var(--text)">Termination</strong><br>You may delete your account at any time from Settings. We reserve the right to suspend accounts that violate these terms.</p>'
-    +'<p><strong style="color:var(--text)">Contact</strong><br>Questions? Email <strong style="color:var(--teal)">support@fieldiq.app</strong></p>'
+    +'<p><strong style="color:var(--text)">Contact</strong><br>Questions? Email <strong style="color:var(--teal)">support@fieldiq.pro</strong></p>'
   );
 }
 function contactSupport(){
   var email=CURRENT_USER?CURRENT_USER.email:'';
-  window.location.href='mailto:support@fieldiq.app?subject=FieldIQ Support Request&body=Hi FieldIQ team,%0A%0AAccount: '+encodeURIComponent(email)+'%0A%0AIssue:%0A';
+  window.location.href='mailto:support@fieldiq.pro?subject=FieldIQ Support Request&body=Hi FieldIQ team,%0A%0AAccount: '+encodeURIComponent(email)+'%0A%0AIssue:%0A';
 }
 
 function initApp(){
