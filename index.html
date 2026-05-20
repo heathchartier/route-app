@@ -852,27 +852,39 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Quick Access</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Sync &amp; Storage</div>
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <button onclick="runSyncDiag()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128269; Sync Diagnostic</button>
       <button onclick="forceCacheClear()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--red);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128260; Clear Cache + Reload</button>
     </div>
-    <div style="margin-bottom:12px">
+    <div style="margin-bottom:16px">
       <button onclick="forceSyncUp()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.35);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9650; Force Upload My Data to Cloud</button>
     </div>
-    <div style="margin-bottom:12px">
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Customer Data</div>
+    <div style="margin-bottom:8px">
       <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
-      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds groups using your current "customers per day" setting. Run this after changing that setting in My Profile.</div>
+      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds route groups using your "customers per day" setting. Run this after changing that setting in My Profile.</div>
     </div>
     <div class="card">
-      <div class="lbl" style="color:var(--teal)">Import Excel or CSV</div>
+      <div class="lbl" style="color:var(--teal)">&#128229; Import Customer List</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.5">Upload your customer list from Excel or CSV. New accounts are added automatically and assigned to a route group by zip code. Existing accounts get their sales data updated — notes and history are <strong style="color:var(--text)">never overwritten</strong>.</div>
+      <div style="background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.25);border-radius:var(--r2);padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:18px;flex-shrink:0">&#9888;</div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--amber);font-weight:700;margin-bottom:2px">Column format matters</div>
+          <div style="font-size:11px;color:var(--sub);line-height:1.4">Your file needs: Name, Code, Address, City, State, Zip, Phone, Email, Lifetime Sales. Not sure? Download our template first.</div>
+        </div>
+        <button onclick="downloadCustomerTemplate()" style="flex-shrink:0;padding:7px 11px;border-radius:var(--r3);background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Get Template</button>
+      </div>
       <div class="drop" onclick="document.getElementById('xl-input').click()">
         <div style="font-size:36px;margin-bottom:8px">&#128202;</div>
         <div style="font-weight:700;font-size:15px;color:var(--text)">Tap to choose file</div>
-        <div style="font-size:12px;color:var(--sub);margin-top:5px">.xlsx or .csv accepted</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:5px">.xlsx or .csv &bull; Customer list only &bull; Price sheets go in Pricing tab</div>
       </div>
       <input type="file" id="xl-input" accept=".xlsx,.csv" style="display:none">
       <div id="import-status" style="margin-top:10px;font-size:13px;display:none;color:var(--teal)"></div>
@@ -903,6 +915,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       </div>
       <div id="pend-list"></div>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Vendors</div>
         <div class="card" style="margin-top:4px">
       <div class="lbl" style="color:var(--blue)">Add Vendor</div>
       <div class="fl">Name *</div><input class="fi" id="av-name" type="text" placeholder="Vendor name">
@@ -914,29 +927,47 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="btn btn-b" id="btn-add-vendor">Add Vendor</button>
     </div>
 <div class="card">
-      <div class="lbl">Add Customer</div>
-      <div class="fl">Name *</div><input class="fi" id="a-name" type="text">
+      <div class="lbl">&#10133; Add Customer Manually</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Add a single new customer by hand. For a large list, use <strong style="color:var(--teal)">Import Customer List</strong> above — it's much faster.</div>
+      <div class="fl">Business Name *</div><input class="fi" id="a-name" type="text" placeholder="Company or customer name">
       <div class="fl">Address</div><input class="fi" id="a-addr" type="text">
       <div class="fl">City</div><input class="fi" id="a-city" type="text">
       <div class="fl">Phone</div><input class="fi" id="a-ph" type="tel">
-      <div class="fl">Zip (group auto-assigned)</div><input class="fi" id="a-zip" type="text" style="width:120px" placeholder="e.g. 92507">
+      <div class="fl">Zip (route group auto-assigned)</div><input class="fi" id="a-zip" type="text" style="width:120px" placeholder="e.g. 92507">
       <button class="btn btn-b" id="btn-add">Add Customer</button>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">My Info &amp; Pay</div>
     <div class="card">
-      <div class="lbl">Data</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button id="btn-exp" style="padding:9px 16px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export CSV</button>
-        <button id="btn-exp-notes" style="padding:9px 16px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export Notes</button>
-        <button onclick="showMonthlyReportV2()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
-        <button onclick="showMileageLog()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128663; Mileage Log</button>
-          <button onclick="showExpenseLog()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.3)">&#128181; Expense Log</button>
-          <button onclick="showCommissionSettings()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(0,209,122,.12);color:var(--green);border:1px solid rgba(0,209,122,.3)">&#128176; Commission Rate</button>
-          <button onclick="showProfileSettings()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(0,229,184,.12);color:var(--teal);border:1px solid rgba(0,229,184,.3)">&#128100; My Profile</button>
-          <button onclick="showMonthlyReport()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3)">&#128202; Monthly Report</button>
-        <button id="btn-clr" style="padding:9px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Visits</button>
-        <button id="btn-rst" style="padding:9px 16px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All</button>
+      <div class="lbl">&#128100; My Profile &amp; Settings</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Your name, company, territory, and rep info used throughout the app</div>
+      <button onclick="showProfileSettings()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(0,229,184,.12);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128100; Edit My Profile</button>
+    </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128176; Commission &amp; Pay</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Set your commission rate to track estimated earnings on your sales</div>
+      <button onclick="showCommissionSettings()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(0,209,122,.12);color:var(--green);border:1px solid rgba(0,209,122,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128176; Commission Rate Settings</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Reports &amp; Exports</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128202; Reports &amp; Exports</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export your data or view performance reports</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="btn-exp" style="padding:9px 14px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Export Customer CSV</button>
+        <button id="btn-exp-notes" style="padding:9px 14px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Export Notes</button>
+        <button onclick="showMonthlyReportV2()" style="padding:9px 14px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
+        <button onclick="showMileageLog()" style="padding:9px 14px;border-radius:var(--r2);background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128663; Mileage Log</button>
+        <button onclick="showExpenseLog()" style="padding:9px 14px;border-radius:var(--r2);background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128181; Expense Log</button>
       </div>
     </div>
+    <div class="card" style="margin-top:4px;border:1px solid rgba(255,77,106,.2)">
+      <div class="lbl" style="color:var(--red)">&#9888; Danger Zone</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">These actions affect visit history. Clear Visits resets today's route — your customer list stays. Reset All wipes all visit data permanently.</div>
+      <div style="display:flex;gap:8px">
+        <button id="btn-clr" style="flex:1;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Today's Visits</button>
+        <button id="btn-rst" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All Visit Data</button>
+      </div>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Data Health</div>
     <div class="card" id="missing-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--amber)">&#9888; Missing Contact Data</div>
@@ -945,28 +976,33 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Tap any customer to fill in the missing info</div>
       <div id="missing-list"></div>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Backup</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128190; Backup &amp; Restore</div>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export all your visits, notes, tags, contacts, and samples to a file</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Save a complete backup of all your visits, notes, tags, contacts, and history to a file — restore it anytime to bring your data back exactly as it was.</div>
       <div style="display:flex;gap:8px">
-        <button onclick="exportBackup()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Export</button>
-        <button onclick="document.getElementById('backup-file').click()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128228; Import</button>
+        <button onclick="exportBackup()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Save Backup</button>
+        <button onclick="document.getElementById('backup-file').click()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128228; Restore Backup</button>
       </div>
       <input type="file" id="backup-file" accept=".json" style="display:none" onchange="importBackup(this)">
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Tools &amp; Features</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl" style="color:var(--blue)">&#128197; Calendar Sync</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export your scheduled follow-ups to any calendar app (Google, Apple, Outlook)</div>
       <button onclick="exportCalendarICS()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128197; Download Follow-Ups (.ics)</button>
     </div>
     <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:var(--teal)">&#128229; Import Templates</div>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Download a blank template to format your data for import</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="downloadCustomerTemplate()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128101; Customer CSV</button>
-        <button onclick="showBizCardScanner()" style="flex:1;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Business Card</button>
-      </div>
+      <div class="lbl" style="color:var(--teal)">&#128229; Download Import Template</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Don't have an existing file? Download a blank template with all the right column headers already set up — just fill it in and import.</div>
+      <button onclick="downloadCustomerTemplate()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Download Customer List Template (.csv)</button>
     </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:#c084fc">&#128247; Add Customer via Business Card</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Point your camera at a business card, then fill in the details. Saves instantly as a new customer in your list — no manual typing required.</div>
+      <button onclick="showBizCardScanner()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Card &amp; Add New Customer</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Route Settings</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128205; Group Names</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Give your groups custom names</div>
@@ -1002,6 +1038,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
         </div>
       </div>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Security</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128274; App Security</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Protect your customer data with a PIN + Face ID</div>
@@ -1011,9 +1048,11 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="disableAppLock()" id="btn-dis-lock" style="display:none;width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">&#128275; Disable Lock</button>
     </div>
     <div class="card" style="margin-top:4px">
-      <div class="lbl">Dashboard Cards</div>
+      <div class="lbl">&#127968; Dashboard Cards</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Choose which insight cards appear on your Home screen. Turn off anything you don't need to keep your dashboard clean and focused.</div>
       <div id="dash-toggles"></div>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Account</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128274; Account</div>
       <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:12px">—</div>
@@ -1022,6 +1061,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-bottom:6px">&#128275; Sign Out</button>
       <button onclick="confirmDeleteAccount()" style="width:100%;padding:8px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.18);color:rgba(239,68,68,.5);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600">Delete My Account</button>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">About</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#8505;&#65039; About FieldIQ</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Version 1.0 &mdash; Outside Sales Intelligence</div>
@@ -1044,7 +1084,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <div class="hdr">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><h1>Pricing</h1><div class="sub" id="pr-lbl">No price sheet loaded</div></div>
-      <button onclick="document.getElementById('pr-input').click()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px">Upload Sheet</button>
+      <button onclick="document.getElementById('pr-input').click()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px">&#128229; Upload Price Sheet</button>
     </div>
     <div class="price-ctrl">
       <div class="price-margin-wrap">
@@ -1064,7 +1104,8 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-top:12px;font-size:13px;color:var(--sub);line-height:1.6">
       <div style="font-weight:700;color:var(--text);margin-bottom:6px">How it works</div>
-      Export your price list from your order system as Excel or CSV. The app will read your columns automatically — just make sure you have a <b style="color:var(--teal)">Cost</b> column. Set your margin % above and Sell Price is calculated instantly. Re-upload anytime when costs change.
+      Export your price list from your order system as Excel or CSV. The app reads your columns automatically — just make sure you have a <b style="color:var(--teal)">Cost</b> column. Set your margin % above and sell price calculates instantly. Re-upload anytime costs change.
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;color:var(--dim)">&#128161; This is for your <strong style="color:var(--sub)">product price sheet</strong> only. To import your customer list, go to <strong style="color:var(--sub)">Settings → Import Customer List</strong>.</div>
     </div>
   </div>
   <div id="pr-table-wrap" style="display:none">
@@ -2783,27 +2824,39 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Quick Access</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Sync &amp; Storage</div>
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <button onclick="runSyncDiag()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128269; Sync Diagnostic</button>
       <button onclick="forceCacheClear()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--red);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128260; Clear Cache + Reload</button>
     </div>
-    <div style="margin-bottom:12px">
+    <div style="margin-bottom:16px">
       <button onclick="forceSyncUp()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.35);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9650; Force Upload My Data to Cloud</button>
     </div>
-    <div style="margin-bottom:12px">
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Customer Data</div>
+    <div style="margin-bottom:8px">
       <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
-      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds groups using your current "customers per day" setting. Run this after changing that setting in My Profile.</div>
+      <div style="font-size:11px;color:var(--sub);margin-top:5px;padding:0 2px">Rebuilds route groups using your "customers per day" setting. Run this after changing that setting in My Profile.</div>
     </div>
     <div class="card">
-      <div class="lbl" style="color:var(--teal)">Import Excel or CSV</div>
+      <div class="lbl" style="color:var(--teal)">&#128229; Import Customer List</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.5">Upload your customer list from Excel or CSV. New accounts are added automatically and assigned to a route group by zip code. Existing accounts get their sales data updated — notes and history are <strong style="color:var(--text)">never overwritten</strong>.</div>
+      <div style="background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.25);border-radius:var(--r2);padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:18px;flex-shrink:0">&#9888;</div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--amber);font-weight:700;margin-bottom:2px">Column format matters</div>
+          <div style="font-size:11px;color:var(--sub);line-height:1.4">Your file needs: Name, Code, Address, City, State, Zip, Phone, Email, Lifetime Sales. Not sure? Download our template first.</div>
+        </div>
+        <button onclick="downloadCustomerTemplate()" style="flex-shrink:0;padding:7px 11px;border-radius:var(--r3);background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Get Template</button>
+      </div>
       <div class="drop" onclick="document.getElementById('xl-input').click()">
         <div style="font-size:36px;margin-bottom:8px">&#128202;</div>
         <div style="font-weight:700;font-size:15px;color:var(--text)">Tap to choose file</div>
-        <div style="font-size:12px;color:var(--sub);margin-top:5px">.xlsx or .csv accepted</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:5px">.xlsx or .csv &bull; Customer list only &bull; Price sheets go in Pricing tab</div>
       </div>
       <input type="file" id="xl-input" accept=".xlsx,.csv" style="display:none">
       <div id="import-status" style="margin-top:10px;font-size:13px;display:none;color:var(--teal)"></div>
@@ -2834,6 +2887,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       </div>
       <div id="pend-list"></div>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Vendors</div>
         <div class="card" style="margin-top:4px">
       <div class="lbl" style="color:var(--blue)">Add Vendor</div>
       <div class="fl">Name *</div><input class="fi" id="av-name" type="text" placeholder="Vendor name">
@@ -2845,29 +2899,47 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="btn btn-b" id="btn-add-vendor">Add Vendor</button>
     </div>
 <div class="card">
-      <div class="lbl">Add Customer</div>
-      <div class="fl">Name *</div><input class="fi" id="a-name" type="text">
+      <div class="lbl">&#10133; Add Customer Manually</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Add a single new customer by hand. For a large list, use <strong style="color:var(--teal)">Import Customer List</strong> above — it's much faster.</div>
+      <div class="fl">Business Name *</div><input class="fi" id="a-name" type="text" placeholder="Company or customer name">
       <div class="fl">Address</div><input class="fi" id="a-addr" type="text">
       <div class="fl">City</div><input class="fi" id="a-city" type="text">
       <div class="fl">Phone</div><input class="fi" id="a-ph" type="tel">
-      <div class="fl">Zip (group auto-assigned)</div><input class="fi" id="a-zip" type="text" style="width:120px" placeholder="e.g. 92507">
+      <div class="fl">Zip (route group auto-assigned)</div><input class="fi" id="a-zip" type="text" style="width:120px" placeholder="e.g. 92507">
       <button class="btn btn-b" id="btn-add">Add Customer</button>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">My Info &amp; Pay</div>
     <div class="card">
-      <div class="lbl">Data</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button id="btn-exp" style="padding:9px 16px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export CSV</button>
-        <button id="btn-exp-notes" style="padding:9px 16px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">Export Notes</button>
-        <button onclick="showMonthlyReportV2()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
-        <button onclick="showMileageLog()" style="padding:9px 16px;border-radius:var(--r2);background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128663; Mileage Log</button>
-          <button onclick="showExpenseLog()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.3)">&#128181; Expense Log</button>
-          <button onclick="showCommissionSettings()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(0,209,122,.12);color:var(--green);border:1px solid rgba(0,209,122,.3)">&#128176; Commission Rate</button>
-          <button onclick="showProfileSettings()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(0,229,184,.12);color:var(--teal);border:1px solid rgba(0,229,184,.3)">&#128100; My Profile</button>
-          <button onclick="showMonthlyReport()" style="padding:11px 14px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3)">&#128202; Monthly Report</button>
-        <button id="btn-clr" style="padding:9px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Visits</button>
-        <button id="btn-rst" style="padding:9px 16px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All</button>
+      <div class="lbl">&#128100; My Profile &amp; Settings</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Your name, company, territory, and rep info used throughout the app</div>
+      <button onclick="showProfileSettings()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(0,229,184,.12);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128100; Edit My Profile</button>
+    </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128176; Commission &amp; Pay</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Set your commission rate to track estimated earnings on your sales</div>
+      <button onclick="showCommissionSettings()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(0,209,122,.12);color:var(--green);border:1px solid rgba(0,209,122,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128176; Commission Rate Settings</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Reports &amp; Exports</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128202; Reports &amp; Exports</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export your data or view performance reports</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="btn-exp" style="padding:9px 14px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Export Customer CSV</button>
+        <button id="btn-exp-notes" style="padding:9px 14px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Export Notes</button>
+        <button onclick="showMonthlyReportV2()" style="padding:9px 14px;border-radius:var(--r2);background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; Monthly Report</button>
+        <button onclick="showMileageLog()" style="padding:9px 14px;border-radius:var(--r2);background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128663; Mileage Log</button>
+        <button onclick="showExpenseLog()" style="padding:9px 14px;border-radius:var(--r2);background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128181; Expense Log</button>
       </div>
     </div>
+    <div class="card" style="margin-top:4px;border:1px solid rgba(255,77,106,.2)">
+      <div class="lbl" style="color:var(--red)">&#9888; Danger Zone</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">These actions affect visit history. Clear Visits resets today's route — your customer list stays. Reset All wipes all visit data permanently.</div>
+      <div style="display:flex;gap:8px">
+        <button id="btn-clr" style="flex:1;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Clear Today's Visits</button>
+        <button id="btn-rst" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">Reset All Visit Data</button>
+      </div>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Data Health</div>
     <div class="card" id="missing-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--amber)">&#9888; Missing Contact Data</div>
@@ -2876,28 +2948,33 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Tap any customer to fill in the missing info</div>
       <div id="missing-list"></div>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Backup</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128190; Backup &amp; Restore</div>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export all your visits, notes, tags, contacts, and samples to a file</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Save a complete backup of all your visits, notes, tags, contacts, and history to a file — restore it anytime to bring your data back exactly as it was.</div>
       <div style="display:flex;gap:8px">
-        <button onclick="exportBackup()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Export</button>
-        <button onclick="document.getElementById('backup-file').click()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128228; Import</button>
+        <button onclick="exportBackup()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Save Backup</button>
+        <button onclick="document.getElementById('backup-file').click()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128228; Restore Backup</button>
       </div>
       <input type="file" id="backup-file" accept=".json" style="display:none" onchange="importBackup(this)">
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Tools &amp; Features</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl" style="color:var(--blue)">&#128197; Calendar Sync</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Export your scheduled follow-ups to any calendar app (Google, Apple, Outlook)</div>
       <button onclick="exportCalendarICS()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128197; Download Follow-Ups (.ics)</button>
     </div>
     <div class="card" style="margin-top:4px">
-      <div class="lbl" style="color:var(--teal)">&#128229; Import Templates</div>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Download a blank template to format your data for import</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="downloadCustomerTemplate()" style="flex:1;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128101; Customer CSV</button>
-        <button onclick="showBizCardScanner()" style="flex:1;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Business Card</button>
-      </div>
+      <div class="lbl" style="color:var(--teal)">&#128229; Download Import Template</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Don't have an existing file? Download a blank template with all the right column headers already set up — just fill it in and import.</div>
+      <button onclick="downloadCustomerTemplate()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128229; Download Customer List Template (.csv)</button>
     </div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl" style="color:#c084fc">&#128247; Add Customer via Business Card</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Point your camera at a business card, then fill in the details. Saves instantly as a new customer in your list — no manual typing required.</div>
+      <button onclick="showBizCardScanner()" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Scan Card &amp; Add New Customer</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Route Settings</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128205; Group Names</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Give your groups custom names</div>
@@ -2934,9 +3011,11 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       </div>
     </div>
     <div class="card" style="margin-top:4px">
-      <div class="lbl">Dashboard Cards</div>
+      <div class="lbl">&#127968; Dashboard Cards</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Choose which insight cards appear on your Home screen. Turn off anything you don't need to keep your dashboard clean and focused.</div>
       <div id="dash-toggles"></div>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Account</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128274; Account</div>
       <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:12px">—</div>
@@ -2945,6 +3024,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-bottom:6px">&#128275; Sign Out</button>
       <button onclick="confirmDeleteAccount()" style="width:100%;padding:8px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.18);color:rgba(239,68,68,.5);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600">Delete My Account</button>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">About</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#8505;&#65039; About FieldIQ</div>
       <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Version 1.0 &mdash; Outside Sales Intelligence</div>
@@ -2967,7 +3047,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <div class="hdr">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><h1>Pricing</h1><div class="sub" id="pr-lbl">No price sheet loaded</div></div>
-      <button onclick="document.getElementById('pr-input').click()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px">Upload Sheet</button>
+      <button onclick="document.getElementById('pr-input').click()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px">&#128229; Upload Price Sheet</button>
     </div>
     <div class="price-ctrl">
       <div class="price-margin-wrap">
@@ -2987,7 +3067,8 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-top:12px;font-size:13px;color:var(--sub);line-height:1.6">
       <div style="font-weight:700;color:var(--text);margin-bottom:6px">How it works</div>
-      Export your price list from your order system as Excel or CSV. The app will read your columns automatically — just make sure you have a <b style="color:var(--teal)">Cost</b> column. Set your margin % above and Sell Price is calculated instantly. Re-upload anytime when costs change.
+      Export your price list from your order system as Excel or CSV. The app reads your columns automatically — just make sure you have a <b style="color:var(--teal)">Cost</b> column. Set your margin % above and sell price calculates instantly. Re-upload anytime costs change.
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;color:var(--dim)">&#128161; This is for your <strong style="color:var(--sub)">product price sheet</strong> only. To import your customer list, go to <strong style="color:var(--sub)">Settings → Import Customer List</strong>.</div>
     </div>
   </div>
   <div id="pr-table-wrap" style="display:none">
