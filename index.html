@@ -844,9 +844,12 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
       <button onclick="runSyncDiag()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128269; Sync Diagnostic</button>
       <button onclick="forceCacheClear()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--red);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128260; Clear Cache + Reload</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <button onclick="forceSyncUp()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.35);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9650; Force Upload My Data to Cloud</button>
     </div>
     <div style="margin-bottom:12px">
       <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
@@ -2744,9 +2747,12 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
       <button onclick="showEOD()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128202; EOD Summary</button>
     </div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
       <button onclick="runSyncDiag()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128269; Sync Diagnostic</button>
       <button onclick="forceCacheClear()" style="flex:1;padding:10px 8px;border-radius:var(--r2);background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--red);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">&#128260; Clear Cache + Reload</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <button onclick="forceSyncUp()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.35);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#9650; Force Upload My Data to Cloud</button>
     </div>
     <div style="margin-bottom:12px">
       <button onclick="confirmRecalcGroups()" style="width:100%;padding:12px 14px;border-radius:var(--r2);background:rgba(0,229,184,.08);border:1px solid rgba(0,229,184,.25);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128257; Recalculate Route Groups</button>
@@ -8586,8 +8592,9 @@ function _showDiag(txt){
     el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)';
     el.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:20px 18px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
       +'<div style="font-size:15px;font-weight:800;margin-bottom:12px">&#128269; Sync Diagnostic</div>'
-      +'<pre id="sync-diag-txt" style="font-size:12px;color:var(--text);background:var(--bg3);padding:12px;border-radius:8px;white-space:pre-wrap;max-height:55vh;overflow-y:auto;font-family:monospace;border:1px solid var(--border2);line-height:1.6"></pre>'
-      +'<button onclick="document.getElementById(\'sync-diag-modal\').remove()" style="width:100%;margin-top:12px;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+      +'<pre id="sync-diag-txt" style="font-size:12px;color:var(--text);background:var(--bg3);padding:12px;border-radius:8px;white-space:pre-wrap;max-height:45vh;overflow-y:auto;font-family:monospace;border:1px solid var(--border2);line-height:1.6"></pre>'
+      +'<button onclick="document.getElementById(\'sync-diag-modal\').remove();forceSyncUp();" style="width:100%;margin-top:10px;padding:12px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.35);color:var(--teal);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">&#9650; Force Upload My Data to Cloud</button>'
+      +'<button onclick="document.getElementById(\'sync-diag-modal\').remove()" style="width:100%;margin-top:8px;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
       +'</div>';
     document.body.appendChild(el);
   }
@@ -8600,31 +8607,64 @@ function runSyncDiag(){
     lines.push('NOT SIGNED IN\nSign in first, then run diagnostic.');
     _showDiag(lines.join('\n'));return;
   }
+  var localVisits=Object.keys(ST.visits||{}).length;
+  var localCusts=(ST.addedCustomers||[]).length;
   lines.push('User:  '+CURRENT_USER.email);
-  lines.push('UID:   '+CURRENT_USER.id.slice(0,12)+'...\n');
+  lines.push('UID:   '+CURRENT_USER.id.slice(0,12)+'...');
+  lines.push('LOCAL: '+localVisits+' customers with visits, '+localCusts+' added customers\n');
   lines.push('Running...');
   _showDiag(lines.join('\n'));
-  // Step 1 — read
-  sb.from('hc_state').select('id,updated_at').eq('id',CURRENT_USER.id).then(function(r1){
+  // Step 1 — read state_json (do NOT write diag data — that was corrupting the row)
+  sb.from('hc_state').select('id,updated_at,state_json').eq('id',CURRENT_USER.id).then(function(r1){
     lines.pop();
-    if(r1.error){lines.push('READ:  FAILED\n       '+r1.error.message);}
-    else{lines.push('READ:  OK ('+r1.data.length+' row'+(r1.data.length===1?'':'s')+' found)');}
-    _showDiag(lines.join('\n'));
-    // Step 2 — minimal write
+    if(r1.error){
+      lines.push('READ:  FAILED — '+r1.error.message);
+      lines.push('\nFix: In Supabase SQL Editor run:\nALTER TABLE hc_state DISABLE ROW LEVEL SECURITY;');
+      _showDiag(lines.join('\n'));return;
+    }
+    if(!r1.data||r1.data.length===0){
+      lines.push('READ:  OK — NO ROW EXISTS YET');
+      lines.push('       Your data has never been uploaded.');
+      lines.push('       Tap "Force Upload My Data" below.');
+    }else{
+      var snap=r1.data[0].state_json;
+      var remVisits=snap?Object.keys(snap.visits||{}).length:0;
+      var remCusts=snap?(snap.addedCustomers||[]).length:0;
+      var updAt=r1.data[0].updated_at?r1.data[0].updated_at.slice(0,19).replace('T',' '):'-';
+      lines.push('READ:  OK — row found, updated '+updAt);
+      if(!snap||snap._diag){
+        lines.push('CLOUD: ⚠️ CORRUPTED — only contains diagnostic placeholder');
+        lines.push('       Tap "Force Upload My Data" to fix.');
+      }else{
+        lines.push('CLOUD: '+remVisits+' customers with visits, '+remCusts+' added customers');
+        if(remVisits===0&&localVisits>0){lines.push('       ⚠️ Cloud has no visit data — tap Force Upload');}
+        else if(remVisits>0&&localVisits===0){lines.push('       ⚠️ Local has no data — reload app to pull from cloud');}
+        else if(remVisits>0&&localVisits>0){lines.push('       ✅ Both sides have data — sync should work');}
+      }
+    }
+    // Step 2 — minimal write test (only id+updated_at, never touch state_json here)
     sb.from('hc_state').upsert({id:CURRENT_USER.id,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(r2){
-      if(r2.error){lines.push('WRITE: FAILED\n       '+r2.error.message);}
-      else{lines.push('WRITE: OK');}
+      if(r2.error){lines.push('\nWRITE: FAILED — '+r2.error.message);}
+      else{lines.push('\nWRITE: OK — Supabase connection working');}
+      lines.push('\n--- Tap Force Upload if cloud data looks wrong ---');
       _showDiag(lines.join('\n'));
-      // Step 3 — state_json column
-      sb.from('hc_state').upsert({id:CURRENT_USER.id,state_json:{_diag:1}},{onConflict:'id'}).then(function(r3){
-        if(r3.error){
-          lines.push('EXT:   state_json column MISSING\n       Run SQL in Supabase:\n       ALTER TABLE hc_state ADD COLUMN\n       IF NOT EXISTS state_json jsonb;');
-        }else{lines.push('EXT:   state_json column OK');}
-        lines.push('\n--- Share this with support ---');
-        _showDiag(lines.join('\n'));
-      });
     });
   });
+}
+function forceSyncUp(){
+  if(!CURRENT_USER){alert('Sign in first.');return;}
+  if(!confirm('Upload all your local data to the cloud now?\n\nThis will overwrite the cloud copy with whatever is on this device.'))return;
+  var sl=document.getElementById('sync-lbl');
+  if(sl)sl.textContent='Uploading…';
+  sb.from('hc_state').upsert({id:CURRENT_USER.id,state_json:ST,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(res){
+    if(res.error){
+      alert('Upload failed: '+res.error.message);
+      if(sl)sl.textContent='Upload error';
+    }else{
+      if(sl)sl.textContent='Synced';
+      alert('✅ Upload complete!\n\nNow open FieldIQ on your other device and reload — your data should appear.');
+    }
+  }).catch(function(e){alert('Upload error: '+String(e));});
 }
 function forceCacheClear(){
   if(!confirm('Clear app cache and reload? Fixes stale icons and stuck sync. Your data is NOT deleted.'))return;
