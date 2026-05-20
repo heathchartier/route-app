@@ -1659,13 +1659,12 @@ function openM(code){
 function closeM(){var ov=document.getElementById('ov');if(ov)ov.className='ov';mC=null;}
 
 function _applyRemoteState(rem){
+  // rem is a full ST snapshot (camelCase keys) stored in state_json
   var mc={};
-  // state_json holds all extended fields (added in v2 schema upgrade)
-  var ext=rem.state_json||{};
   var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
   for(var code in allCodes){
-    var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
-    var combined=loc.concat(rem2),seen={},deduped=[];
+    var loc=ST.visits[code]||[],remV=(rem.visits||{})[code]||[];
+    var combined=loc.concat(remV),seen={},deduped=[];
     for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
     deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
     mc[code]=deduped;
@@ -1678,32 +1677,30 @@ function _applyRemoteState(rem){
   ST.edits=Object.assign({},rem.edits||{},ST.edits);
   ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
   ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
-  ST.groupNotes=Object.assign({},ext.group_notes||rem.group_notes||rem.groupNotes||{},ST.groupNotes||{});
-  ST.snoozed=Object.assign({},ext.snoozed||rem.snoozed||{},ST.snoozed||{});
-  ST.tags=Object.assign({},ext.tags||rem.tags||{},ST.tags||{});
-  ST.orders=Object.assign({},ext.orders||rem.orders||{},ST.orders||{});
-  ST.todos=Object.assign({},ext.todos||rem.todos||{},ST.todos||{});
-  ST.followups=Object.assign({},ext.followups||rem.followups||{},ST.followups||{});
-  ST.quotes=Object.assign({},ext.quotes||rem.quotes||{},ST.quotes||{});
-  ST.mileage=Object.assign({},ext.mileage||rem.mileage||{},ST.mileage||{});
-  if(!ST.expenses||!ST.expenses.length)ST.expenses=ext.expenses||rem.expenses||[];
-  ST.contacts=Object.assign({},ext.contacts||rem.contacts||{},ST.contacts||{});
-  ST.groupNames=Object.assign({},ext.group_names||rem.group_names||rem.groupNames||{},ST.groupNames||{});
-  ST.salesTargets=Object.assign({},ext.sales_targets||rem.sales_targets||{},ST.salesTargets||{});
-  ST.tierTargets=Object.assign({},ext.tier_targets||rem.tier_targets||{},ST.tierTargets||{});
-  ST.productReqs=Object.assign({},ext.product_reqs||rem.product_reqs||{},ST.productReqs||{});
-  ST.samples=Object.assign({},ext.samples||rem.samples||{},ST.samples||{});
-  var rcr=(ext.comm_rate!==undefined)?ext.comm_rate:rem.comm_rate;
-  if(rcr!==undefined&&ST.commRate===3)ST.commRate=rcr;
-  var rp=ext.user_profile||rem.user_profile;
-  if(rp&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rp,ST.userProfile||{});}
-  ST.hiddenCards=Object.assign({},ext.hidden_cards||rem.hidden_cards||{},ST.hiddenCards||{});
-  ST.vendorEdits=Object.assign({},ext.vendor_edits||rem.vendor_edits||{},ST.vendorEdits||{});
-  var remVendors=ext.added_vendors||rem.added_vendors||[],avm={};
+  ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
+  ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
+  ST.tags=Object.assign({},rem.tags||{},ST.tags||{});
+  ST.orders=Object.assign({},rem.orders||{},ST.orders||{});
+  ST.todos=Object.assign({},rem.todos||{},ST.todos||{});
+  ST.followups=Object.assign({},rem.followups||{},ST.followups||{});
+  ST.quotes=Object.assign({},rem.quotes||{},ST.quotes||{});
+  ST.mileage=Object.assign({},rem.mileage||{},ST.mileage||{});
+  if(!ST.expenses||!ST.expenses.length)ST.expenses=rem.expenses||[];
+  ST.contacts=Object.assign({},rem.contacts||{},ST.contacts||{});
+  ST.groupNames=Object.assign({},rem.groupNames||{},ST.groupNames||{});
+  ST.salesTargets=Object.assign({},rem.salesTargets||{},ST.salesTargets||{});
+  ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
+  ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
+  ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
+  if(rem.commRate!==undefined&&ST.commRate===3)ST.commRate=rem.commRate;
+  if(rem.userProfile&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rem.userProfile,ST.userProfile||{});}
+  ST.hiddenCards=Object.assign({},rem.hiddenCards||{},ST.hiddenCards||{});
+  ST.vendorEdits=Object.assign({},rem.vendorEdits||{},ST.vendorEdits||{});
+  var remVendors=rem.addedVendors||[],avm={};
   for(var i=0;i<(ST.addedVendors||[]).length;i++)avm[ST.addedVendors[i].code]=ST.addedVendors[i];
   for(var i=0;i<remVendors.length;i++){if(!avm[remVendors[i].code])avm[remVendors[i].code]=remVendors[i];}
   ST.addedVendors=Object.keys(avm).map(function(k){return avm[k];});
-  var ra=rem.added_customers||[],am={};
+  var ra=rem.addedCustomers||[],am={};
   for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
   for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
   ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
@@ -1714,7 +1711,7 @@ function syncDown(){
   var done=false;
   function finish(){
     if(done)return;done=true;
-    try{migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();}catch(e){console.error('syncDown finish err:',e);}
+    try{migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();}catch(e){console.error('finish err:',e);}
     if(sl)sl.textContent='Synced';
   }
   function offlineFinish(reason){
@@ -1723,23 +1720,19 @@ function syncDown(){
     try{migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();}catch(e){}
     if(sl)sl.textContent='Offline mode';
   }
-  // Safety net — if Supabase never responds, unfreeze the app after 12s
   var timer=setTimeout(function(){offlineFinish('timeout');},12000);
-  sb.from('hc_state').select('*').eq('id',CURRENT_USER.id).then(function(res){
+  sb.from('hc_state').select('state_json,updated_at').eq('id',CURRENT_USER.id).then(function(res){
     clearTimeout(timer);
     if(res.error){offlineFinish(res.error.message);return;}
     var rows=res.data||[];
-    if(rows.length>0){
-      try{_applyRemoteState(rows[0]);}catch(e){console.error('_applyRemoteState err:',e);}
-      // Remote row exists but has no visits yet (e.g. created by diagnostic) — push local data up
-      var remVisitCount=rows[0].visits?Object.keys(rows[0].visits).length:0;
-      var localVisitCount=Object.keys(ST.visits||{}).length;
-      if(remVisitCount===0&&localVisitCount>0){syncUp();}
-    }
-    else{syncUp();}  // no remote row yet — push local data up
+    var remSnap=rows.length>0?rows[0].state_json:null;
+    if(remSnap){try{_applyRemoteState(remSnap);}catch(e){console.error('applyRemote err:',e);}}
+    // Auto-push if remote has no visits but local does
+    var remVisits=remSnap?Object.keys(remSnap.visits||{}).length:0;
+    if(remVisits===0&&Object.keys(ST.visits||{}).length>0){syncUp();}
     if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
-      sb.from('hc_state').select('*').eq('id','heath').then(function(r2){
-        if(!r2.error&&r2.data&&r2.data.length>0){try{_applyRemoteState(r2.data[0]);}catch(e){console.error(e);}}
+      sb.from('hc_state').select('state_json').eq('id','heath').then(function(r2){
+        if(!r2.error&&r2.data&&r2.data.length>0&&r2.data[0].state_json){try{_applyRemoteState(r2.data[0].state_json);}catch(e){}}
         finish();
       }).catch(function(){finish();});
     }else{finish();}
@@ -1754,41 +1747,11 @@ function syncUp(){
   syncTimer=setTimeout(function(){
     var sl=document.getElementById('sync-lbl');
     if(sl)sl.textContent='Syncing…';
-    // Extended fields packed into state_json JSONB column (run SQL to add: ALTER TABLE hc_state ADD COLUMN IF NOT EXISTS state_json jsonb;)
-    var stateJson={
-      group_notes:ST.groupNotes||{},snoozed:ST.snoozed||{},
-      tags:ST.tags||{},orders:ST.orders||{},todos:ST.todos||{},
-      followups:ST.followups||{},quotes:ST.quotes||{},
-      mileage:ST.mileage||{},expenses:ST.expenses||[],
-      contacts:ST.contacts||{},group_names:ST.groupNames||{},
-      sales_targets:ST.salesTargets||{},tier_targets:ST.tierTargets||{},
-      product_reqs:ST.productReqs||{},samples:ST.samples||{},
-      comm_rate:ST.commRate,user_profile:ST.userProfile||{},
-      added_vendors:ST.addedVendors||[],vendor_edits:ST.vendorEdits||{},
-      hidden_cards:ST.hiddenCards||{}
-    };
-    var payload={
-      id:uid,
-      visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,
-      removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],
-      scheduled:ST.scheduled||{},competitors:ST.competitors||{},
-      state_json:stateJson,
-      updated_at:new Date().toISOString()
-    };
-    sb.from('hc_state').upsert(payload,{onConflict:'id'}).then(function(res){
-      if(res.error){
-        // state_json column may not exist yet — retry without it
-        console.warn('syncUp (with state_json) failed:',res.error.message,'. Retrying without…');
-        var p2=Object.assign({},payload);
-        delete p2.state_json;
-        sb.from('hc_state').upsert(p2,{onConflict:'id'}).then(function(r2){
-          if(r2.error){
-            console.error('syncUp fallback failed:',r2.error.message);
-            if(sl)sl.textContent='Sync error: '+r2.error.message.slice(0,60);
-          }else{if(sl)sl.textContent='Synced';}
-        });
-      }else{if(sl)sl.textContent='Synced';}
-    });
+    // Write entire ST as state_json — one column, no schema mapping needed
+    sb.from('hc_state').upsert({id:uid,state_json:ST,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(res){
+      if(res.error){console.error('syncUp failed:',res.error.message);if(sl)sl.textContent='Sync error: '+res.error.message.slice(0,50);}
+      else{if(sl)sl.textContent='Synced';}
+    }).catch(function(err){console.error('syncUp catch:',err);if(sl)sl.textContent='Sync error';});
   },1500);
 }
 
@@ -3587,13 +3550,12 @@ function openM(code){
 function closeM(){var ov=document.getElementById('ov');if(ov)ov.className='ov';mC=null;}
 
 function _applyRemoteState(rem){
+  // rem is a full ST snapshot (camelCase keys) stored in state_json
   var mc={};
-  // state_json holds all extended fields (added in v2 schema upgrade)
-  var ext=rem.state_json||{};
   var allCodes={};for(var k in ST.visits)allCodes[k]=1;for(var k in (rem.visits||{}))allCodes[k]=1;
   for(var code in allCodes){
-    var loc=ST.visits[code]||[],rem2=(rem.visits||{})[code]||[];
-    var combined=loc.concat(rem2),seen={},deduped=[];
+    var loc=ST.visits[code]||[],remV=(rem.visits||{})[code]||[];
+    var combined=loc.concat(remV),seen={},deduped=[];
     for(var i=0;i<combined.length;i++){var key=combined[i].date+combined[i].type;if(!seen[key]){seen[key]=1;deduped.push(combined[i]);}}
     deduped.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
     mc[code]=deduped;
@@ -3606,32 +3568,30 @@ function _applyRemoteState(rem){
   ST.edits=Object.assign({},rem.edits||{},ST.edits);
   ST.scheduled=Object.assign({},rem.scheduled||{},ST.scheduled);
   ST.competitors=Object.assign({},rem.competitors||{},ST.competitors||{});
-  ST.groupNotes=Object.assign({},ext.group_notes||rem.group_notes||rem.groupNotes||{},ST.groupNotes||{});
-  ST.snoozed=Object.assign({},ext.snoozed||rem.snoozed||{},ST.snoozed||{});
-  ST.tags=Object.assign({},ext.tags||rem.tags||{},ST.tags||{});
-  ST.orders=Object.assign({},ext.orders||rem.orders||{},ST.orders||{});
-  ST.todos=Object.assign({},ext.todos||rem.todos||{},ST.todos||{});
-  ST.followups=Object.assign({},ext.followups||rem.followups||{},ST.followups||{});
-  ST.quotes=Object.assign({},ext.quotes||rem.quotes||{},ST.quotes||{});
-  ST.mileage=Object.assign({},ext.mileage||rem.mileage||{},ST.mileage||{});
-  if(!ST.expenses||!ST.expenses.length)ST.expenses=ext.expenses||rem.expenses||[];
-  ST.contacts=Object.assign({},ext.contacts||rem.contacts||{},ST.contacts||{});
-  ST.groupNames=Object.assign({},ext.group_names||rem.group_names||rem.groupNames||{},ST.groupNames||{});
-  ST.salesTargets=Object.assign({},ext.sales_targets||rem.sales_targets||{},ST.salesTargets||{});
-  ST.tierTargets=Object.assign({},ext.tier_targets||rem.tier_targets||{},ST.tierTargets||{});
-  ST.productReqs=Object.assign({},ext.product_reqs||rem.product_reqs||{},ST.productReqs||{});
-  ST.samples=Object.assign({},ext.samples||rem.samples||{},ST.samples||{});
-  var rcr=(ext.comm_rate!==undefined)?ext.comm_rate:rem.comm_rate;
-  if(rcr!==undefined&&ST.commRate===3)ST.commRate=rcr;
-  var rp=ext.user_profile||rem.user_profile;
-  if(rp&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rp,ST.userProfile||{});}
-  ST.hiddenCards=Object.assign({},ext.hidden_cards||rem.hidden_cards||{},ST.hiddenCards||{});
-  ST.vendorEdits=Object.assign({},ext.vendor_edits||rem.vendor_edits||{},ST.vendorEdits||{});
-  var remVendors=ext.added_vendors||rem.added_vendors||[],avm={};
+  ST.groupNotes=Object.assign({},rem.groupNotes||{},ST.groupNotes||{});
+  ST.snoozed=Object.assign({},rem.snoozed||{},ST.snoozed||{});
+  ST.tags=Object.assign({},rem.tags||{},ST.tags||{});
+  ST.orders=Object.assign({},rem.orders||{},ST.orders||{});
+  ST.todos=Object.assign({},rem.todos||{},ST.todos||{});
+  ST.followups=Object.assign({},rem.followups||{},ST.followups||{});
+  ST.quotes=Object.assign({},rem.quotes||{},ST.quotes||{});
+  ST.mileage=Object.assign({},rem.mileage||{},ST.mileage||{});
+  if(!ST.expenses||!ST.expenses.length)ST.expenses=rem.expenses||[];
+  ST.contacts=Object.assign({},rem.contacts||{},ST.contacts||{});
+  ST.groupNames=Object.assign({},rem.groupNames||{},ST.groupNames||{});
+  ST.salesTargets=Object.assign({},rem.salesTargets||{},ST.salesTargets||{});
+  ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
+  ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
+  ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
+  if(rem.commRate!==undefined&&ST.commRate===3)ST.commRate=rem.commRate;
+  if(rem.userProfile&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rem.userProfile,ST.userProfile||{});}
+  ST.hiddenCards=Object.assign({},rem.hiddenCards||{},ST.hiddenCards||{});
+  ST.vendorEdits=Object.assign({},rem.vendorEdits||{},ST.vendorEdits||{});
+  var remVendors=rem.addedVendors||[],avm={};
   for(var i=0;i<(ST.addedVendors||[]).length;i++)avm[ST.addedVendors[i].code]=ST.addedVendors[i];
   for(var i=0;i<remVendors.length;i++){if(!avm[remVendors[i].code])avm[remVendors[i].code]=remVendors[i];}
   ST.addedVendors=Object.keys(avm).map(function(k){return avm[k];});
-  var ra=rem.added_customers||[],am={};
+  var ra=rem.addedCustomers||[],am={};
   for(var i=0;i<(ST.addedCustomers||[]).length;i++)am[ST.addedCustomers[i].code]=ST.addedCustomers[i];
   for(var i=0;i<ra.length;i++){if(!am[ra[i].code])am[ra[i].code]=ra[i];}
   ST.addedCustomers=Object.keys(am).map(function(k){return am[k];});
@@ -3642,7 +3602,7 @@ function syncDown(){
   var done=false;
   function finish(){
     if(done)return;done=true;
-    try{migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();}catch(e){console.error('syncDown finish err:',e);}
+    try{migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();}catch(e){console.error('finish err:',e);}
     if(sl)sl.textContent='Synced';
   }
   function offlineFinish(reason){
@@ -3651,23 +3611,19 @@ function syncDown(){
     try{migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();}catch(e){}
     if(sl)sl.textContent='Offline mode';
   }
-  // Safety net — if Supabase never responds, unfreeze the app after 12s
   var timer=setTimeout(function(){offlineFinish('timeout');},12000);
-  sb.from('hc_state').select('*').eq('id',CURRENT_USER.id).then(function(res){
+  sb.from('hc_state').select('state_json,updated_at').eq('id',CURRENT_USER.id).then(function(res){
     clearTimeout(timer);
     if(res.error){offlineFinish(res.error.message);return;}
     var rows=res.data||[];
-    if(rows.length>0){
-      try{_applyRemoteState(rows[0]);}catch(e){console.error('_applyRemoteState err:',e);}
-      // Remote row exists but has no visits yet (e.g. created by diagnostic) — push local data up
-      var remVisitCount=rows[0].visits?Object.keys(rows[0].visits).length:0;
-      var localVisitCount=Object.keys(ST.visits||{}).length;
-      if(remVisitCount===0&&localVisitCount>0){syncUp();}
-    }
-    else{syncUp();}  // no remote row yet — push local data up
+    var remSnap=rows.length>0?rows[0].state_json:null;
+    if(remSnap){try{_applyRemoteState(remSnap);}catch(e){console.error('applyRemote err:',e);}}
+    // Auto-push if remote has no visits but local does
+    var remVisits=remSnap?Object.keys(remSnap.visits||{}).length:0;
+    if(remVisits===0&&Object.keys(ST.visits||{}).length>0){syncUp();}
     if(Object.keys(ST.visits||{}).length===0&&CURRENT_USER&&CURRENT_USER.email===LEGACY_ADMIN_EMAIL){
-      sb.from('hc_state').select('*').eq('id','heath').then(function(r2){
-        if(!r2.error&&r2.data&&r2.data.length>0){try{_applyRemoteState(r2.data[0]);}catch(e){console.error(e);}}
+      sb.from('hc_state').select('state_json').eq('id','heath').then(function(r2){
+        if(!r2.error&&r2.data&&r2.data.length>0&&r2.data[0].state_json){try{_applyRemoteState(r2.data[0].state_json);}catch(e){}}
         finish();
       }).catch(function(){finish();});
     }else{finish();}
@@ -3682,41 +3638,11 @@ function syncUp(){
   syncTimer=setTimeout(function(){
     var sl=document.getElementById('sync-lbl');
     if(sl)sl.textContent='Syncing…';
-    // Extended fields packed into state_json JSONB column (run SQL to add: ALTER TABLE hc_state ADD COLUMN IF NOT EXISTS state_json jsonb;)
-    var stateJson={
-      group_notes:ST.groupNotes||{},snoozed:ST.snoozed||{},
-      tags:ST.tags||{},orders:ST.orders||{},todos:ST.todos||{},
-      followups:ST.followups||{},quotes:ST.quotes||{},
-      mileage:ST.mileage||{},expenses:ST.expenses||[],
-      contacts:ST.contacts||{},group_names:ST.groupNames||{},
-      sales_targets:ST.salesTargets||{},tier_targets:ST.tierTargets||{},
-      product_reqs:ST.productReqs||{},samples:ST.samples||{},
-      comm_rate:ST.commRate,user_profile:ST.userProfile||{},
-      added_vendors:ST.addedVendors||[],vendor_edits:ST.vendorEdits||{},
-      hidden_cards:ST.hiddenCards||{}
-    };
-    var payload={
-      id:uid,
-      visits:ST.visits,notes:ST.notes,hot:ST.hot,archived:ST.archived,
-      removed:ST.removed,edits:ST.edits,added_customers:ST.addedCustomers||[],
-      scheduled:ST.scheduled||{},competitors:ST.competitors||{},
-      state_json:stateJson,
-      updated_at:new Date().toISOString()
-    };
-    sb.from('hc_state').upsert(payload,{onConflict:'id'}).then(function(res){
-      if(res.error){
-        // state_json column may not exist yet — retry without it
-        console.warn('syncUp (with state_json) failed:',res.error.message,'. Retrying without…');
-        var p2=Object.assign({},payload);
-        delete p2.state_json;
-        sb.from('hc_state').upsert(p2,{onConflict:'id'}).then(function(r2){
-          if(r2.error){
-            console.error('syncUp fallback failed:',r2.error.message);
-            if(sl)sl.textContent='Sync error: '+r2.error.message.slice(0,60);
-          }else{if(sl)sl.textContent='Synced';}
-        });
-      }else{if(sl)sl.textContent='Synced';}
-    });
+    // Write entire ST as state_json — one column, no schema mapping needed
+    sb.from('hc_state').upsert({id:uid,state_json:ST,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(res){
+      if(res.error){console.error('syncUp failed:',res.error.message);if(sl)sl.textContent='Sync error: '+res.error.message.slice(0,50);}
+      else{if(sl)sl.textContent='Synced';}
+    }).catch(function(err){console.error('syncUp catch:',err);if(sl)sl.textContent='Sync error';});
   },1500);
 }
 
