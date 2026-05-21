@@ -557,6 +557,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.38 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.89-13.48-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
       Continue with Google
     </button>
+    <button onclick="siwaStart()" style="width:100%;background:#000;color:#fff;border:1px solid #333;border-radius:var(--r2);padding:13px 16px;font-size:15px;font-weight:600;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px">
+      <svg width="16" height="20" viewBox="0 0 814 1000" style="flex-shrink:0"><path fill="#fff" d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 454.9 0 336.5 0 221.6c0-193.3 126.4-295.5 250.8-295.5 66.1 0 121.2 43.4 162.7 43.4 39.5 0 101.1-46 176.3-46 28.5 0 130.9 2.6 198.3 99.2zm-234-181.5c31.1-36.9 53.1-88.1 53.1-139.3 0-7.1-.6-14.3-1.9-20.1-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 83.6-55.1 135.5 0 7.8 1.3 15.6 1.9 18.1 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-71.3z"/></svg>
+      Continue with Apple
+    </button>
     <div style="text-align:center;margin-top:14px">
       <button onclick="authForgot()" style="background:none;border:none;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;padding:4px 8px">Forgot password?</button>
     </div>
@@ -1071,7 +1075,8 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="lbl">&#128274; Account</div>
       <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:12px">—</div>
       <button onclick="showChangePassword()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128273; Change Password</button>
-      <button onclick="showChangeEmail()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:12px;text-align:left;padding-left:14px">&#9993; Change Email</button>
+      <button onclick="showChangeEmail()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#9993; Change Email</button>
+      <button id="manage-sub-btn" onclick="manageSubscription()" style="display:none;width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:12px;text-align:left;padding-left:14px">&#10024; Manage Subscription</button>
       <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-bottom:6px">&#128275; Sign Out</button>
       <button onclick="confirmDeleteAccount()" style="width:100%;padding:8px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.18);color:rgba(239,68,68,.5);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600">Delete My Account</button>
     </div>
@@ -2623,6 +2628,35 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 </head>
 <body>
 
+<!-- PAYWALL SCREEN -->
+<div id="paywall-screen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:10000;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:auto">
+  <div style="width:100%;max-width:380px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-size:38px;font-weight:900;color:var(--teal);letter-spacing:-1.5px">FieldIQ</div>
+      <div style="font-size:13px;color:var(--sub);margin-top:6px;letter-spacing:.3px">Outside Sales Intelligence</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px">
+      <div style="font-size:18px;font-weight:800;margin-bottom:6px;color:var(--text)">FieldIQ Pro</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:20px">Everything you need to own your territory</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">&#10003;</span>Smart route optimization by territory group</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">&#10003;</span>Customer visit tracking &amp; history</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">&#10003;</span>Callbacks, orders &amp; quote builder</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">&#10003;</span>Mileage &amp; expense tracking</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">&#10003;</span>Competitor intelligence &amp; territory analytics</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">&#10003;</span>Sync across all your devices</div>
+      </div>
+      <div style="text-align:center;border-top:1px solid var(--border);padding-top:20px">
+        <div style="font-size:34px;font-weight:900;color:var(--teal);letter-spacing:-1px">$19<span style="font-size:16px;font-weight:600;color:var(--sub)">/month</span></div>
+        <div style="font-size:12px;color:var(--sub);margin-top:5px">14-day free trial &bull; Cancel anytime in Apple ID settings</div>
+      </div>
+    </div>
+    <button id="paywall-sub-btn" onclick="iapSubscribe()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.2px;margin-bottom:12px">Start Free Trial</button>
+    <button onclick="iapRestore()" style="width:100%;background:transparent;color:var(--sub);border:1px solid var(--border2);border-radius:var(--r2);padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Restore Purchase</button>
+    <div id="paywall-msg" style="text-align:center;font-size:12px;color:var(--sub);margin-top:16px;line-height:1.5">Subscription renews monthly at $19.00. Cancel anytime.</div>
+  </div>
+</div>
+
 <!-- PAGES - all visible by default, JS will hide non-active ones -->
 <div id="toast-undo"><span id="toast-undo-msg">Logged</span><button id="toast-undo-btn" onclick="undoLastVisit()">UNDO</button></div>
 
@@ -3051,7 +3085,8 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="lbl">&#128274; Account</div>
       <div id="auth-user-lbl" style="font-size:13px;color:var(--sub);margin-bottom:12px">—</div>
       <button onclick="showChangePassword()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128273; Change Password</button>
-      <button onclick="showChangeEmail()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:12px;text-align:left;padding-left:14px">&#9993; Change Email</button>
+      <button onclick="showChangeEmail()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#9993; Change Email</button>
+      <button id="manage-sub-btn" onclick="manageSubscription()" style="display:none;width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:12px;text-align:left;padding-left:14px">&#10024; Manage Subscription</button>
       <button onclick="doSignOut()" style="width:100%;padding:9px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.35);color:#ef4444;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-bottom:6px">&#128275; Sign Out</button>
       <button onclick="confirmDeleteAccount()" style="width:100%;padding:8px;border-radius:var(--r2);background:transparent;border:1px solid rgba(239,68,68,.18);color:rgba(239,68,68,.5);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600">Delete My Account</button>
     </div>
@@ -10675,7 +10710,110 @@ function onLogin(user){
   updateSecurityStatus();
   migrateBaseCustomers();
   go('dash');
+  if(isIOSApp()){
+    requestIAPStatus();
+    var msb=document.getElementById('manage-sub-btn');
+    if(msb)msb.style.display='';
+  }
 }
+
+// ── IN-APP PURCHASE (iOS App Store) ──────────────────────────────────────────
+function isIOSApp(){return /PWAShell/.test(navigator.userAgent);}
+
+function requestIAPStatus(){
+  if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers['iap-get-status']){
+    window.webkit.messageHandlers['iap-get-status'].postMessage({});
+  }
+}
+
+function iapSubscribe(){
+  var btn=document.getElementById('paywall-sub-btn');
+  if(btn){btn.textContent='Processing...';btn.disabled=true;}
+  if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers['iap-purchase']){
+    window.webkit.messageHandlers['iap-purchase'].postMessage({});
+  }
+}
+
+function iapRestore(){
+  var msg=document.getElementById('paywall-msg');
+  if(msg)msg.textContent='Restoring...';
+  if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers['iap-restore']){
+    window.webkit.messageHandlers['iap-restore'].postMessage({});
+  }
+}
+
+window.onIAPStatus=function(data){
+  var pw=document.getElementById('paywall-screen');
+  if(!pw)return;
+  if(data.status==='active'){
+    pw.style.display='none';
+  }else{
+    pw.style.display='flex';
+  }
+};
+
+window.onIAPPurchaseResult=function(data){
+  var btn=document.getElementById('paywall-sub-btn');
+  if(btn){btn.textContent='Start Free Trial';btn.disabled=false;}
+  if(data.success){
+    var pw=document.getElementById('paywall-screen');
+    if(pw)pw.style.display='none';
+    toast('Welcome to FieldIQ Pro!');
+  }else if(data.error&&data.error!=='cancelled'&&data.error!=='pending'){
+    var msg=document.getElementById('paywall-msg');
+    if(msg)msg.textContent='Purchase failed. Please try again.';
+  }
+};
+
+window.onIAPRestoreResult=function(data){
+  var msg=document.getElementById('paywall-msg');
+  if(data.success){
+    var pw=document.getElementById('paywall-screen');
+    if(pw)pw.style.display='none';
+    toast('Subscription restored!');
+  }else{
+    if(msg)msg.textContent='No active subscription found. Tap Start Free Trial to get started.';
+  }
+};
+
+function manageSubscription(){
+  window.location.href='itms-apps://apps.apple.com/account/subscriptions';
+}
+
+// ── SIGN IN WITH APPLE ────────────────────────────────────────────────────────
+function siwaStart(){
+  if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers['siwa-start']){
+    window.webkit.messageHandlers['siwa-start'].postMessage({});
+  }else{
+    // Web fallback — Supabase OAuth redirect
+    sb.auth.signInWithOAuth({provider:'apple',options:{redirectTo:window.location.href}});
+  }
+}
+
+window.onSIWAToken=async function(data){
+  var er=document.getElementById('auth-error');
+  if(er)er.style.display='none';
+  try{
+    var res=await sb.auth.signInWithIdToken({provider:'apple',token:data.token});
+    if(res.error){showAuthError(res.error.message);return;}
+    var user=res.data&&res.data.user;
+    if(!user){showAuthError('Sign in failed. Please try again.');return;}
+    // Apple only sends the name on the very first login — save it if we got it
+    if(data.name&&data.name.trim()){
+      await sb.auth.updateUser({data:{display_name:data.name.trim()}}).catch(function(){});
+      if(!user.user_metadata)user.user_metadata={};
+      if(!user.user_metadata.userProfile)user.user_metadata.userProfile={};
+      if(!user.user_metadata.userProfile.name)user.user_metadata.userProfile.name=data.name.trim();
+    }
+    onLogin(user);
+  }catch(e){
+    showAuthError('Sign in failed. Please try again.');
+  }
+};
+
+window.onSIWAError=function(data){
+  if(data&&data.error)showAuthError(data.error);
+};
 
 function migrateBaseCustomers(){
   if(!CURRENT_USER||CURRENT_USER.email!==LEGACY_ADMIN_EMAIL)return;
