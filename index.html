@@ -544,7 +544,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <input id="auth-pass" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:6px;outline:none">
     <div id="auth-pass-hint" style="display:none;font-size:12px;color:var(--sub);margin-bottom:8px;padding:0 2px">Minimum 6 characters required</div>
     <div id="auth-pass2-wrap" style="display:none;margin-bottom:6px">
-      <input id="auth-pass2" type="password" placeholder="Confirm password" autocomplete="new-password" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;outline:none">
+      <input id="auth-pass2" type="password" placeholder="Confirm password" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;outline:none">
     </div>
     <div id="auth-pass-spacer" style="height:14px"></div>
     <button id="auth-btn" onclick="doAuth()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.2px">Sign In</button>
@@ -10632,6 +10632,8 @@ function doAuth(){
 function onLogin(user){
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
+  // Reset ST to blank so previous session data doesn't leak into a new account
+  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
   if(!ST.userProfile)ST.userProfile={};
   // Restore profile from auth metadata if localStorage was cleared
