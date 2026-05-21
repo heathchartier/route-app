@@ -9467,7 +9467,8 @@ function rBackupAlert(){
   var today=new Date();
   var last=ST.lastExportDate?new Date(ST.lastExportDate):null;
   var daysSince=last?Math.floor((today-last)/(1000*60*60*24)):999;
-  if(daysSince<30){el.style.display='none';return;}
+  var hasData=Object.keys(ST.visits||{}).length>0||Object.keys(ST.orders||{}).length>0;
+  if(daysSince<30||(!last&&!hasData)){el.style.display='none';return;}
   el.style.display='block';
   var msg=last?('Last backup was '+daysSince+' days ago'):'You haven\'t exported your data yet';
   el.innerHTML='<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px;display:flex;align-items:center;gap:10px">'
@@ -9760,7 +9761,7 @@ function rUpsellNudges(){
     if(tags.indexOf('Big Fish')!==-1&&daysSinceQ>60){reason='Big Fish — no quote in '+daysSinceQ+'d';pri=5;}
     else if(tags.indexOf('Hot Opportunity')!==-1&&daysSinceQ>30){reason='Hot Opportunity — follow up on quote';pri=4;}
     else if(lostQ.length&&daysSinceQ>45){reason='Re-pitch: lost quote '+daysSinceQ+'d ago';pri=3;}
-    else if(tags.indexOf('Competitor Risk')!==-1&&ds(c.code)>30){reason='Competitor Risk — '+ds(c.code)+'d since visit';pri=3;}
+    else if(tags.indexOf('Competitor Risk')!==-1&&ds(c.code)>30){var _dsc=ds(c.code);reason='Competitor Risk — '+(_dsc>=1000000?'never visited':_dsc+'d since visit');pri=3;}
     else if(tags.indexOf('Champion')!==-1&&daysSinceOrd>60){reason='Champion — no order in '+daysSinceOrd+'d';pri=2;}
     else if(tags.indexOf('Dormant')!==-1&&c.lifetimeSales>5000&&daysSinceOrd>60){reason='Dormant high-value — re-engage';pri=2;}
     else if(daysSinceQ>90&&c.lifetimeSales>10000&&ds(c.code)<30){reason='High-value — due for a quote';pri=1;}
