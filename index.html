@@ -10779,7 +10779,11 @@ window.onIAPRestoreResult=function(data){
 };
 
 function manageSubscription(){
-  window.location.href='itms-apps://apps.apple.com/account/subscriptions';
+  if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers['manage-subscription']){
+    window.webkit.messageHandlers['manage-subscription'].postMessage({});
+  } else {
+    window.open('https://apps.apple.com/account/subscriptions','_blank');
+  }
 }
 
 // ── SIGN IN WITH APPLE ────────────────────────────────────────────────────────
