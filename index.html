@@ -10589,6 +10589,10 @@ function generateRouteGroups(onDone){
 }
 
 // ── AUTH ────────────────────────────────────────────────────────────────────
+// Auto-switch to signup tab if URL has #signup hash (for links from marketing site)
+window.addEventListener('load',function(){
+  if(window.location.hash==='#signup'){authTab('signup');history.replaceState(null,'',window.location.pathname);}
+});
 function authTab(mode){
   AUTH_MODE=mode;
   var si=document.getElementById('auth-tab-signin');
