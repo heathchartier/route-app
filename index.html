@@ -7563,10 +7563,11 @@ function rBirthdayAlert(){
 
 /* ── APP LOCK / SECURITY ── */
 var _pinBuf='';
+var _appUnlockedThisSession=false; // in-memory only — cleared when WKWebView process is killed
 function initAppLock(){
   var pin=localStorage.getItem('hrt_pin');
   if(!pin)return;
-  if(sessionStorage.getItem('hrt_unlocked'))return;
+  if(_appUnlockedThisSession)return;
   showLockScreen();
 }
 function showLockScreen(){
@@ -7632,6 +7633,7 @@ function verifyPIN(pin){
   }
 }
 function unlockApp(){
+  _appUnlockedThisSession=true;
   sessionStorage.setItem('hrt_unlocked','1');
   var el=document.getElementById('lock-screen');
   if(el){el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},300);}
@@ -7704,6 +7706,7 @@ function showFaceIDSetup(){
 function disableAppLock(){
   localStorage.removeItem('hrt_pin');
   localStorage.removeItem('hrt_cred_id');
+  _appUnlockedThisSession=false;
   sessionStorage.removeItem('hrt_unlocked');
   toast('&#128275; App lock disabled');
   updateSecurityStatus();
@@ -10689,6 +10692,7 @@ function onLogin(user){
   var ul=document.getElementById('auth-user-lbl');
   if(ul)ul.textContent='Signed in as '+user.email;
   // Fresh password login already proves identity — skip app lock screen this session
+  _appUnlockedThisSession=true;
   sessionStorage.setItem('hrt_unlocked','1');
   loadRolling();
   loadPricing();
