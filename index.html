@@ -6073,7 +6073,7 @@ function showPriceColMapper(hdrs,rows,fname){
     '<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px"></div>'+
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
       '<div style="font-size:18px;font-weight:800">Map Price Sheet Columns</div>'+
-      '<button onclick="this.closest(\'div[style*=fixed]\').remove();document.body.style.overflow=\'\'" style="background:var(--bg3);border:1px solid var(--border);color:var(--sub);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px">&#x2715;</button>'+
+      '<button onclick="if(window._priceMapperSheet){window._priceMapperSheet.remove();window._priceMapperSheet=null;document.body.style.overflow=\'\';}" style="background:var(--bg3);border:1px solid var(--border);color:var(--sub);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px">&#x2715;</button>'+
     '</div>'+
     '<div style="font-size:12px;color:var(--sub);margin-bottom:14px"><span style="color:var(--text);font-weight:600">'+esc(fname)+'</span> &middot; '+hdrs.length+' columns &middot; '+rows.length+' items &mdash; confirm the column mapping below.</div>'+
     _PRICE_FIELD_DEFS.map(mapRow).join('')+
@@ -6081,10 +6081,11 @@ function showPriceColMapper(hdrs,rows,fname){
       '<strong style="color:var(--teal)">UOM examples:</strong> ea, bf, lf, sqft, ft&sup2;, lb, oz, gal, cs, pk, ton, box, roll, sheet, pc &mdash; anything in your file works.'+
     '</div>'+
     '<button onclick="confirmPriceImport()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:8px">&#10003; Confirm &amp; Load</button>'+
-    '<button onclick="this.closest(\'div[style*=fixed]\').remove();document.body.style.overflow=\'\'" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'+
+    '<button onclick="if(window._priceMapperSheet){window._priceMapperSheet.remove();window._priceMapperSheet=null;document.body.style.overflow=\'\';}" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'+
   '</div>';
+  window._priceMapperSheet=sh;
   document.body.appendChild(sh);
-  sh.addEventListener('click',function(ev){if(ev.target===sh){sh.remove();document.body.style.overflow='';}});
+  sh.addEventListener('click',function(ev){if(ev.target===sh){sh.remove();document.body.style.overflow='';window._priceMapperSheet=null;}});
 }
 
 function confirmPriceImport(){
@@ -6095,8 +6096,7 @@ function confirmPriceImport(){
     ci[fd.key]=sel?parseInt(sel.value):-1;
   });
   if(ci.cost<0){toast('Please map a Cost / Price column');return;}
-  var sh=document.querySelector('div[style*="z-index: 10000"],div[style*="z-index:10000"]');
-  if(sh){sh.remove();document.body.style.overflow='';}
+  if(window._priceMapperSheet){window._priceMapperSheet.remove();document.body.style.overflow='';window._priceMapperSheet=null;}
   priceColMap=ci;savePriceMap();
   priceData=pi.rows.map(function(row){
     return{
