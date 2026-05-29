@@ -7647,7 +7647,10 @@ function renderOrderSheet(code){
   var totStr=tot?('$'+tot.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})):'$0.00';
   sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:82vh;overflow-y:auto">'
    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
-   +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">&#128230; Log Order</div>'
+   +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+     +'<div style="font-size:17px;font-weight:800">&#128230; Log Order</div>'
+     +(priceData.length?'<button onclick="openPriceListPicker(\''+esc(code)+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:12px;font-weight:700;padding:7px 11px;border-radius:var(--r2);cursor:pointer;font-family:inherit">&#128203; Price List</button>':'')
+   +'</div>'
    +'<div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px">Items</div>'
    +rows
    +'<button onclick="_orderItems.push({item:\'\',qty:\'\',unit:\'ea\',unitPrice:\'\',lineTotal:0});renderOrderSheet(\''+esc(code)+'\')" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px">+ Add Item</button>'
@@ -7704,6 +7707,111 @@ function rOrders(code){
     +'</div>';
   }
   el.innerHTML=h;
+}
+
+/* ── PRICE LIST PICKER (order sheet integration) ── */
+var _plPickerQtys={};
+function openPriceListPicker(code){
+  if(!priceData.length)return;
+  _plPickerQtys={};
+  var picker=document.createElement('div');
+  picker.id='pl-picker-overlay';
+  picker.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  document.body.appendChild(picker);
+  _renderPLPicker(code,'');
+}
+function _renderPLPicker(code,q){
+  var picker=document.getElementById('pl-picker-overlay');if(!picker)return;
+  var marginEl=document.getElementById('pr-margin');
+  var margin=parseFloat(marginEl?marginEl.value:35)||35;
+  var multiplier=1+margin/100;
+  picker.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;display:flex;flex-direction:column;box-sizing:border-box">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px"></div>'
+   +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+     +'<div style="font-size:17px;font-weight:800">&#128203; Price List</div>'
+     +'<button onclick="document.getElementById(\'pl-picker-overlay\').remove()" style="background:transparent;border:none;color:var(--sub);font-size:24px;cursor:pointer;padding:0;line-height:1">&#215;</button>'
+   +'</div>'
+   +'<input id="pl-picker-srch" type="text" placeholder="Search code or description..." value="'+esc(q)+'" style="width:100%;padding:9px 12px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;box-sizing:border-box;margin-bottom:10px;outline:none">'
+   +'<div id="pl-picker-list" style="flex:1;overflow-y:auto;min-height:0;margin-bottom:12px">'
+     +_buildPLList(multiplier,q)
+   +'</div>'
+   +'<button onclick="usePriceListItems(\''+esc(code)+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--green);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;flex-shrink:0">Add to Order</button>'
+   +'</div>';
+  var srch=document.getElementById('pl-picker-srch');
+  if(srch){
+    srch.addEventListener('input',function(){
+      var el=document.getElementById('pl-picker-list');if(!el)return;
+      var mEl=document.getElementById('pr-margin');
+      var mult=1+(parseFloat(mEl?mEl.value:35)||35)/100;
+      // preserve qtys from current inputs before re-render
+      var ins=document.querySelectorAll('#pl-picker-list input[data-pidx]');
+      ins.forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
+      el.innerHTML=_buildPLList(mult,this.value);
+    });
+    srch.focus();
+  }
+}
+function _buildPLList(multiplier,q){
+  var sq=(q||'').toLowerCase().trim();
+  var filtered=priceData.filter(function(r){
+    if(!sq)return true;
+    return(r._code+' '+r._desc+' '+r._uom).toLowerCase().indexOf(sq)>=0;
+  });
+  if(!filtered.length)return '<div style="color:var(--sub);text-align:center;padding:24px;font-size:14px">No items found</div>';
+  return filtered.map(function(r){
+    var idx=priceData.indexOf(r);
+    var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
+    var sell=isNaN(cost)||cost<=0?0:parseFloat((cost*multiplier).toFixed(2));
+    var sellStr=sell>0?'$'+sell.toFixed(2):cost>0?'$'+cost.toFixed(2):'—';
+    var uom=r._uom||'ea';
+    var savedQty=_plPickerQtys[idx]||'';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r2);background:var(--bg3);border:1px solid '+(savedQty?'var(--green)':'var(--border2)')+';margin-bottom:7px">'
+      +'<div style="flex:1;min-width:0">'
+        +(r._code?'<div style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.4px;text-transform:uppercase">'+esc(r._code)+'</div>':'')
+        +'<div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(r._desc||'—')+'</div>'
+        +'<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:1px">'+sellStr+(uom?' <span style="color:var(--sub);font-weight:500">/ '+esc(uom)+'</span>':'')+'</div>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0">'
+        +'<div style="font-size:8px;font-weight:700;letter-spacing:.7px;color:var(--sub);text-transform:uppercase">Qty</div>'
+        +'<input type="number" inputmode="decimal" min="0" step="any" placeholder="0"'
+          +' data-pidx="'+idx+'" data-sell="'+sell+'" data-uom="'+esc(uom)+'" data-code="'+esc(r._code||'')+'" data-desc="'+esc(r._desc||'')+'"'
+          +' style="width:62px;padding:7px 0;background:var(--bg2);border:1.5px solid var(--border2);color:var(--text);border-radius:var(--r3);font-size:14px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield;-webkit-appearance:none;box-sizing:border-box"'
+          +(savedQty?' value="'+esc(savedQty)+'"':'')
+          +' oninput="_plPickerQtys[this.dataset.pidx]=this.value;var bd=this.closest(\'div[style*=border]\');if(bd)bd.style.borderColor=parseFloat(this.value)>0?\'var(--green)\':\' var(--border2)\'">'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+function usePriceListItems(code){
+  var overlay=document.getElementById('pl-picker-overlay');if(!overlay)return;
+  // Capture any unsaved qty inputs before reading _plPickerQtys
+  overlay.querySelectorAll('input[data-pidx]').forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
+  var added=0;
+  // Remove the default empty placeholder if it's the only item and truly empty
+  if(_orderItems.length===1&&!_orderItems[0].item&&!_orderItems[0].qty&&!_orderItems[0].unitPrice)_orderItems=[];
+  for(var pidx in _plPickerQtys){
+    var qty=parseFloat(_plPickerQtys[pidx])||0;
+    if(qty<=0)continue;
+    var r=priceData[parseInt(pidx)];if(!r)continue;
+    var marginEl=document.getElementById('pr-margin');
+    var margin=parseFloat(marginEl?marginEl.value:35)||35;
+    var sell=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
+    sell=isNaN(sell)||sell<=0?0:parseFloat((sell*(1+margin/100)).toFixed(2));
+    var uom=r._uom||'ea';
+    var itemLabel=r._code&&r._desc?r._code+' — '+r._desc:(r._desc||r._code||'Item');
+    var lt=sell>0?parseFloat((qty*sell).toFixed(2)):0;
+    _orderItems.push({item:itemLabel,qty:String(qty),unit:uom,unitPrice:sell?String(sell):'',lineTotal:lt});
+    added++;
+  }
+  overlay.remove();
+  if(!_orderItems.length)_orderItems=[{item:'',qty:'',unit:'ea',unitPrice:'',lineTotal:0}];
+  if(added>0){
+    renderOrderSheet(code);
+    toast(added+' item'+(added>1?'s':'')+' added to order');
+  }else{
+    renderOrderSheet(code);
+    toast('Enter a qty to add items');
+  }
 }
 
 /* ── BIRTHDAY / ANNIVERSARY ALERTS ── */
