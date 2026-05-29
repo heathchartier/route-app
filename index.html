@@ -253,13 +253,16 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .pr-item-left{flex:1;min-width:0}
 .pr-code{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.5px;margin-bottom:2px;text-transform:uppercase}
 .pr-desc{font-size:13px;font-weight:600;line-height:1.35;color:var(--text)}
-.pr-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;padding-top:2px}
+.pr-item-right{display:flex;flex-direction:row;align-items:center;gap:10px;flex-shrink:0;padding-top:2px}
+.pr-info-col{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .pr-uom{font-size:9px;font-weight:700;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:2px 6px;color:var(--dim);letter-spacing:.5px;text-transform:uppercase}
 .pr-prices{display:flex;align-items:center;gap:5px}
 .pr-cost-v{font-size:11px;color:var(--sub)}
 .pr-sell-v{font-size:14px;font-weight:800;color:var(--teal);letter-spacing:-.3px}
-.pr-qty-in{width:54px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r3);padding:5px 0;font-size:13px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield}
-.pr-qty-in:focus{border-color:var(--teal)}
+.pr-qty-col{display:flex;flex-direction:column;align-items:center;gap:2px}
+.pr-qty-lbl{font-size:8px;font-weight:700;letter-spacing:.7px;color:var(--sub);text-transform:uppercase}
+.pr-qty-in{width:58px;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:var(--r3);padding:7px 0;font-size:14px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield}
+.pr-qty-in:focus{border-color:var(--teal);background:var(--bg2)}
 .pr-qty-in::-webkit-outer-spin-button,.pr-qty-in::-webkit-inner-spin-button{-webkit-appearance:none}
 
 /* ── SETTINGS ── */
@@ -2418,13 +2421,16 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .pr-item-left{flex:1;min-width:0}
 .pr-code{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.5px;margin-bottom:2px;text-transform:uppercase}
 .pr-desc{font-size:13px;font-weight:600;line-height:1.35;color:var(--text)}
-.pr-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;padding-top:2px}
+.pr-item-right{display:flex;flex-direction:row;align-items:center;gap:10px;flex-shrink:0;padding-top:2px}
+.pr-info-col{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .pr-uom{font-size:9px;font-weight:700;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:2px 6px;color:var(--dim);letter-spacing:.5px;text-transform:uppercase}
 .pr-prices{display:flex;align-items:center;gap:5px}
 .pr-cost-v{font-size:11px;color:var(--sub)}
 .pr-sell-v{font-size:14px;font-weight:800;color:var(--teal);letter-spacing:-.3px}
-.pr-qty-in{width:54px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r3);padding:5px 0;font-size:13px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield}
-.pr-qty-in:focus{border-color:var(--teal)}
+.pr-qty-col{display:flex;flex-direction:column;align-items:center;gap:2px}
+.pr-qty-lbl{font-size:8px;font-weight:700;letter-spacing:.7px;color:var(--sub);text-transform:uppercase}
+.pr-qty-in{width:58px;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);border-radius:var(--r3);padding:7px 0;font-size:14px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield}
+.pr-qty-in:focus{border-color:var(--teal);background:var(--bg2)}
 .pr-qty-in::-webkit-outer-spin-button,.pr-qty-in::-webkit-inner-spin-button{-webkit-appearance:none}
 
 /* ── SETTINGS ── */
@@ -5930,16 +5936,21 @@ function rPrice(){
           '<div class="pr-desc">'+esc(r._desc||'—')+'</div>'+
         '</div>'+
         '<div class="pr-item-right">'+
-          (uom?'<div class="pr-uom">'+esc(uom)+'</div>':'')+
-          '<div class="pr-prices">'+
-            (costStr!=='—'?'<span class="pr-cost-v">'+esc(costStr)+'</span>':'')+
-            (sellStr?'<span style="color:var(--dim);font-size:10px;margin:0 1px">&#8594;</span><span class="pr-sell-v">'+sellStr+'</span>':'')+
+          '<div class="pr-info-col">'+
+            (uom?'<div class="pr-uom">'+esc(uom)+'</div>':'')+
+            '<div class="pr-prices">'+
+              (costStr!=='—'?'<span class="pr-cost-v">'+esc(costStr)+'</span>':'')+
+              (sellStr?'<span style="color:var(--dim);font-size:10px;margin:0 1px">&#8594;</span><span class="pr-sell-v">'+sellStr+'</span>':'')+
+            '</div>'+
           '</div>'+
-          '<input class="pr-qty-in" type="number" inputmode="decimal" min="0" step="any" placeholder="Qty"'+
-            ' data-idx="'+idx+'" data-sell="'+sell+'"'+
-            ' oninput="updatePriceTotal()"'+
-            (savedQty?' value="'+esc(savedQty)+'"':'')+
-          '>'+
+          '<div class="pr-qty-col">'+
+            '<div class="pr-qty-lbl">Qty</div>'+
+            '<input class="pr-qty-in" type="number" inputmode="decimal" min="0" step="any" placeholder="0"'+
+              ' data-idx="'+idx+'" data-sell="'+sell+'"'+
+              ' oninput="updatePriceTotal()"'+
+              (savedQty?' value="'+esc(savedQty)+'"':'')+
+            '>'+
+          '</div>'+
         '</div>'+
       '</div>';
     }).join('');
