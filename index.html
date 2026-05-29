@@ -7649,7 +7649,7 @@ function renderOrderSheet(code){
    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
      +'<div style="font-size:17px;font-weight:800">&#128230; Log Order</div>'
-     +(priceData.length?'<button onclick="openPriceListPicker(\''+esc(code)+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:12px;font-weight:700;padding:7px 11px;border-radius:var(--r2);cursor:pointer;font-family:inherit">&#128203; Price List</button>':'')
+     +'<button onclick="openPriceListPicker(\''+esc(code)+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:12px;font-weight:700;padding:7px 11px;border-radius:var(--r2);cursor:pointer;font-family:inherit">&#128203; Price List</button>'
    +'</div>'
    +'<div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px">Items</div>'
    +rows
@@ -7712,7 +7712,7 @@ function rOrders(code){
 /* ── PRICE LIST PICKER (order sheet integration) ── */
 var _plPickerQtys={};
 function openPriceListPicker(code){
-  if(!priceData.length)return;
+  if(!priceData.length){toast('No price list loaded — go to Pricing tab and upload your CSV first');return;}
   _plPickerQtys={};
   var picker=document.createElement('div');
   picker.id='pl-picker-overlay';
