@@ -7711,9 +7711,11 @@ function rOrders(code){
 
 /* ── PRICE LIST PICKER (order sheet integration) ── */
 var _plPickerQtys={};
+var _plPickerMargins={};
 function openPriceListPicker(code){
   if(!priceData.length){toast('No price list loaded — go to Pricing tab and upload your CSV first');return;}
   _plPickerQtys={};
+  _plPickerMargins={};
   var picker=document.createElement('div');
   picker.id='pl-picker-overlay';
   picker.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
@@ -7743,15 +7745,18 @@ function _renderPLPicker(code,q){
       var el=document.getElementById('pl-picker-list');if(!el)return;
       var mEl=document.getElementById('pr-margin');
       var mult=1+(parseFloat(mEl?mEl.value:35)||35)/100;
-      // preserve qtys from current inputs before re-render
+      // preserve qtys + margins from current inputs before re-render
       var ins=document.querySelectorAll('#pl-picker-list input[data-pidx]');
       ins.forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
+      var mins=document.querySelectorAll('#pl-picker-list input[data-midx]');
+      mins.forEach(function(n){_plPickerMargins[n.dataset.midx]=n.value;});
       el.innerHTML=_buildPLList(mult,this.value);
     });
     srch.focus();
   }
 }
 function _buildPLList(multiplier,q){
+  var globalMargin=Math.round((multiplier-1)*100);
   var sq=(q||'').toLowerCase().trim();
   var filtered=priceData.filter(function(r){
     if(!sq)return true;
@@ -7761,43 +7766,65 @@ function _buildPLList(multiplier,q){
   return filtered.map(function(r){
     var idx=priceData.indexOf(r);
     var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
-    var sell=isNaN(cost)||cost<=0?0:parseFloat((cost*multiplier).toFixed(2));
+    var savedMargin=_plPickerMargins[idx]!==undefined?_plPickerMargins[idx]:String(globalMargin);
+    var itemMargin=parseFloat(savedMargin)||0;
+    var sell=isNaN(cost)||cost<=0?0:parseFloat((cost*(1+itemMargin/100)).toFixed(2));
     var sellStr=sell>0?'$'+sell.toFixed(2):cost>0?'$'+cost.toFixed(2):'—';
+    var costStr=isNaN(cost)||cost<=0?'—':'$'+cost.toFixed(2);
     var uom=r._uom||'ea';
     var savedQty=_plPickerQtys[idx]||'';
     var hasSavedQty=savedQty&&parseFloat(savedQty)>0;
-    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r2);background:var(--bg3);border:1px solid '+(hasSavedQty?'var(--green)':'var(--border2)')+';margin-bottom:7px">'
+    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:var(--r2);background:var(--bg3);border:1px solid '+(hasSavedQty?'var(--green)':'var(--border2)')+';margin-bottom:7px">'
       +'<div style="flex:1;min-width:0">'
         +(r._code?'<div style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.4px;text-transform:uppercase">'+esc(r._code)+'</div>':'')
         +'<div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(r._desc||'—')+'</div>'
-        +'<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:1px">'+sellStr+(uom?' <span style="color:var(--sub);font-weight:500">/ '+esc(uom)+'</span>':'')+'</div>'
+        +'<div style="font-size:11px;color:var(--sub);margin-top:1px">Cost: '+costStr+(uom?' / '+esc(uom):'')+'</div>'
       +'</div>'
-      +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0">'
-        +'<div style="font-size:8px;font-weight:700;letter-spacing:.7px;color:var(--sub);text-transform:uppercase">Qty</div>'
+      +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;min-width:62px">'
+        +'<div style="font-size:7px;font-weight:700;letter-spacing:.5px;color:var(--sub);text-transform:uppercase">Margin</div>'
+        +'<div style="display:flex;align-items:center;gap:1px">'
+          +'<input type="number" inputmode="decimal" min="0" max="100" step="1"'
+            +' data-midx="'+idx+'" data-cost="'+cost+'"'
+            +' style="width:38px;padding:4px 0;background:var(--bg2);border:1.5px solid var(--border2);color:var(--text);border-radius:var(--r3);font-size:12px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield;-webkit-appearance:none"'
+            +' value="'+savedMargin+'"'
+            +' oninput="_plSellUpdate('+idx+','+cost+',this.value)">'
+          +'<span style="font-size:10px;color:var(--sub);font-weight:700">%</span>'
+        +'</div>'
+        +'<div id="pl-sp-'+idx+'" style="font-size:11px;color:var(--green);font-weight:800;margin-bottom:2px">'+sellStr+'</div>'
+        +'<div style="font-size:7px;font-weight:700;letter-spacing:.5px;color:var(--sub);text-transform:uppercase">Qty</div>'
         +'<input type="number" inputmode="decimal" min="0" step="any" placeholder="0"'
           +' data-pidx="'+idx+'"'
-          +' style="width:62px;padding:7px 0;background:var(--bg2);border:1.5px solid var(--border2);color:var(--text);border-radius:var(--r3);font-size:14px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield;-webkit-appearance:none;box-sizing:border-box"'
+          +' style="width:50px;padding:6px 0;background:var(--bg2);border:1.5px solid var(--border2);color:var(--text);border-radius:var(--r3);font-size:13px;font-weight:700;text-align:center;font-family:inherit;outline:none;-moz-appearance:textfield;-webkit-appearance:none"'
           +(savedQty?' value="'+savedQty+'"':'')
           +' oninput="_plPickerQtys[this.dataset.pidx]=this.value">'
       +'</div>'
     +'</div>';
   }).join('');
 }
+function _plSellUpdate(idx,cost,marginVal){
+  _plPickerMargins[idx]=String(marginVal);
+  var margin=parseFloat(marginVal)||0;
+  var sell=cost>0?parseFloat((cost*(1+margin/100)).toFixed(2)):0;
+  var el=document.getElementById('pl-sp-'+idx);
+  if(el)el.textContent=sell>0?'$'+sell.toFixed(2):(cost>0?'$'+cost.toFixed(2):'—');
+}
 function usePriceListItems(code){
   var overlay=document.getElementById('pl-picker-overlay');if(!overlay)return;
-  // Capture any unsaved qty inputs before reading _plPickerQtys
+  // Capture any unsaved qty + margin inputs before reading stored values
   overlay.querySelectorAll('input[data-pidx]').forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
+  overlay.querySelectorAll('input[data-midx]').forEach(function(n){_plPickerMargins[n.dataset.midx]=n.value;});
   var added=0;
   // Remove the default empty placeholder if it's the only item and truly empty
   if(_orderItems.length===1&&!_orderItems[0].item&&!_orderItems[0].qty&&!_orderItems[0].unitPrice)_orderItems=[];
+  var globalMarginEl=document.getElementById('pr-margin');
+  var globalMargin=parseFloat(globalMarginEl?globalMarginEl.value:35)||35;
   for(var pidx in _plPickerQtys){
     var qty=parseFloat(_plPickerQtys[pidx])||0;
     if(qty<=0)continue;
     var r=priceData[parseInt(pidx)];if(!r)continue;
-    var marginEl=document.getElementById('pr-margin');
-    var margin=parseFloat(marginEl?marginEl.value:35)||35;
+    var itemMargin=_plPickerMargins[pidx]!==undefined?parseFloat(_plPickerMargins[pidx])||0:globalMargin;
     var sell=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
-    sell=isNaN(sell)||sell<=0?0:parseFloat((sell*(1+margin/100)).toFixed(2));
+    sell=isNaN(sell)||sell<=0?0:parseFloat((sell*(1+itemMargin/100)).toFixed(2));
     var uom=r._uom||'ea';
     var itemLabel=r._code&&r._desc?r._code+' — '+r._desc:(r._desc||r._code||'Item');
     var lt=sell>0?parseFloat((qty*sell).toFixed(2)):0;
