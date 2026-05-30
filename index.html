@@ -11631,8 +11631,14 @@ function saveBizCardCustomer(){
 function showTab(p){var m={home:'dash',customers:'cust',groups:'grps',vendors:'vend',pricing:'price',settings:'set'};go(m[p]||p);}
 
 function _applyDemoData(){
-  // Hide real customers — only show the 85 fake imported ones (ST.addedCustomers)
-  CUSTOMERS_BASE=[];
+  // Identify real vs fake customers: real ones have codes in CUSTOMERS_BASE
+  var realCodes={};
+  for(var i=0;i<CUSTOMERS_BASE.length;i++)realCodes[CUSTOMERS_BASE[i].code]=true;
+  // Keep only the fake imported customers (codes not in CUSTOMERS_BASE)
+  var fakeCusts=(ST.addedCustomers||[]).filter(function(c){return !realCodes[c.code];});
+  // Back up full addedCustomers list so we can restore on clear
+  try{localStorage.setItem('hrt_demo_bk_ac',JSON.stringify(ST.addedCustomers||[]));}catch(e){}
+  ST.addedCustomers=fakeCusts;
   var now=Date.now(),td=new Date(now).toISOString();
   var d3=new Date(now-3*864e5).toISOString();
   var d7=new Date(now-7*864e5).toISOString();
@@ -11758,6 +11764,7 @@ function clearDemoData(){
     var bh=localStorage.getItem('hrt_demo_bk_hot');if(bh)ST.hot=JSON.parse(bh);
     var bc=localStorage.getItem('hrt_demo_bk_comp');if(bc)ST.competitors=JSON.parse(bc);
     var bf=localStorage.getItem('hrt_demo_bk_fu');if(bf)ST.followups=JSON.parse(bf);
+    var bac=localStorage.getItem('hrt_demo_bk_ac');if(bac)ST.addedCustomers=JSON.parse(bac);
   }catch(e){}
   localStorage.removeItem('hrt_demo');
   localStorage.removeItem('hrt_demo_bk_visits');
@@ -11766,6 +11773,7 @@ function clearDemoData(){
   localStorage.removeItem('hrt_demo_bk_hot');
   localStorage.removeItem('hrt_demo_bk_comp');
   localStorage.removeItem('hrt_demo_bk_fu');
+  localStorage.removeItem('hrt_demo_bk_ac');
   lSave();
   toast('Real data restored — reloading...');
   setTimeout(function(){location.reload();},800);
