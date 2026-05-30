@@ -886,6 +886,15 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
+    <div id="demo-mode-banner" style="display:none;background:rgba(255,176,32,.15);border:1px solid rgba(255,176,32,.4);border-radius:var(--r2);padding:10px 14px;margin-bottom:14px;align-items:center;justify-content:space-between;gap:10px">
+      <div><div style="font-size:12px;font-weight:800;color:var(--amber)">&#127916; DEMO MODE ACTIVE</div><div style="font-size:11px;color:var(--sub);margin-top:2px">Fake data loaded for screen recording</div></div>
+      <button onclick="clearDemoData()" style="background:rgba(255,77,106,.15);color:var(--red);border:1px solid rgba(255,77,106,.3);border-radius:var(--r2);padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">&#10005; Clear Demo</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">&#127916; Screen Recording</div>
+    <div style="margin-bottom:16px">
+      <button onclick="loadDemoData()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.35);color:var(--amber);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#127916; Load Demo Data for Recording</button>
+      <div style="font-size:11px;color:var(--dim);margin-top:6px;padding:0 2px">Loads a realistic fake territory for recording. Your real data is safe — tap Clear Demo when done.</div>
+    </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Quick Access</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
@@ -2929,6 +2938,15 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
+    <div id="demo-mode-banner" style="display:none;background:rgba(255,176,32,.15);border:1px solid rgba(255,176,32,.4);border-radius:var(--r2);padding:10px 14px;margin-bottom:14px;align-items:center;justify-content:space-between;gap:10px">
+      <div><div style="font-size:12px;font-weight:800;color:var(--amber)">&#127916; DEMO MODE ACTIVE</div><div style="font-size:11px;color:var(--sub);margin-top:2px">Fake data loaded for screen recording</div></div>
+      <button onclick="clearDemoData()" style="background:rgba(255,77,106,.15);color:var(--red);border:1px solid rgba(255,77,106,.3);border-radius:var(--r2);padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">&#10005; Clear Demo</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">&#127916; Screen Recording</div>
+    <div style="margin-bottom:16px">
+      <button onclick="loadDemoData()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.35);color:var(--amber);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#127916; Load Demo Data for Recording</button>
+      <div style="font-size:11px;color:var(--dim);margin-top:6px;padding:0 2px">Loads a realistic fake territory for recording. Your real data is safe — tap Clear Demo when done.</div>
+    </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Quick Access</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
@@ -11601,6 +11619,196 @@ function saveBizCardCustomer(){
   if(ov)ov.remove();
   toast('&#10003; '+name+' added as new customer!');
   rCust();
+}
+
+/* ── DEMO MODE ─────────────────────────────────────────────────────────────── */
+function loadDemoData(){
+  if(!confirm('Load demo data for screen recording?\n\nYour real data is NOT deleted — just hidden while demo is active. Tap "Clear Demo" in Settings when done.'))return;
+  var t=new Date(),td=t.toISOString();
+  var yd=new Date(t-864e5).toISOString();
+  var d3=new Date(t-3*864e5).toISOString();
+  var d7=new Date(t-7*864e5).toISOString();
+  var d14=new Date(t-14*864e5).toISOString();
+  var d50=new Date(t-50*864e5).toISOString();
+  var d60=new Date(t-60*864e5).toISOString();
+  var d90=new Date(t-90*864e5).toISOString();
+  var fu3=new Date(t+3*864e5).toISOString();
+  var fu7=new Date(t+7*864e5).toISOString();
+
+  // Save real data snapshot key so we can restore on clear
+  localStorage.setItem('hrt_demo_mode','1');
+  try{localStorage.setItem('hrt_demo_real_ST',JSON.stringify(ST));}catch(e){}
+  try{localStorage.setItem('hrt_demo_real_CB',JSON.stringify(CUSTOMERS_BASE));}catch(e){}
+
+  // Override base customers to empty — demo customers come from ST.addedCustomers
+  CUSTOMERS_BASE=[];
+
+  ST.addedCustomers=[
+    {code:'PCL001',name:'Pacific Coast Lumber',address:'1201 Harbor Blvd',city:'Anaheim',state:'CA',zip:'92801',phone:'714-555-0101',email:'orders@paccoastlumber.com',group:1,tier:'A',lifetimeSales:148000,sales2024:38500,sales2025:43200,sales2526:19800,_isDemo:true},
+    {code:'WSB002',name:'Westside Building Supply',address:'8840 Venice Blvd',city:'Los Angeles',state:'CA',zip:'90034',phone:'310-555-0202',email:'purchasing@westsidebuild.com',group:1,tier:'A',lifetimeSales:92000,sales2024:24000,sales2025:28500,sales2526:12100,_isDemo:true},
+    {code:'SCD003',name:'SoCal Contractors Depot',address:'3300 Long Beach Blvd',city:'Lynwood',state:'CA',zip:'90262',phone:'323-555-0303',email:'info@socalcontractors.com',group:1,tier:'B',lifetimeSales:54000,sales2024:14200,sales2025:16800,sales2526:7200,_isDemo:true},
+    {code:'DVM004',name:'Desert Valley Millwork',address:'74100 Country Club Dr',city:'Palm Desert',state:'CA',zip:'92260',phone:'760-555-0404',email:'orders@dvmillwork.com',group:2,tier:'A',lifetimeSales:67000,sales2024:17500,sales2025:19200,sales2526:8800,_isDemo:true},
+    {code:'IEW005',name:'Inland Empire Woodworks',address:'1845 Third St',city:'Norco',state:'CA',zip:'92860',phone:'951-555-0505',email:'purchasing@iewoodworks.com',group:2,tier:'B',lifetimeSales:38000,sales2024:9800,sales2025:11200,sales2526:4100,_isDemo:true},
+    {code:'HDL006',name:'High Desert Lumber',address:'44250 Sierra Hwy',city:'Lancaster',state:'CA',zip:'93534',phone:'661-555-0606',email:'sales@highdesertlumber.com',group:2,tier:'B',lifetimeSales:29000,sales2024:7200,sales2025:8600,sales2526:2100,_isDemo:true},
+    {code:'SDL007',name:'San Diego Lumber Co',address:'6120 Friars Rd',city:'San Diego',state:'CA',zip:'92108',phone:'619-555-0707',email:'orders@sdlumberco.com',group:3,tier:'A',lifetimeSales:112000,sales2024:29800,sales2025:34100,sales2526:15500,_isDemo:true},
+    {code:'OCB008',name:'OC Building Materials',address:'2250 S Anaheim Blvd',city:'Anaheim',state:'CA',zip:'92805',phone:'714-555-0808',email:'purchasing@ocbuild.com',group:3,tier:'B',lifetimeSales:44000,sales2024:11200,sales2025:13400,sales2526:5900,_isDemo:true},
+    {code:'TBC009',name:'Torrance Building Center',address:'19200 Hawthorne Blvd',city:'Torrance',state:'CA',zip:'90503',phone:'310-555-0909',email:'orders@torrancebuild.com',group:3,tier:'B',lifetimeSales:31000,sales2024:8100,sales2025:9400,sales2526:1200,_isDemo:true},
+    {code:'VFS010',name:'Valley Frame & Supply',address:'12800 Van Nuys Blvd',city:'Pacoima',state:'CA',zip:'91331',phone:'818-555-1010',email:'orders@valleyframe.com',group:4,tier:'A',lifetimeSales:88000,sales2024:22000,sales2025:26500,sales2526:11800,_isDemo:true},
+    {code:'RWP011',name:'Riverside Wood Products',address:'3600 University Ave',city:'Riverside',state:'CA',zip:'92501',phone:'951-555-1111',email:'purchasing@rwproducts.com',group:4,tier:'B',lifetimeSales:52000,sales2024:13500,sales2025:15800,sales2526:6700,_isDemo:true},
+    {code:'LBM012',name:'Long Beach Millwork',address:'2401 E Pacific Coast Hwy',city:'Long Beach',state:'CA',zip:'90804',phone:'562-555-1212',email:'sales@lbmillwork.com',group:4,tier:'B',lifetimeSales:41000,sales2024:10200,sales2025:12100,sales2526:5100,_isDemo:true},
+    {code:'BAK013',name:'Bakersfield Building Co',address:'5800 District Blvd',city:'Bakersfield',state:'CA',zip:'93313',phone:'661-555-1313',email:'orders@bakersfieldbuilding.com',group:4,tier:'A',lifetimeSales:76000,sales2024:19800,sales2025:23400,sales2526:10200,_isDemo:true},
+    {code:'SBB014',name:'South Bay Building Supply',address:'1600 Artesia Blvd',city:'Torrance',state:'CA',zip:'90504',phone:'310-555-1414',email:'info@southbaybuild.com',group:3,tier:'C',lifetimeSales:18000,sales2024:4200,sales2025:5100,sales2526:1800,_isDemo:true},
+    {code:'RHL015',name:'Rancho Hardware & Lumber',address:'9200 Milliken Ave',city:'Rancho Cucamonga',state:'CA',zip:'91730',phone:'909-555-1515',email:'orders@ranchohardware.com',group:2,tier:'C',lifetimeSales:22000,sales2024:5400,sales2025:6200,sales2526:800,_isDemo:true}
+  ];
+
+  // Visits — today: 4 visited, 2 not avail; older: realistic mix
+  ST.visits={
+    'PCL001':[{type:'visited',date:d60,note:'Reviewed Q1 pricing'},{type:'visited',date:d14,note:'Dropped White Oak samples'},{type:'visited',date:td,note:''}],
+    'WSB002':[{type:'visited',date:d50,note:''},{type:'not_in',date:d7,note:'Out of office'},{type:'visited',date:td,note:''}],
+    'SCD003':[{type:'visited',date:d90,note:''}],
+    'DVM004':[{type:'visited',date:d14,note:'Interested in 5/4 walnut pricing'},{type:'not_in',date:td,note:''}],
+    'IEW005':[{type:'visited',date:d3,note:'Pricing inquiry — will follow up with quote'},{type:'visited',date:td,note:''}],
+    'HDL006':[{type:'visited',date:d90,note:''}],
+    'SDL007':[{type:'visited',date:d60,note:''},{type:'visited',date:d7,note:''}],
+    'OCB008':[{type:'visited',date:d50,note:''}],
+    'TBC009':[{type:'visited',date:d90,note:''}],
+    'VFS010':[{type:'visited',date:d7,note:''},{type:'not_in',date:td,note:''}],
+    'RWP011':[{type:'visited',date:d14,note:''}],
+    'LBM012':[{type:'visited',date:d60,note:''}],
+    'BAK013':[{type:'visited',date:d3,note:''},{type:'visited',date:td,note:''}],
+    'SBB014':[{type:'visited',date:d90,note:''}],
+    'RHL015':[]
+  };
+
+  // Orders
+  ST.orders={
+    'BAK013':[{date:td,item:'3/4 particle board (22 ea @ $33.72/ea = $741.84)',amount:742,note:'PO #4521',items:[{item:'PB3448 — 3/4 48X96 Birch B2 Plywood',qty:22,unit:'ea',unitPrice:33.72,lineTotal:741.84}]}],
+    'VFS010':[{date:td,item:'4/4 SEL/BTR Walnut 15/16 9-10 FT (38 BF @ $15.65/BF = $594.70)',amount:595,note:'Will call pickup Friday',items:[{item:'WD4421-10 — 4/4 SEL/BTR Walnut',qty:38,unit:'BF',unitPrice:15.65,lineTotal:594.70}]}],
+    'PCL001':[{date:d7,item:'4/4 FAS White Oak 15/16 7-8 FT (55 BF @ $12.49/BF)',amount:687,note:'',items:[{item:'WD4416-8 — 4/4 FAS White Oak',qty:55,unit:'BF',unitPrice:12.49,lineTotal:686.95}]},{date:td,item:'5/4 FAS White Oak 1-3/16 9-10 FT (40 BF @ $15.41/BF)',amount:616,note:'PO #3847',items:[{item:'WD5416-10 — 5/4 FAS White Oak',qty:40,unit:'BF',unitPrice:15.41,lineTotal:616.40}]}],
+    'SDL007':[{date:d7,item:'3/4 Baltic Birch BB/BB (18 ea @ $93.56/ea)',amount:1684,note:'Large cabinet order',items:[{item:'PB3448BB — 3/4 48X96 Baltic Birch',qty:18,unit:'ea',unitPrice:93.56,lineTotal:1684.08}]}],
+    'IEW005':[{date:d3,item:'4/4 FAS Hard Maple 15/16 9-10 FT (60 BF @ $5.22/BF)',amount:313,note:'',items:[{item:'WD4415-10 — 4/4 SEL/BTR Hard Maple',qty:60,unit:'BF',unitPrice:5.22,lineTotal:313.2}]}]
+  };
+
+  // Notes
+  ST.notes={
+    'PCL001':'Key account — prefers White Oak and Baltic Birch. Ask about mill direct pricing on next visit. Contact is Mike Torres.',
+    'DVM004':'Switching from competitor — price sensitive on walnut. Send updated price sheet by Friday.',
+    'IEW005':'Pricing inquiry — will follow up with quote. Needs 5/4 walnut and hard maple regularly. Hot prospect.',
+    'SDL007':'Largest cabinet shop in San Diego. Order monthly. Keep stocked on Baltic Birch.',
+    'BAK013':'Growing fast — doubled orders YTD. Ask about dedicated stock program.',
+    'TBC009':'Account going quiet — used to order $9k/year, nothing since January. Needs a visit.'
+  };
+
+  // Hot leads
+  ST.hot={'IEW005':true,'DVM004':true};
+
+  // Competitors
+  ST.competitors={
+    'SCD003':'Pacific Woodworking',
+    'HDL006':'Home Depot Pro',
+    'TBC009':'Pacific Woodworking',
+    'SBB014':'84 Lumber'
+  };
+
+  // Follow-ups
+  ST.followups={
+    'DVM004':[{date:fu3,note:'Send updated walnut price sheet',done:false}],
+    'IEW005':[{date:fu3,note:'Follow up on quote — 5/4 walnut + hard maple',done:false}],
+    'TBC009':[{date:fu7,note:'Re-engage — account going quiet',done:false}],
+    'RHL015':[{date:fu7,note:'First visit — intro call',done:false}]
+  };
+
+  // Tags
+  ST.tags={
+    'PCL001':['key-account','white-oak'],
+    'SDL007':['key-account','cabinets'],
+    'BAK013':['growing','high-potential'],
+    'IEW005':['hot-prospect'],
+    'DVM004':['hot-prospect','price-sensitive']
+  };
+
+  // Demo price list
+  priceData=[
+    {_code:'WD4416-8',_desc:'4/4 FAS White Oak 15/16" 7-8 FT',_uom:'BF',_cost:'6.85'},
+    {_code:'WD4416-10',_desc:'4/4 FAS White Oak 15/16" 9-10 FT',_uom:'BF',_cost:'7.20'},
+    {_code:'WD5416-10',_desc:'5/4 FAS White Oak 1-3/16" 9-10 FT',_uom:'BF',_cost:'8.45'},
+    {_code:'WD4421-8',_desc:'4/4 SEL/BTR Walnut 15/16" 7-8 FT',_uom:'BF',_cost:'10.25'},
+    {_code:'WD4421-10',_desc:'4/4 SEL/BTR Walnut 15/16" 9-10 FT',_uom:'BF',_cost:'11.00'},
+    {_code:'WD8421-10',_desc:'8/4 FAS Walnut 1-15/16" 9-10 FT',_uom:'BF',_cost:'12.75'},
+    {_code:'WD4415-8',_desc:'4/4 SEL/BTR Hard Maple 15/16" 7-8 FT',_uom:'BF',_cost:'3.20'},
+    {_code:'WD4415-10',_desc:'4/4 SEL/BTR Hard Maple 15/16" 9-10 FT',_uom:'BF',_cost:'3.45'},
+    {_code:'WD8415-10',_desc:'8/4 FAS Hard Maple 1-15/16" 9-10 FT',_uom:'BF',_cost:'5.80'},
+    {_code:'WD4412-10',_desc:'4/4 FAS Cherry 15/16" 9-10 FT',_uom:'BF',_cost:'4.60'},
+    {_code:'WD4418-8',_desc:'4/4 Superior Alder 15/16" 7-8 FT',_uom:'BF',_cost:'2.85'},
+    {_code:'WD4418-10',_desc:'4/4 Superior Alder 15/16" 9-10 FT',_uom:'BF',_cost:'3.10'},
+    {_code:'WD4413-10',_desc:'4/4 FAS Poplar 15/16" 9-10 FT',_uom:'BF',_cost:'2.00'},
+    {_code:'WD4411-8',_desc:'4/4 FAS Ash 15/16" 7-8 FT',_uom:'BF',_cost:'3.75'},
+    {_code:'WD4411-10',_desc:'4/4 FAS Ash 15/16" 9-10 FT',_uom:'BF',_cost:'4.00'},
+    {_code:'WD4420-8',_desc:'4/4 FAS Soft Maple 15/16" 7-8 FT',_uom:'BF',_cost:'2.95'},
+    {_code:'WD4420-10',_desc:'4/4 SEL/BTR Soft Maple 15/16" 9-10 FT',_uom:'BF',_cost:'3.15'},
+    {_code:'WD4419-10',_desc:'4/4 SEL/BTR Hickory 15/16" 9-10 FT',_uom:'BF',_cost:'3.50'},
+    {_code:'PB3448',_desc:'3/4 48X96 Birch B2 Plywood CARB2',_uom:'EA',_cost:'52.40'},
+    {_code:'PB3448BB',_desc:'3/4 48X96 Baltic Birch BB/BB CARB2',_uom:'EA',_cost:'61.75'},
+    {_code:'PB1448',_desc:'1/4 48X96 Birch MDF Core',_uom:'EA',_cost:'28.90'},
+    {_code:'PB1248',_desc:'12MM 48X96 Birch BB/BB CARB2',_uom:'EA',_cost:'38.50'},
+    {_code:'PL3448WO',_desc:'3/4 48X96 White Oak Veneer Rotary',_uom:'EA',_cost:'84.00'},
+    {_code:'PL1448WO',_desc:'1/4 48X96 White Oak Veneer Panel 2S',_uom:'EA',_cost:'42.50'},
+    {_code:'MD3448',_desc:'3/4 49X97 MDF ULEF NAF',_uom:'EA',_cost:'31.80'},
+    {_code:'MD1448',_desc:'1/4 49X97 MDF ULEF NAF',_uom:'EA',_cost:'14.40'},
+    {_code:'LB2X4-8',_desc:'2X4 8\' DF STD & BTR S4S',_uom:'EA',_cost:'5.60'},
+    {_code:'LB2X4-10',_desc:'2X4 10\' DF STD & BTR S4S',_uom:'EA',_cost:'6.90'},
+    {_code:'LB2X6-8',_desc:'2X6 8\' DF STD & BTR S4S',_uom:'EA',_cost:'7.40'},
+    {_code:'LB2X6-10',_desc:'2X6 10\' DF STD & BTR S4S',_uom:'EA',_cost:'9.20'},
+    {_code:'PL3448CD',_desc:'23/32 48X96 CD EXT Plywood',_uom:'EA',_cost:'32.50'},
+    {_code:'PL3448AC',_desc:'3/4 48X96 AC INT Plywood Sanded',_uom:'EA',_cost:'44.80'},
+    {_code:'CM34',_desc:'3/4" Crown Moulding S4S 16 FT',_uom:'LF',_cost:'1.85'},
+    {_code:'HB1448',_desc:'1/8 48X96 Standard Hardboard',_uom:'EA',_cost:'9.20'},
+    {_code:'BB5X5-9',_desc:'9MM 60X60 Baltic Birch BB/BB CARB2',_uom:'EA',_cost:'44.20'},
+    {_code:'BB5X5-12',_desc:'12MM 60X60 Baltic Birch BB/BB CARB2',_uom:'EA',_cost:'58.90'}
+  ];
+  savePricing();
+
+  lSave();
+
+  // Show demo banner
+  var banners=document.querySelectorAll('#demo-mode-banner');
+  banners.forEach(function(b){b.style.display='flex';});
+
+  // Re-render all views
+  try{rDash();}catch(e){}
+  try{rCust();}catch(e){}
+  try{rGrps();}catch(e){}
+  try{rRoute();}catch(e){}
+  try{rPrice();}catch(e){}
+
+  // Navigate to home to show the loaded dashboard
+  showTab('home');
+  toast('Demo loaded — 15 accounts, active sales day ready to record');
+}
+
+function clearDemoData(){
+  if(!confirm('Clear demo data and restore your real account?'))return;
+
+  // Restore real ST
+  try{
+    var realST=localStorage.getItem('hrt_demo_real_ST');
+    if(realST)ST=JSON.parse(realST);
+  }catch(e){}
+
+  // Restore real CUSTOMERS_BASE
+  try{
+    var realCB=localStorage.getItem('hrt_demo_real_CB');
+    if(realCB)CUSTOMERS_BASE=JSON.parse(realCB);
+  }catch(e){}
+
+  localStorage.removeItem('hrt_demo_mode');
+  localStorage.removeItem('hrt_demo_real_ST');
+  localStorage.removeItem('hrt_demo_real_CB');
+
+  lSave();
+
+  toast('Demo cleared — reloading...');
+  setTimeout(function(){location.reload();},1000);
 }
 
 function initApp(){
