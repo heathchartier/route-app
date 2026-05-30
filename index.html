@@ -11631,7 +11631,8 @@ function saveBizCardCustomer(){
 function showTab(p){var m={home:'dash',customers:'cust',groups:'grps',vendors:'vend',pricing:'price',settings:'set'};go(m[p]||p);}
 
 function _applyDemoData(){
-  // Use existing customers — just layer activity on top of whoever is already there
+  // Hide real customers — only show the 85 fake imported ones (ST.addedCustomers)
+  CUSTOMERS_BASE=[];
   var now=Date.now(),td=new Date(now).toISOString();
   var d3=new Date(now-3*864e5).toISOString();
   var d7=new Date(now-7*864e5).toISOString();
@@ -11727,22 +11728,47 @@ function _applyDemoData(){
 }
 
 function loadDemoData(){
-  if(!confirm('Load demo data for screen recording?\n\nYour real data is safe — tap Clear Demo in Settings when done.'))return;
+  if(!confirm('Load demo data for screen recording?\n\nYour real customer data is backed up and fully restored when you tap Clear Demo.'))return;
   try{
+    // Back up real activity before overwriting
+    localStorage.setItem('hrt_demo_bk_visits',JSON.stringify(ST.visits||{}));
+    localStorage.setItem('hrt_demo_bk_orders',JSON.stringify(ST.orders||{}));
+    localStorage.setItem('hrt_demo_bk_notes',JSON.stringify(ST.notes||{}));
+    localStorage.setItem('hrt_demo_bk_hot',JSON.stringify(ST.hot||{}));
+    localStorage.setItem('hrt_demo_bk_comp',JSON.stringify(ST.competitors||{}));
+    localStorage.setItem('hrt_demo_bk_fu',JSON.stringify(ST.followups||{}));
     localStorage.setItem('hrt_demo','1');
     _applyDemoData();
     var dmb=document.getElementById('demo-mode-banner');
     if(dmb)dmb.style.display='flex';
     go('dash');
-    setTimeout(function(){toast('Demo active — 15 fake accounts loaded');},300);
+    setTimeout(function(){toast('Demo active — 85 fake accounts, real data backed up');},300);
   }catch(err){
+    localStorage.removeItem('hrt_demo');
     alert('Demo load error: '+err.message);
   }
 }
 function clearDemoData(){
   if(!confirm('Clear demo data and restore your real account?'))return;
+  // Restore real activity data
+  try{
+    var bv=localStorage.getItem('hrt_demo_bk_visits');if(bv)ST.visits=JSON.parse(bv);
+    var bo=localStorage.getItem('hrt_demo_bk_orders');if(bo)ST.orders=JSON.parse(bo);
+    var bn=localStorage.getItem('hrt_demo_bk_notes');if(bn)ST.notes=JSON.parse(bn);
+    var bh=localStorage.getItem('hrt_demo_bk_hot');if(bh)ST.hot=JSON.parse(bh);
+    var bc=localStorage.getItem('hrt_demo_bk_comp');if(bc)ST.competitors=JSON.parse(bc);
+    var bf=localStorage.getItem('hrt_demo_bk_fu');if(bf)ST.followups=JSON.parse(bf);
+  }catch(e){}
   localStorage.removeItem('hrt_demo');
-  location.reload();
+  localStorage.removeItem('hrt_demo_bk_visits');
+  localStorage.removeItem('hrt_demo_bk_orders');
+  localStorage.removeItem('hrt_demo_bk_notes');
+  localStorage.removeItem('hrt_demo_bk_hot');
+  localStorage.removeItem('hrt_demo_bk_comp');
+  localStorage.removeItem('hrt_demo_bk_fu');
+  lSave();
+  toast('Real data restored — reloading...');
+  setTimeout(function(){location.reload();},800);
 }
 
 function initApp(){
