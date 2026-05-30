@@ -11774,15 +11774,8 @@ function loadDemoData(){
   var banners=document.querySelectorAll('#demo-mode-banner');
   banners.forEach(function(b){b.style.display='flex';});
 
-  // Re-render all views
-  try{rDash();}catch(e){}
-  try{rCust();}catch(e){}
-  try{rGrps();}catch(e){}
-  try{rRoute();}catch(e){}
-  try{rPrice();}catch(e){}
-
-  // Navigate to home to show the loaded dashboard
-  showTab('home');
+  // Navigate to dashboard — go() handles rendering
+  go('dash');
   toast('Demo loaded — 15 accounts, active sales day ready to record');
 }
 
