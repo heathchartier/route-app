@@ -11689,11 +11689,11 @@ function _applyDemoData(){
   if(c(5))ST.competitors[c(5)]='Home Depot Pro';
   if(c(8))ST.competitors[c(8)]='Pacific Woodworking';
 
-  // Follow-ups
+  // Follow-ups — stored as plain ISO date strings
   ST.followups={};
-  if(c(3))ST.followups[c(3)]=[{date:fu3,note:'Send updated walnut price sheet',done:false}];
-  if(c(4))ST.followups[c(4)]=[{date:fu3,note:'Follow up on walnut + hard maple quote',done:false}];
-  if(c(8))ST.followups[c(8)]=[{date:fu7,note:'Re-engage — account going quiet',done:false}];
+  if(c(3))ST.followups[c(3)]=fu3;
+  if(c(4))ST.followups[c(4)]=fu3;
+  if(c(8))ST.followups[c(8)]=fu7;
 
   priceData=[
     {_code:'WD4416-8',_desc:'4/4 FAS White Oak 15/16" 7-8 FT',_uom:'BF',_cost:'6.85'},
