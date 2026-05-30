@@ -7842,6 +7842,76 @@ function usePriceListItems(code){
   }
 }
 
+/* ── PRICE LIST PICKER — QUOTE MODE ── */
+function openPLPickerQuote(){
+  if(!priceData.length){toast('No price list loaded — go to Pricing tab and upload your CSV first');return;}
+  _plPickerQtys={};
+  _plPickerMargins={};
+  var picker=document.createElement('div');
+  picker.id='pl-picker-overlay';
+  picker.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:6000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  document.body.appendChild(picker);
+  _renderPLPickerQuote();
+}
+function _renderPLPickerQuote(){
+  var picker=document.getElementById('pl-picker-overlay');if(!picker)return;
+  var marginEl=document.getElementById('pr-margin');
+  var margin=parseFloat(marginEl?marginEl.value:35)||35;
+  var multiplier=1+margin/100;
+  picker.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;display:flex;flex-direction:column;box-sizing:border-box">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px"></div>'
+   +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+     +'<div style="font-size:17px;font-weight:800">&#128203; Price List</div>'
+     +'<button onclick="document.getElementById(\'pl-picker-overlay\').remove()" style="background:transparent;border:none;color:var(--sub);font-size:24px;cursor:pointer;padding:0;line-height:1">&#215;</button>'
+   +'</div>'
+   +'<input id="pl-picker-srch" type="text" placeholder="Search code or description..." style="width:100%;padding:9px 12px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;box-sizing:border-box;margin-bottom:10px;outline:none">'
+   +'<div id="pl-picker-list" style="flex:1;overflow-y:auto;min-height:0;margin-bottom:12px">'
+     +_buildPLList(multiplier,'')
+   +'</div>'
+   +'<button onclick="usePLItemsForQuote()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;flex-shrink:0">Add to Quote</button>'
+   +'</div>';
+  var srch=document.getElementById('pl-picker-srch');
+  if(srch){
+    srch.addEventListener('input',function(){
+      var el=document.getElementById('pl-picker-list');if(!el)return;
+      var mEl=document.getElementById('pr-margin');
+      var mult=1+(parseFloat(mEl?mEl.value:35)||35)/100;
+      var ins=document.querySelectorAll('#pl-picker-list input[data-pidx]');
+      ins.forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
+      var mins=document.querySelectorAll('#pl-picker-list input[data-midx]');
+      mins.forEach(function(n){_plPickerMargins[n.dataset.midx]=n.value;});
+      el.innerHTML=_buildPLList(mult,this.value);
+    });
+    srch.focus();
+  }
+}
+function usePLItemsForQuote(){
+  var overlay=document.getElementById('pl-picker-overlay');if(!overlay)return;
+  overlay.querySelectorAll('input[data-pidx]').forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
+  overlay.querySelectorAll('input[data-midx]').forEach(function(n){_plPickerMargins[n.dataset.midx]=n.value;});
+  var globalMarginEl=document.getElementById('pr-margin');
+  var globalMargin=parseFloat(globalMarginEl?globalMarginEl.value:35)||35;
+  var added=0;
+  // Remove empty placeholder row if present
+  if(_qItems.length===1&&!_qItems[0].name&&!_qItems[0].price)_qItems=[];
+  for(var pidx in _plPickerQtys){
+    var qty=parseFloat(_plPickerQtys[pidx])||0;
+    if(qty<=0)continue;
+    var r=priceData[parseInt(pidx)];if(!r)continue;
+    var itemMargin=_plPickerMargins[pidx]!==undefined?parseFloat(_plPickerMargins[pidx])||0:globalMargin;
+    var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
+    var sell=isNaN(cost)||cost<=0?0:parseFloat((cost*(1+itemMargin/100)).toFixed(2));
+    var itemLabel=r._code&&r._desc?r._code+' — '+r._desc:(r._desc||r._code||'Item');
+    _qItems.push({name:itemLabel,qty:qty,price:sell});
+    added++;
+  }
+  overlay.remove();
+  if(!_qItems.length)_qItems=[{name:'',qty:1,price:0}];
+  _renderQRows();
+  if(added>0)toast(added+' item'+(added>1?'s':'')+' added to quote');
+  else toast('Enter a qty to add items');
+}
+
 /* ── BIRTHDAY / ANNIVERSARY ALERTS ── */
 function daysUntilDate(targetMM,targetDD){
   var now=new Date();
@@ -9437,7 +9507,10 @@ function showQuoteBuilder(code){
   var sh=document.createElement('div');sh.id='quote-builder';
   sh.style.cssText='position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end';
   sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;margin:0 auto;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch">'
-    +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">&#128203; New Quote</div>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+      +'<div style="font-size:17px;font-weight:800">&#128203; New Quote</div>'
+      +(priceData.length?'<button onclick="openPLPickerQuote()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:12px;font-weight:700;padding:7px 11px;border-radius:var(--r2);cursor:pointer;font-family:inherit">&#128203; Price List</button>':'')
+    +'</div>'
     +'<div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Customer</div>'
     +'<div onclick="showQCustPicker()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:11px 12px;margin-bottom:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">'
     +'<span id="qb-cust-name" style="font-size:14px;font-weight:600;color:'+(_qCode?'var(--text)':'var(--sub)')+'">'+esc(custName)+'</span>'
