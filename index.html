@@ -11631,6 +11631,7 @@ function saveBizCardCustomer(){
 function showTab(p){var m={home:'dash',customers:'cust',groups:'grps',vendors:'vend',pricing:'price',settings:'set'};go(m[p]||p);}
 
 function _applyDemoData(){
+  // Use existing customers — just layer activity on top of whoever is already there
   var now=Date.now(),td=new Date(now).toISOString();
   var d3=new Date(now-3*864e5).toISOString();
   var d7=new Date(now-7*864e5).toISOString();
@@ -11640,58 +11641,60 @@ function _applyDemoData(){
   var d90=new Date(now-90*864e5).toISOString();
   var fu3=new Date(now+3*864e5).toISOString();
   var fu7=new Date(now+7*864e5).toISOString();
-  CUSTOMERS_BASE=[];
-  ST.addedCustomers=[
-    {code:'PCL001',name:'Pacific Coast Lumber',address:'1201 Harbor Blvd',city:'Anaheim',state:'CA',zip:'92801',phone:'714-555-0101',email:'orders@paccoastlumber.com',group:1,tier:'A',lifetimeSales:148000,sales2024:38500,sales2025:43200,sales2526:19800,_isDemo:true},
-    {code:'WSB002',name:'Westside Building Supply',address:'8840 Venice Blvd',city:'Los Angeles',state:'CA',zip:'90034',phone:'310-555-0202',email:'purchasing@westsidebuild.com',group:1,tier:'A',lifetimeSales:92000,sales2024:24000,sales2025:28500,sales2526:12100,_isDemo:true},
-    {code:'SCD003',name:'SoCal Contractors Depot',address:'3300 Long Beach Blvd',city:'Lynwood',state:'CA',zip:'90262',phone:'323-555-0303',email:'info@socalcontractors.com',group:1,tier:'B',lifetimeSales:54000,sales2024:14200,sales2025:16800,sales2526:7200,_isDemo:true},
-    {code:'DVM004',name:'Desert Valley Millwork',address:'74100 Country Club Dr',city:'Palm Desert',state:'CA',zip:'92260',phone:'760-555-0404',email:'orders@dvmillwork.com',group:2,tier:'A',lifetimeSales:67000,sales2024:17500,sales2025:19200,sales2526:8800,_isDemo:true},
-    {code:'IEW005',name:'Inland Empire Woodworks',address:'1845 Third St',city:'Norco',state:'CA',zip:'92860',phone:'951-555-0505',email:'purchasing@iewoodworks.com',group:2,tier:'B',lifetimeSales:38000,sales2024:9800,sales2025:11200,sales2526:4100,_isDemo:true},
-    {code:'HDL006',name:'High Desert Lumber',address:'44250 Sierra Hwy',city:'Lancaster',state:'CA',zip:'93534',phone:'661-555-0606',email:'sales@highdesertlumber.com',group:2,tier:'B',lifetimeSales:29000,sales2024:7200,sales2025:8600,sales2526:2100,_isDemo:true},
-    {code:'SDL007',name:'San Diego Lumber Co',address:'6120 Friars Rd',city:'San Diego',state:'CA',zip:'92108',phone:'619-555-0707',email:'orders@sdlumberco.com',group:3,tier:'A',lifetimeSales:112000,sales2024:29800,sales2025:34100,sales2526:15500,_isDemo:true},
-    {code:'OCB008',name:'OC Building Materials',address:'2250 S Anaheim Blvd',city:'Anaheim',state:'CA',zip:'92805',phone:'714-555-0808',email:'purchasing@ocbuild.com',group:3,tier:'B',lifetimeSales:44000,sales2024:11200,sales2025:13400,sales2526:5900,_isDemo:true},
-    {code:'TBC009',name:'Torrance Building Center',address:'19200 Hawthorne Blvd',city:'Torrance',state:'CA',zip:'90503',phone:'310-555-0909',email:'orders@torrancebuild.com',group:3,tier:'B',lifetimeSales:31000,sales2024:8100,sales2025:9400,sales2526:1200,_isDemo:true},
-    {code:'VFS010',name:'Valley Frame & Supply',address:'12800 Van Nuys Blvd',city:'Pacoima',state:'CA',zip:'91331',phone:'818-555-1010',email:'orders@valleyframe.com',group:4,tier:'A',lifetimeSales:88000,sales2024:22000,sales2025:26500,sales2526:11800,_isDemo:true},
-    {code:'RWP011',name:'Riverside Wood Products',address:'3600 University Ave',city:'Riverside',state:'CA',zip:'92501',phone:'951-555-1111',email:'purchasing@rwproducts.com',group:4,tier:'B',lifetimeSales:52000,sales2024:13500,sales2025:15800,sales2526:6700,_isDemo:true},
-    {code:'LBM012',name:'Long Beach Millwork',address:'2401 E Pacific Coast Hwy',city:'Long Beach',state:'CA',zip:'90804',phone:'562-555-1212',email:'sales@lbmillwork.com',group:4,tier:'B',lifetimeSales:41000,sales2024:10200,sales2025:12100,sales2526:5100,_isDemo:true},
-    {code:'BAK013',name:'Bakersfield Building Co',address:'5800 District Blvd',city:'Bakersfield',state:'CA',zip:'93313',phone:'661-555-1313',email:'orders@bakersfieldbuilding.com',group:4,tier:'A',lifetimeSales:76000,sales2024:19800,sales2025:23400,sales2526:10200,_isDemo:true},
-    {code:'SBB014',name:'South Bay Building Supply',address:'1600 Artesia Blvd',city:'Torrance',state:'CA',zip:'90504',phone:'310-555-1414',email:'info@southbaybuild.com',group:3,tier:'C',lifetimeSales:18000,sales2024:4200,sales2025:5100,sales2526:1800,_isDemo:true},
-    {code:'RHL015',name:'Rancho Hardware & Lumber',address:'9200 Milliken Ave',city:'Rancho Cucamonga',state:'CA',zip:'91730',phone:'909-555-1515',email:'orders@ranchohardware.com',group:2,tier:'C',lifetimeSales:22000,sales2024:5400,sales2025:6200,sales2526:800,_isDemo:true}
-  ];
-  ST.visits={
-    'PCL001':[{type:'visited',date:d60,note:'Reviewed Q1 pricing'},{type:'visited',date:d14,note:'Dropped White Oak samples'},{type:'visited',date:td,note:''}],
-    'WSB002':[{type:'visited',date:d50,note:''},{type:'not_in',date:d7,note:'Out of office'},{type:'visited',date:td,note:''}],
-    'SCD003':[{type:'visited',date:d90,note:''}],
-    'DVM004':[{type:'visited',date:d14,note:'Interested in 5/4 walnut'},{type:'not_in',date:td,note:''}],
-    'IEW005':[{type:'visited',date:d3,note:'Pricing inquiry — will follow up with quote'},{type:'visited',date:td,note:''}],
-    'HDL006':[{type:'visited',date:d90,note:''}],
-    'SDL007':[{type:'visited',date:d60,note:''},{type:'visited',date:d7,note:''}],
-    'OCB008':[{type:'visited',date:d50,note:''}],
-    'TBC009':[{type:'visited',date:d90,note:''}],
-    'VFS010':[{type:'visited',date:d7,note:''},{type:'not_in',date:td,note:''}],
-    'RWP011':[{type:'visited',date:d14,note:''}],
-    'LBM012':[{type:'visited',date:d60,note:''}],
-    'BAK013':[{type:'visited',date:d3,note:''},{type:'visited',date:td,note:''}],
-    'SBB014':[{type:'visited',date:d90,note:''}],
-    'RHL015':[]
-  };
-  ST.orders={
-    'BAK013':[{date:td,item:'3/4 particle board (22 ea @ $33.72/ea)',amount:742,note:'PO #4521',items:[{item:'PB3448 — 3/4 48X96 Birch Plywood',qty:22,unit:'ea',unitPrice:33.72,lineTotal:741.84}]}],
-    'VFS010':[{date:td,item:'4/4 SEL/BTR Walnut 9-10 FT (38 BF @ $15.65/BF)',amount:595,note:'Will call pickup Friday',items:[{item:'WD4421-10 — 4/4 SEL/BTR Walnut',qty:38,unit:'BF',unitPrice:15.65,lineTotal:594.70}]}],
-    'PCL001':[{date:td,item:'5/4 FAS White Oak (40 BF @ $15.41/BF)',amount:616,note:'PO #3847',items:[{item:'WD5416-10 — 5/4 FAS White Oak',qty:40,unit:'BF',unitPrice:15.41,lineTotal:616.40}]}],
-    'IEW005':[{date:d3,item:'4/4 Hard Maple (60 BF @ $5.22/BF)',amount:313,note:'',items:[{item:'WD4415-10 — 4/4 Hard Maple',qty:60,unit:'BF',unitPrice:5.22,lineTotal:313.2}]}]
-  };
-  ST.notes={
-    'PCL001':'Key account — prefers White Oak and Baltic Birch. Contact is Mike Torres.',
-    'DVM004':'Switching from competitor — price sensitive on walnut. Send updated price sheet.',
-    'IEW005':'Pricing inquiry — will follow up with quote. Needs 5/4 walnut and hard maple regularly.',
-    'SDL007':'Largest cabinet shop in San Diego. Orders monthly. Keep stocked on Baltic Birch.',
-    'BAK013':'Growing fast — doubled orders YTD. Ask about dedicated stock program.',
-    'TBC009':'Account going quiet — used to order $9k/year, nothing since January.'
-  };
-  ST.hot={'IEW005':true,'DVM004':true};
-  ST.competitors={'SCD003':'Pacific Woodworking','HDL006':'Home Depot Pro','TBC009':'Pacific Woodworking','SBB014':'84 Lumber'};
-  ST.followups={'DVM004':[{date:fu3,note:'Send updated walnut price sheet',done:false}],'IEW005':[{date:fu3,note:'Follow up on 5/4 walnut + hard maple quote',done:false}],'TBC009':[{date:fu7,note:'Re-engage — account going quiet',done:false}]};
+
+  // Get codes from existing customer list
+  var custs=allC();
+  var c=function(i){return custs[i]?custs[i].code:null;};
+  var n=function(i){return custs[i]?custs[i].name:'Account';};
+
+  // Build visits using real customer codes
+  ST.visits={};
+  if(c(0))ST.visits[c(0)]=[{type:'visited',date:d60,note:'Reviewed pricing'},{type:'visited',date:d14,note:'Dropped samples'},{type:'visited',date:td,note:''}];
+  if(c(1))ST.visits[c(1)]=[{type:'visited',date:d50,note:''},{type:'not_in',date:d7,note:'Out of office'},{type:'visited',date:td,note:''}];
+  if(c(2))ST.visits[c(2)]=[{type:'visited',date:d90,note:''}];
+  if(c(3))ST.visits[c(3)]=[{type:'visited',date:d14,note:'Interested in walnut pricing'},{type:'not_in',date:td,note:''}];
+  if(c(4))ST.visits[c(4)]=[{type:'visited',date:d3,note:'Pricing inquiry — will follow up with quote'},{type:'visited',date:td,note:''}];
+  if(c(5))ST.visits[c(5)]=[{type:'visited',date:d90,note:''}];
+  if(c(6))ST.visits[c(6)]=[{type:'visited',date:d60,note:''},{type:'visited',date:d7,note:''}];
+  if(c(7))ST.visits[c(7)]=[{type:'visited',date:d50,note:''}];
+  if(c(8))ST.visits[c(8)]=[{type:'visited',date:d90,note:''}];
+  if(c(9))ST.visits[c(9)]=[{type:'visited',date:d7,note:''},{type:'not_in',date:td,note:''}];
+  if(c(10))ST.visits[c(10)]=[{type:'visited',date:d14,note:''}];
+  if(c(11))ST.visits[c(11)]=[{type:'visited',date:d60,note:''}];
+  if(c(12))ST.visits[c(12)]=[{type:'visited',date:d3,note:''},{type:'visited',date:td,note:''}];
+  if(c(13))ST.visits[c(13)]=[{type:'visited',date:d90,note:''}];
+
+  // Orders on first 3 customers
+  ST.orders={};
+  if(c(12))ST.orders[c(12)]=[{date:td,item:'3/4 Birch Plywood (22 ea @ $33.72/ea)',amount:742,note:'PO #4521',items:[{item:'PB3448 — 3/4 Birch Plywood',qty:22,unit:'ea',unitPrice:33.72,lineTotal:741.84}]}];
+  if(c(9))ST.orders[c(9)]=[{date:td,item:'4/4 SEL/BTR Walnut (38 BF @ $15.65/BF)',amount:595,note:'Will call pickup Friday',items:[{item:'WD4421-10 — 4/4 Walnut',qty:38,unit:'BF',unitPrice:15.65,lineTotal:594.70}]}];
+  if(c(0))ST.orders[c(0)]=[{date:td,item:'5/4 FAS White Oak (40 BF @ $15.41/BF)',amount:616,note:'PO #3847',items:[{item:'WD5416-10 — 5/4 White Oak',qty:40,unit:'BF',unitPrice:15.41,lineTotal:616.40}]}];
+  if(c(4))ST.orders[c(4)]=[{date:d3,item:'4/4 Hard Maple (60 BF @ $5.22/BF)',amount:313,note:'',items:[{item:'WD4415-10 — Hard Maple',qty:60,unit:'BF',unitPrice:5.22,lineTotal:313.20}]}];
+
+  // Notes
+  ST.notes={};
+  if(c(0))ST.notes[c(0)]='Key account — White Oak and Baltic Birch. Ask about mill direct pricing. Contact is Mike.';
+  if(c(3))ST.notes[c(3)]='Switching from competitor — price sensitive on walnut. Send updated sheet.';
+  if(c(4))ST.notes[c(4)]='Pricing inquiry — follow up with quote. Needs walnut and hard maple regularly.';
+  if(c(6))ST.notes[c(6)]='Largest account in territory. Orders monthly. Keep stocked on Baltic Birch.';
+  if(c(12))ST.notes[c(12)]='Growing fast — doubled orders YTD. Ask about dedicated stock program.';
+  if(c(8))ST.notes[c(8)]='Account going quiet — used to order $9k/yr, nothing since January.';
+
+  // Hot leads + competitors
+  ST.hot={};
+  if(c(4))ST.hot[c(4)]=true;
+  if(c(3))ST.hot[c(3)]=true;
+  ST.competitors={};
+  if(c(2))ST.competitors[c(2)]='Pacific Woodworking';
+  if(c(5))ST.competitors[c(5)]='Home Depot Pro';
+  if(c(8))ST.competitors[c(8)]='Pacific Woodworking';
+
+  // Follow-ups
+  ST.followups={};
+  if(c(3))ST.followups[c(3)]=[{date:fu3,note:'Send updated walnut price sheet',done:false}];
+  if(c(4))ST.followups[c(4)]=[{date:fu3,note:'Follow up on walnut + hard maple quote',done:false}];
+  if(c(8))ST.followups[c(8)]=[{date:fu7,note:'Re-engage — account going quiet',done:false}];
+
   priceData=[
     {_code:'WD4416-8',_desc:'4/4 FAS White Oak 15/16" 7-8 FT',_uom:'BF',_cost:'6.85'},
     {_code:'WD4416-10',_desc:'4/4 FAS White Oak 15/16" 9-10 FT',_uom:'BF',_cost:'7.20'},
