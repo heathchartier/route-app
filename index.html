@@ -11146,9 +11146,8 @@ function onLogin(user){
   if(localStorage.getItem('hrt_demo')==='1'){
     var dmb=document.getElementById('demo-mode-banner');
     if(dmb)dmb.style.display='flex';
-    setTimeout(function(){toast('Demo mode active — 15 fake accounts loaded');},800);
   }
-  syncDown();
+  if(localStorage.getItem('hrt_demo')!=='1')syncDown();
   checkAndNotify();
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
   initAppLock();
@@ -11727,15 +11726,21 @@ function _applyDemoData(){
 
 function loadDemoData(){
   if(!confirm('Load demo data for screen recording?\n\nYour real data is safe — tap Clear Demo in Settings when done.'))return;
-  localStorage.setItem('hrt_demo','1');
-  toast('Loading demo...');
-  setTimeout(function(){location.reload();},600);
+  try{
+    localStorage.setItem('hrt_demo','1');
+    _applyDemoData();
+    var dmb=document.getElementById('demo-mode-banner');
+    if(dmb)dmb.style.display='flex';
+    go('dash');
+    setTimeout(function(){toast('Demo active — 15 fake accounts loaded');},300);
+  }catch(err){
+    alert('Demo load error: '+err.message);
+  }
 }
 function clearDemoData(){
   if(!confirm('Clear demo data and restore your real account?'))return;
   localStorage.removeItem('hrt_demo');
-  toast('Clearing demo...');
-  setTimeout(function(){location.reload();},600);
+  location.reload();
 }
 
 function initApp(){
