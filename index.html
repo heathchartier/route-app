@@ -11108,6 +11108,7 @@ function onLogin(user){
   // Reset ST to blank so previous session data doesn't leak into a new account
   ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
+  if(localStorage.getItem('hrt_demo')==='1')_applyDemoData();
   if(!ST.userProfile)ST.userProfile={};
   // Restore profile from auth metadata if localStorage was cleared
   var meta=user.user_metadata||{};
@@ -11142,6 +11143,11 @@ function onLogin(user){
   try{rGrps();}catch(e){}
   try{rVend();}catch(e){}
   try{renderCustomRoute();}catch(e){}
+  if(localStorage.getItem('hrt_demo')==='1'){
+    var dmb=document.getElementById('demo-mode-banner');
+    if(dmb)dmb.style.display='flex';
+    setTimeout(function(){toast('Demo mode active — 15 fake accounts loaded');},800);
+  }
   syncDown();
   checkAndNotify();
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
@@ -11622,8 +11628,10 @@ function saveBizCardCustomer(){
 }
 
 /* ── DEMO MODE ─────────────────────────────────────────────────────────────── */
-function loadDemoData(){
-  if(!confirm('Load demo data for screen recording?\n\nYour real data is NOT deleted — just hidden while demo is active. Tap "Clear Demo" in Settings when done.'))return;
+// Compatibility shim — old cached builds may call showTab()
+function showTab(p){var m={home:'dash',customers:'cust',groups:'grps',vendors:'vend',pricing:'price',settings:'set'};go(m[p]||p);}
+
+function _applyDemoData(){
   var t=new Date(),td=t.toISOString();
   var yd=new Date(t-864e5).toISOString();
   var d3=new Date(t-3*864e5).toISOString();
@@ -11634,15 +11642,7 @@ function loadDemoData(){
   var d90=new Date(t-90*864e5).toISOString();
   var fu3=new Date(t+3*864e5).toISOString();
   var fu7=new Date(t+7*864e5).toISOString();
-
-  // Save real data snapshot key so we can restore on clear
-  localStorage.setItem('hrt_demo_mode','1');
-  try{localStorage.setItem('hrt_demo_real_ST',JSON.stringify(ST));}catch(e){}
-  try{localStorage.setItem('hrt_demo_real_CB',JSON.stringify(CUSTOMERS_BASE));}catch(e){}
-
-  // Override base customers to empty — demo customers come from ST.addedCustomers
   CUSTOMERS_BASE=[];
-
   ST.addedCustomers=[
     {code:'PCL001',name:'Pacific Coast Lumber',address:'1201 Harbor Blvd',city:'Anaheim',state:'CA',zip:'92801',phone:'714-555-0101',email:'orders@paccoastlumber.com',group:1,tier:'A',lifetimeSales:148000,sales2024:38500,sales2025:43200,sales2526:19800,_isDemo:true},
     {code:'WSB002',name:'Westside Building Supply',address:'8840 Venice Blvd',city:'Los Angeles',state:'CA',zip:'90034',phone:'310-555-0202',email:'purchasing@westsidebuild.com',group:1,tier:'A',lifetimeSales:92000,sales2024:24000,sales2025:28500,sales2526:12100,_isDemo:true},
@@ -11660,13 +11660,11 @@ function loadDemoData(){
     {code:'SBB014',name:'South Bay Building Supply',address:'1600 Artesia Blvd',city:'Torrance',state:'CA',zip:'90504',phone:'310-555-1414',email:'info@southbaybuild.com',group:3,tier:'C',lifetimeSales:18000,sales2024:4200,sales2025:5100,sales2526:1800,_isDemo:true},
     {code:'RHL015',name:'Rancho Hardware & Lumber',address:'9200 Milliken Ave',city:'Rancho Cucamonga',state:'CA',zip:'91730',phone:'909-555-1515',email:'orders@ranchohardware.com',group:2,tier:'C',lifetimeSales:22000,sales2024:5400,sales2025:6200,sales2526:800,_isDemo:true}
   ];
-
-  // Visits — today: 4 visited, 2 not avail; older: realistic mix
   ST.visits={
     'PCL001':[{type:'visited',date:d60,note:'Reviewed Q1 pricing'},{type:'visited',date:d14,note:'Dropped White Oak samples'},{type:'visited',date:td,note:''}],
     'WSB002':[{type:'visited',date:d50,note:''},{type:'not_in',date:d7,note:'Out of office'},{type:'visited',date:td,note:''}],
     'SCD003':[{type:'visited',date:d90,note:''}],
-    'DVM004':[{type:'visited',date:d14,note:'Interested in 5/4 walnut pricing'},{type:'not_in',date:td,note:''}],
+    'DVM004':[{type:'visited',date:d14,note:'Interested in 5/4 walnut'},{type:'not_in',date:td,note:''}],
     'IEW005':[{type:'visited',date:d3,note:'Pricing inquiry — will follow up with quote'},{type:'visited',date:td,note:''}],
     'HDL006':[{type:'visited',date:d90,note:''}],
     'SDL007':[{type:'visited',date:d60,note:''},{type:'visited',date:d7,note:''}],
@@ -11679,55 +11677,23 @@ function loadDemoData(){
     'SBB014':[{type:'visited',date:d90,note:''}],
     'RHL015':[]
   };
-
-  // Orders
   ST.orders={
-    'BAK013':[{date:td,item:'3/4 particle board (22 ea @ $33.72/ea = $741.84)',amount:742,note:'PO #4521',items:[{item:'PB3448 — 3/4 48X96 Birch B2 Plywood',qty:22,unit:'ea',unitPrice:33.72,lineTotal:741.84}]}],
-    'VFS010':[{date:td,item:'4/4 SEL/BTR Walnut 15/16 9-10 FT (38 BF @ $15.65/BF = $594.70)',amount:595,note:'Will call pickup Friday',items:[{item:'WD4421-10 — 4/4 SEL/BTR Walnut',qty:38,unit:'BF',unitPrice:15.65,lineTotal:594.70}]}],
-    'PCL001':[{date:d7,item:'4/4 FAS White Oak 15/16 7-8 FT (55 BF @ $12.49/BF)',amount:687,note:'',items:[{item:'WD4416-8 — 4/4 FAS White Oak',qty:55,unit:'BF',unitPrice:12.49,lineTotal:686.95}]},{date:td,item:'5/4 FAS White Oak 1-3/16 9-10 FT (40 BF @ $15.41/BF)',amount:616,note:'PO #3847',items:[{item:'WD5416-10 — 5/4 FAS White Oak',qty:40,unit:'BF',unitPrice:15.41,lineTotal:616.40}]}],
-    'SDL007':[{date:d7,item:'3/4 Baltic Birch BB/BB (18 ea @ $93.56/ea)',amount:1684,note:'Large cabinet order',items:[{item:'PB3448BB — 3/4 48X96 Baltic Birch',qty:18,unit:'ea',unitPrice:93.56,lineTotal:1684.08}]}],
-    'IEW005':[{date:d3,item:'4/4 FAS Hard Maple 15/16 9-10 FT (60 BF @ $5.22/BF)',amount:313,note:'',items:[{item:'WD4415-10 — 4/4 SEL/BTR Hard Maple',qty:60,unit:'BF',unitPrice:5.22,lineTotal:313.2}]}]
+    'BAK013':[{date:td,item:'3/4 particle board (22 ea @ $33.72/ea)',amount:742,note:'PO #4521',items:[{item:'PB3448 — 3/4 48X96 Birch Plywood',qty:22,unit:'ea',unitPrice:33.72,lineTotal:741.84}]}],
+    'VFS010':[{date:td,item:'4/4 SEL/BTR Walnut 9-10 FT (38 BF @ $15.65/BF)',amount:595,note:'Will call pickup Friday',items:[{item:'WD4421-10 — 4/4 SEL/BTR Walnut',qty:38,unit:'BF',unitPrice:15.65,lineTotal:594.70}]}],
+    'PCL001':[{date:td,item:'5/4 FAS White Oak (40 BF @ $15.41/BF)',amount:616,note:'PO #3847',items:[{item:'WD5416-10 — 5/4 FAS White Oak',qty:40,unit:'BF',unitPrice:15.41,lineTotal:616.40}]}],
+    'IEW005':[{date:d3,item:'4/4 Hard Maple (60 BF @ $5.22/BF)',amount:313,note:'',items:[{item:'WD4415-10 — 4/4 Hard Maple',qty:60,unit:'BF',unitPrice:5.22,lineTotal:313.2}]}]
   };
-
-  // Notes
   ST.notes={
-    'PCL001':'Key account — prefers White Oak and Baltic Birch. Ask about mill direct pricing on next visit. Contact is Mike Torres.',
-    'DVM004':'Switching from competitor — price sensitive on walnut. Send updated price sheet by Friday.',
-    'IEW005':'Pricing inquiry — will follow up with quote. Needs 5/4 walnut and hard maple regularly. Hot prospect.',
-    'SDL007':'Largest cabinet shop in San Diego. Order monthly. Keep stocked on Baltic Birch.',
+    'PCL001':'Key account — prefers White Oak and Baltic Birch. Contact is Mike Torres.',
+    'DVM004':'Switching from competitor — price sensitive on walnut. Send updated price sheet.',
+    'IEW005':'Pricing inquiry — will follow up with quote. Needs 5/4 walnut and hard maple regularly.',
+    'SDL007':'Largest cabinet shop in San Diego. Orders monthly. Keep stocked on Baltic Birch.',
     'BAK013':'Growing fast — doubled orders YTD. Ask about dedicated stock program.',
-    'TBC009':'Account going quiet — used to order $9k/year, nothing since January. Needs a visit.'
+    'TBC009':'Account going quiet — used to order $9k/year, nothing since January.'
   };
-
-  // Hot leads
   ST.hot={'IEW005':true,'DVM004':true};
-
-  // Competitors
-  ST.competitors={
-    'SCD003':'Pacific Woodworking',
-    'HDL006':'Home Depot Pro',
-    'TBC009':'Pacific Woodworking',
-    'SBB014':'84 Lumber'
-  };
-
-  // Follow-ups
-  ST.followups={
-    'DVM004':[{date:fu3,note:'Send updated walnut price sheet',done:false}],
-    'IEW005':[{date:fu3,note:'Follow up on quote — 5/4 walnut + hard maple',done:false}],
-    'TBC009':[{date:fu7,note:'Re-engage — account going quiet',done:false}],
-    'RHL015':[{date:fu7,note:'First visit — intro call',done:false}]
-  };
-
-  // Tags
-  ST.tags={
-    'PCL001':['key-account','white-oak'],
-    'SDL007':['key-account','cabinets'],
-    'BAK013':['growing','high-potential'],
-    'IEW005':['hot-prospect'],
-    'DVM004':['hot-prospect','price-sensitive']
-  };
-
-  // Demo price list
+  ST.competitors={'SCD003':'Pacific Woodworking','HDL006':'Home Depot Pro','TBC009':'Pacific Woodworking','SBB014':'84 Lumber'};
+  ST.followups={'DVM004':[{date:fu3,note:'Send updated walnut price sheet',done:false}],'IEW005':[{date:fu3,note:'Follow up on 5/4 walnut + hard maple quote',done:false}],'TBC009':[{date:fu7,note:'Re-engage — account going quiet',done:false}]};
   priceData=[
     {_code:'WD4416-8',_desc:'4/4 FAS White Oak 15/16" 7-8 FT',_uom:'BF',_cost:'6.85'},
     {_code:'WD4416-10',_desc:'4/4 FAS White Oak 15/16" 9-10 FT',_uom:'BF',_cost:'7.20'},
@@ -11737,71 +11703,39 @@ function loadDemoData(){
     {_code:'WD8421-10',_desc:'8/4 FAS Walnut 1-15/16" 9-10 FT',_uom:'BF',_cost:'12.75'},
     {_code:'WD4415-8',_desc:'4/4 SEL/BTR Hard Maple 15/16" 7-8 FT',_uom:'BF',_cost:'3.20'},
     {_code:'WD4415-10',_desc:'4/4 SEL/BTR Hard Maple 15/16" 9-10 FT',_uom:'BF',_cost:'3.45'},
-    {_code:'WD8415-10',_desc:'8/4 FAS Hard Maple 1-15/16" 9-10 FT',_uom:'BF',_cost:'5.80'},
     {_code:'WD4412-10',_desc:'4/4 FAS Cherry 15/16" 9-10 FT',_uom:'BF',_cost:'4.60'},
-    {_code:'WD4418-8',_desc:'4/4 Superior Alder 15/16" 7-8 FT',_uom:'BF',_cost:'2.85'},
     {_code:'WD4418-10',_desc:'4/4 Superior Alder 15/16" 9-10 FT',_uom:'BF',_cost:'3.10'},
     {_code:'WD4413-10',_desc:'4/4 FAS Poplar 15/16" 9-10 FT',_uom:'BF',_cost:'2.00'},
-    {_code:'WD4411-8',_desc:'4/4 FAS Ash 15/16" 7-8 FT',_uom:'BF',_cost:'3.75'},
     {_code:'WD4411-10',_desc:'4/4 FAS Ash 15/16" 9-10 FT',_uom:'BF',_cost:'4.00'},
-    {_code:'WD4420-8',_desc:'4/4 FAS Soft Maple 15/16" 7-8 FT',_uom:'BF',_cost:'2.95'},
-    {_code:'WD4420-10',_desc:'4/4 SEL/BTR Soft Maple 15/16" 9-10 FT',_uom:'BF',_cost:'3.15'},
     {_code:'WD4419-10',_desc:'4/4 SEL/BTR Hickory 15/16" 9-10 FT',_uom:'BF',_cost:'3.50'},
+    {_code:'WD4420-10',_desc:'4/4 SEL/BTR Soft Maple 15/16" 9-10 FT',_uom:'BF',_cost:'3.15'},
     {_code:'PB3448',_desc:'3/4 48X96 Birch B2 Plywood CARB2',_uom:'EA',_cost:'52.40'},
     {_code:'PB3448BB',_desc:'3/4 48X96 Baltic Birch BB/BB CARB2',_uom:'EA',_cost:'61.75'},
     {_code:'PB1448',_desc:'1/4 48X96 Birch MDF Core',_uom:'EA',_cost:'28.90'},
-    {_code:'PB1248',_desc:'12MM 48X96 Birch BB/BB CARB2',_uom:'EA',_cost:'38.50'},
     {_code:'PL3448WO',_desc:'3/4 48X96 White Oak Veneer Rotary',_uom:'EA',_cost:'84.00'},
-    {_code:'PL1448WO',_desc:'1/4 48X96 White Oak Veneer Panel 2S',_uom:'EA',_cost:'42.50'},
     {_code:'MD3448',_desc:'3/4 49X97 MDF ULEF NAF',_uom:'EA',_cost:'31.80'},
-    {_code:'MD1448',_desc:'1/4 49X97 MDF ULEF NAF',_uom:'EA',_cost:'14.40'},
-    {_code:'LB2X4-8',_desc:'2X4 8\' DF STD & BTR S4S',_uom:'EA',_cost:'5.60'},
-    {_code:'LB2X4-10',_desc:'2X4 10\' DF STD & BTR S4S',_uom:'EA',_cost:'6.90'},
-    {_code:'LB2X6-8',_desc:'2X6 8\' DF STD & BTR S4S',_uom:'EA',_cost:'7.40'},
-    {_code:'LB2X6-10',_desc:'2X6 10\' DF STD & BTR S4S',_uom:'EA',_cost:'9.20'},
+    {_code:'LB2X4-8',_desc:'2X4 8ft DF STD & BTR S4S',_uom:'EA',_cost:'5.60'},
+    {_code:'LB2X4-10',_desc:'2X4 10ft DF STD & BTR S4S',_uom:'EA',_cost:'6.90'},
+    {_code:'LB2X6-8',_desc:'2X6 8ft DF STD & BTR S4S',_uom:'EA',_cost:'7.40'},
     {_code:'PL3448CD',_desc:'23/32 48X96 CD EXT Plywood',_uom:'EA',_cost:'32.50'},
-    {_code:'PL3448AC',_desc:'3/4 48X96 AC INT Plywood Sanded',_uom:'EA',_cost:'44.80'},
-    {_code:'CM34',_desc:'3/4" Crown Moulding S4S 16 FT',_uom:'LF',_cost:'1.85'},
-    {_code:'HB1448',_desc:'1/8 48X96 Standard Hardboard',_uom:'EA',_cost:'9.20'},
     {_code:'BB5X5-9',_desc:'9MM 60X60 Baltic Birch BB/BB CARB2',_uom:'EA',_cost:'44.20'},
     {_code:'BB5X5-12',_desc:'12MM 60X60 Baltic Birch BB/BB CARB2',_uom:'EA',_cost:'58.90'}
   ];
   savePricing();
-
   lSave();
-
-  // Show demo banner
-  var banners=document.querySelectorAll('#demo-mode-banner');
-  banners.forEach(function(b){b.style.display='flex';});
-
-  // Navigate to dashboard — go() handles rendering
-  go('dash');
-  toast('Demo loaded — 15 accounts, active sales day ready to record');
 }
 
+function loadDemoData(){
+  if(!confirm('Load demo data for screen recording?\n\nYour real data is safe — tap Clear Demo in Settings when done.'))return;
+  localStorage.setItem('hrt_demo','1');
+  toast('Loading demo...');
+  setTimeout(function(){location.reload();},600);
+}
 function clearDemoData(){
   if(!confirm('Clear demo data and restore your real account?'))return;
-
-  // Restore real ST
-  try{
-    var realST=localStorage.getItem('hrt_demo_real_ST');
-    if(realST)ST=JSON.parse(realST);
-  }catch(e){}
-
-  // Restore real CUSTOMERS_BASE
-  try{
-    var realCB=localStorage.getItem('hrt_demo_real_CB');
-    if(realCB)CUSTOMERS_BASE=JSON.parse(realCB);
-  }catch(e){}
-
-  localStorage.removeItem('hrt_demo_mode');
-  localStorage.removeItem('hrt_demo_real_ST');
-  localStorage.removeItem('hrt_demo_real_CB');
-
-  lSave();
-
-  toast('Demo cleared — reloading...');
-  setTimeout(function(){location.reload();},1000);
+  localStorage.removeItem('hrt_demo');
+  toast('Clearing demo...');
+  setTimeout(function(){location.reload();},600);
 }
 
 function initApp(){
