@@ -11080,7 +11080,7 @@ function doAuth(){
   if(er)er.style.display='none';
   if(AUTH_MODE==='signin'){
     sb.auth.signInWithPassword({email:email,password:pass}).then(function(r){
-      btn.disabled=false;
+      btn.disabled=false;btn.textContent='Sign In';
       if(r.error){showAuthError(r.error.message);authTab('signin');return;}
       onLogin(r.data.user);
     });
@@ -11108,7 +11108,7 @@ function onLogin(user){
   // Reset ST to blank so previous session data doesn't leak into a new account
   ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
-  if(localStorage.getItem('hrt_demo')==='1')_applyDemoData();
+  if(localStorage.getItem('hrt_demo')==='1'){try{_applyDemoData();}catch(e){console.error('demo err',e);localStorage.removeItem('hrt_demo');}}
   if(!ST.userProfile)ST.userProfile={};
   // Restore profile from auth metadata if localStorage was cleared
   var meta=user.user_metadata||{};
