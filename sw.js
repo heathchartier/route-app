@@ -1,4 +1,4 @@
-const CACHE = 'hcroutes-v57';
+const CACHE = 'hcroutes-v58';
 const ASSETS = [
   '/route-app/', '/route-app/index.html', '/route-app/manifest.json',
   '/route-app/apple-touch-icon.png', '/route-app/icon-180.png',

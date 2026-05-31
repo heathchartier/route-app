@@ -11685,8 +11685,14 @@ function initApp(){
     if(res.data&&res.data.session&&res.data.session.user){
       onLogin(res.data.session.user);
     }else{
-      var as=document.getElementById('auth-screen');
-      if(as)as.style.display='flex';
+      // Show trial info on first visit, then auth screen
+      if(!localStorage.getItem('fieldiq_trial_info_seen')){
+        var infoOv = document.getElementById('trial-info-overlay');
+        if(infoOv) infoOv.style.display = 'flex';
+      }else{
+        var as=document.getElementById('auth-screen');
+        if(as)as.style.display='flex';
+      }
     }
   });
 }
@@ -11749,7 +11755,8 @@ function initApp(){
       <div style="display:flex;gap:8px"><div style="color:var(--teal)">✓</div><div>Order logging & sales analytics</div></div>
     </div>
 
-    <button onclick="dismissTrialInfo()" style="width:100%;padding:14px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit">Start My Free Trial</button>
+    <button onclick="dismissTrialInfoAndSignUp()" style="width:100%;padding:14px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:10px">Start My Free Trial</button>
+    <button onclick="dismissTrialInfoAndSignIn()" style="width:100%;padding:11px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Already Have an Account</button>
     <div style="font-size:10px;color:var(--dim);text-align:center;margin-top:12px">Cancel anytime during your trial</div>
   </div>
 </div>
@@ -11841,12 +11848,20 @@ function checkSubscription(){
   return true;
 }
 
-function dismissTrialInfo(){
+function dismissTrialInfoAndSignUp(){
   var infoOv = document.getElementById('trial-info-overlay');
   if(infoOv) infoOv.style.display = 'none';
   localStorage.setItem('fieldiq_trial_info_seen', '1');
-  updateTrialBanner(TRIAL_DURATION_DAYS);
-  toast('Welcome! Your 14-day free trial is active.');
+  // Show auth screen in signup mode
+  authTab('signup');
+}
+
+function dismissTrialInfoAndSignIn(){
+  var infoOv = document.getElementById('trial-info-overlay');
+  if(infoOv) infoOv.style.display = 'none';
+  localStorage.setItem('fieldiq_trial_info_seen', '1');
+  // Show auth screen in signin mode
+  authTab('signin');
 }
 
 function updateTrialBanner(daysLeft){
