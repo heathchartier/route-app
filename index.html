@@ -11807,8 +11807,21 @@ var SUBSCRIPTION_STATUS = null;
 var TRIAL_START_DATE = null;
 var TRIAL_DURATION_DAYS = 14;
 
+// Accounts with permanent free full access — add friends here
+var FREE_ACCESS_EMAILS = [
+  'heathchartier@gmail.com',
+  'appreview@fieldiq.pro'
+];
+
+function isFreeAccess(){
+  if(!CURRENT_USER) return false;
+  var email = (CURRENT_USER.email || '').toLowerCase().trim();
+  return FREE_ACCESS_EMAILS.map(function(e){return e.toLowerCase();}).indexOf(email) !== -1;
+}
+
 // Check subscription status on app load
 function checkSubscription(){
+  if(isFreeAccess()) return true; // permanent free accounts skip paywall entirely
   // Load trial start date from localStorage
   var trialStart = localStorage.getItem('fieldiq_trial_start');
   if(trialStart){
@@ -11887,6 +11900,7 @@ function updateTrialBanner(daysLeft){
 
 // iOS calls this with subscription status
 window.onIAPStatus = function(result){
+  if(isFreeAccess()) return; // free accounts ignore IAP status — always have access
   SUBSCRIPTION_STATUS = result.status;
   if(result.status === 'active'){
     hidePaywall();
