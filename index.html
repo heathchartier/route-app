@@ -886,15 +886,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
-    <div id="demo-mode-banner" style="display:none;background:rgba(255,176,32,.15);border:1px solid rgba(255,176,32,.4);border-radius:var(--r2);padding:10px 14px;margin-bottom:14px;align-items:center;justify-content:space-between;gap:10px">
-      <div><div style="font-size:12px;font-weight:800;color:var(--amber)">&#127916; DEMO MODE ACTIVE</div><div style="font-size:11px;color:var(--sub);margin-top:2px">Fake data loaded for screen recording</div></div>
-      <button onclick="clearDemoData()" style="background:rgba(255,77,106,.15);color:var(--red);border:1px solid rgba(255,77,106,.3);border-radius:var(--r2);padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">&#10005; Clear Demo</button>
-    </div>
-    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">&#127916; Screen Recording</div>
-    <div style="margin-bottom:16px">
-      <button onclick="loadDemoData()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.35);color:var(--amber);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#127916; Load Demo Data for Recording</button>
-      <div style="font-size:11px;color:var(--dim);margin-top:6px;padding:0 2px">Loads a realistic fake territory for recording. Your real data is safe — tap Clear Demo when done.</div>
-    </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Quick Access</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
@@ -2938,15 +2929,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="sub" id="sync-lbl">Checking sync...</div>
   </div>
   <div class="body" style="padding-top:16px">
-    <div id="demo-mode-banner" style="display:none;background:rgba(255,176,32,.15);border:1px solid rgba(255,176,32,.4);border-radius:var(--r2);padding:10px 14px;margin-bottom:14px;align-items:center;justify-content:space-between;gap:10px">
-      <div><div style="font-size:12px;font-weight:800;color:var(--amber)">&#127916; DEMO MODE ACTIVE</div><div style="font-size:11px;color:var(--sub);margin-top:2px">Fake data loaded for screen recording</div></div>
-      <button onclick="clearDemoData()" style="background:rgba(255,77,106,.15);color:var(--red);border:1px solid rgba(255,77,106,.3);border-radius:var(--r2);padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">&#10005; Clear Demo</button>
-    </div>
-    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">&#127916; Screen Recording</div>
-    <div style="margin-bottom:16px">
-      <button onclick="loadDemoData()" style="width:100%;padding:11px 14px;border-radius:var(--r2);background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.35);color:var(--amber);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#127916; Load Demo Data for Recording</button>
-      <div style="font-size:11px;color:var(--dim);margin-top:6px;padding:0 2px">Loads a realistic fake territory for recording. Your real data is safe — tap Clear Demo when done.</div>
-    </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:0 2px 6px">Quick Access</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
       <button onclick="showHowToUse()" style="flex:1;padding:12px 14px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128214; How to Use</button>
@@ -11108,7 +11090,13 @@ function onLogin(user){
   // Reset ST to blank so previous session data doesn't leak into a new account
   ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
-  if(localStorage.getItem('hrt_demo')==='1'){try{_applyDemoData();}catch(e){console.error('demo err',e);localStorage.removeItem('hrt_demo');}}
+  // One-time cleanup: remove any fake demo customers that got added accidentally
+  var _fakeCodes={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
+  var _before=(ST.addedCustomers||[]).length;
+  ST.addedCustomers=(ST.addedCustomers||[]).filter(function(c){return !_fakeCodes[c.code]&&!c._isDemo;});
+  if(ST.addedCustomers.length!==_before){lSave();console.log('Removed',_before-ST.addedCustomers.length,'demo customers');}
+  // Clear any leftover demo localStorage keys
+  localStorage.removeItem('hrt_demo');localStorage.removeItem('hrt_demo_bk_visits');localStorage.removeItem('hrt_demo_bk_orders');localStorage.removeItem('hrt_demo_bk_notes');localStorage.removeItem('hrt_demo_bk_hot');localStorage.removeItem('hrt_demo_bk_comp');localStorage.removeItem('hrt_demo_bk_fu');localStorage.removeItem('hrt_demo_bk_ac');localStorage.removeItem('hrt_demo_mode');localStorage.removeItem('hrt_demo_real_ST');localStorage.removeItem('hrt_demo_real_CB');
   if(!ST.userProfile)ST.userProfile={};
   // Restore profile from auth metadata if localStorage was cleared
   var meta=user.user_metadata||{};
@@ -11143,11 +11131,7 @@ function onLogin(user){
   try{rGrps();}catch(e){}
   try{rVend();}catch(e){}
   try{renderCustomRoute();}catch(e){}
-  if(localStorage.getItem('hrt_demo')==='1'){
-    var dmb=document.getElementById('demo-mode-banner');
-    if(dmb)dmb.style.display='flex';
-  }
-  if(localStorage.getItem('hrt_demo')!=='1')syncDown();
+  syncDown();
   checkAndNotify();
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
   initAppLock();
@@ -11626,158 +11610,6 @@ function saveBizCardCustomer(){
   rCust();
 }
 
-/* ── DEMO MODE ─────────────────────────────────────────────────────────────── */
-// Compatibility shim — old cached builds may call showTab()
-function showTab(p){var m={home:'dash',customers:'cust',groups:'grps',vendors:'vend',pricing:'price',settings:'set'};go(m[p]||p);}
-
-function _applyDemoData(){
-  // Identify real vs fake customers: real ones have codes in CUSTOMERS_BASE
-  var realCodes={};
-  for(var i=0;i<CUSTOMERS_BASE.length;i++)realCodes[CUSTOMERS_BASE[i].code]=true;
-  // Keep only the fake imported customers (codes not in CUSTOMERS_BASE)
-  var fakeCusts=(ST.addedCustomers||[]).filter(function(c){return !realCodes[c.code];});
-  // Back up full addedCustomers list so we can restore on clear
-  try{localStorage.setItem('hrt_demo_bk_ac',JSON.stringify(ST.addedCustomers||[]));}catch(e){}
-  ST.addedCustomers=fakeCusts;
-  var now=Date.now(),td=new Date(now).toISOString();
-  var d3=new Date(now-3*864e5).toISOString();
-  var d7=new Date(now-7*864e5).toISOString();
-  var d14=new Date(now-14*864e5).toISOString();
-  var d50=new Date(now-50*864e5).toISOString();
-  var d60=new Date(now-60*864e5).toISOString();
-  var d90=new Date(now-90*864e5).toISOString();
-  var fu3=new Date(now+3*864e5).toISOString();
-  var fu7=new Date(now+7*864e5).toISOString();
-
-  // Get codes from existing customer list
-  var custs=allC();
-  var c=function(i){return custs[i]?custs[i].code:null;};
-  var n=function(i){return custs[i]?custs[i].name:'Account';};
-
-  // Build visits using real customer codes
-  ST.visits={};
-  if(c(0))ST.visits[c(0)]=[{type:'visited',date:d60,note:'Reviewed pricing'},{type:'visited',date:d14,note:'Dropped samples'},{type:'visited',date:td,note:''}];
-  if(c(1))ST.visits[c(1)]=[{type:'visited',date:d50,note:''},{type:'not_in',date:d7,note:'Out of office'},{type:'visited',date:td,note:''}];
-  if(c(2))ST.visits[c(2)]=[{type:'visited',date:d90,note:''}];
-  if(c(3))ST.visits[c(3)]=[{type:'visited',date:d14,note:'Interested in walnut pricing'},{type:'not_in',date:td,note:''}];
-  if(c(4))ST.visits[c(4)]=[{type:'visited',date:d3,note:'Pricing inquiry — will follow up with quote'},{type:'visited',date:td,note:''}];
-  if(c(5))ST.visits[c(5)]=[{type:'visited',date:d90,note:''}];
-  if(c(6))ST.visits[c(6)]=[{type:'visited',date:d60,note:''},{type:'visited',date:d7,note:''}];
-  if(c(7))ST.visits[c(7)]=[{type:'visited',date:d50,note:''}];
-  if(c(8))ST.visits[c(8)]=[{type:'visited',date:d90,note:''}];
-  if(c(9))ST.visits[c(9)]=[{type:'visited',date:d7,note:''},{type:'not_in',date:td,note:''}];
-  if(c(10))ST.visits[c(10)]=[{type:'visited',date:d14,note:''}];
-  if(c(11))ST.visits[c(11)]=[{type:'visited',date:d60,note:''}];
-  if(c(12))ST.visits[c(12)]=[{type:'visited',date:d3,note:''},{type:'visited',date:td,note:''}];
-  if(c(13))ST.visits[c(13)]=[{type:'visited',date:d90,note:''}];
-
-  // Orders on first 3 customers
-  ST.orders={};
-  if(c(12))ST.orders[c(12)]=[{date:td,item:'3/4 Birch Plywood (22 ea @ $33.72/ea)',amount:742,note:'PO #4521',items:[{item:'PB3448 — 3/4 Birch Plywood',qty:22,unit:'ea',unitPrice:33.72,lineTotal:741.84}]}];
-  if(c(9))ST.orders[c(9)]=[{date:td,item:'4/4 SEL/BTR Walnut (38 BF @ $15.65/BF)',amount:595,note:'Will call pickup Friday',items:[{item:'WD4421-10 — 4/4 Walnut',qty:38,unit:'BF',unitPrice:15.65,lineTotal:594.70}]}];
-  if(c(0))ST.orders[c(0)]=[{date:td,item:'5/4 FAS White Oak (40 BF @ $15.41/BF)',amount:616,note:'PO #3847',items:[{item:'WD5416-10 — 5/4 White Oak',qty:40,unit:'BF',unitPrice:15.41,lineTotal:616.40}]}];
-  if(c(4))ST.orders[c(4)]=[{date:d3,item:'4/4 Hard Maple (60 BF @ $5.22/BF)',amount:313,note:'',items:[{item:'WD4415-10 — Hard Maple',qty:60,unit:'BF',unitPrice:5.22,lineTotal:313.20}]}];
-
-  // Notes
-  ST.notes={};
-  if(c(0))ST.notes[c(0)]='Key account — White Oak and Baltic Birch. Ask about mill direct pricing. Contact is Mike.';
-  if(c(3))ST.notes[c(3)]='Switching from competitor — price sensitive on walnut. Send updated sheet.';
-  if(c(4))ST.notes[c(4)]='Pricing inquiry — follow up with quote. Needs walnut and hard maple regularly.';
-  if(c(6))ST.notes[c(6)]='Largest account in territory. Orders monthly. Keep stocked on Baltic Birch.';
-  if(c(12))ST.notes[c(12)]='Growing fast — doubled orders YTD. Ask about dedicated stock program.';
-  if(c(8))ST.notes[c(8)]='Account going quiet — used to order $9k/yr, nothing since January.';
-
-  // Hot leads + competitors
-  ST.hot={};
-  if(c(4))ST.hot[c(4)]=true;
-  if(c(3))ST.hot[c(3)]=true;
-  ST.competitors={};
-  if(c(2))ST.competitors[c(2)]='Pacific Woodworking';
-  if(c(5))ST.competitors[c(5)]='Home Depot Pro';
-  if(c(8))ST.competitors[c(8)]='Pacific Woodworking';
-
-  // Follow-ups — stored as plain ISO date strings
-  ST.followups={};
-  if(c(3))ST.followups[c(3)]=fu3;
-  if(c(4))ST.followups[c(4)]=fu3;
-  if(c(8))ST.followups[c(8)]=fu7;
-
-  priceData=[
-    {_code:'WD4416-8',_desc:'4/4 FAS White Oak 15/16" 7-8 FT',_uom:'BF',_cost:'6.85'},
-    {_code:'WD4416-10',_desc:'4/4 FAS White Oak 15/16" 9-10 FT',_uom:'BF',_cost:'7.20'},
-    {_code:'WD5416-10',_desc:'5/4 FAS White Oak 1-3/16" 9-10 FT',_uom:'BF',_cost:'8.45'},
-    {_code:'WD4421-8',_desc:'4/4 SEL/BTR Walnut 15/16" 7-8 FT',_uom:'BF',_cost:'10.25'},
-    {_code:'WD4421-10',_desc:'4/4 SEL/BTR Walnut 15/16" 9-10 FT',_uom:'BF',_cost:'11.00'},
-    {_code:'WD8421-10',_desc:'8/4 FAS Walnut 1-15/16" 9-10 FT',_uom:'BF',_cost:'12.75'},
-    {_code:'WD4415-8',_desc:'4/4 SEL/BTR Hard Maple 15/16" 7-8 FT',_uom:'BF',_cost:'3.20'},
-    {_code:'WD4415-10',_desc:'4/4 SEL/BTR Hard Maple 15/16" 9-10 FT',_uom:'BF',_cost:'3.45'},
-    {_code:'WD4412-10',_desc:'4/4 FAS Cherry 15/16" 9-10 FT',_uom:'BF',_cost:'4.60'},
-    {_code:'WD4418-10',_desc:'4/4 Superior Alder 15/16" 9-10 FT',_uom:'BF',_cost:'3.10'},
-    {_code:'WD4413-10',_desc:'4/4 FAS Poplar 15/16" 9-10 FT',_uom:'BF',_cost:'2.00'},
-    {_code:'WD4411-10',_desc:'4/4 FAS Ash 15/16" 9-10 FT',_uom:'BF',_cost:'4.00'},
-    {_code:'WD4419-10',_desc:'4/4 SEL/BTR Hickory 15/16" 9-10 FT',_uom:'BF',_cost:'3.50'},
-    {_code:'WD4420-10',_desc:'4/4 SEL/BTR Soft Maple 15/16" 9-10 FT',_uom:'BF',_cost:'3.15'},
-    {_code:'PB3448',_desc:'3/4 48X96 Birch B2 Plywood CARB2',_uom:'EA',_cost:'52.40'},
-    {_code:'PB3448BB',_desc:'3/4 48X96 Baltic Birch BB/BB CARB2',_uom:'EA',_cost:'61.75'},
-    {_code:'PB1448',_desc:'1/4 48X96 Birch MDF Core',_uom:'EA',_cost:'28.90'},
-    {_code:'PL3448WO',_desc:'3/4 48X96 White Oak Veneer Rotary',_uom:'EA',_cost:'84.00'},
-    {_code:'MD3448',_desc:'3/4 49X97 MDF ULEF NAF',_uom:'EA',_cost:'31.80'},
-    {_code:'LB2X4-8',_desc:'2X4 8ft DF STD & BTR S4S',_uom:'EA',_cost:'5.60'},
-    {_code:'LB2X4-10',_desc:'2X4 10ft DF STD & BTR S4S',_uom:'EA',_cost:'6.90'},
-    {_code:'LB2X6-8',_desc:'2X6 8ft DF STD & BTR S4S',_uom:'EA',_cost:'7.40'},
-    {_code:'PL3448CD',_desc:'23/32 48X96 CD EXT Plywood',_uom:'EA',_cost:'32.50'},
-    {_code:'BB5X5-9',_desc:'9MM 60X60 Baltic Birch BB/BB CARB2',_uom:'EA',_cost:'44.20'},
-    {_code:'BB5X5-12',_desc:'12MM 60X60 Baltic Birch BB/BB CARB2',_uom:'EA',_cost:'58.90'}
-  ];
-  savePricing();
-  lSave();
-}
-
-function loadDemoData(){
-  if(!confirm('Load demo data for screen recording?\n\nYour real customer data is backed up and fully restored when you tap Clear Demo.'))return;
-  try{
-    // Back up real activity before overwriting
-    localStorage.setItem('hrt_demo_bk_visits',JSON.stringify(ST.visits||{}));
-    localStorage.setItem('hrt_demo_bk_orders',JSON.stringify(ST.orders||{}));
-    localStorage.setItem('hrt_demo_bk_notes',JSON.stringify(ST.notes||{}));
-    localStorage.setItem('hrt_demo_bk_hot',JSON.stringify(ST.hot||{}));
-    localStorage.setItem('hrt_demo_bk_comp',JSON.stringify(ST.competitors||{}));
-    localStorage.setItem('hrt_demo_bk_fu',JSON.stringify(ST.followups||{}));
-    localStorage.setItem('hrt_demo','1');
-    _applyDemoData();
-    var dmb=document.getElementById('demo-mode-banner');
-    if(dmb)dmb.style.display='flex';
-    go('dash');
-    setTimeout(function(){toast('Demo active — 85 fake accounts, real data backed up');},300);
-  }catch(err){
-    localStorage.removeItem('hrt_demo');
-    alert('Demo load error: '+err.message);
-  }
-}
-function clearDemoData(){
-  if(!confirm('Clear demo data and restore your real account?'))return;
-  // Restore real activity data
-  try{
-    var bv=localStorage.getItem('hrt_demo_bk_visits');if(bv)ST.visits=JSON.parse(bv);
-    var bo=localStorage.getItem('hrt_demo_bk_orders');if(bo)ST.orders=JSON.parse(bo);
-    var bn=localStorage.getItem('hrt_demo_bk_notes');if(bn)ST.notes=JSON.parse(bn);
-    var bh=localStorage.getItem('hrt_demo_bk_hot');if(bh)ST.hot=JSON.parse(bh);
-    var bc=localStorage.getItem('hrt_demo_bk_comp');if(bc)ST.competitors=JSON.parse(bc);
-    var bf=localStorage.getItem('hrt_demo_bk_fu');if(bf)ST.followups=JSON.parse(bf);
-    var bac=localStorage.getItem('hrt_demo_bk_ac');if(bac)ST.addedCustomers=JSON.parse(bac);
-  }catch(e){}
-  localStorage.removeItem('hrt_demo');
-  localStorage.removeItem('hrt_demo_bk_visits');
-  localStorage.removeItem('hrt_demo_bk_orders');
-  localStorage.removeItem('hrt_demo_bk_notes');
-  localStorage.removeItem('hrt_demo_bk_hot');
-  localStorage.removeItem('hrt_demo_bk_comp');
-  localStorage.removeItem('hrt_demo_bk_fu');
-  localStorage.removeItem('hrt_demo_bk_ac');
-  lSave();
-  toast('Real data restored — reloading...');
-  setTimeout(function(){location.reload();},800);
-}
 
 function initApp(){
   document.body.style.overflow='hidden';
