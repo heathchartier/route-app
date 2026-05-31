@@ -1111,7 +1111,15 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="showTermsOfService()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128203; Terms of Service</button>
       <button onclick="contactSupport()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;text-align:left;padding-left:14px">&#128172; Contact Support</button>
     </div>
-    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:11px;letter-spacing:.3px">&copy; 2025 FieldIQ. All rights reserved.</div>
+
+    <!-- TESTING ONLY: Hidden subscription testing (tap copyright 5 times to reveal) -->
+    <div class="card" style="margin-top:4px;border:1px solid rgba(255,77,106,.2);background:rgba(255,77,106,.05);display:none" id="iap-testing-card">
+      <div style="font-size:10px;font-weight:800;color:var(--red);letter-spacing:1px;margin-bottom:8px">⚠️ TESTING ONLY</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Force paywall to appear for testing subscription flow</div>
+      <button onclick="forcePaywallTest()" style="width:100%;padding:11px;border-radius:var(--r2);background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Expire Trial & Show Paywall</button>
+    </div>
+
+    <div id="settings-copyright" onclick="revealTestingCard()" style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:11px;letter-spacing:.3px;cursor:pointer;user-select:none">&copy; 2025 FieldIQ. All rights reserved.</div>
   </div>
 </div>
 
@@ -3156,7 +3164,15 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button onclick="showTermsOfService()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;margin-bottom:6px;text-align:left;padding-left:14px">&#128203; Terms of Service</button>
       <button onclick="contactSupport()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;text-align:left;padding-left:14px">&#128172; Contact Support</button>
     </div>
-    <div style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:11px;letter-spacing:.3px">&copy; 2025 FieldIQ. All rights reserved.</div>
+
+    <!-- TESTING ONLY: Hidden subscription testing (tap copyright 5 times to reveal) -->
+    <div class="card" style="margin-top:4px;border:1px solid rgba(255,77,106,.2);background:rgba(255,77,106,.05);display:none" id="iap-testing-card">
+      <div style="font-size:10px;font-weight:800;color:var(--red);letter-spacing:1px;margin-bottom:8px">⚠️ TESTING ONLY</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:12px">Force paywall to appear for testing subscription flow</div>
+      <button onclick="forcePaywallTest()" style="width:100%;padding:11px;border-radius:var(--r2);background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Expire Trial & Show Paywall</button>
+    </div>
+
+    <div id="settings-copyright" onclick="revealTestingCard()" style="text-align:center;padding:16px 0 8px;color:var(--dim);font-size:11px;letter-spacing:.3px;cursor:pointer;user-select:none">&copy; 2025 FieldIQ. All rights reserved.</div>
   </div>
 </div>
 
@@ -11105,7 +11121,16 @@ function doAuth(){
     var company=(document.getElementById('auth-company').value||'').trim();
     sb.auth.signUp({email:email,password:pass}).then(function(r){
       btn.disabled=false;btn.textContent='Create Account';
-      if(r.error){showAuthError(r.error.message||'Sign up failed. Please try again.');authTab('signup');return;}
+      if(r.error){
+        var msg = r.error.message||'Sign up failed. Please try again.';
+        // Handle duplicate email more clearly
+        if(msg.toLowerCase().includes('already registered')||msg.toLowerCase().includes('already exists')||msg.toLowerCase().includes('duplicate')){
+          msg = 'This email already has an account. Try signing in instead.';
+        }
+        showAuthError(msg);
+        authTab('signup');
+        return;
+      }
       if(r.data&&r.data.user&&r.data.user.id){
         if(name)ST.userProfile.name=name;
         if(company)ST.userProfile.company=company;
@@ -11116,7 +11141,12 @@ function doAuth(){
       }
     }).catch(function(err){
       btn.disabled=false;btn.textContent='Create Account';
-      showAuthError(err.message||'Network error. Please try again.');
+      var msg = err.message||'Network error. Please try again.';
+      // Handle duplicate email in catch block too
+      if(msg.toLowerCase().includes('already registered')||msg.toLowerCase().includes('already exists')||msg.toLowerCase().includes('duplicate')){
+        msg = 'This email already has an account. Try signing in instead.';
+      }
+      showAuthError(msg);
       authTab('signup');
     });
   }
@@ -11851,6 +11881,33 @@ if(document.readyState === 'loading'){
   document.addEventListener('DOMContentLoaded', checkSubscription);
 }else{
   checkSubscription();
+}
+
+/* ── TESTING SHORTCUTS ─────────────────────────────────────────────────── */
+var _tapCount = 0;
+function revealTestingCard(){
+  _tapCount++;
+  if(_tapCount >= 5){
+    var card = document.getElementById('iap-testing-card');
+    if(card) card.style.display = 'block';
+    toast('Testing card revealed');
+    _tapCount = 0;
+  }
+}
+
+function forcePaywallTest(){
+  if(!confirm('Force trial to expire and show paywall?\n\nThis is for testing only.')){
+    return;
+  }
+  // Set trial start to 15 days ago
+  var expiredDate = new Date(Date.now() - 15*86400000).toISOString();
+  localStorage.setItem('fieldiq_trial_start', expiredDate);
+  TRIAL_START_DATE = new Date(expiredDate);
+  // Clear subscription status
+  SUBSCRIPTION_STATUS = null;
+  // Show paywall
+  showPaywall();
+  toast('Trial expired — paywall visible');
 }
 </script>
 
