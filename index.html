@@ -1848,7 +1848,18 @@ function syncDown(){
   var done=false;
   function finish(){
     if(done)return;done=true;
-    try{migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();}catch(e){console.error('finish err:',e);}
+    try{
+      migrateBaseCustomers();
+      // One-time cleanup: remove 15 fake demo customers that got added accidentally
+      if(!localStorage.getItem('hrt_cleanup_v1')){
+        var _fc={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
+        var _bl=(ST.addedCustomers||[]).length;
+        ST.addedCustomers=(ST.addedCustomers||[]).filter(function(c){return !_fc[c.code]&&!c._isDemo;});
+        localStorage.setItem('hrt_cleanup_v1','1');
+        if(ST.addedCustomers.length!==_bl){lSave();syncUp();toast('Removed '+(_bl-ST.addedCustomers.length)+' demo accounts — back to '+ST.addedCustomers.length);}
+      }
+      lSave();rDash();rCust();rGrps();checkFirstRun();
+    }catch(e){console.error('finish err:',e);}
     if(sl)sl.textContent='Synced';
   }
   function offlineFinish(reason){
@@ -3881,7 +3892,18 @@ function syncDown(){
   var done=false;
   function finish(){
     if(done)return;done=true;
-    try{migrateBaseCustomers();lSave();rDash();rCust();rGrps();checkFirstRun();}catch(e){console.error('finish err:',e);}
+    try{
+      migrateBaseCustomers();
+      // One-time cleanup: remove 15 fake demo customers that got added accidentally
+      if(!localStorage.getItem('hrt_cleanup_v1')){
+        var _fc={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
+        var _bl=(ST.addedCustomers||[]).length;
+        ST.addedCustomers=(ST.addedCustomers||[]).filter(function(c){return !_fc[c.code]&&!c._isDemo;});
+        localStorage.setItem('hrt_cleanup_v1','1');
+        if(ST.addedCustomers.length!==_bl){lSave();syncUp();toast('Removed '+(_bl-ST.addedCustomers.length)+' demo accounts — back to '+ST.addedCustomers.length);}
+      }
+      lSave();rDash();rCust();rGrps();checkFirstRun();
+    }catch(e){console.error('finish err:',e);}
     if(sl)sl.textContent='Synced';
   }
   function offlineFinish(reason){
