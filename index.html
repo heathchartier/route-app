@@ -609,7 +609,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div id="ob-step2" style="display:none">
       <div style="font-size:26px;font-weight:900;color:var(--text);margin-bottom:6px">Upload your customer list</div>
-      <div style="font-size:14px;color:var(--sub);margin-bottom:24px;line-height:1.6">FieldIQ builds your routes automatically. Any Excel or CSV works &#8212; we auto-detect your columns.</div>
+      <div style="font-size:14px;color:var(--sub);margin-bottom:20px;line-height:1.6">FieldIQ builds your routes automatically. Any Excel or CSV works &#8212; we auto-detect your columns.</div>
+
+      <div style="background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.25);border-radius:var(--r2);padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:18px;flex-shrink:0">&#128161;</div>
+        <div style="flex:1;font-size:12px;color:var(--sub)">First time? Download our template with all required columns</div>
+        <button onclick="downloadCustomerTemplate()" style="flex-shrink:0;padding:8px 12px;border-radius:var(--r3);background:var(--teal);color:#000;border:none;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap">Get Template</button>
+      </div>
+
       <div onclick="document.getElementById('ob-file-input').click()" style="border:2px dashed var(--border2);border-radius:var(--r);padding:32px 16px;text-align:center;cursor:pointer;margin-bottom:20px;background:var(--teal3)">
         <div style="font-size:40px;margin-bottom:10px">&#128194;</div>
         <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Tap to upload</div>
