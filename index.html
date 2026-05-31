@@ -11732,6 +11732,18 @@ var TRIAL_DURATION_DAYS = 14;
 
 // Check subscription status on app load
 function checkSubscription(){
+  // TESTING MODE: Force paywall to show immediately for testing
+  // TODO: Remove this before final launch
+  var FORCE_PAYWALL_FOR_TESTING = true;
+
+  if(FORCE_PAYWALL_FOR_TESTING){
+    // Check if subscribed
+    if(!SUBSCRIPTION_STATUS || SUBSCRIPTION_STATUS !== 'active'){
+      setTimeout(function(){ showPaywall(); }, 2000); // Show after 2 seconds
+    }
+    return;
+  }
+
   // Load trial start date from localStorage
   var trialStart = localStorage.getItem('fieldiq_trial_start');
   if(trialStart){
