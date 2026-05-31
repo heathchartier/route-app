@@ -11085,15 +11085,20 @@ function doAuth(){
   if(AUTH_MODE==='signin'){
     sb.auth.signInWithPassword({email:email,password:pass}).then(function(r){
       btn.disabled=false;btn.textContent='Sign In';
-      if(r.error){showAuthError(r.error.message);authTab('signin');return;}
-      onLogin(r.data.user);
+      if(r.error){showAuthError(r.error.message||'Invalid email or password.');authTab('signin');return;}
+      if(r.data&&r.data.user){onLogin(r.data.user);}
+      else{showAuthError('Sign in failed. Please check your credentials.');authTab('signin');}
+    }).catch(function(err){
+      btn.disabled=false;btn.textContent='Sign In';
+      showAuthError(err.message||'Network error. Please try again.');
+      authTab('signin');
     });
   }else{
     var name=(document.getElementById('auth-name').value||'').trim();
     var company=(document.getElementById('auth-company').value||'').trim();
     sb.auth.signUp({email:email,password:pass}).then(function(r){
-      btn.disabled=false;
-      if(r.error){showAuthError(r.error.message);authTab('signup');return;}
+      btn.disabled=false;btn.textContent='Create Account';
+      if(r.error){showAuthError(r.error.message||'Sign up failed. Please try again.');authTab('signup');return;}
       if(r.data&&r.data.user&&r.data.user.id){
         if(name)ST.userProfile.name=name;
         if(company)ST.userProfile.company=company;
@@ -11102,6 +11107,10 @@ function doAuth(){
         showAuthError('Check your email to confirm your account, then sign in.',true);
         authTab('signup');
       }
+    }).catch(function(err){
+      btn.disabled=false;btn.textContent='Create Account';
+      showAuthError(err.message||'Network error. Please try again.');
+      authTab('signup');
     });
   }
 }
