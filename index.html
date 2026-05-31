@@ -11727,6 +11727,39 @@ function initApp(){
   </div>
 </div>
 
+<!-- ══ TRIAL INFO SCREEN (First Login) ════════════════════════════════════ -->
+<div id="trial-info-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);max-width:400px;width:100%;padding:28px 24px">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:48px;margin-bottom:12px">🎉</div>
+      <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px">Welcome to FieldIQ!</div>
+      <div style="font-size:14px;color:var(--sub);line-height:1.6">The CRM built for outside sales reps</div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,rgba(0,229,184,.12),rgba(0,209,122,.05));border:1px solid var(--teal);border-radius:var(--r2);padding:16px;margin-bottom:20px">
+      <div style="font-size:15px;font-weight:700;color:var(--teal);margin-bottom:8px;text-align:center">Your 14-Day Free Trial Starts Now</div>
+      <div style="font-size:13px;color:var(--sub);text-align:center;line-height:1.5">Full access to everything. No payment required yet.<br>After 14 days: $19.99/month</div>
+    </div>
+
+    <div style="font-size:12px;color:var(--sub);margin-bottom:20px;line-height:1.7">
+      <div style="font-weight:700;color:var(--text);margin-bottom:8px">What's included:</div>
+      <div style="display:flex;gap:8px;margin-bottom:4px"><div style="color:var(--teal)">✓</div><div>Smart route planning & navigation</div></div>
+      <div style="display:flex;gap:8px;margin-bottom:4px"><div style="color:var(--teal)">✓</div><div>Customer management & visit tracking</div></div>
+      <div style="display:flex;gap:8px;margin-bottom:4px"><div style="color:var(--teal)">✓</div><div>Price lists & quote builder</div></div>
+      <div style="display:flex;gap:8px"><div style="color:var(--teal)">✓</div><div>Order logging & sales analytics</div></div>
+    </div>
+
+    <button onclick="dismissTrialInfo()" style="width:100%;padding:14px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit">Start My Free Trial</button>
+    <div style="font-size:10px;color:var(--dim);text-align:center;margin-top:12px">Cancel anytime during your trial</div>
+  </div>
+</div>
+
+<!-- ══ TRIAL COUNTDOWN BANNER ══════════════════════════════════════════════ -->
+<div id="trial-banner" style="display:none;background:linear-gradient(135deg,rgba(0,229,184,.15),rgba(0,209,122,.08));border-bottom:1px solid var(--teal);padding:10px 16px;text-align:center">
+  <div style="font-size:12px;font-weight:700;color:var(--teal)"><span id="trial-days-left">14</span> days left in your free trial</div>
+  <div style="font-size:10px;color:var(--sub);margin-top:2px">Then $19.99/month • Cancel anytime</div>
+</div>
+
 <!-- ══ IAP PAYWALL ══════════════════════════════════════════════════════════ -->
 <div id="paywall-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:10000;overflow-y:auto;padding:20px">
   <div style="max-width:500px;margin:0 auto;padding:40px 0">
@@ -11774,17 +11807,31 @@ function checkSubscription(){
   if(trialStart){
     TRIAL_START_DATE = new Date(trialStart);
     var daysSinceStart = Math.floor((Date.now() - TRIAL_START_DATE.getTime()) / 86400000);
+
     if(daysSinceStart >= TRIAL_DURATION_DAYS){
       // Trial expired - show paywall unless subscribed
       if(!SUBSCRIPTION_STATUS || SUBSCRIPTION_STATUS !== 'active'){
         showPaywall();
         return false;
       }
+    }else{
+      // Trial active - show countdown banner
+      updateTrialBanner(TRIAL_DURATION_DAYS - daysSinceStart);
     }
   }else{
-    // First time user - start trial
+    // First time user - start trial and show info screen
     TRIAL_START_DATE = new Date();
     localStorage.setItem('fieldiq_trial_start', TRIAL_START_DATE.toISOString());
+
+    // Show trial info screen on first login (only if not seen before)
+    if(!localStorage.getItem('fieldiq_trial_info_seen')){
+      setTimeout(function(){
+        var infoOv = document.getElementById('trial-info-overlay');
+        if(infoOv) infoOv.style.display = 'flex';
+      }, 500);
+    }else{
+      updateTrialBanner(TRIAL_DURATION_DAYS);
+    }
   }
 
   // Request subscription status from iOS
@@ -11794,15 +11841,49 @@ function checkSubscription(){
   return true;
 }
 
+function dismissTrialInfo(){
+  var infoOv = document.getElementById('trial-info-overlay');
+  if(infoOv) infoOv.style.display = 'none';
+  localStorage.setItem('fieldiq_trial_info_seen', '1');
+  updateTrialBanner(TRIAL_DURATION_DAYS);
+  toast('Welcome! Your 14-day free trial is active.');
+}
+
+function updateTrialBanner(daysLeft){
+  var banner = document.getElementById('trial-banner');
+  var daysSpan = document.getElementById('trial-days-left');
+
+  if(!banner || !daysSpan) return;
+
+  // Don't show banner if subscribed
+  if(SUBSCRIPTION_STATUS === 'active'){
+    banner.style.display = 'none';
+    return;
+  }
+
+  daysSpan.textContent = daysLeft;
+  banner.style.display = 'block';
+
+  // Insert banner at top of body (after paywall overlay)
+  if(banner.parentElement !== document.body){
+    document.body.insertBefore(banner, document.body.firstChild);
+  }
+}
+
 // iOS calls this with subscription status
 window.onIAPStatus = function(result){
   SUBSCRIPTION_STATUS = result.status;
   if(result.status === 'active'){
     hidePaywall();
+    // Hide trial banner for subscribers
+    var banner = document.getElementById('trial-banner');
+    if(banner) banner.style.display = 'none';
   }else if(TRIAL_START_DATE){
     var daysSinceStart = Math.floor((Date.now() - TRIAL_START_DATE.getTime()) / 86400000);
     if(daysSinceStart >= TRIAL_DURATION_DAYS){
       showPaywall();
+    }else{
+      updateTrialBanner(TRIAL_DURATION_DAYS - daysSinceStart);
     }
   }
 };
@@ -11848,6 +11929,9 @@ window.onIAPPurchaseResult = function(result){
   if(result.success){
     SUBSCRIPTION_STATUS = 'active';
     hidePaywall();
+    // Hide trial banner
+    var banner = document.getElementById('trial-banner');
+    if(banner) banner.style.display = 'none';
     toast('Welcome to FieldIQ! Subscription active.');
   }else if(result.error === 'cancelled'){
     // User cancelled - do nothing
