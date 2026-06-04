@@ -10612,6 +10612,9 @@ function _checkPortalMode(){
   try{localStorage.setItem('fieldiq_trial_info_seen','1');}catch(e){}
   // Aggressively hide every app element so nothing leaks through
   document.body.style.background='#0f172a';
+  document.body.style.overflow='auto';
+  document.body.style.position='static';
+  document.documentElement.style.overflow='auto';
   function _hideAppEls(){
     ['app','trial-info-overlay','paywall-overlay','trial-banner','auth-screen','toast'].forEach(function(id){
       var el=document.getElementById(id);
