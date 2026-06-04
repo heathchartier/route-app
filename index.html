@@ -10605,9 +10605,18 @@ function _checkPortalMode(){
   var params=new URLSearchParams(window.location.search);
   var token=params.get('portal');
   if(!token)return;
-  // Hide the main app, show portal immediately
-  document.body.style.background='var(--bg,#0f172a)';
-  var app=document.getElementById('app');if(app)app.style.display='none';
+  _isPortalMode=true;
+  // Aggressively hide every app element so nothing leaks through
+  document.body.style.background='#0f172a';
+  function _hideAppEls(){
+    ['app','trial-info-overlay','paywall-overlay','trial-banner','auth-screen','toast'].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.style.display='none';
+    });
+  }
+  _hideAppEls();
+  // Re-hide after short delay to catch anything fired via setTimeout
+  setTimeout(_hideAppEls,200);
+  setTimeout(_hideAppEls,700);
   var portalDiv=document.getElementById('portal-root');
   if(!portalDiv){portalDiv=document.createElement('div');portalDiv.id='portal-root';portalDiv.style.cssText='min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:inherit';document.body.appendChild(portalDiv);}
   portalDiv.innerHTML='<div style="max-width:520px;margin:0 auto;padding:20px 16px"><div style="text-align:center;padding:40px 0"><div style="font-size:32px;margin-bottom:8px">⏳</div><div style="font-size:16px;color:#7aa3c4">Loading your price list...</div></div></div>';
@@ -12293,6 +12302,7 @@ function initApp(){
 <script>
 /* ── IAP BRIDGE & SUBSCRIPTION MANAGEMENT ────────────────────────────────── */
 var SUBSCRIPTION_STATUS = null;
+var _isPortalMode = false;
 var TRIAL_START_DATE = null;
 var TRIAL_DURATION_DAYS = 14;
 
@@ -12310,6 +12320,7 @@ function isFreeAccess(){
 
 // Check subscription status on app load
 function checkSubscription(){
+  if(_isPortalMode) return; // portal mode — never show auth or paywall to customers
   if(isFreeAccess()) return true; // permanent free accounts skip paywall entirely
   // Load trial start date from localStorage
   var trialStart = localStorage.getItem('fieldiq_trial_start');
