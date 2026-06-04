@@ -10285,7 +10285,7 @@ function rPricingSection(code){
   var custMargin=ST.custMargins&&ST.custMargins[code]!==undefined?parseFloat(ST.custMargins[code]):null;
   var globalM=parseFloat(document.getElementById('pr-margin')?document.getElementById('pr-margin').value:35)||35;
   var displayM=custMargin!==null?custMargin:globalM;
-  var hasPortal=ST.portalTokens&&ST.portalTokens[code];
+  var hasPortal=ST.portalTokens&&ST.portalTokens[code]&&ST.portalTokens[code]!==null;
   var marginLbl=custMargin!==null?'<span style="color:var(--teal);font-weight:800">'+displayM+'%</span> <span style="font-size:10px;color:var(--teal)">(custom)</span>':'<span style="color:var(--sub);font-weight:700">'+displayM+'%</span> <span style="font-size:10px;color:var(--dim)">(global default)</span>';
 
   // Categories (only show if price list has categories)
@@ -10572,10 +10572,11 @@ function generatePortalLink(code){
   var portalRow={token:token,customer_name:custName,customer_code:code,margin_pct:margin,items:priceData,cat_margins:catMargins,pinned_prices:pinnedPrices};
   sb.from('price_portals').upsert(portalRow,{onConflict:'token'}).then(function(res){
     if(res.error){
-      // Table may not exist yet — store token locally and show setup message
-      lSave();syncUp();
-      rPricingSection(code);
-      toast('⚠ Run Supabase setup first — see Settings → Portal Setup');
+      console.error('Portal write error:',res.error);
+      // Clear the token so it doesn't show as active when write failed
+      ST.portalTokens[code]=null;
+      lSave();
+      toast('Portal error: '+res.error.message+' — try the Supabase fix below');
       return;
     }
     lSave();syncUp();
@@ -10595,7 +10596,8 @@ function revokePortal(code){
   if(!confirm('Revoke this portal link? The customer\'s link will stop working.'))return;
   var token=ST.portalTokens&&ST.portalTokens[code];
   if(token){sb.from('price_portals').delete().eq('token',token).then(function(){});}
-  if(ST.portalTokens)delete ST.portalTokens[code];
+  if(!ST.portalTokens)ST.portalTokens={};
+  ST.portalTokens[code]=null; // null = explicitly revoked (prevents sync from restoring it)
   lSave();syncUp();
   rPricingSection(code);toast('Portal link revoked');
 }
