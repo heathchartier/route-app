@@ -10615,10 +10615,11 @@ function _checkPortalMode(){
       var el=document.getElementById(id);
       if(el){el.style.display='none';el.style.visibility='hidden';}
     });
-    // Also hide anything with high z-index that's not the portal
-    var portalRoot=document.getElementById('portal-root');
-    document.querySelectorAll('body > div').forEach(function(d){
-      if(d.id!=='portal-root'&&d.id!=='toast')d.style.display='none';
+    // Hide nav bar and any app chrome
+    document.querySelectorAll('nav,.nav-bar,#nav,.nb,#nb').forEach(function(el){el.style.display='none';});
+    // Hide all body children except the portal root
+    document.querySelectorAll('body > *').forEach(function(d){
+      if(d.id!=='portal-root')d.style.display='none';
     });
   }
   _hideAppEls();
