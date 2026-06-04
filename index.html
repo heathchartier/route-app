@@ -1368,10 +1368,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1847,6 +1847,8 @@ function _applyRemoteState(rem){
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
   ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
+  ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
+  ST.custItemPrices=Object.assign({},rem.custItemPrices||{},ST.custItemPrices||{});
   ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
   ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
@@ -3420,10 +3422,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -3905,6 +3907,8 @@ function _applyRemoteState(rem){
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
   ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
+  ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
+  ST.custItemPrices=Object.assign({},rem.custItemPrices||{},ST.custItemPrices||{});
   ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
   ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
@@ -6106,7 +6110,8 @@ var _PRICE_FIELD_DEFS=[
   {key:'cost', label:'Cost / Unit Price', required:true,  aliases:['cost','price','unitcost','unitprice','baseprice','listprice','unit cost','unit price','base price','list price','net','netprice','net price']},
   {key:'desc', label:'Description',       required:false, aliases:['description','desc','name','productname','itemname','item','product','material','product name','item name']},
   {key:'code', label:'Product Code',      required:false, aliases:['code','sku','itemcode','partno','partnumber','productcode','itemno','product code','item code','part no','part number','item no']},
-  {key:'uom',  label:'Unit of Measure',   required:false, aliases:['uom','unit','um','unitofmeasure','measure','unit of measure']}
+  {key:'uom',  label:'Unit of Measure',   required:false, aliases:['uom','unit','um','unitofmeasure','measure','unit of measure']},
+  {key:'cat',  label:'Category / Product Group (optional)', required:false, aliases:['category','cat','productgroup','group','productcategory','class','productclass','dept','department','type','producttype','division','line']}
 ];
 
 function _autoDetectPriceCols(hdrs){
@@ -6178,7 +6183,8 @@ function confirmPriceImport(){
       _code:ci.code>=0?(row[ci.code]||''):'',
       _desc:ci.desc>=0?(row[ci.desc]||''):'',
       _uom: ci.uom>=0?(row[ci.uom]||''):'',
-      _cost:ci.cost>=0?(row[ci.cost]||''):''
+      _cost:ci.cost>=0?(row[ci.cost]||''):'',
+      _cat: ci.cat>=0?(row[ci.cat]||'').trim():''
     };
   }).filter(function(r){return r._cost||r._desc||r._code;});
   _priceQtys={};
@@ -7791,7 +7797,7 @@ function _renderPLPicker(code,q){
    +'</div>'
    +'<input id="pl-picker-srch" type="text" placeholder="Search code or description..." value="'+esc(q)+'" style="width:100%;padding:9px 12px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;box-sizing:border-box;margin-bottom:10px;outline:none">'
    +'<div id="pl-picker-list" style="flex:1;overflow-y:auto;min-height:0;margin-bottom:12px">'
-     +_buildPLList(multiplier,q)
+     +_buildPLList(multiplier,q,code)
    +'</div>'
    +'<button onclick="usePriceListItems(\''+esc(code)+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--green);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;flex-shrink:0">Add to Order</button>'
    +'</div>';
@@ -7805,23 +7811,27 @@ function _renderPLPicker(code,q){
       ins.forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
       var mins=document.querySelectorAll('#pl-picker-list input[data-midx]');
       mins.forEach(function(n){_plPickerMargins[n.dataset.midx]=n.value;});
-      el.innerHTML=_buildPLList(mult,this.value);
+      el.innerHTML=_buildPLList(mult,this.value,code);
     });
     srch.focus();
   }
 }
-function _buildPLList(multiplier,q){
+function _buildPLList(multiplier,q,custCode){
   var globalMargin=Math.round((multiplier-1)*100);
   var sq=(q||'').toLowerCase().trim();
   var filtered=priceData.filter(function(r){
     if(!sq)return true;
-    return(r._code+' '+r._desc+' '+r._uom).toLowerCase().indexOf(sq)>=0;
+    return(r._code+' '+r._desc+' '+r._uom+' '+(r._cat||'')).toLowerCase().indexOf(sq)>=0;
   });
   if(!filtered.length)return '<div style="color:var(--sub);text-align:center;padding:24px;font-size:14px">No items found</div>';
+  var code=custCode||mC;
   return filtered.map(function(r){
     var idx=priceData.indexOf(r);
     var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
-    var savedMargin=_plPickerMargins[idx]!==undefined?_plPickerMargins[idx]:String(globalMargin);
+    // Use effective margin from waterfall as the starting value (user can still adjust per-order)
+    var effectiveM=code?getEffectiveMarginsForItem(code,r):globalMargin;
+    var isPinned=code&&r._code&&ST.custItemPrices&&ST.custItemPrices[code]&&ST.custItemPrices[code][r._code]!==undefined;
+    var savedMargin=_plPickerMargins[idx]!==undefined?_plPickerMargins[idx]:String(isPinned?effectiveM:effectiveM);
     var itemMargin=parseFloat(savedMargin)||0;
     var sell=isNaN(cost)||cost<=0?0:parseFloat((cost*(1+itemMargin/100)).toFixed(2));
     var sellStr=sell>0?'$'+sell.toFixed(2):cost>0?'$'+cost.toFixed(2):'—';
@@ -7829,9 +7839,14 @@ function _buildPLList(multiplier,q){
     var uom=r._uom||'ea';
     var savedQty=_plPickerQtys[idx]||'';
     var hasSavedQty=savedQty&&parseFloat(savedQty)>0;
-    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:var(--r2);background:var(--bg3);border:1px solid '+(hasSavedQty?'var(--green)':'var(--border2)')+';margin-bottom:7px">'
+    var catLabel=r._cat?'<span style="background:rgba(74,158,255,.15);color:var(--blue);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px;text-transform:uppercase">'+esc(r._cat)+'</span>':'';
+    var pinnedLabel=isPinned?'<span style="background:rgba(0,229,184,.15);color:var(--teal);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">PINNED</span>':'';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:var(--r2);background:var(--bg3);border:1px solid '+(hasSavedQty?'var(--green)':isPinned?'rgba(0,229,184,.3)':'var(--border2)')+';margin-bottom:7px">'
       +'<div style="flex:1;min-width:0">'
-        +(r._code?'<div style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.4px;text-transform:uppercase">'+esc(r._code)+'</div>':'')
+        +'<div style="display:flex;align-items:center;flex-wrap:wrap;gap:2px">'
+          +(r._code?'<span style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.4px;text-transform:uppercase">'+esc(r._code)+'</span>':'')
+          +catLabel+pinnedLabel
+        +'</div>'
         +'<div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(r._desc||'—')+'</div>'
         +'<div style="font-size:11px;color:var(--sub);margin-top:1px">Cost: '+costStr+(uom?' / '+esc(uom):'')+'</div>'
       +'</div>'
@@ -7920,7 +7935,7 @@ function _renderPLPickerQuote(){
    +'</div>'
    +'<input id="pl-picker-srch" type="text" placeholder="Search code or description..." style="width:100%;padding:9px 12px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;box-sizing:border-box;margin-bottom:10px;outline:none">'
    +'<div id="pl-picker-list" style="flex:1;overflow-y:auto;min-height:0;margin-bottom:12px">'
-     +_buildPLList(multiplier,'')
+     +_buildPLList(multiplier,'',mC)
    +'</div>'
    +'<button onclick="usePLItemsForQuote()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;flex-shrink:0">Add to Quote</button>'
    +'</div>';
@@ -7933,7 +7948,7 @@ function _renderPLPickerQuote(){
       ins.forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
       var mins=document.querySelectorAll('#pl-picker-list input[data-midx]');
       mins.forEach(function(n){_plPickerMargins[n.dataset.midx]=n.value;});
-      el.innerHTML=_buildPLList(mult,this.value);
+      el.innerHTML=_buildPLList(mult,this.value,mC);
     });
     srch.focus();
   }
@@ -10219,30 +10234,140 @@ function getCustMargin(code){
   return parseFloat(el?el.value:35)||35;
 }
 
+/* ── WATERFALL: get effective margin % for a specific item + customer ── */
+// Priority: item pin (returns sell price directly) → category → flat customer → global
+function getEffectiveMarginsForItem(code,item){
+  // Layer 3: per-item price pin — returns margin equivalent for display in picker
+  if(item._code&&ST.custItemPrices&&ST.custItemPrices[code]&&ST.custItemPrices[code][item._code]!==undefined){
+    var pinnedPrice=ST.custItemPrices[code][item._code];
+    var cost=parseFloat(String(item._cost||'').replace(/[$,]/g,''));
+    if(cost>0)return Math.round(((pinnedPrice/cost)-1)*100);
+    return getCustMargin(code);
+  }
+  // Layer 2: category margin
+  var cat=(item._cat||'').trim();
+  if(cat&&ST.custCatMargins&&ST.custCatMargins[code]&&ST.custCatMargins[code][cat]!==undefined){
+    return parseFloat(ST.custCatMargins[code][cat])||0;
+  }
+  // Layer 1: flat customer margin (or global)
+  return getCustMargin(code);
+}
+
+/* ── WATERFALL: get the final sell price for a specific item + customer ── */
+function getEffectiveSellPrice(code,item){
+  var cost=parseFloat(String(item._cost||'').replace(/[$,]/g,''));
+  if(isNaN(cost)||cost<=0)return 0;
+  // Layer 3: item price pin
+  if(item._code&&ST.custItemPrices&&ST.custItemPrices[code]&&ST.custItemPrices[code][item._code]!==undefined){
+    return ST.custItemPrices[code][item._code];
+  }
+  // Layer 2: category
+  var cat=(item._cat||'').trim();
+  if(cat&&ST.custCatMargins&&ST.custCatMargins[code]&&ST.custCatMargins[code][cat]!==undefined){
+    var cm=parseFloat(ST.custCatMargins[code][cat])||0;
+    return parseFloat((cost*(1+cm/100)).toFixed(2));
+  }
+  // Layer 1: flat
+  var m=getCustMargin(code);
+  return parseFloat((cost*(1+m/100)).toFixed(2));
+}
+
+/* ── GET UNIQUE CATEGORIES FROM PRICE LIST ── */
+function _getPriceCategories(){
+  var cats={};
+  priceData.forEach(function(r){if(r._cat&&r._cat.trim())cats[r._cat.trim()]=1;});
+  return Object.keys(cats).sort();
+}
+
 /* ── RENDER PRICING SECTION IN CUSTOMER MODAL ── */
 function rPricingSection(code){
   var el=document.getElementById('m-pricing-sect');if(!el)return;
-  var margin=ST.custMargins&&ST.custMargins[code]!==undefined?parseFloat(ST.custMargins[code]):null;
-  var hasGlobal=!!document.getElementById('pr-margin');
+  var custMargin=ST.custMargins&&ST.custMargins[code]!==undefined?parseFloat(ST.custMargins[code]):null;
   var globalM=parseFloat(document.getElementById('pr-margin')?document.getElementById('pr-margin').value:35)||35;
-  var displayM=margin!==null?margin:globalM;
+  var displayM=custMargin!==null?custMargin:globalM;
   var hasPortal=ST.portalTokens&&ST.portalTokens[code];
-  var marginLbl=margin!==null?'<span style="color:var(--teal);font-weight:800">'+displayM+'%</span> <span style="font-size:10px;color:var(--teal)">(custom)</span>':'<span style="color:var(--sub);font-weight:700">'+displayM+'%</span> <span style="font-size:10px;color:var(--dim)">(global default)</span>';
+  var marginLbl=custMargin!==null?'<span style="color:var(--teal);font-weight:800">'+displayM+'%</span> <span style="font-size:10px;color:var(--teal)">(custom)</span>':'<span style="color:var(--sub);font-weight:700">'+displayM+'%</span> <span style="font-size:10px;color:var(--dim)">(global default)</span>';
+
+  // Categories (only show if price list has categories)
+  var cats=_getPriceCategories();
+  var catHtml='';
+  if(cats.length){
+    var catMargins=ST.custCatMargins&&ST.custCatMargins[code]||{};
+    catHtml='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">'
+     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+       +'<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.7px">By Category</div>'
+       +'<div style="font-size:10px;color:var(--dim)">Overrides flat rate</div>'
+     +'</div>'
+     +cats.map(function(cat){
+       var catM=catMargins[cat]!==undefined?parseFloat(catMargins[cat]):null;
+       var itemCount=priceData.filter(function(r){return(r._cat||'').trim()===cat;}).length;
+       return'<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">'
+         +'<div>'
+           +'<div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(cat)+'</div>'
+           +'<div style="font-size:11px;color:var(--dim);margin-top:1px">'+itemCount+' item'+(itemCount!==1?'s':'')
+             +(catM!==null?' &bull; <span style="color:var(--teal)">'+catM+'% custom</span>':' &bull; <span style="color:var(--dim)">using flat '+displayM+'%</span>')
+           +'</div>'
+         +'</div>'
+         +'<div style="display:flex;align-items:center;gap:4px">'
+           +'<input type="number" min="0" max="200" step="0.5" placeholder="'+displayM+'" value="'+(catM!==null?catM:'')+'"'
+             +' onchange="setCustCatMargin(\''+esc(code)+'\',\''+esc(cat)+'\',this.value)"'
+             +' style="width:52px;padding:5px 6px;border-radius:var(--r3);background:var(--bg3);border:1px solid var(--border2);color:var(--teal);font-family:inherit;font-size:13px;font-weight:700;text-align:center;outline:none">'
+           +'<span style="font-size:11px;color:var(--sub)">%</span>'
+         +'</div>'
+       +'</div>';
+     }).join('')
+     +'</div>';
+  }
+
+  // Item price pins
+  var pins=ST.custItemPrices&&ST.custItemPrices[code]||{};
+  var pinCodes=Object.keys(pins);
+  var pinsHtml='';
+  if(pinCodes.length||priceData.length){
+    pinsHtml='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">'
+     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+       +'<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.7px">Item Price Pins</div>'
+       +(priceData.length?'<button onclick="showItemPinPicker(\''+esc(code)+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Pin Item</button>':'')
+     +'</div>';
+    if(pinCodes.length){
+      pinsHtml+=pinCodes.map(function(itemCode){
+        var pinnedPrice=pins[itemCode];
+        var item=priceData.filter(function(r){return r._code===itemCode;})[0];
+        var desc=item?item._desc:itemCode;
+        var cost=item?parseFloat(String(item._cost||'').replace(/[$,]/g,'')):0;
+        var costStr=cost>0?'cost $'+cost.toFixed(2):'';
+        return'<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">'
+          +'<div style="flex:1;min-width:0">'
+            +'<div style="font-size:12px;font-weight:700;color:var(--teal)">'+esc(itemCode)+'</div>'
+            +'<div style="font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(desc)+(costStr?' &bull; '+costStr:'')+'</div>'
+          +'</div>'
+          +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+            +'<div style="font-size:14px;font-weight:800;color:var(--green)">$'+parseFloat(pinnedPrice).toFixed(2)+'</div>'
+            +'<button onclick="removeItemPin(\''+esc(code)+'\',\''+esc(itemCode)+'\')" style="background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);border-radius:6px;padding:3px 7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">✕</button>'
+          +'</div>'
+        +'</div>';
+      }).join('');
+    }else{
+      pinsHtml+='<div style="font-size:12px;color:var(--dim);padding:6px 0">'+(priceData.length?'No pinned items yet. Pin an item to override its price for this customer only.':'Load a price list in the Pricing tab to enable item pins.')+'</div>';
+    }
+    pinsHtml+='</div>';
+  }
+
   el.innerHTML=
-    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-   +'<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.8px">Pricing</div>'
-   +'</div>'
+    '<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Pricing</div>'
    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">'
      +'<div>'
-       +'<div style="font-size:12px;color:var(--sub)">Markup %</div>'
+       +'<div style="font-size:12px;color:var(--sub)">Base Markup %</div>'
        +'<div style="font-size:14px;margin-top:2px">'+marginLbl+'</div>'
      +'</div>'
      +'<button onclick="editCustMargin(\''+esc(code)+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#9998; Edit</button>'
    +'</div>'
-   +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">'
+   +catHtml
+   +pinsHtml
+   +'<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0 0">'
      +'<div>'
        +'<div style="font-size:12px;color:var(--sub)">Customer Price Portal</div>'
-       +(hasPortal?'<div style="font-size:11px;color:var(--teal);margin-top:2px">&#10003; Portal active</div>':'<div style="font-size:11px;color:var(--dim);margin-top:2px">Shareable price list link</div>')
+       +(hasPortal?'<div style="font-size:11px;color:var(--teal);margin-top:2px">&#10003; Portal active — shareable link ready</div>':'<div style="font-size:11px;color:var(--dim);margin-top:2px">Give customer a searchable price list</div>')
      +'</div>'
      +(hasPortal
        ?'<div style="display:flex;gap:6px">'
@@ -10298,6 +10423,90 @@ function clearCustMargin(code){
   lSave();syncUp();
   var sheet=document.querySelector('div[style*="z-index: 1300"],div[style*="z-index:1300"]');if(sheet)sheet.remove();
   rPricingSection(code);toast('Reset to global default');
+}
+
+/* ── CATEGORY MARGIN SAVE ── */
+function setCustCatMargin(code,cat,val){
+  if(!ST.custCatMargins)ST.custCatMargins={};
+  if(!ST.custCatMargins[code])ST.custCatMargins[code]={};
+  var v=val.trim();
+  if(v===''||isNaN(parseFloat(v))){delete ST.custCatMargins[code][cat];}
+  else{ST.custCatMargins[code][cat]=parseFloat(v);}
+  lSave();syncUp();
+  rPricingSection(code);
+  toast(v===''?cat+' reset to flat rate':cat+' set to '+parseFloat(v)+'%');
+}
+
+/* ── ITEM PRICE PIN PICKER ── */
+function showItemPinPicker(code){
+  if(!priceData.length){toast('Load a price list first');return;}
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1400;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var pins=ST.custItemPrices&&ST.custItemPrices[code]||{};
+  function buildList(q){
+    var sq=(q||'').toLowerCase().trim();
+    var filtered=priceData.filter(function(r){
+      if(!r._code)return false;
+      if(!sq)return true;
+      return(r._code+' '+r._desc+' '+(r._cat||'')).toLowerCase().indexOf(sq)>=0;
+    });
+    if(!filtered.length)return'<div style="color:#64748b;text-align:center;padding:20px;font-size:14px">No items found</div>';
+    return filtered.slice(0,60).map(function(r){
+      var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
+      var effM=getEffectiveMarginsForItem(code,r);
+      var defSell=cost>0?parseFloat((cost*(1+effM/100)).toFixed(2)):0;
+      var pinned=pins[r._code]!==undefined;
+      var pinnedPrice=pinned?pins[r._code]:defSell;
+      return'<div style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid '+(pinned?'rgba(0,229,184,.4)':'rgba(255,255,255,.08)')+';margin-bottom:6px">'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:11px;color:#00e5b8;font-weight:700">'+esc(r._code)+(r._cat?'  <span style="color:#64748b;font-size:10px">'+esc(r._cat)+'</span>':'')+'</div>'
+          +'<div style="font-size:13px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(r._desc||'')+'</div>'
+          +'<div style="font-size:11px;color:#64748b">Cost: '+(cost>0?'$'+cost.toFixed(2):'—')+(r._uom?' / '+esc(r._uom):'')+(pinned?' &bull; <span style="color:#00e5b8">PINNED</span>':'')+'</div>'
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0">'
+          +'<div style="font-size:10px;color:#64748b;font-weight:700">SELL $</div>'
+          +'<input type="number" min="0" step="0.01" value="'+(pinnedPrice>0?pinnedPrice.toFixed(2):'')+'" placeholder="'+(defSell>0?defSell.toFixed(2):'')+'"'
+            +' style="width:70px;padding:6px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid '+(pinned?'rgba(0,229,184,.5)':'rgba(255,255,255,.15)')+';color:'+(pinned?'#00e5b8':'#e2e8f0')+';font-size:13px;font-weight:700;text-align:center;font-family:inherit;outline:none"'
+            +' onchange="saveItemPin(\''+esc(code)+'\',\''+esc(r._code)+'\',this.value,this)">'
+          +(pinned?'<button onclick="removeItemPin(\''+esc(code)+'\',\''+esc(r._code)+'\')" style="font-size:10px;color:#f87171;background:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;padding:2px">✕ clear</button>':'')
+        +'</div>'
+      +'</div>';
+    }).join('');
+  }
+  sheet.innerHTML='<div style="background:#1e293b;border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 16px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.1);max-height:88vh;display:flex;flex-direction:column;box-sizing:border-box">'
+   +'<div style="width:40px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin:0 auto 14px"></div>'
+   +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'
+     +'<div style="font-size:17px;font-weight:800;color:#e2e8f0">Pin Item Prices</div>'
+     +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:rgba(255,255,255,.08);border:none;color:#94a3b8;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:18px">&#215;</button>'
+   +'</div>'
+   +'<div style="font-size:12px;color:#64748b;margin-bottom:12px">Set an exact sell price for specific items. Overrides category and flat markup for this customer.</div>'
+   +'<input id="pin-srch" type="search" placeholder="Search code or description..." style="width:100%;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#e2e8f0;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;margin-bottom:10px">'
+   +'<div id="pin-list" style="flex:1;overflow-y:auto;min-height:0">'+buildList('')+'</div>'
+   +'</div>';
+  var srch=sheet.querySelector('#pin-srch');
+  if(srch){srch.addEventListener('input',function(){var l=sheet.querySelector('#pin-list');if(l)l.innerHTML=buildList(this.value);});}
+  sheet.addEventListener('click',function(e){if(e.target===sheet){sheet.remove();rPricingSection(code);}});
+  document.body.appendChild(sheet);
+}
+function saveItemPin(code,itemCode,val,inputEl){
+  if(!ST.custItemPrices)ST.custItemPrices={};
+  if(!ST.custItemPrices[code])ST.custItemPrices[code]={};
+  var v=parseFloat(val);
+  if(!isNaN(v)&&v>0){
+    ST.custItemPrices[code][itemCode]=v;
+    if(inputEl){inputEl.style.color='#00e5b8';inputEl.style.borderColor='rgba(0,229,184,.5)';}
+    lSave();syncUp();toast('Price pinned: '+itemCode+' → $'+v.toFixed(2));
+  }else{
+    delete ST.custItemPrices[code][itemCode];
+    if(inputEl){inputEl.style.color='#e2e8f0';inputEl.style.borderColor='rgba(255,255,255,.15)';}
+    lSave();syncUp();
+  }
+}
+function removeItemPin(code,itemCode){
+  if(!ST.custItemPrices||!ST.custItemPrices[code])return;
+  delete ST.custItemPrices[code][itemCode];
+  lSave();syncUp();
+  rPricingSection(code);toast('Pin removed: '+itemCode);
 }
 
 /* ── SALES OVERRIDE EDIT ── */
@@ -10358,7 +10567,9 @@ function generatePortalLink(code){
   var margin=getCustMargin(code);
   var custName=c.name;
   // Store portal in Supabase price_portals table
-  var portalRow={token:token,customer_name:custName,customer_code:code,margin_pct:margin,items:priceData};
+  var catMargins=ST.custCatMargins&&ST.custCatMargins[code]||{};
+  var pinnedPrices=ST.custItemPrices&&ST.custItemPrices[code]||{};
+  var portalRow={token:token,customer_name:custName,customer_code:code,margin_pct:margin,items:priceData,cat_margins:catMargins,pinned_prices:pinnedPrices};
   sb.from('price_portals').upsert(portalRow,{onConflict:'token'}).then(function(res){
     if(res.error){
       // Table may not exist yet — store token locally and show setup message
@@ -10400,36 +10611,60 @@ function _checkPortalMode(){
   var portalDiv=document.getElementById('portal-root');
   if(!portalDiv){portalDiv=document.createElement('div');portalDiv.id='portal-root';portalDiv.style.cssText='min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:inherit';document.body.appendChild(portalDiv);}
   portalDiv.innerHTML='<div style="max-width:520px;margin:0 auto;padding:20px 16px"><div style="text-align:center;padding:40px 0"><div style="font-size:32px;margin-bottom:8px">⏳</div><div style="font-size:16px;color:#7aa3c4">Loading your price list...</div></div></div>';
-  sb.from('price_portals').select('customer_name,margin_pct,items').eq('token',token).single().then(function(res){
+  sb.from('price_portals').select('customer_name,margin_pct,items,cat_margins,pinned_prices').eq('token',token).single().then(function(res){
     if(res.error||!res.data){
       portalDiv.innerHTML='<div style="max-width:520px;margin:0 auto;padding:40px 16px;text-align:center"><div style="font-size:32px;margin-bottom:12px">🔗</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">Link not found</div><div style="font-size:14px;color:#64748b">This price list link may have expired or been revoked. Contact your sales rep for a new link.</div></div>';
       return;
     }
     var d=res.data;
-    _renderPortal(portalDiv,d.customer_name,d.margin_pct,d.items);
+    _renderPortal(portalDiv,d.customer_name,d.margin_pct,d.items,{catMargins:d.cat_margins||{},pinnedPrices:d.pinned_prices||{}});
   });
 }
-function _renderPortal(el,custName,marginPct,items){
+function _renderPortal(el,custName,marginPct,items,portalData){
   var margin=parseFloat(marginPct)||35;
+  portalData=portalData||{};
   var q='';
+  // Build categorized index from pinned items
+  var pinnedPrices=portalData.pinnedPrices||{};
+  var catMargins=portalData.catMargins||{};
+  function getPortalSell(r){
+    var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
+    if(isNaN(cost)||cost<=0)return 0;
+    // Layer 3: item pin
+    if(r._code&&pinnedPrices[r._code]!==undefined)return pinnedPrices[r._code];
+    // Layer 2: category
+    var cat=(r._cat||'').trim();
+    if(cat&&catMargins[cat]!==undefined)return parseFloat((cost*(1+catMargins[cat]/100)).toFixed(2));
+    // Layer 1: flat
+    return parseFloat((cost*(1+margin/100)).toFixed(2));
+  }
   function buildList(){
     var filtered=items.filter(function(r){
       if(!q)return true;
-      return(r._code+' '+r._desc+' '+r._uom).toLowerCase().indexOf(q.toLowerCase())>=0;
+      return(r._code+' '+r._desc+' '+r._uom+' '+(r._cat||'')).toLowerCase().indexOf(q.toLowerCase())>=0;
     });
     if(!filtered.length)return'<div style="text-align:center;padding:40px 16px;color:#64748b">No items found for "'+q+'"</div>';
-    return filtered.map(function(r){
-      var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
-      var sell=!isNaN(cost)&&cost>0?(cost*(1+margin/100)):0;
-      return'<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:8px">'
-        +'<div style="flex:1;min-width:0">'
-          +(r._code?'<div style="font-size:11px;color:#00e5b8;font-weight:700;letter-spacing:.5px">'+r._code+'</div>':'')
-          +'<div style="font-size:14px;font-weight:600;color:#e2e8f0;margin-top:2px">'+r._desc+'</div>'
-          +(r._uom?'<div style="font-size:11px;color:#64748b;margin-top:2px">per '+r._uom+'</div>':'')
-        +'</div>'
-        +(sell>0?'<div style="font-size:18px;font-weight:800;color:#00e5b8;white-space:nowrap">$'+(Math.ceil(sell*4)/4).toFixed(2)+'</div>':'<div style="font-size:14px;color:#64748b">—</div>')
-      +'</div>';
-    }).join('');
+    // Group by category if categories exist
+    var hasCats=filtered.some(function(r){return r._cat&&r._cat.trim();});
+    if(hasCats&&!q){
+      var groups={};var order=[];
+      filtered.forEach(function(r){var c=(r._cat||'').trim()||'General';if(!groups[c]){groups[c]=[];order.push(c);}groups[c].push(r);});
+      return order.map(function(cat){
+        return'<div style="padding:8px 0 4px;font-size:10px;font-weight:800;color:#00e5b8;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(0,229,184,.2);margin-bottom:4px">'+esc(cat)+'</div>'
+          +groups[cat].map(function(r){return _portalItem(r,getPortalSell(r));}).join('');
+      }).join('');
+    }
+    return filtered.map(function(r){return _portalItem(r,getPortalSell(r));}).join('');
+  }
+  function _portalItem(r,sell){
+    return'<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:8px">'
+      +'<div style="flex:1;min-width:0">'
+        +(r._code?'<div style="font-size:11px;color:#00e5b8;font-weight:700;letter-spacing:.5px">'+r._code+'</div>':'')
+        +'<div style="font-size:14px;font-weight:600;color:#e2e8f0;margin-top:2px">'+r._desc+'</div>'
+        +(r._uom?'<div style="font-size:11px;color:#64748b;margin-top:2px">per '+r._uom+'</div>':'')
+      +'</div>'
+      +(sell>0?'<div style="font-size:18px;font-weight:800;color:#00e5b8;white-space:nowrap">$'+sell.toFixed(2)+'</div>':'<div style="font-size:14px;color:#64748b">—</div>')
+    +'</div>';
   }
   el.innerHTML='<div style="max-width:520px;margin:0 auto;padding:0 0 40px">'
    +'<div style="background:linear-gradient(135deg,rgba(0,229,184,.15),rgba(0,209,122,.06));border-bottom:1px solid rgba(0,229,184,.2);padding:20px 16px 16px">'
@@ -10438,7 +10673,7 @@ function _renderPortal(el,custName,marginPct,items){
    +'</div>'
    +'<div style="padding:12px 16px;position:sticky;top:0;background:#0f172a;z-index:10;border-bottom:1px solid rgba(255,255,255,.06)">'
      +'<input id="portal-srch" type="search" placeholder="Search by code or description..." style="width:100%;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#e2e8f0;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none">'
-     +'<div id="portal-count" style="font-size:11px;color:#64748b;margin-top:6px">'+items.length+' items</div>'
+     +'<div id="portal-count" style="font-size:11px;color:#64748b;margin-top:6px">'+items.length+' items'+(_getPriceCategories&&_getPriceCategories().length?' across '+_getPriceCategories().length+' categories':'')+'</div>'
    +'</div>'
    +'<div id="portal-list" style="padding:0 16px">'+buildList()+'</div>'
    +'<div style="padding:20px 16px;text-align:center;font-size:11px;color:#334155">Prices shown are your custom rates. All prices subject to change.</div>'
@@ -11410,7 +11645,7 @@ function onLogin(user){
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
   // Reset ST to blank so previous session data doesn't leak into a new account
-  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
   // One-time cleanup: remove any fake demo customers that got added accidentally
   var _fakeCodes={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
@@ -11622,7 +11857,7 @@ function doSignOut(){
     CURRENT_USER=null;
     SK='';
     rollingRoute=null;saveRolling();
-    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
     authTab('signin');
@@ -11696,7 +11931,7 @@ function confirmDeleteAccount(){
   sb.from('hc_state').delete().eq('id',uid).then(function(){
     sb.auth.signOut().then(function(){
       CURRENT_USER=null;SK='';
-      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
       // Clear local storage
       try{localStorage.removeItem('fieldiq_'+uid);}catch(e){}
       authTab('signin');
