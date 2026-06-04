@@ -1227,6 +1227,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="contact-row"><div class="contact-icon">&#9993;</div><div id="m-e"></div></div>
       <div id="m-g" style="font-size:12px;color:var(--sub);margin-top:4px;padding-left:42px"></div>
       <div id="m-target-sect" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border2)"></div>
+      <div id="m-pricing-sect" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border2)"></div>
     </div>
     <div id="m-edit" class="msect" style="display:none">
       <div class="msect-lbl">Edit Contact</div>
@@ -1367,10 +1368,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1767,7 +1768,9 @@ function openM(code){
   // Quiet account: used to spend, now isn't
   var quietHtml='';
   if(c.lifetimeSales>15000&&c.sales2526<500)quietHtml='<div class="quiet-flag">&#9888; Account Going Quiet</div>';
-  if(ms)ms.innerHTML=[['Lifetime',c.lifetimeSales],['2024',c.sales2024],['2025',c.sales2025],['YTD',c.sales2526]].map(function(x){return'<div class="sbox"><div class="sbl">'+x[0]+'</div><div class="sbv" style="'+( x[0]==='YTD'?'color:var(--teal)':'')+'">'+fmt(x[1])+'</div></div>';}).join('')+(trendHtml||quietHtml?'<div style="width:100%;margin-top:6px">'+trendHtml+quietHtml+'</div>':'');
+  var so=ST.salesOverrides&&ST.salesOverrides[code]||{};
+  var sboxData=[['Lifetime','lifetimeSales',so.lifetimeSales!==undefined?so.lifetimeSales:c.lifetimeSales],['2024','sales2024',so.sales2024!==undefined?so.sales2024:c.sales2024],['2025','sales2025',so.sales2025!==undefined?so.sales2025:c.sales2025],['YTD','sales2526',so.sales2526!==undefined?so.sales2526:c.sales2526]];
+  if(ms)ms.innerHTML=sboxData.map(function(x){var isOvr=so[x[1]]!==undefined;return'<div class="sbox" onclick="editSalesVal(\''+esc(code)+'\',\''+x[1]+'\')" style="cursor:pointer;position:relative">'+(isOvr?'<div style="position:absolute;top:4px;right:4px;font-size:8px;color:var(--teal);font-weight:800">EDIT</div>':'')+'<div class="sbl">'+x[0]+'</div><div class="sbv" style="'+(x[0]==='YTD'?'color:var(--teal)':'')+'">'+fmt(x[2])+'</div><div style="font-size:9px;color:var(--dim);margin-top:2px">tap to edit</div></div>';}).join('')+(trendHtml||quietHtml?'<div style="width:100%;margin-top:6px">'+trendHtml+quietHtml+'</div>':'');
   var mh=document.getElementById('m-hot');if(mh)mh.textContent=ST.hot[code]?'Remove Hot':'Hot Lead';
   var mn2=document.getElementById('m-note');if(mn2)mn2.value=(ST.notes&&ST.notes[code])||'';
   var noteVal=(ST.notes&&ST.notes[code])||'';
@@ -1800,7 +1803,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?('Visited'+(l.rating?' '+(l.rating==='cold'?'&#128528;':l.rating==='neutral'?'&#128578;':'&#128293;'):'')):l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);rQuotesModal(code);rModalPhoto(code);rProductRequests(code);
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);rQuotesModal(code);rModalPhoto(code);rProductRequests(code);rPricingSection(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -1843,6 +1846,9 @@ function _applyRemoteState(rem){
   ST.salesTargets=Object.assign({},rem.salesTargets||{},ST.salesTargets||{});
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
   ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
+  ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
+  ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
+  ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
   if(rem.commRate!==undefined&&ST.commRate===3)ST.commRate=rem.commRate;
   if(rem.userProfile&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rem.userProfile,ST.userProfile||{});}
@@ -3280,6 +3286,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="contact-row"><div class="contact-icon">&#9993;</div><div id="m-e"></div></div>
       <div id="m-g" style="font-size:12px;color:var(--sub);margin-top:4px;padding-left:42px"></div>
       <div id="m-target-sect" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border2)"></div>
+      <div id="m-pricing-sect" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border2)"></div>
     </div>
     <div id="m-edit" class="msect" style="display:none">
       <div class="msect-lbl">Edit Contact</div>
@@ -3413,10 +3420,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -3819,7 +3826,9 @@ function openM(code){
   // Quiet account: used to spend, now isn't
   var quietHtml='';
   if(c.lifetimeSales>15000&&c.sales2526<500)quietHtml='<div class="quiet-flag">&#9888; Account Going Quiet</div>';
-  if(ms)ms.innerHTML=[['Lifetime',c.lifetimeSales],['2024',c.sales2024],['2025',c.sales2025],['YTD',c.sales2526]].map(function(x){return'<div class="sbox"><div class="sbl">'+x[0]+'</div><div class="sbv" style="'+( x[0]==='YTD'?'color:var(--teal)':'')+'">'+fmt(x[1])+'</div></div>';}).join('')+(trendHtml||quietHtml?'<div style="width:100%;margin-top:6px">'+trendHtml+quietHtml+'</div>':'');
+  var so=ST.salesOverrides&&ST.salesOverrides[code]||{};
+  var sboxData=[['Lifetime','lifetimeSales',so.lifetimeSales!==undefined?so.lifetimeSales:c.lifetimeSales],['2024','sales2024',so.sales2024!==undefined?so.sales2024:c.sales2024],['2025','sales2025',so.sales2025!==undefined?so.sales2025:c.sales2025],['YTD','sales2526',so.sales2526!==undefined?so.sales2526:c.sales2526]];
+  if(ms)ms.innerHTML=sboxData.map(function(x){var isOvr=so[x[1]]!==undefined;return'<div class="sbox" onclick="editSalesVal(\''+esc(code)+'\',\''+x[1]+'\')" style="cursor:pointer;position:relative">'+(isOvr?'<div style="position:absolute;top:4px;right:4px;font-size:8px;color:var(--teal);font-weight:800">EDIT</div>':'')+'<div class="sbl">'+x[0]+'</div><div class="sbv" style="'+(x[0]==='YTD'?'color:var(--teal)':'')+'">'+fmt(x[2])+'</div><div style="font-size:9px;color:var(--dim);margin-top:2px">tap to edit</div></div>';}).join('')+(trendHtml||quietHtml?'<div style="width:100%;margin-top:6px">'+trendHtml+quietHtml+'</div>':'');
   var mh=document.getElementById('m-hot');if(mh)mh.textContent=ST.hot[code]?'Remove Hot':'Hot Lead';
   var mn2=document.getElementById('m-note');if(mn2)mn2.value=(ST.notes&&ST.notes[code])||'';
   var noteVal=(ST.notes&&ST.notes[code])||'';
@@ -3852,7 +3861,7 @@ function openM(code){
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
   for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?('Visited'+(l.rating?' '+(l.rating==='cold'?'&#128528;':l.rating==='neutral'?'&#128578;':'&#128293;'):'')):l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
-  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);rQuotesModal(code);rModalPhoto(code);rProductRequests(code);
+  var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);rQuotesModal(code);rModalPhoto(code);rProductRequests(code);rPricingSection(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
   var meb=document.getElementById('m-edt');if(meb)meb.textContent='Edit';
@@ -3895,6 +3904,9 @@ function _applyRemoteState(rem){
   ST.salesTargets=Object.assign({},rem.salesTargets||{},ST.salesTargets||{});
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
   ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
+  ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
+  ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
+  ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
   if(rem.commRate!==undefined&&ST.commRate===3)ST.commRate=rem.commRate;
   if(rem.userProfile&&(!ST.userProfile||!ST.userProfile.name)){ST.userProfile=Object.assign({},rem.userProfile,ST.userProfile||{});}
@@ -7769,8 +7781,7 @@ function openPriceListPicker(code){
 }
 function _renderPLPicker(code,q){
   var picker=document.getElementById('pl-picker-overlay');if(!picker)return;
-  var marginEl=document.getElementById('pr-margin');
-  var margin=parseFloat(marginEl?marginEl.value:35)||35;
+  var margin=getCustMargin(code);
   var multiplier=1+margin/100;
   picker.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;display:flex;flex-direction:column;box-sizing:border-box">'
    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px"></div>'
@@ -7788,8 +7799,7 @@ function _renderPLPicker(code,q){
   if(srch){
     srch.addEventListener('input',function(){
       var el=document.getElementById('pl-picker-list');if(!el)return;
-      var mEl=document.getElementById('pr-margin');
-      var mult=1+(parseFloat(mEl?mEl.value:35)||35)/100;
+      var mult=1+getCustMargin(code)/100;
       // preserve qtys + margins from current inputs before re-render
       var ins=document.querySelectorAll('#pl-picker-list input[data-pidx]');
       ins.forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
@@ -7900,8 +7910,7 @@ function openPLPickerQuote(){
 }
 function _renderPLPickerQuote(){
   var picker=document.getElementById('pl-picker-overlay');if(!picker)return;
-  var marginEl=document.getElementById('pr-margin');
-  var margin=parseFloat(marginEl?marginEl.value:35)||35;
+  var margin=getCustMargin(mC);
   var multiplier=1+margin/100;
   picker.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:88vh;display:flex;flex-direction:column;box-sizing:border-box">'
    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px"></div>'
@@ -7919,8 +7928,7 @@ function _renderPLPickerQuote(){
   if(srch){
     srch.addEventListener('input',function(){
       var el=document.getElementById('pl-picker-list');if(!el)return;
-      var mEl=document.getElementById('pr-margin');
-      var mult=1+(parseFloat(mEl?mEl.value:35)||35)/100;
+      var mult=1+getCustMargin(mC)/100;
       var ins=document.querySelectorAll('#pl-picker-list input[data-pidx]');
       ins.forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
       var mins=document.querySelectorAll('#pl-picker-list input[data-midx]');
@@ -7934,8 +7942,7 @@ function usePLItemsForQuote(){
   var overlay=document.getElementById('pl-picker-overlay');if(!overlay)return;
   overlay.querySelectorAll('input[data-pidx]').forEach(function(n){if(n.value)_plPickerQtys[n.dataset.pidx]=n.value;});
   overlay.querySelectorAll('input[data-midx]').forEach(function(n){_plPickerMargins[n.dataset.midx]=n.value;});
-  var globalMarginEl=document.getElementById('pr-margin');
-  var globalMargin=parseFloat(globalMarginEl?globalMarginEl.value:35)||35;
+  var globalMargin=getCustMargin(mC);
   var added=0;
   // Remove empty placeholder row if present
   if(_qItems.length===1&&!_qItems[0].name&&!_qItems[0].price)_qItems=[];
@@ -10201,6 +10208,253 @@ function deleteProductReq(code,idx){
   rProductRequests(code);
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   PER-CUSTOMER MARGIN, SALES OVERRIDES & PRICING PORTAL
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── GET EFFECTIVE MARGIN FOR A CUSTOMER ── */
+function getCustMargin(code){
+  if(code&&ST.custMargins&&ST.custMargins[code]!==undefined)return parseFloat(ST.custMargins[code])||0;
+  var el=document.getElementById('pr-margin');
+  return parseFloat(el?el.value:35)||35;
+}
+
+/* ── RENDER PRICING SECTION IN CUSTOMER MODAL ── */
+function rPricingSection(code){
+  var el=document.getElementById('m-pricing-sect');if(!el)return;
+  var margin=ST.custMargins&&ST.custMargins[code]!==undefined?parseFloat(ST.custMargins[code]):null;
+  var hasGlobal=!!document.getElementById('pr-margin');
+  var globalM=parseFloat(document.getElementById('pr-margin')?document.getElementById('pr-margin').value:35)||35;
+  var displayM=margin!==null?margin:globalM;
+  var hasPortal=ST.portalTokens&&ST.portalTokens[code];
+  var marginLbl=margin!==null?'<span style="color:var(--teal);font-weight:800">'+displayM+'%</span> <span style="font-size:10px;color:var(--teal)">(custom)</span>':'<span style="color:var(--sub);font-weight:700">'+displayM+'%</span> <span style="font-size:10px;color:var(--dim)">(global default)</span>';
+  el.innerHTML=
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+   +'<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.8px">Pricing</div>'
+   +'</div>'
+   +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">'
+     +'<div>'
+       +'<div style="font-size:12px;color:var(--sub)">Markup %</div>'
+       +'<div style="font-size:14px;margin-top:2px">'+marginLbl+'</div>'
+     +'</div>'
+     +'<button onclick="editCustMargin(\''+esc(code)+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#9998; Edit</button>'
+   +'</div>'
+   +'<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">'
+     +'<div>'
+       +'<div style="font-size:12px;color:var(--sub)">Customer Price Portal</div>'
+       +(hasPortal?'<div style="font-size:11px;color:var(--teal);margin-top:2px">&#10003; Portal active</div>':'<div style="font-size:11px;color:var(--dim);margin-top:2px">Shareable price list link</div>')
+     +'</div>'
+     +(hasPortal
+       ?'<div style="display:flex;gap:6px">'
+          +'<button onclick="copyPortalLink(\''+esc(code)+'\')" style="background:var(--teal2);border:1px solid rgba(0,229,184,.3);color:var(--teal);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128279; Copy</button>'
+          +'<button onclick="revokePortal(\''+esc(code)+'\')" style="background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128465;</button>'
+        +'</div>'
+       :'<button onclick="generatePortalLink(\''+esc(code)+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128279; Generate</button>')
+   +'</div>';
+}
+
+/* ── EDIT CUSTOMER MARKUP % ── */
+function editCustMargin(code){
+  var c=null;var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===code){c=a[i];break;}}
+  var current=ST.custMargins&&ST.custMargins[code]!==undefined?ST.custMargins[code]:'';
+  var globalM=parseFloat(document.getElementById('pr-margin')?document.getElementById('pr-margin').value:35)||35;
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1300;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(36px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">Custom Markup %</div>'
+   +'<div style="font-size:13px;color:var(--sub);margin-bottom:16px">Set a specific markup for <strong style="color:var(--text)">'+(c?esc(c.name):'this customer')+'</strong>. Leave blank to use the global default ('+globalM+'%).</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Markup % (e.g. 22 = sell at cost + 22%)</div>'
+   +'<input id="cust-margin-inp" type="number" min="0" max="200" step="0.5" placeholder="e.g. 22  (blank = use global default: '+globalM+'%)" value="'+esc(String(current))+'" style="width:100%;padding:12px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:16px;box-sizing:border-box;margin-bottom:6px;outline:none">'
+   +'<div id="cust-margin-preview" style="font-size:12px;color:var(--sub);margin-bottom:16px;height:16px"></div>'
+   +'<button onclick="saveCustMargin(\''+esc(code)+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save Markup</button>'
+   +'<button onclick="clearCustMargin(\''+esc(code)+'\')" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:8px">Reset to Global Default</button>'
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+   +'</div>';
+  var inp=sheet.querySelector('#cust-margin-inp');
+  if(inp){
+    inp.addEventListener('input',function(){
+      var v=parseFloat(this.value);var prev=sheet.querySelector('#cust-margin-preview');
+      if(prev){prev.textContent=!isNaN(v)&&v>0?'e.g. $100 cost → sell at $'+(100*(1+v/100)).toFixed(2):'';}
+    });
+    if(current!==''){var ev=new Event('input');inp.dispatchEvent(ev);}
+  }
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+function saveCustMargin(code){
+  var inp=document.getElementById('cust-margin-inp');if(!inp)return;
+  var v=inp.value.trim();
+  if(!ST.custMargins)ST.custMargins={};
+  if(v===''||isNaN(parseFloat(v))){delete ST.custMargins[code];}
+  else{ST.custMargins[code]=parseFloat(v);}
+  lSave();syncUp();
+  var sheet=document.querySelector('div[style*="z-index: 1300"],div[style*="z-index:1300"]');if(sheet)sheet.remove();
+  rPricingSection(code);toast('Markup saved');
+}
+function clearCustMargin(code){
+  if(!ST.custMargins)ST.custMargins={};
+  delete ST.custMargins[code];
+  lSave();syncUp();
+  var sheet=document.querySelector('div[style*="z-index: 1300"],div[style*="z-index:1300"]');if(sheet)sheet.remove();
+  rPricingSection(code);toast('Reset to global default');
+}
+
+/* ── SALES OVERRIDE EDIT ── */
+function editSalesVal(code,key){
+  var c=null;var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===code){c=a[i];break;}}
+  var so=ST.salesOverrides&&ST.salesOverrides[code]||{};
+  var current=so[key]!==undefined?so[key]:(c?c[key]:0);
+  var labels={lifetimeSales:'Lifetime Sales',sales2024:'FY 2024 Sales',sales2025:'FY 2025 Sales',sales2526:'Current YTD Sales'};
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1300;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(36px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">Edit: '+(labels[key]||key)+'</div>'
+   +'<div style="font-size:13px;color:var(--sub);margin-bottom:16px">Override the imported value for <strong style="color:var(--text)">'+(c?esc(c.name):'this customer')+'</strong>. Import will update this value again unless you re-override.</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">$ Amount</div>'
+   +'<input id="sales-ovr-inp" type="number" min="0" step="100" value="'+Math.round(current||0)+'" style="width:100%;padding:12px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:16px;box-sizing:border-box;margin-bottom:16px;outline:none">'
+   +'<button onclick="saveSalesOverride(\''+esc(code)+'\',\''+key+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save</button>'
+   +(so[key]!==undefined?'<button onclick="clearSalesOverride(\''+esc(code)+'\',\''+key+'\')" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:8px">Reset to Import Value</button>':'')
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+function saveSalesOverride(code,key){
+  var inp=document.getElementById('sales-ovr-inp');if(!inp)return;
+  var v=parseFloat(inp.value);if(isNaN(v))v=0;
+  if(!ST.salesOverrides)ST.salesOverrides={};
+  if(!ST.salesOverrides[code])ST.salesOverrides[code]={};
+  ST.salesOverrides[code][key]=v;
+  lSave();syncUp();
+  var sheet=document.querySelector('div[style*="z-index: 1300"],div[style*="z-index:1300"]');if(sheet)sheet.remove();
+  openM(code);toast('Sales figure updated');
+}
+function clearSalesOverride(code,key){
+  if(!ST.salesOverrides||!ST.salesOverrides[code])return;
+  delete ST.salesOverrides[code][key];
+  lSave();syncUp();
+  var sheet=document.querySelector('div[style*="z-index: 1300"],div[style*="z-index:1300"]');if(sheet)sheet.remove();
+  openM(code);toast('Reset to import value');
+}
+
+/* ── PRICING PORTAL ── */
+function _genToken(){
+  var a='';var c='abcdefghijklmnopqrstuvwxyz0123456789';
+  for(var i=0;i<32;i++)a+=c[Math.floor(Math.random()*c.length)];
+  return a;
+}
+function _getPortalURL(token){
+  return window.location.origin+window.location.pathname+'?portal='+token;
+}
+function generatePortalLink(code){
+  if(!priceData.length){toast('Load a price list in the Pricing tab first');return;}
+  var c=null;var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===code){c=a[i];break;}}
+  if(!c){toast('Customer not found');return;}
+  var token=_genToken();
+  if(!ST.portalTokens)ST.portalTokens={};
+  ST.portalTokens[code]=token;
+  var margin=getCustMargin(code);
+  var custName=c.name;
+  // Store portal in Supabase price_portals table
+  var portalRow={token:token,customer_name:custName,customer_code:code,margin_pct:margin,items:priceData};
+  sb.from('price_portals').upsert(portalRow,{onConflict:'token'}).then(function(res){
+    if(res.error){
+      // Table may not exist yet — store token locally and show setup message
+      lSave();syncUp();
+      rPricingSection(code);
+      toast('⚠ Run Supabase setup first — see Settings → Portal Setup');
+      return;
+    }
+    lSave();syncUp();
+    rPricingSection(code);
+    copyPortalLink(code);
+    toast('Portal link copied! Share with '+custName);
+  });
+}
+function copyPortalLink(code){
+  var token=ST.portalTokens&&ST.portalTokens[code];
+  if(!token){toast('No portal link yet — tap Generate first');return;}
+  var url=_getPortalURL(token);
+  if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){toast('Link copied to clipboard!');});}
+  else{var ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Link copied!');}
+}
+function revokePortal(code){
+  if(!confirm('Revoke this portal link? The customer\'s link will stop working.'))return;
+  var token=ST.portalTokens&&ST.portalTokens[code];
+  if(token){sb.from('price_portals').delete().eq('token',token).then(function(){});}
+  if(ST.portalTokens)delete ST.portalTokens[code];
+  lSave();syncUp();
+  rPricingSection(code);toast('Portal link revoked');
+}
+
+/* ── PORTAL VIEW (triggered by ?portal=TOKEN in URL) ── */
+function _checkPortalMode(){
+  var params=new URLSearchParams(window.location.search);
+  var token=params.get('portal');
+  if(!token)return;
+  // Hide the main app, show portal immediately
+  document.body.style.background='var(--bg,#0f172a)';
+  var app=document.getElementById('app');if(app)app.style.display='none';
+  var portalDiv=document.getElementById('portal-root');
+  if(!portalDiv){portalDiv=document.createElement('div');portalDiv.id='portal-root';portalDiv.style.cssText='min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:inherit';document.body.appendChild(portalDiv);}
+  portalDiv.innerHTML='<div style="max-width:520px;margin:0 auto;padding:20px 16px"><div style="text-align:center;padding:40px 0"><div style="font-size:32px;margin-bottom:8px">⏳</div><div style="font-size:16px;color:#7aa3c4">Loading your price list...</div></div></div>';
+  sb.from('price_portals').select('customer_name,margin_pct,items').eq('token',token).single().then(function(res){
+    if(res.error||!res.data){
+      portalDiv.innerHTML='<div style="max-width:520px;margin:0 auto;padding:40px 16px;text-align:center"><div style="font-size:32px;margin-bottom:12px">🔗</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">Link not found</div><div style="font-size:14px;color:#64748b">This price list link may have expired or been revoked. Contact your sales rep for a new link.</div></div>';
+      return;
+    }
+    var d=res.data;
+    _renderPortal(portalDiv,d.customer_name,d.margin_pct,d.items);
+  });
+}
+function _renderPortal(el,custName,marginPct,items){
+  var margin=parseFloat(marginPct)||35;
+  var q='';
+  function buildList(){
+    var filtered=items.filter(function(r){
+      if(!q)return true;
+      return(r._code+' '+r._desc+' '+r._uom).toLowerCase().indexOf(q.toLowerCase())>=0;
+    });
+    if(!filtered.length)return'<div style="text-align:center;padding:40px 16px;color:#64748b">No items found for "'+q+'"</div>';
+    return filtered.map(function(r){
+      var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
+      var sell=!isNaN(cost)&&cost>0?(cost*(1+margin/100)):0;
+      return'<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:8px">'
+        +'<div style="flex:1;min-width:0">'
+          +(r._code?'<div style="font-size:11px;color:#00e5b8;font-weight:700;letter-spacing:.5px">'+r._code+'</div>':'')
+          +'<div style="font-size:14px;font-weight:600;color:#e2e8f0;margin-top:2px">'+r._desc+'</div>'
+          +(r._uom?'<div style="font-size:11px;color:#64748b;margin-top:2px">per '+r._uom+'</div>':'')
+        +'</div>'
+        +(sell>0?'<div style="font-size:18px;font-weight:800;color:#00e5b8;white-space:nowrap">$'+(Math.ceil(sell*4)/4).toFixed(2)+'</div>':'<div style="font-size:14px;color:#64748b">—</div>')
+      +'</div>';
+    }).join('');
+  }
+  el.innerHTML='<div style="max-width:520px;margin:0 auto;padding:0 0 40px">'
+   +'<div style="background:linear-gradient(135deg,rgba(0,229,184,.15),rgba(0,209,122,.06));border-bottom:1px solid rgba(0,229,184,.2);padding:20px 16px 16px">'
+     +'<div style="font-size:22px;font-weight:900;color:#e2e8f0;margin-bottom:2px">'+custName+'</div>'
+     +'<div style="font-size:13px;color:#7aa3c4">Your current pricing — powered by FieldIQ</div>'
+   +'</div>'
+   +'<div style="padding:12px 16px;position:sticky;top:0;background:#0f172a;z-index:10;border-bottom:1px solid rgba(255,255,255,.06)">'
+     +'<input id="portal-srch" type="search" placeholder="Search by code or description..." style="width:100%;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#e2e8f0;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none">'
+     +'<div id="portal-count" style="font-size:11px;color:#64748b;margin-top:6px">'+items.length+' items</div>'
+   +'</div>'
+   +'<div id="portal-list" style="padding:0 16px">'+buildList()+'</div>'
+   +'<div style="padding:20px 16px;text-align:center;font-size:11px;color:#334155">Prices shown are your custom rates. All prices subject to change.</div>'
+   +'</div>';
+  var srch=document.getElementById('portal-srch');
+  if(srch){
+    srch.addEventListener('input',function(){
+      q=this.value;
+      var list=document.getElementById('portal-list');if(list)list.innerHTML=buildList();
+      var cnt=document.getElementById('portal-count');
+      var f=items.filter(function(r){if(!q)return true;return(r._code+' '+r._desc+' '+r._uom).toLowerCase().indexOf(q.toLowerCase())>=0;});
+      if(cnt)cnt.textContent=f.length+(q?' matching':'')+(f.length!==items.length?' of '+items.length:'')+(items.length===1?' item':' items');
+    });
+  }
+}
+
 /* ── UPSELL NUDGES ── */
 function rUpsellNudges(){
   var el=document.getElementById('d-upsell');if(!el)return;
@@ -11156,7 +11410,7 @@ function onLogin(user){
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
   // Reset ST to blank so previous session data doesn't leak into a new account
-  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
   // One-time cleanup: remove any fake demo customers that got added accidentally
   var _fakeCodes={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
@@ -11368,7 +11622,7 @@ function doSignOut(){
     CURRENT_USER=null;
     SK='';
     rollingRoute=null;saveRolling();
-    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
     authTab('signin');
@@ -11442,7 +11696,7 @@ function confirmDeleteAccount(){
   sb.from('hc_state').delete().eq('id',uid).then(function(){
     sb.auth.signOut().then(function(){
       CURRENT_USER=null;SK='';
-      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
       // Clear local storage
       try{localStorage.removeItem('fieldiq_'+uid);}catch(e){}
       authTab('signin');
@@ -11989,11 +12243,11 @@ window.onIAPRestoreResult = function(result){
   }
 };
 
-// Check subscription when app loads
+// Check for portal mode FIRST — bypass auth entirely if portal URL
 if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', checkSubscription);
+  document.addEventListener('DOMContentLoaded', function(){_checkPortalMode();checkSubscription();});
 }else{
-  checkSubscription();
+  _checkPortalMode();checkSubscription();
 }
 
 /* ── TESTING SHORTCUTS ─────────────────────────────────────────────────── */
