@@ -1362,7 +1362,7 @@ var VENDORS_BASE=[
 ];
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
-var sb=supabase.createClient(SURL,SKEY);
+var sb=sb||supabase.createClient(SURL,SKEY);
 var SK='';
 var CURRENT_USER=null;
 var AUTH_MODE='signin';
@@ -3416,7 +3416,7 @@ var VENDORS_BASE=[
 ];
 var SURL='https://oaxkcsnmiozpnnhlmkmi.supabase.co';
 var SKEY='sb_publishable_j6iNpqB7GVx-os2XMWJs7A_eFUC9r_P';
-var sb=supabase.createClient(SURL,SKEY);
+var sb=sb||supabase.createClient(SURL,SKEY);
 var SK='';
 var CURRENT_USER=null;
 var AUTH_MODE='signin';
@@ -4548,7 +4548,7 @@ function exportNotes(){
 
 // Wire up all events
 document.querySelectorAll('nav a').forEach(function(a){
-  a.addEventListener('click',function(){go(this.getAttribute('data-p'));});
+  a.addEventListener('click',function(){if(mC)closeM();go(this.getAttribute('data-p'));});
 });
 document.querySelectorAll('.chip').forEach(function(chip){
   chip.addEventListener('click',function(){
@@ -4738,8 +4738,15 @@ function handleImport(inp){
   var file=inp.files[0];if(!file)return;
   var status=window._importStatusOverride||document.getElementById('import-status');
   window._importStatusOverride=null;
-  if(status){status.style.color='var(--sub)';status.textContent='Reading file...';}
   var ext=file.name.split('.').pop().toLowerCase();
+  if(ext!=='csv'&&ext!=='xlsx'&&ext!=='xls'){
+    if(status){status.style.color='#ef4444';status.textContent='Please upload an .xlsx or .csv file.';}
+    toast('❌ Please upload an .xlsx or .csv file');
+    inp.value='';
+    return;
+  }
+  if(status){status.style.color='var(--sub)';status.textContent='Reading file...';}
+  var extCheck=ext;
   var doMap=function(hdrs,rows,fname){
     showColumnMapper(hdrs,rows,fname,status);
   };
@@ -11610,6 +11617,7 @@ function doAuth(){
   var pass=document.getElementById('auth-pass').value||'';
   var btn=document.getElementById('auth-btn');
   if(!email||!pass){showAuthError('Please enter your email and password.');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showAuthError('Please enter a valid email address.');return;}
   if(AUTH_MODE==='signup'&&pass.length<6){showAuthError('Password must be at least 6 characters.');return;}
   if(AUTH_MODE==='signup'){var pass2=(document.getElementById('auth-pass2').value||'');if(pass!==pass2){showAuthError('Passwords do not match.');return;}}
   btn.disabled=true;
@@ -11892,6 +11900,7 @@ function doSignOut(){
     ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
+    var tb=document.getElementById('trial-banner');if(tb)tb.style.display='none';
     authTab('signin');
     document.body.style.overflow='hidden';
     var as=document.getElementById('auth-screen');
