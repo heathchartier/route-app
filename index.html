@@ -10631,7 +10631,7 @@ function _checkPortalMode(){
   setTimeout(_hideAppEls,300);
   setTimeout(_hideAppEls,800);
   var portalDiv=document.getElementById('portal-root');
-  if(!portalDiv){portalDiv=document.createElement('div');portalDiv.id='portal-root';portalDiv.style.cssText='min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:inherit';document.body.appendChild(portalDiv);}
+  if(!portalDiv){portalDiv=document.createElement('div');portalDiv.id='portal-root';portalDiv.style.cssText='position:fixed;inset:0;background:#0f172a;color:#e2e8f0;font-family:inherit;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:99999';document.body.appendChild(portalDiv);}
   portalDiv.innerHTML='<div style="max-width:520px;margin:0 auto;padding:20px 16px"><div style="text-align:center;padding:40px 0"><div style="font-size:32px;margin-bottom:8px">⏳</div><div style="font-size:16px;color:#7aa3c4">Loading your price list...</div></div></div>';
   sb.from('price_portals').select('customer_name,margin_pct,items,cat_margins,pinned_prices').eq('token',token).single().then(function(res){
     if(res.error||!res.data){
