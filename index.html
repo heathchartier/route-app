@@ -10606,17 +10606,24 @@ function _checkPortalMode(){
   var token=params.get('portal');
   if(!token)return;
   _isPortalMode=true;
+  // Mark trial as seen so no setTimeout can re-show it in this session
+  try{localStorage.setItem('fieldiq_trial_info_seen','1');}catch(e){}
   // Aggressively hide every app element so nothing leaks through
   document.body.style.background='#0f172a';
   function _hideAppEls(){
     ['app','trial-info-overlay','paywall-overlay','trial-banner','auth-screen','toast'].forEach(function(id){
-      var el=document.getElementById(id);if(el)el.style.display='none';
+      var el=document.getElementById(id);
+      if(el){el.style.display='none';el.style.visibility='hidden';}
+    });
+    // Also hide anything with high z-index that's not the portal
+    var portalRoot=document.getElementById('portal-root');
+    document.querySelectorAll('body > div').forEach(function(d){
+      if(d.id!=='portal-root'&&d.id!=='toast')d.style.display='none';
     });
   }
   _hideAppEls();
-  // Re-hide after short delay to catch anything fired via setTimeout
-  setTimeout(_hideAppEls,200);
-  setTimeout(_hideAppEls,700);
+  setTimeout(_hideAppEls,300);
+  setTimeout(_hideAppEls,800);
   var portalDiv=document.getElementById('portal-root');
   if(!portalDiv){portalDiv=document.createElement('div');portalDiv.id='portal-root';portalDiv.style.cssText='min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:inherit';document.body.appendChild(portalDiv);}
   portalDiv.innerHTML='<div style="max-width:520px;margin:0 auto;padding:20px 16px"><div style="text-align:center;padding:40px 0"><div style="font-size:32px;margin-bottom:8px">⏳</div><div style="font-size:16px;color:#7aa3c4">Loading your price list...</div></div></div>';
@@ -11679,6 +11686,16 @@ function onLogin(user){
   if(as)as.style.display='none';
   var ul=document.getElementById('auth-user-lbl');
   if(ul)ul.textContent='Signed in as '+user.email;
+  // Free access accounts: immediately suppress trial screen + paywall
+  if(isFreeAccess()){
+    try{localStorage.setItem('fieldiq_trial_info_seen','1');}catch(e){}
+    var _tio=document.getElementById('trial-info-overlay');
+    if(_tio)_tio.style.display='none';
+    var _tb=document.getElementById('trial-banner');
+    if(_tb)_tb.style.display='none';
+    var _po=document.getElementById('paywall-overlay');
+    if(_po)_po.style.display='none';
+  }
   // Fresh password login already proves identity — skip app lock screen this session
   _appUnlockedThisSession=true;
   sessionStorage.setItem('hrt_unlocked','1');
@@ -12232,7 +12249,7 @@ function initApp(){
 </div>
 
 <!-- ══ TRIAL INFO SCREEN (First Login) ════════════════════════════════════ -->
-<div id="trial-info-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px">
+<div id="trial-info-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:10001;align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);max-width:400px;width:100%;padding:28px 24px">
     <div style="text-align:center;margin-bottom:20px">
       <div style="font-size:48px;margin-bottom:12px">🎉</div>
