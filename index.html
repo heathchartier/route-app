@@ -12327,6 +12327,10 @@ function initApp(){
       <button onclick="restoreSubscribe()" style="width:100%;padding:12px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Restore Purchase</button>
     </div>
 
+    <div style="text-align:center;margin-bottom:16px">
+      <button onclick="hidePaywall();var as=document.getElementById('auth-screen');if(as)as.style.display='flex';" style="background:none;border:none;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline">Already have an account? Sign In</button>
+    </div>
+
     <div style="font-size:11px;color:var(--dim);text-align:center;line-height:1.6">
       Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage subscriptions in App Store settings.
     </div>
