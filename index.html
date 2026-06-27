@@ -537,6 +537,8 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" async></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 </head>
 <body>
 
@@ -1093,6 +1095,20 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Choose which insight cards appear on your Home screen. Turn off anything you don't need to keep your dashboard clean and focused.</div>
       <div id="dash-toggles"></div>
     </div>
+
+    <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Documents</div>
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">&#128193; My Documents</div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:14px;line-height:1.5">Price lists, calculation sheets, photos, and reference files — synced to the cloud and available on all your devices.</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button onclick="docsPickFile()" style="flex:1;padding:12px 8px;border-radius:var(--r2);background:var(--teal2);border:1px solid rgba(0,229,184,.3);color:var(--teal);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128206; Upload File</button>
+        <button onclick="docsPickPhoto()" style="flex:1;padding:12px 8px;border-radius:var(--r2);background:var(--blue2);border:1px solid rgba(74,158,255,.3);color:var(--blue);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128247; Take Photo</button>
+      </div>
+      <input type="file" id="docs-file-input" accept=".pdf,.xlsx,.xls,.docx,.doc,.csv,.txt,.png,.jpg,.jpeg" style="display:none" onchange="docsHandleFile(this)">
+      <input type="file" id="docs-camera-input" accept="image/*" capture="environment" style="display:none" onchange="docsHandleCamera(this)">
+      <div id="docs-list"><div style="text-align:center;padding:20px;color:var(--dim);font-size:13px">Loading...</div></div>
+    </div>
+
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Account</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128274; Account</div>
@@ -1407,7 +1423,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;docsLoad();}
 }
 
 function smartGroup(){
@@ -3461,7 +3477,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;}
+  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;docsLoad();}
 }
 
 function smartGroup(){
@@ -12337,6 +12353,25 @@ function initApp(){
   </div>
 </div>
 
+<!-- ══ DOCS CROP MODAL ══════════════════════════════════════════════════════ -->
+<div id="docs-crop-modal" style="display:none;position:fixed;inset:0;background:#000;z-index:20000;flex-direction:column">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 12px;background:rgba(0,0,0,.85)">
+    <button onclick="docsCropCancel()" style="padding:8px 16px;border-radius:var(--r3);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>
+    <span style="font-size:15px;font-weight:700;color:#fff">Crop Photo</span>
+    <button onclick="docsCropUse()" style="padding:8px 16px;border-radius:var(--r3);background:var(--teal);border:none;color:#000;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Use Photo</button>
+  </div>
+  <div style="flex:1;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center">
+    <img id="docs-crop-img" style="max-width:100%;display:block">
+  </div>
+  <div style="padding:12px 18px calc(env(safe-area-inset-bottom,0px) + 12px);background:rgba(0,0,0,.85);display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+    <button onclick="docsCropRotate(-90)" style="padding:8px 14px;border-radius:var(--r3);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">&#8634; Rotate</button>
+    <button onclick="docsCropAspect(NaN)" style="padding:8px 14px;border-radius:var(--r3);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Free</button>
+    <button onclick="docsCropAspect(1)" style="padding:8px 14px;border-radius:var(--r3);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Square</button>
+    <button onclick="docsCropAspect(4/3)" style="padding:8px 14px;border-radius:var(--r3);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">4:3</button>
+    <button onclick="docsCropAspect(16/9)" style="padding:8px 14px;border-radius:var(--r3);background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">16:9</button>
+  </div>
+</div>
+
 <script>
 /* ── IAP BRIDGE & SUBSCRIPTION MANAGEMENT ────────────────────────────────── */
 var SUBSCRIPTION_STATUS = null;
@@ -12559,6 +12594,138 @@ function forcePaywallTest(){
   // Show paywall
   showPaywall();
   toast('Trial expired — paywall visible');
+}
+</script>
+
+<script>
+/* ── DOCUMENTS ──────────────────────────────────────────────────────────── */
+var _docsCropper = null;
+var _docsPendingFile = null;
+
+function docsPickFile() { document.getElementById('docs-file-input').click(); }
+function docsPickPhoto() { document.getElementById('docs-camera-input').click(); }
+
+function docsHandleFile(inp) {
+  var f = inp.files[0]; if (!f) return; inp.value = '';
+  if (f.type.startsWith('image/')) { docsShowCropper(f); }
+  else { docsUpload(f); }
+}
+
+function docsHandleCamera(inp) {
+  var f = inp.files[0]; if (!f) return; inp.value = '';
+  docsShowCropper(f);
+}
+
+function docsShowCropper(file) {
+  _docsPendingFile = file;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var modal = document.getElementById('docs-crop-modal');
+    var img = document.getElementById('docs-crop-img');
+    img.src = e.target.result;
+    modal.style.display = 'flex';
+    if (_docsCropper) { _docsCropper.destroy(); _docsCropper = null; }
+    img.onload = function() {
+      _docsCropper = new Cropper(img, {
+        viewMode: 1, autoCropArea: 0.95,
+        movable: true, zoomable: true, scalable: true, rotatable: true
+      });
+    };
+  };
+  reader.readAsDataURL(file);
+}
+
+function docsCropRotate(deg) { if (_docsCropper) _docsCropper.rotate(deg); }
+function docsCropAspect(r) { if (_docsCropper) _docsCropper.setAspectRatio(isNaN(r) ? NaN : r); }
+
+function docsCropCancel() {
+  document.getElementById('docs-crop-modal').style.display = 'none';
+  if (_docsCropper) { _docsCropper.destroy(); _docsCropper = null; }
+  _docsPendingFile = null;
+}
+
+function docsCropUse() {
+  if (!_docsCropper) return;
+  var origName = _docsPendingFile ? _docsPendingFile.name : 'photo.jpg';
+  var saveName = origName.replace(/\.[^.]+$/, '') + '.jpg';
+  _docsCropper.getCroppedCanvas({ maxWidth: 2048, maxHeight: 2048 }).toBlob(function(blob) {
+    var file = new File([blob], saveName, { type: 'image/jpeg' });
+    document.getElementById('docs-crop-modal').style.display = 'none';
+    _docsCropper.destroy(); _docsCropper = null; _docsPendingFile = null;
+    docsUpload(file);
+  }, 'image/jpeg', 0.88);
+}
+
+async function docsUpload(file) {
+  if (!CURRENT_USER) { showToast('Sign in first'); return; }
+  var uid = CURRENT_USER.id;
+  var safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  var path = uid + '/' + Date.now() + '-' + safe;
+  showToast('Uploading…');
+  var res = await sb.storage.from('fieldiq-docs').upload(path, file, { upsert: false });
+  if (res.error) { showToast('Upload failed: ' + res.error.message); return; }
+  showToast('Uploaded ✓');
+  docsLoad();
+}
+
+async function docsLoad() {
+  if (!CURRENT_USER) return;
+  var el = document.getElementById('docs-list');
+  if (!el) return;
+  var uid = CURRENT_USER.id;
+  var res = await sb.storage.from('fieldiq-docs').list(uid, {
+    sortBy: { column: 'created_at', order: 'desc' }, limit: 200
+  });
+  if (res.error || !res.data || !res.data.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px 0;color:var(--dim);font-size:13px">No documents yet — tap Upload File or Take Photo to add one.</div>';
+    return;
+  }
+  el.innerHTML = res.data.map(function(f) { return docsRow(f, uid); }).join('');
+}
+
+function docsIcon(name) {
+  var ext = (name.split('.').pop() || '').toLowerCase();
+  if (ext === 'pdf') return '&#128196;';
+  if (['xlsx','xls','csv'].indexOf(ext) !== -1) return '&#128202;';
+  if (['docx','doc'].indexOf(ext) !== -1) return '&#128203;';
+  if (['jpg','jpeg','png','gif','heic','webp'].indexOf(ext) !== -1) return '&#128444;&#65039;';
+  return '&#128206;';
+}
+
+function docsBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return Math.round(b / 1024) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
+}
+
+function docsRow(f, uid) {
+  var display = f.name.replace(/^\d{13}-/, '');
+  var size = (f.metadata && f.metadata.size) ? docsBytes(f.metadata.size) : '';
+  var path = uid + '/' + f.name;
+  var pathSafe = path.replace(/'/g, "\\'");
+  var dispSafe = display.replace(/'/g, "\\'");
+  return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">'
+    + '<div style="font-size:26px;flex-shrink:0">' + docsIcon(f.name) + '</div>'
+    + '<div style="flex:1;min-width:0;cursor:pointer" onclick="docsOpen(\'' + pathSafe + '\')">'
+    + '<div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">' + display + '</div>'
+    + (size ? '<div style="font-size:11px;color:var(--sub);margin-top:2px">' + size + '</div>' : '')
+    + '</div>'
+    + '<button onclick="docsDelete(\'' + pathSafe + '\',\'' + dispSafe + '\')" style="padding:6px 10px;border-radius:var(--r3);background:transparent;border:1px solid rgba(255,77,106,.3);color:var(--red);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">&#10005;</button>'
+    + '</div>';
+}
+
+async function docsOpen(path) {
+  var res = await sb.storage.from('fieldiq-docs').createSignedUrl(path, 3600);
+  if (res.error || !res.data) { showToast('Could not open file'); return; }
+  window.open(res.data.signedUrl, '_blank');
+}
+
+async function docsDelete(path, name) {
+  if (!confirm('Delete “' + name + '”?')) return;
+  var res = await sb.storage.from('fieldiq-docs').remove([path]);
+  if (res.error) { showToast('Delete failed'); return; }
+  showToast('Deleted');
+  docsLoad();
 }
 </script>
 
