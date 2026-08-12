@@ -738,7 +738,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       </div>
       <div class="tesla-stops" id="d-tesla-stops"></div>
       <div class="tesla-btns">
-        <button class="tesla-cont" id="d-tesla-cont">Continue Route in Apple Maps</button>
+        <button class="tesla-cont" id="d-tesla-cont">Continue Route</button>
         <button class="tesla-clear" onclick="clearRollingRoute()">Done</button>
       </div>
     </div>
@@ -2828,7 +2828,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       </div>
       <div class="tesla-stops" id="d-tesla-stops"></div>
       <div class="tesla-btns">
-        <button class="tesla-cont" id="d-tesla-cont">Continue Route in Apple Maps</button>
+        <button class="tesla-cont" id="d-tesla-cont">Continue Route</button>
         <button class="tesla-clear" onclick="clearRollingRoute()">Done</button>
       </div>
     </div>
@@ -5524,7 +5524,7 @@ function showMapPicker(stops,homeStart,homeEnd){
   var opts=[
     {icon:'&#127758;',name:'Google Maps',sub:'All '+n+' stops'+(homeStart?' from home':' from your location'),url:googleUrl,bg:'rgba(66,133,244,.15)',store:googleStore,storeNote:'Don\'t have Google Maps?'},
     {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail||!isIOS},
-    {icon:'&#9889;',name:'Tesla',sub:'All '+n+' stops via Google Maps',note:'Opens Google Maps. When your phone is connected to Tesla via Bluetooth, navigation mirrors to your Tesla screen automatically.',url:googleUrl,bg:'rgba(232,33,39,.12)',store:googleStore,storeNote:'Don\'t have Google Maps?',hidden:!teslaAvail||!isIOS},
+    {icon:'&#9889;',name:'Tesla',sub:'Rolling route — 1 stop at a time ('+n+' total)',note:'Opens Google Maps for each stop. When your phone is connected to Tesla via Bluetooth, each stop mirrors to your Tesla screen. Tap "Next Stop" in FieldIQ after each visit.',handler:function(){startRollingRoute(effectiveStops,'gmaps',rollingStart);},bg:'rgba(232,33,39,.12)',store:googleStore,storeNote:'Don\'t have Google Maps?',hidden:!teslaAvail||!isIOS},
     {icon:'&#128663;',name:'Waze',sub:wazeLabel,note:'Waze always navigates from your current GPS location. To start from home, use Google Maps or Apple Maps.',handler:function(){startRollingRoute(effectiveStops,'waze',rollingStart);},bg:'rgba(255,176,32,.12)',store:wazeStore,storeNote:'Don\'t have Waze?'}
   ];
 
@@ -5886,36 +5886,40 @@ function saveRolling(){
   }catch(e){}
 }
 
-function startTeslaRoute(stops){startRollingRoute(stops,'apple');}
+function startTeslaRoute(stops){startRollingRoute(stops,'gmaps');}
 
 function startRollingRoute(stops,type,saddr){
   type=type||'apple';
-  var FIRST=type==='waze'?1:4;
+  var FIRST=(type==='waze'||type==='gmaps')?1:4;
   var batch=stops.slice(0,FIRST);
   var remaining=stops.slice(FIRST);
   var uid=CURRENT_USER?CURRENT_USER.id:'';
   rollingRoute={remaining:remaining,batchNum:1,total:stops.length,type:type,userId:uid};
   saveRolling();
   if(type==='waze')openWazeRoute(batch[0]);
+  else if(type==='gmaps')openGoogleMapsStop(batch[0]);
   else openAppleMapsRoute(batch,saddr||null);
   rRolling();
   if(type==='waze')toast('🚗 Waze Route started — stop 1 of '+stops.length);
+  else if(type==='gmaps')toast('⚡ Tesla Route started — stop 1 of '+stops.length);
   else toast('⚡ Rolling Route started — '+batch.length+' stops');
 }
 
 function continueRollingRoute(){
   if(!rollingRoute||!rollingRoute.remaining.length){clearRollingRoute();return;}
   var type=rollingRoute.type||'apple';
-  var REST=type==='waze'?1:3;
+  var REST=(type==='waze'||type==='gmaps')?1:3;
   var batch=rollingRoute.remaining.slice(0,REST);
   var remaining=rollingRoute.remaining.slice(REST);
   rollingRoute.remaining=remaining;
   rollingRoute.batchNum++;
   saveRolling();
   if(type==='waze')openWazeRoute(batch[0]);
+  else if(type==='gmaps')openGoogleMapsStop(batch[0]);
   else openAppleMapsRoute(batch);
   rRolling();
   if(type==='waze')toast('🚗 Stop '+rollingRoute.batchNum+' of '+rollingRoute.total);
+  else if(type==='gmaps')toast('⚡ Stop '+rollingRoute.batchNum+' of '+rollingRoute.total);
   else toast('⚡ Batch '+rollingRoute.batchNum+' — '+batch.length+' stops');
   if(!remaining.length)toast('Last batch — route complete after these stops!');
 }
@@ -5932,6 +5936,12 @@ function openWazeRoute(stop){
   var addr=_routeAddr(stop);
   if(!addr)return;
   window.open('https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr),'_blank');
+}
+function openGoogleMapsStop(stop){
+  if(!stop)return;
+  var addr=_routeAddr(stop);
+  if(!addr)return;
+  window.open('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(addr)+'&travelmode=driving','_blank');
 }
 
 function clearRollingRoute(){
@@ -5958,10 +5968,10 @@ function rRolling(){
   if(!rollingRoute){card.style.display='none';return;}
   card.style.display='block';
   var type=rollingRoute.type||'apple';
-  var REST=type==='waze'?1:3;
-  var mapName=type==='waze'?'Waze':'Apple Maps';
+  var REST=(type==='waze'||type==='gmaps')?1:3;
+  var mapName=type==='waze'?'Waze':type==='gmaps'?'Google Maps':'Apple Maps';
   var lblEl=card.querySelector('.tesla-lbl');
-  if(lblEl)lblEl.textContent=type==='waze'?'🚗 Waze Route Active':'⚡ Rolling Route Active';
+  if(lblEl)lblEl.textContent=type==='waze'?'🚗 Waze Route Active':type==='gmaps'?'⚡ Tesla Route Active':'⚡ Rolling Route Active';
   var rem=rollingRoute.remaining.length;
   batchEl.textContent='Batch '+rollingRoute.batchNum+' of '+(rollingRoute.batchNum+Math.ceil(rem/REST));
   if(rem===0){
