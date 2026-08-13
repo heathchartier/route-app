@@ -192,6 +192,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .tesla-btns{display:grid;grid-template-columns:1fr auto;gap:8px}
 .tesla-cont{padding:11px;border-radius:var(--r2);border:none;background:#e82127;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.2px}
 .tesla-clear{padding:11px 14px;border-radius:var(--r2);border:1px solid rgba(232,33,39,.4);background:transparent;color:#e82127;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+.tesla-share{padding:10px;border-radius:var(--r2);border:1px solid rgba(74,158,255,.3);background:var(--blue2);color:var(--blue);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.2px}
 
 /* ── SECTION DIVIDER ── */
 .msect{margin-top:20px}
@@ -733,13 +734,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="tesla-card" id="d-tesla" style="display:none">
       <div class="tesla-hdr">
         <div class="tesla-dot"></div>
-        <div class="tesla-lbl">⚡ Tesla Route Active</div>
+        <div class="tesla-lbl">🗺 Rolling Route Active</div>
         <div class="tesla-batch" id="d-tesla-batch"></div>
       </div>
       <div class="tesla-stops" id="d-tesla-stops"></div>
       <div class="tesla-btns">
         <button class="tesla-cont" id="d-tesla-cont">Continue Route</button>
         <button class="tesla-clear" onclick="clearRollingRoute()">Done</button>
+        <button class="tesla-share" id="d-tesla-share" onclick="shareNextStop()" style="display:none;grid-column:1/-1">&#8599; Share Next Stop</button>
       </div>
     </div>
     <div class="retry-card" id="d-retry" style="display:none">
@@ -2419,6 +2421,7 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .tesla-btns{display:grid;grid-template-columns:1fr auto;gap:8px}
 .tesla-cont{padding:11px;border-radius:var(--r2);border:none;background:#e82127;color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.2px}
 .tesla-clear{padding:11px 14px;border-radius:var(--r2);border:1px solid rgba(232,33,39,.4);background:transparent;color:#e82127;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+.tesla-share{padding:10px;border-radius:var(--r2);border:1px solid rgba(74,158,255,.3);background:var(--blue2);color:var(--blue);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.2px}
 
 /* ── SECTION DIVIDER ── */
 .msect{margin-top:20px}
@@ -2823,13 +2826,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="tesla-card" id="d-tesla" style="display:none">
       <div class="tesla-hdr">
         <div class="tesla-dot"></div>
-        <div class="tesla-lbl">⚡ Tesla Route Active</div>
+        <div class="tesla-lbl">🗺 Rolling Route Active</div>
         <div class="tesla-batch" id="d-tesla-batch"></div>
       </div>
       <div class="tesla-stops" id="d-tesla-stops"></div>
       <div class="tesla-btns">
         <button class="tesla-cont" id="d-tesla-cont">Continue Route</button>
         <button class="tesla-clear" onclick="clearRollingRoute()">Done</button>
+        <button class="tesla-share" id="d-tesla-share" onclick="shareNextStop()" style="display:none;grid-column:1/-1">&#8599; Share Next Stop</button>
       </div>
     </div>
     <div class="retry-card" id="d-retry" style="display:none">
@@ -5524,7 +5528,7 @@ function showMapPicker(stops,homeStart,homeEnd){
   var opts=[
     {icon:'&#127758;',name:'Google Maps',sub:'All '+n+' stops'+(homeStart?' from home':' from your location'),url:googleUrl,bg:'rgba(66,133,244,.15)',store:googleStore,storeNote:'Don\'t have Google Maps?'},
     {icon:'&#63743;',name:'Apple Maps',sub:appleLabel,handler:function(){startRollingRoute(effectiveStops,'apple',rollingStart);},bg:'rgba(0,212,170,.12)',hidden:!teslaAvail||!isIOS},
-    {icon:'&#9889;',name:'Tesla',sub:'Rolling route — 1 stop at a time ('+n+' total)',note:'Opens Google Maps for each stop. When your phone is connected to Tesla via Bluetooth, each stop mirrors to your Tesla screen. Tap "Next Stop" in FieldIQ after each visit.',handler:function(){startRollingRoute(effectiveStops,'gmaps',rollingStart);},bg:'rgba(232,33,39,.12)',store:googleStore,storeNote:'Don\'t have Google Maps?',hidden:!teslaAvail||!isIOS},
+    {icon:'&#128506;',name:'Rolling Route',sub:'Google Maps — 1 stop at a time ('+n+' total)',note:'Opens Google Maps for each stop. Works on iOS, Android, Tesla, and any navigation app. Tap "Next Stop" in FieldIQ after each visit.',handler:function(){startRollingRoute(effectiveStops,'gmaps',rollingStart);},bg:'rgba(66,133,244,.15)',store:googleStore,storeNote:'Don\'t have Google Maps?',hidden:!teslaAvail},
     {icon:'&#128663;',name:'Waze',sub:wazeLabel,note:'Waze always navigates from your current GPS location. To start from home, use Google Maps or Apple Maps.',handler:function(){startRollingRoute(effectiveStops,'waze',rollingStart);},bg:'rgba(255,176,32,.12)',store:wazeStore,storeNote:'Don\'t have Waze?'}
   ];
 
@@ -5901,7 +5905,7 @@ function startRollingRoute(stops,type,saddr){
   else openAppleMapsRoute(batch,saddr||null);
   rRolling();
   if(type==='waze')toast('🚗 Waze Route started — stop 1 of '+stops.length);
-  else if(type==='gmaps')toast('⚡ Tesla Route started — stop 1 of '+stops.length);
+  else if(type==='gmaps')toast('🗺 Rolling Route started — stop 1 of '+stops.length);
   else toast('⚡ Rolling Route started — '+batch.length+' stops');
 }
 
@@ -5919,7 +5923,7 @@ function continueRollingRoute(){
   else openAppleMapsRoute(batch);
   rRolling();
   if(type==='waze')toast('🚗 Stop '+rollingRoute.batchNum+' of '+rollingRoute.total);
-  else if(type==='gmaps')toast('⚡ Stop '+rollingRoute.batchNum+' of '+rollingRoute.total);
+  else if(type==='gmaps')toast('🗺 Stop '+rollingRoute.batchNum+' of '+rollingRoute.total);
   else toast('⚡ Batch '+rollingRoute.batchNum+' — '+batch.length+' stops');
   if(!remaining.length)toast('Last batch — route complete after these stops!');
 }
@@ -5948,7 +5952,7 @@ function clearRollingRoute(){
   rollingRoute=null;saveRolling();
   var card=document.getElementById('d-tesla');
   if(card)card.style.display='none';
-  toast('Tesla Route cleared');
+  toast('Route cleared');
 }
 
 function openAppleMapsRoute(stops,saddr){
@@ -5962,6 +5966,7 @@ function openAppleMapsRoute(stops,saddr){
 function rRolling(){
   var card=document.getElementById('d-tesla');
   var contBtn=document.getElementById('d-tesla-cont');
+  var shareBtn=document.getElementById('d-tesla-share');
   var batchEl=document.getElementById('d-tesla-batch');
   var stopsEl=document.getElementById('d-tesla-stops');
   if(!card)return;
@@ -5971,18 +5976,33 @@ function rRolling(){
   var REST=(type==='waze'||type==='gmaps')?1:3;
   var mapName=type==='waze'?'Waze':type==='gmaps'?'Google Maps':'Apple Maps';
   var lblEl=card.querySelector('.tesla-lbl');
-  if(lblEl)lblEl.textContent=type==='waze'?'🚗 Waze Route Active':type==='gmaps'?'⚡ Tesla Route Active':'⚡ Rolling Route Active';
+  if(lblEl)lblEl.textContent=type==='waze'?'🚗 Waze Route Active':'🗺 Rolling Route Active';
   var rem=rollingRoute.remaining.length;
   batchEl.textContent='Batch '+rollingRoute.batchNum+' of '+(rollingRoute.batchNum+Math.ceil(rem/REST));
   if(rem===0){
     stopsEl.innerHTML='<div style="color:#e82127;font-size:13px;font-weight:600">All '+rollingRoute.total+' stops routed ✓</div>';
     contBtn.style.display='none';
+    if(shareBtn)shareBtn.style.display='none';
   }else{
     var nextBatch=rollingRoute.remaining.slice(0,REST);
     stopsEl.innerHTML='<div style="font-size:12px;color:var(--sub);margin-bottom:6px">'+rem+' stop'+(rem!==1?'s':'')+' remaining — next '+Math.min(REST,rem)+':</div>'+
       nextBatch.map(function(s){return'<div style="font-size:13px;font-weight:600;padding:3px 0">'+esc(s.name)+' <span style="color:var(--sub);font-weight:400">· '+esc(s.city||'')+'</span></div>';}).join('');
     contBtn.style.display='block';
     contBtn.textContent='Continue — Next '+Math.min(REST,rem)+' Stop'+(Math.min(REST,rem)!==1?'s':'')+' in '+mapName;
+    if(shareBtn)shareBtn.style.display='block';
+  }
+}
+
+function shareNextStop(){
+  if(!rollingRoute||!rollingRoute.remaining.length)return;
+  var stop=rollingRoute.remaining[0];
+  var addr=_routeAddr(stop);
+  if(!addr)return;
+  var url='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(addr)+'&travelmode=driving';
+  if(navigator.share){
+    navigator.share({title:(stop.name||'Next Stop')+' — '+addr,url:url}).catch(function(){});
+  }else{
+    window.open(url,'_blank');
   }
 }
 // ─────────────────────────────────────────────────────────────────────────────
@@ -7003,7 +7023,7 @@ function showHowToUse(){
     {icon:'&#128229;',title:'Excel Import',body:'Settings → Import Customer List. Upload an .xlsx or .csv file — new accounts are added automatically with the correct route group assigned by zip code. Existing accounts get their sales figures updated; visit notes and history are never overwritten. If your file includes a Product Group, Category, Class, or Division column, FieldIQ uses it to enable category-level pricing per customer. Import discrepancies (address or contact changes) are flagged for your review before applying.'},
     {icon:'&#128190;',title:'Data Export',body:'Settings → Export Data. Downloads a CSV of all 600+ customers with visit history, notes, financials, tags, orders, quotes, and more. A red banner appears on the dashboard if you haven\'t exported in 30+ days.'},
     {icon:'&#128272;',title:'Security',body:'Set a PIN in Settings to lock the app. You can also enable Face ID / Touch ID so you unlock with biometrics instead of typing your PIN every time.'},
-    {icon:'&#9889;',title:'Rolling Route (Apple, Tesla & Waze)',body:'Tap "Route" on any group to pick your nav app. Apple Maps and Tesla both use rolling batches of 4 stops at a time — when you return to FieldIQ, tap "Continue" to load the next batch. Waze uses a rolling 1-stop-at-a-time approach. Google Maps loads all stops at once. Set your home address in My Profile to add "Start from home" and "Return home" toggles to any route.'},
+    {icon:'&#128506;',title:'Rolling Route',body:'Tap "Route" on any group to pick your nav app. Apple Maps uses rolling batches of 4 stops at a time — when you return to FieldIQ, tap "Continue" to load the next batch. Rolling Route (Google Maps) and Waze both use a 1-stop-at-a-time approach — great for Tesla and Android Auto. Use "Share Next Stop" on the active route card to send the next stop to any navigation app. Google Maps loads all stops at once. Set your home address in My Profile to add "Start from home" and "Return home" toggles to any route.'},
     {icon:'&#128194;',title:'Pricing Tab',body:'Upload your price sheet (Excel or CSV). Set a global margin % and sell prices calculate instantly. Search by item code or description. Per-customer pricing overrides the global margin using a 3-layer waterfall: (1) flat markup % per customer, (2) category margins if your sheet has a product group column, (3) item price pins for exact dollar overrides on specific SKUs. Set these in any customer card under Pricing.'},
     {icon:'&#128279;',title:'Customer Price Portal',body:'Inside any customer card, tap "Generate" under Customer Price Portal to create a unique shareable link. Your customer gets a clean, searchable view of their own prices — no login, no app install. The link reflects their waterfall pricing (pins → category → flat). Revoke the link anytime from the same card.'},
     {icon:'&#128200;',title:'Per-Customer Pricing',body:'Open any customer card → Pricing section. Set a Base Markup % to override the global margin just for that customer. If your price sheet includes a Product Group/Category column, you can also set different margins per category. For individual SKUs, use Item Price Pins to lock in an exact dollar price — pins always win over everything else. All of these flow into the quote builder and order screen automatically.'},
