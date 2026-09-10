@@ -1455,12 +1455,12 @@ var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
-function lSave(){try{var s=JSON.stringify(ST);localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
+function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
 function ds(code){var v=ST.visits[code];if(!v||!v.length)return 1000000;return Math.floor((Date.now()-new Date(v[v.length-1].date))/864e5);}
 function dc(code){var d=ds(code);return d>=1000000?'#64748b':d<=14?'#10b981':d<=45?'#f59e0b':'#ef4444';}
-function mv(code,type){if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);})}}
+function mv(code,type){if(!window._mvD)window._mvD={};var k=code+':'+type;if(window._mvD[k]&&Date.now()-window._mvD[k]<3000)return;window._mvD[k]=Date.now();if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);})}}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function allC(){
@@ -3606,12 +3606,12 @@ var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
 function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
-function lSave(){try{var s=JSON.stringify(ST);localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
+function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
 function ds(code){var v=ST.visits[code];if(!v||!v.length)return 1000000;return Math.floor((Date.now()-new Date(v[v.length-1].date))/864e5);}
 function dc(code){var d=ds(code);return d>=1000000?'#64748b':d<=14?'#10b981':d<=45?'#f59e0b':'#ef4444';}
-function mv(code,type){if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);})}}
+function mv(code,type){if(!window._mvD)window._mvD={};var k=code+':'+type;if(window._mvD[k]&&Date.now()-window._mvD[k]<3000)return;window._mvD[k]=Date.now();if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);})}}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function allC(){
@@ -10790,34 +10790,49 @@ function rQuoteAlert(){
   var el=document.getElementById('d-quotes-alert');if(!el)return;
   if(!ST.quotes){el.style.display='none';return;}
   var today=new Date().toISOString().split('T')[0];
-  var a=allC(),due=[];
+  var cutoff45=Date.now()-45*864e5;
+  var a=allC(),due=[],stale=[];
   Object.keys(ST.quotes).forEach(function(k){
     var q=ST.quotes[k];
-    if(q.status==='open'&&!q.dismissed&&q.followupDate&&q.followupDate<=today){
-      var cust=null;for(var i=0;i<a.length;i++){if(a[i].code===q.code){cust=a[i];break;}}
-      if(cust)due.push({q:q,c:cust});
-    }
+    if(q.status!=='open'||q.dismissed)return;
+    var cust=null;for(var i=0;i<a.length;i++){if(a[i].code===q.code){cust=a[i];break;}}
+    if(!cust)return;
+    if(q.followupDate&&q.followupDate<=today){due.push({q:q,c:cust});}
+    else if(!q.followupDate&&new Date(q.date).getTime()<cutoff45){stale.push({q:q,c:cust});}
   });
-  if(!due.length){el.style.display='none';return;}
+  if(!due.length&&!stale.length){el.style.display='none';return;}
   due.sort(function(a,b){return a.q.followupDate.localeCompare(b.q.followupDate);});
+  stale.sort(function(a,b){return new Date(a.q.date)-new Date(b.q.date);});
   el.style.display='block';
-  var h='<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px">'
-    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#fbbf24;margin-bottom:6px">&#128203; Quote Follow-Ups Due</div>';
-  due.slice(0,4).forEach(function(item){
+  var h='';
+  function qRow(item,borderColor,bg){
     var q=item.q,c=item.c;
     var total=qGrandTotal(q);
-    h+='<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid rgba(251,191,36,.12)">'
+    var age=Math.floor((Date.now()-new Date(q.date).getTime())/864e5);
+    return '<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid '+borderColor+'">'
       +'<div style="flex:1;min-width:0;cursor:pointer" onclick="openM(\''+c.code+'\')">'
       +'<div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
-      +'<div style="font-size:11px;color:var(--sub)">'+(total?fmt(total)+' &bull; ':'')+q.items.length+' item'+(q.items.length!==1?'s':'')+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+(total?fmt(total)+' &bull; ':'')+age+'d old</div>'
       +'</div>'
       +'<button onclick="setQuoteOutcome(\''+q.id+'\',\'won\')" style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:var(--r2);padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">Won</button>'
       +'<button onclick="promptQuoteLoss(\''+q.id+'\')" style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">Lost</button>'
       +'<button onclick="ST.quotes[\''+q.id+'\'].dismissed=true;lSave();rDash()" style="background:transparent;border:1px solid var(--border2);border-radius:var(--r2);padding:4px 7px;font-size:12px;color:var(--sub);cursor:pointer;font-family:inherit;flex-shrink:0">&#215;</button>'
       +'</div>';
-  });
-  if(due.length>4)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(due.length-4)+' more</div>';
-  h+='</div>';
+  }
+  if(due.length){
+    h+='<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:10px">'
+      +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#fbbf24;margin-bottom:6px">&#128203; Quote Follow-Ups Due</div>';
+    due.slice(0,4).forEach(function(item){h+=qRow(item,'rgba(251,191,36,.12)');});
+    if(due.length>4)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(due.length-4)+' more</div>';
+    h+='</div>';
+  }
+  if(stale.length){
+    h+='<div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:var(--r2);padding:10px 12px;margin-bottom:10px">'
+      +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#ef4444;margin-bottom:6px">&#128338; Stale Open Quotes (45d+)</div>';
+    stale.slice(0,3).forEach(function(item){h+=qRow(item,'rgba(239,68,68,.1)');});
+    if(stale.length>3)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(stale.length-3)+' more</div>';
+    h+='</div>';
+  }
   el.innerHTML=h;
 }
 
