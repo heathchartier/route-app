@@ -773,6 +773,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div class="card" id="d-pace-card" style="display:none"></div>
     <div class="card" id="d-due-card" style="display:none"></div>
+    <div class="card" id="d-coverage-card" style="display:none"></div>
     <div class="card" id="d-quiet-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--red)">&#9888; Going Quiet</div>
@@ -2893,6 +2894,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div class="card" id="d-pace-card" style="display:none"></div>
     <div class="card" id="d-due-card" style="display:none"></div>
+    <div class="card" id="d-coverage-card" style="display:none"></div>
     <div class="card" id="d-quiet-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--red)">&#9888; Going Quiet</div>
@@ -3629,7 +3631,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
 }
 
 function rRoute(){
@@ -4294,7 +4296,8 @@ var DASH_CARDS=[
   {key:'tier',label:'Visit Cadence Overdue',el:'d-tier-card'},
   {key:'weekplan',label:'Weekly Plan',el:'d-plan-card'},
   {key:'samples',label:'Sample Follow-Ups',el:'d-samples-card'},
-  {key:'target',label:'Visit Goal Tracker',el:'d-target-card'}
+  {key:'target',label:'Visit Goal Tracker',el:'d-target-card'},
+  {key:'coverage',label:'Territory Coverage',el:'d-coverage-card'}
 ];
 function dashCardHidden(key){
   var h=ST.hiddenCards||{};return !!h[key];
@@ -9847,6 +9850,142 @@ function rNBA(a){
    +'</div>'
    +(action.code?'<div style="font-size:12px;color:var(--sub);flex-shrink:0">'+action.cta+' &#8250;</div>':'')
    +'</div>';
+}
+
+/* ── TERRITORY COVERAGE ── */
+function _buildCoverageData(windowDays){
+  var a=allC(),cutoff=Date.now()-windowDays*864e5;
+  var grpMap={};
+  for(var i=0;i<a.length;i++){
+    var c=a[i],g=c.group;
+    if(!grpMap[g])grpMap[g]={total:0,visited:0,revenue:0,visitedRev:0,lastWorked:null,name:getGroupName(g)};
+    grpMap[g].total++;
+    grpMap[g].revenue+=(c.lifetimeSales||0);
+    var logs=ST.visits[c.code]||[];
+    var wasVisited=false;
+    for(var j=logs.length-1;j>=0;j--){
+      if(logs[j].type!=='visited')continue;
+      var d=new Date(logs[j].date);
+      if(d.getTime()>=cutoff){wasVisited=true;}
+      if(!grpMap[g].lastWorked||d>grpMap[g].lastWorked)grpMap[g].lastWorked=d;
+      break;
+    }
+    if(wasVisited){grpMap[g].visited++;grpMap[g].visitedRev+=(c.lifetimeSales||0);}
+  }
+  return grpMap;
+}
+function rCoverageCard(){
+  var card=document.getElementById('d-coverage-card');if(!card)return;
+  if(dashCardHidden('coverage')){card.style.display='none';return;}
+  var win=30;
+  var grpMap=_buildCoverageData(win);
+  var groups=Object.keys(grpMap);
+  if(!groups.length){card.style.display='none';return;}
+  var totalAccts=0,totalVisited=0;
+  groups.forEach(function(g){totalAccts+=grpMap[g].total;totalVisited+=grpMap[g].visited;});
+  var pct=totalAccts>0?Math.round(totalVisited/totalAccts*100):0;
+  var barCol=pct>=75?'var(--teal)':pct>=50?'var(--amber)':'var(--red)';
+  // Cold zones: groups with 0 or lowest coverage, at least 3 accounts
+  var cold=groups.filter(function(g){return grpMap[g].total>=3;});
+  cold.sort(function(a,b){
+    var pa=grpMap[a].visited/grpMap[a].total,pb=grpMap[b].visited/grpMap[b].total;
+    if(pa!==pb)return pa-pb;
+    var da=grpMap[a].lastWorked?Date.now()-grpMap[a].lastWorked:Infinity;
+    var db=grpMap[b].lastWorked?Date.now()-grpMap[b].lastWorked:Infinity;
+    return db-da;
+  });
+  cold=cold.slice(0,3);
+  var coldH=cold.map(function(g){
+    var gd=grpMap[g];
+    var gp=Math.round(gd.visited/gd.total*100);
+    var gc2=gp>=75?'var(--teal)':gp>=50?'var(--amber)':'var(--red)';
+    var lastW=gd.lastWorked?Math.floor((Date.now()-gd.lastWorked)/864e5)+'d ago':'Never';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer" onclick="cG='+g+';go(\'cust\')">'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(gd.name)+'</div>'
+        +'<div style="font-size:10px;color:var(--sub)">'+gd.visited+'/'+gd.total+' visited &bull; last: '+lastW+'</div>'
+      +'</div>'
+      +'<div style="text-align:right;flex-shrink:0">'
+        +'<div style="font-size:13px;font-weight:800;color:'+gc2+'">'+gp+'%</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  card.style.display='block';
+  card.innerHTML='<div class="card-hdr">'
+    +'<div class="lbl" style="margin:0">&#127758; Territory Coverage</div>'
+    +'<span style="font-size:11px;color:var(--sub)">Last '+win+'d</span>'
+  +'</div>'
+  +'<div style="display:flex;align-items:center;gap:10px;margin:10px 0 8px">'
+    +'<div style="flex:1;background:var(--bg3);border-radius:20px;height:8px;overflow:hidden">'
+      +'<div style="height:100%;border-radius:20px;background:'+barCol+';width:'+pct+'%;transition:width .4s"></div>'
+    +'</div>'
+    +'<div style="font-size:18px;font-weight:800;color:'+barCol+';flex-shrink:0">'+pct+'%</div>'
+  +'</div>'
+  +'<div style="font-size:11px;color:var(--sub);margin-bottom:10px">'+totalVisited+' of '+totalAccts+' accounts visited</div>'
+  +(cold.length?'<div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Coldest Zones</div>'+coldH:'')
+  +'<button onclick="showCoverageReport()" style="width:100%;margin-top:10px;padding:8px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Full Territory Report ›</button>';
+}
+function showCoverageReport(){
+  var existing=document.getElementById('coverage-report-ov');if(existing)existing.remove();
+  var ov=document.createElement('div');ov.id='coverage-report-ov';
+  ov.style.cssText='position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;justify-content:center';
+  var win=30;
+  var grpMap=_buildCoverageData(win);
+  var groups=Object.keys(grpMap).filter(function(g){return grpMap[g].total>0;});
+  groups.sort(function(a,b){
+    var pa=grpMap[a].visited/grpMap[a].total,pb=grpMap[b].visited/grpMap[b].total;
+    return pa-pb; // lowest coverage first
+  });
+  var totalAccts=0,totalVisited=0,totalRev=0,totalVisitedRev=0;
+  groups.forEach(function(g){totalAccts+=grpMap[g].total;totalVisited+=grpMap[g].visited;totalRev+=grpMap[g].revenue;totalVisitedRev+=grpMap[g].visitedRev;});
+  var overallPct=totalAccts>0?Math.round(totalVisited/totalAccts*100):0;
+  var revPct=totalRev>0?Math.round(totalVisitedRev/totalRev*100):0;
+  var rows=groups.map(function(g){
+    var gd=grpMap[g];
+    var gp=Math.round(gd.visited/gd.total*100);
+    var gc=gp>=75?'#10b981':gp>=50?'var(--amber)':'#ef4444';
+    var lastW=gd.lastWorked?Math.floor((Date.now()-gd.lastWorked)/864e5)+'d ago':'Never';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="cG='+g+';document.getElementById(\'coverage-report-ov\').remove();go(\'cust\')">'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(gd.name)+'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px;margin-top:3px">'
+          +'<div style="flex:1;background:var(--bg3);border-radius:20px;height:5px;overflow:hidden">'
+            +'<div style="height:100%;border-radius:20px;background:'+gc+';width:'+gp+'%"></div>'
+          +'</div>'
+          +'<div style="font-size:10px;color:var(--sub);flex-shrink:0">'+gd.visited+'/'+gd.total+'</div>'
+        +'</div>'
+        +'<div style="font-size:10px;color:var(--sub);margin-top:2px">Last: '+lastW+(gd.revenue?' &bull; '+fmt(gd.revenue)+' lifetime':'')+'</div>'
+      +'</div>'
+      +'<div style="font-size:15px;font-weight:800;color:'+gc+';flex-shrink:0;min-width:38px;text-align:right">'+gp+'%</div>'
+    +'</div>';
+  }).join('');
+  ov.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column">'
+    +'<div style="padding:18px 18px 10px;flex-shrink:0">'
+      +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px"></div>'
+      +'<div style="font-size:18px;font-weight:800;margin-bottom:4px">&#127758; Territory Coverage</div>'
+      +'<div style="font-size:12px;color:var(--sub);margin-bottom:12px">Last 30 days &nbsp;&bull;&nbsp; Tap any group to jump there</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
+        +'<div style="background:var(--bg3);border-radius:var(--r2);padding:10px 12px;text-align:center">'
+          +'<div style="font-size:22px;font-weight:800;color:'+(overallPct>=75?'var(--teal)':overallPct>=50?'var(--amber)':'var(--red)')+'">'+overallPct+'%</div>'
+          +'<div style="font-size:11px;color:var(--sub)">Accounts covered</div>'
+          +'<div style="font-size:10px;color:var(--dim)">'+totalVisited+' of '+totalAccts+'</div>'
+        +'</div>'
+        +'<div style="background:var(--bg3);border-radius:var(--r2);padding:10px 12px;text-align:center">'
+          +'<div style="font-size:22px;font-weight:800;color:'+(revPct>=75?'var(--teal)':revPct>=50?'var(--amber)':'var(--red)')+'">'+revPct+'%</div>'
+          +'<div style="font-size:11px;color:var(--sub)">Revenue covered</div>'
+          +'<div style="font-size:10px;color:var(--dim)">'+fmt(totalVisitedRev)+' / '+fmt(totalRev)+'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>'
+    +'<div style="overflow-y:auto;flex:1;padding:0 18px">'
+      +rows
+    +'</div>'
+    +'<div style="padding:12px 18px;flex-shrink:0">'
+      +'<button onclick="document.getElementById(\'coverage-report-ov\').remove()" style="width:100%;padding:12px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+    +'</div>'
+  +'</div>';
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
+  document.body.appendChild(ov);
 }
 
 /* ── SALES PACE ── */
