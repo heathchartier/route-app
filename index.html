@@ -5149,6 +5149,7 @@ function doImport(hdrs,rows,fname,status){
   } else {
     for(var f in COLS){ci[f]=-1;for(var i=0;i<COLS[f].length;i++){for(var j=0;j<hdrs.length;j++){if(hdrs[j]===COLS[f][i]||hdrs[j].indexOf(COLS[f][i])>=0){ci[f]=j;break;}}if(ci[f]>=0)break;}
   }}
+  if(rows.length>3000&&!confirm('This file has '+rows.length.toLocaleString()+' rows — large imports may take a moment. Continue?'))return;
   var added=0,updated=0,skipped=0,flagged=0,badAddr=0,badZip=0,a=allC(),newDiscrep=[],addedNames=[],badZipRows=[];
   var importDate=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
@@ -8285,16 +8286,28 @@ function rOrders(code){
     var o=recent[i];
     var d=new Date(o.date);
     var dstr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    var origIdx=orders.length-1-i;
     h+='<div style="padding:8px 0;border-bottom:1px solid var(--border)">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
         +'<div style="font-size:13px;font-weight:600;flex:1;color:var(--text)">'+esc(o.item)+'</div>'
         +(o.amount?'<div style="font-size:13px;font-weight:800;color:var(--green);flex-shrink:0">$'+o.amount.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>':'')
+        +'<button onclick="deleteOrder(\''+esc(code)+'\','+origIdx+')" style="background:transparent;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 4px;flex-shrink:0" title="Delete order">&#10005;</button>'
       +'</div>'
       +(o.note?'<div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(o.note)+'</div>':'')
       +'<div style="font-size:11px;color:var(--dim);margin-top:3px">'+dstr+'</div>'
     +'</div>';
   }
   el.innerHTML=h;
+}
+function deleteOrder(code,idx){
+  var arr=ST.orders&&ST.orders[code]?ST.orders[code]:[];
+  if(idx<0||idx>=arr.length)return;
+  if(!confirm('Delete this order entry?'))return;
+  arr.splice(idx,1);
+  if(!ST.orders)ST.orders={};
+  ST.orders[code]=arr;
+  lSave();syncUp();
+  rOrders(code);
 }
 
 /* ── PRICE LIST PICKER (order sheet integration) ── */
