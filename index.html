@@ -1106,6 +1106,23 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
           <input class="tier-target-inp" id="tier-c-inp" type="number" min="1" max="365" placeholder="45" oninput="saveTierTarget('C',this.value)">
         </div>
       </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border2)">
+        <div style="font-size:12px;color:var(--sub);margin-bottom:8px">Preferred visit window — show badge when visiting after this hour (24h, blank = off)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier A before</div>
+            <input class="tier-target-inp" id="tier-a-win" type="text" placeholder="12:00" oninput="saveTierWindow('A',this.value)" style="text-align:center">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier B before</div>
+            <input class="tier-target-inp" id="tier-b-win" type="text" placeholder="15:00" oninput="saveTierWindow('B',this.value)" style="text-align:center">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier C before</div>
+            <input class="tier-target-inp" id="tier-c-win" type="text" placeholder="" oninput="saveTierWindow('C',this.value)" style="text-align:center">
+          </div>
+        </div>
+      </div>
     </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Security</div>
     <div class="card" style="margin-top:4px">
@@ -1434,10 +1451,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1769,7 +1786,8 @@ function rCPage(){
     var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>60?note.slice(0,60)+'…':note)+'</div>':'';
     var hoursBadge=isOutsideHours(c.code)?'<span style="background:rgba(251,191,36,.15);color:#fbbf24;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ CLOSED</span>':'';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
+    var tierWinBadge=isTierWindowLate(c)?'<span style="background:rgba(239,68,68,.12);color:#ef4444;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ PAST WINDOW</span>':'';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
   }
   var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
   var cm=document.getElementById('c-more');if(cm)cm.style.display=fc.length>PG*(pg+1)?'block':'none';
@@ -1914,7 +1932,7 @@ function _applyRemoteState(rem){
   ST.salesTargets=Object.assign({},rem.salesTargets||{},ST.salesTargets||{});
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
   ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});
-  ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});ST.visitHours=Object.assign({},rem.visitHours||{},ST.visitHours||{});
+  ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});ST.visitHours=Object.assign({},rem.visitHours||{},ST.visitHours||{});ST.tierWindows=Object.assign({},rem.tierWindows||{},ST.tierWindows||{});
   if(rem.cardOrder&&rem.cardOrder.length&&(!ST.cardOrder||!ST.cardOrder.length))ST.cardOrder=rem.cardOrder.slice();
   // Restore price list from cloud if local is empty
   if(rem.priceList&&rem.priceList.length&&!priceData.length){ST.priceList=rem.priceList;priceData=rem.priceList;try{localStorage.setItem(PRICE_KEY,JSON.stringify(priceData));}catch(e){}}
@@ -3285,6 +3303,23 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
           <input class="tier-target-inp" id="tier-c-inp" type="number" min="1" max="365" placeholder="45" oninput="saveTierTarget('C',this.value)">
         </div>
       </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border2)">
+        <div style="font-size:12px;color:var(--sub);margin-bottom:8px">Preferred visit window — show badge when visiting after this hour (24h, blank = off)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier A before</div>
+            <input class="tier-target-inp" id="tier-a-win" type="text" placeholder="12:00" oninput="saveTierWindow('A',this.value)" style="text-align:center">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier B before</div>
+            <input class="tier-target-inp" id="tier-b-win" type="text" placeholder="15:00" oninput="saveTierWindow('B',this.value)" style="text-align:center">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--sub);margin-bottom:4px">Tier C before</div>
+            <input class="tier-target-inp" id="tier-c-win" type="text" placeholder="" oninput="saveTierWindow('C',this.value)" style="text-align:center">
+          </div>
+        </div>
+      </div>
     </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#127968; Dashboard Cards</div>
@@ -3567,10 +3602,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -3912,7 +3947,8 @@ function rCPage(){
     var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>60?note.slice(0,60)+'…':note)+'</div>':'';
     var hoursBadge=isOutsideHours(c.code)?'<span style="background:rgba(251,191,36,.15);color:#fbbf24;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ CLOSED</span>':'';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
+    var tierWinBadge=isTierWindowLate(c)?'<span style="background:rgba(239,68,68,.12);color:#ef4444;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ PAST WINDOW</span>':'';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
   }
   var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
   var cm=document.getElementById('c-more');if(cm)cm.style.display=fc.length>PG*(pg+1)?'block':'none';
@@ -4057,7 +4093,7 @@ function _applyRemoteState(rem){
   ST.salesTargets=Object.assign({},rem.salesTargets||{},ST.salesTargets||{});
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
   ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});
-  ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});ST.visitHours=Object.assign({},rem.visitHours||{},ST.visitHours||{});
+  ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});ST.visitHours=Object.assign({},rem.visitHours||{},ST.visitHours||{});ST.tierWindows=Object.assign({},rem.tierWindows||{},ST.tierWindows||{});
   if(rem.cardOrder&&rem.cardOrder.length&&(!ST.cardOrder||!ST.cardOrder.length))ST.cardOrder=rem.cardOrder.slice();
   // Restore price list from cloud if local is empty
   if(rem.priceList&&rem.priceList.length&&!priceData.length){ST.priceList=rem.priceList;priceData=rem.priceList;try{localStorage.setItem(PRICE_KEY,JSON.stringify(priceData));}catch(e){}}
@@ -7455,6 +7491,20 @@ function saveTierTarget(tier,val){
   ST.tierTargets[tier]=val;
   lSave();syncUp();rDash();
 }
+function saveTierWindow(tier,val){
+  if(!ST.tierWindows)ST.tierWindows={};
+  var v=val.trim();
+  if(v)ST.tierWindows[tier]=v;else delete ST.tierWindows[tier];
+  lSave();syncUp();
+}
+function isTierWindowLate(c){
+  if(!ST.tierWindows)return false;
+  var tier=getTier(c);
+  var win=ST.tierWindows[tier];if(!win)return false;
+  var cutoff=_parseHour(win);if(cutoff===null)return false;
+  var now=new Date();
+  return(now.getHours()*60+now.getMinutes())>=cutoff;
+}
 function initTierInputs(){
   var ia=document.getElementById('tier-a-inp');
   var ib=document.getElementById('tier-b-inp');
@@ -7462,6 +7512,12 @@ function initTierInputs(){
   if(ia)ia.value=getTierTarget('A');
   if(ib)ib.value=getTierTarget('B');
   if(ic)ic.value=getTierTarget('C');
+  var wa=document.getElementById('tier-a-win');
+  var wb=document.getElementById('tier-b-win');
+  var wc=document.getElementById('tier-c-win');
+  if(wa)wa.value=(ST.tierWindows&&ST.tierWindows['A'])||'';
+  if(wb)wb.value=(ST.tierWindows&&ST.tierWindows['B'])||'';
+  if(wc)wc.value=(ST.tierWindows&&ST.tierWindows['C'])||'';
 }
 function rTierCard(){
   var card=document.getElementById('d-tier-card');
@@ -12691,7 +12747,7 @@ function onLogin(user){
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
   // Reset ST to blank so previous session data doesn't leak into a new account
-  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
   // One-time cleanup: remove any fake demo customers that got added accidentally
   var _fakeCodes={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
@@ -12913,7 +12969,7 @@ function doSignOut(){
     CURRENT_USER=null;
     SK='';
     rollingRoute=null;saveRolling();
-    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
     var tb=document.getElementById('trial-banner');if(tb)tb.style.display='none';
@@ -12988,7 +13044,7 @@ function confirmDeleteAccount(){
   sb.from('hc_state').delete().eq('id',uid).then(function(){
     sb.auth.signOut().then(function(){
       CURRENT_USER=null;SK='';
-      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
       // Clear local storage
       try{localStorage.removeItem('fieldiq_'+uid);}catch(e){}
       authTab('signin');
