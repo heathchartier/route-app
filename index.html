@@ -1030,6 +1030,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Tap any customer to fill in the missing info</div>
       <div id="missing-list"></div>
     </div>
+    <div class="card" id="zip-health-card" style="display:none;margin-top:4px">
+      <div class="card-hdr">
+        <div class="lbl" style="margin:0;color:var(--red)">&#128205; ZIP / Group Health</div>
+        <span id="zip-health-count" style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700"></span>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:6px">Missing ZIPs or ZIP→group mismatches. Tap to edit, or use Fix buttons.</div>
+      <div id="zip-health-list"></div>
+    </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Backup</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128190; Backup &amp; Restore</div>
@@ -1399,10 +1407,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1438,7 +1446,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;docsLoad();}
+  else if(p==='set'){rPendingEdits();rMissing();rZipHealth();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;docsLoad();}
 }
 
 function smartGroup(){
@@ -1879,6 +1887,7 @@ function _applyRemoteState(rem){
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
   ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});
   ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});
+  if(rem.cardOrder&&rem.cardOrder.length&&(!ST.cardOrder||!ST.cardOrder.length))ST.cardOrder=rem.cardOrder.slice();
   ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
@@ -3132,6 +3141,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Tap any customer to fill in the missing info</div>
       <div id="missing-list"></div>
     </div>
+    <div class="card" id="zip-health-card" style="display:none;margin-top:4px">
+      <div class="card-hdr">
+        <div class="lbl" style="margin:0;color:var(--red)">&#128205; ZIP / Group Health</div>
+        <span id="zip-health-count" style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700"></span>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:6px">Missing ZIPs or ZIP→group mismatches. Tap to edit, or use Fix buttons.</div>
+      <div id="zip-health-list"></div>
+    </div>
     <div style="font-size:10px;font-weight:800;color:var(--dim);letter-spacing:1.2px;text-transform:uppercase;padding:12px 2px 6px">Backup</div>
     <div class="card" style="margin-top:4px">
       <div class="lbl">&#128190; Backup &amp; Restore</div>
@@ -3466,10 +3483,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
 function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -3505,7 +3522,7 @@ function go(p){
   else if(p==='grps')rGrps();
   else if(p==='vend')rVend();
   else if(p==='price')rPrice();
-  else if(p==='set'){rPendingEdits();rMissing();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;docsLoad();}
+  else if(p==='set'){rPendingEdits();rMissing();rZipHealth();rDashToggles();initTierInputs();document.getElementById('dupe-results').innerHTML='';rNotifStatus();updateSecurityStatus();var ul=document.getElementById('auth-user-lbl');if(ul&&CURRENT_USER)ul.textContent='Signed in as '+CURRENT_USER.email;docsLoad();}
 }
 
 function smartGroup(){
@@ -3594,7 +3611,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
 }
 
 function rRoute(){
@@ -3956,6 +3973,7 @@ function _applyRemoteState(rem){
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
   ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});
   ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});
+  if(rem.cardOrder&&rem.cardOrder.length&&(!ST.cardOrder||!ST.cardOrder.length))ST.cardOrder=rem.cardOrder.slice();
   ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
@@ -4241,36 +4259,72 @@ function rNewCustomers(){
 
 // ── DASHBOARD CARD TOGGLES ────────────────────────────────────────────────
 var DASH_CARDS=[
-  {key:'brief',label:'Morning Briefing'},
-  {key:'nba',label:'Next Best Action'},
-  {key:'streak',label:'Visit Streak'},
-  {key:'goal',label:'Weekly Goal'},
-  {key:'newcusts',label:'New Accounts'},
-  {key:'leaderboard',label:'YTD Leaderboard'},
-  {key:'hotleads',label:'Hot Leads Overdue'},
-  {key:'winback',label:'Win-Back Targets'},
-  {key:'trend',label:'Visit Trend Chart'},
-  {key:'pace',label:'Sales Pace'},
-  {key:'due',label:'Due Soon'},
-  {key:'schedule',label:'This Week\'s Schedule'},
-  {key:'quiet',label:'Going Quiet'},
-  {key:'comp',label:'Competitor Intel'},
-  {key:'tier',label:'Visit Cadence Overdue'},
-  {key:'weekplan',label:'Weekly Plan'},
-  {key:'samples',label:'Sample Follow-Ups'},
-  {key:'target',label:'Visit Goal Tracker'}
+  {key:'brief',label:'Morning Briefing',el:'d-brief'},
+  {key:'nba',label:'Next Best Action',el:'d-nba'},
+  {key:'streak',label:'Visit Streak',el:'d-streak'},
+  {key:'goal',label:'Weekly Goal',el:'d-goal-card'},
+  {key:'newcusts',label:'New Accounts',el:'d-new-card'},
+  {key:'leaderboard',label:'YTD Leaderboard',el:'d-leaderboard'},
+  {key:'hotleads',label:'Hot Leads Overdue',el:'d-hot-card'},
+  {key:'winback',label:'Win-Back Targets',el:'d-winback-card'},
+  {key:'trend',label:'Visit Trend Chart',el:'d-trend-card'},
+  {key:'pace',label:'Sales Pace',el:'d-pace-card'},
+  {key:'due',label:'Due Soon',el:'d-due-card'},
+  {key:'schedule',label:'This Week\'s Schedule',el:'d-sched-card'},
+  {key:'quiet',label:'Going Quiet',el:'d-quiet-card'},
+  {key:'comp',label:'Competitor Intel',el:'d-comp-card'},
+  {key:'tier',label:'Visit Cadence Overdue',el:'d-tier-card'},
+  {key:'weekplan',label:'Weekly Plan',el:'d-plan-card'},
+  {key:'samples',label:'Sample Follow-Ups',el:'d-samples-card'},
+  {key:'target',label:'Visit Goal Tracker',el:'d-target-card'}
 ];
 function dashCardHidden(key){
   var h=ST.hiddenCards||{};return !!h[key];
 }
+function getCardOrder(){
+  var order=ST.cardOrder&&ST.cardOrder.length?ST.cardOrder.slice():DASH_CARDS.map(function(c){return c.key;});
+  // append any keys not yet in order (future cards added after user saved order)
+  DASH_CARDS.forEach(function(c){if(order.indexOf(c.key)<0)order.push(c.key);});
+  return order;
+}
+function applyCardOrder(){
+  var body=document.querySelector('#p-dash .body');
+  if(!body)return;
+  var order=getCardOrder();
+  var keyMap={};DASH_CARDS.forEach(function(c){keyMap[c.key]=c;});
+  for(var i=0;i<order.length;i++){
+    var card=keyMap[order[i]];if(!card)continue;
+    var el=document.getElementById(card.el);
+    if(el)body.appendChild(el);
+  }
+}
+function moveCard(key,dir){
+  var order=getCardOrder();
+  var idx=order.indexOf(key);
+  if(idx<0)return;
+  var newIdx=idx+dir;
+  if(newIdx<0||newIdx>=order.length)return;
+  var tmp=order[idx];order[idx]=order[newIdx];order[newIdx]=tmp;
+  ST.cardOrder=order;
+  lSave();syncUp();
+  applyCardOrder();
+  rDashToggles();
+}
 function rDashToggles(){
   var el=document.getElementById('dash-toggles');if(!el)return;
+  var order=getCardOrder();
+  var cardMap={};DASH_CARDS.forEach(function(c){cardMap[c.key]=c;});
   var h='';
-  for(var i=0;i<DASH_CARDS.length;i++){
-    var c=DASH_CARDS[i];
+  for(var i=0;i<order.length;i++){
+    var c=cardMap[order[i]];if(!c)continue;
     var on=!dashCardHidden(c.key);
-    h+='<div class="tog-wrap">'
-      +'<div class="tog-lbl">'+c.label+'</div>'
+    var isFirst=(i===0),isLast=(i===order.length-1);
+    h+='<div class="tog-wrap" style="align-items:center">'
+      +'<div style="display:flex;flex-direction:column;gap:1px;margin-right:6px">'
+        +'<button onclick="moveCard(\''+c.key+'\',-1)" '+(isFirst?'disabled':'')+' style="width:18px;height:14px;padding:0;border:none;background:transparent;color:'+(isFirst?'var(--dim)':'var(--sub)')+';cursor:'+(isFirst?'default':'pointer')+';font-size:10px;line-height:1">▲</button>'
+        +'<button onclick="moveCard(\''+c.key+'\',1)" '+(isLast?'disabled':'')+' style="width:18px;height:14px;padding:0;border:none;background:transparent;color:'+(isLast?'var(--dim)':'var(--sub)')+';cursor:'+(isLast?'default':'pointer')+';font-size:10px;line-height:1">▼</button>'
+      +'</div>'
+      +'<div class="tog-lbl" style="flex:1">'+c.label+'</div>'
       +'<label class="tog"><input type="checkbox" data-card="'+c.key+'"'+(on?' checked':'')+'><span class="tog-sl"></span></label>'
     +'</div>';
   }
@@ -4440,6 +4494,77 @@ function rMissing(){
     if(mb)mb.addEventListener('click',function(){render(true);});
   }
   render(false);
+}
+
+// ── ZIP / GROUP HEALTH ────────────────────────────────────────────────────
+function rZipHealth(){
+  var card=document.getElementById('zip-health-card');
+  var list=document.getElementById('zip-health-list');
+  var cnt=document.getElementById('zip-health-count');
+  if(!card||!list)return;
+  var a=allC(),issues=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    var z=c.zip?String(c.zip).replace(/\D/g,'').slice(0,5):'';
+    if(!z){issues.push({c:c,type:'nozip',label:'No ZIP code'});continue;}
+    var mapped=ZIP_TO_GROUP[z];
+    if(!mapped){issues.push({c:c,type:'unknown',label:'Unrecognized ZIP '+z});continue;}
+    if(String(mapped)!==String(c.group)){issues.push({c:c,type:'mismatch',label:'ZIP '+z+' → Group '+mapped+' (assigned '+c.group+')',correct:mapped});}
+  }
+  issues.sort(function(a,b){return b.c.lifetimeSales-a.c.lifetimeSales;});
+  if(!issues.length){card.style.display='none';return;}
+  card.style.display='block';
+  if(cnt)cnt.textContent=issues.length;
+  var mismatches=issues.filter(function(x){return x.type==='mismatch';});
+  var h='';
+  if(mismatches.length>1){
+    h+='<button onclick="fixAllZipGroups()" style="width:100%;padding:7px;margin-bottom:8px;border-radius:var(--r2);background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.3);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700">Fix All Mismatches ('+mismatches.length+')</button>';
+  }
+  var preview=issues.slice(0,8);
+  for(var j=0;j<preview.length;j++){
+    var m=preview[j];
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border1)">'
+      +'<div class="dot" style="background:'+(m.type==='nozip'?'var(--amber)':'#f87171')+'"></div>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" data-code="'+m.c.code+'" data-action="open">'+esc(m.c.name)+tierBadge(m.c)+'</div>'
+        +'<div style="font-size:11px;color:'+(m.type==='nozip'?'var(--amber)':'#f87171')+'">'+m.label+'</div>'
+      +'</div>'
+      +(m.type==='mismatch'?'<button onclick="fixZipGroup(\''+m.c.code+'\','+m.correct+')" style="padding:4px 10px;border-radius:20px;background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.3);cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;white-space:nowrap">Fix →'+m.correct+'</button>':'<div style="font-size:12px;color:var(--sub);cursor:pointer" data-code="'+m.c.code+'" data-action="open">Edit ›</div>')
+    +'</div>';
+  }
+  if(issues.length>8)h+='<div style="font-size:12px;color:var(--sub);text-align:center;padding:8px">…and '+(issues.length-8)+' more</div>';
+  list.innerHTML=h;
+  list.querySelectorAll('[data-action="open"]').forEach(function(r){
+    r.addEventListener('click',function(){openM(this.getAttribute('data-code'));});
+  });
+}
+function fixZipGroup(code,newGroup){
+  var a=allC();
+  var c=a.find(function(x){return x.code===code;});
+  if(!c)return;
+  if(!ST.edits)ST.edits={};
+  if(!ST.edits[code])ST.edits[code]={};
+  ST.edits[code].group=String(newGroup);
+  lSave();syncUp();
+  toast('Group updated → '+newGroup);
+  rZipHealth();
+}
+function fixAllZipGroups(){
+  var a=allC(),fixed=0;
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    var z=c.zip?String(c.zip).replace(/\D/g,'').slice(0,5):'';
+    if(!z)continue;
+    var mapped=ZIP_TO_GROUP[z];
+    if(mapped&&String(mapped)!==String(c.group)){
+      if(!ST.edits)ST.edits={};
+      if(!ST.edits[c.code])ST.edits[c.code]={};
+      ST.edits[c.code].group=String(mapped);
+      fixed++;
+    }
+  }
+  if(fixed){lSave();syncUp();toast('Fixed '+fixed+' group mismatches');}
+  rZipHealth();
 }
 
 // ── MORNING BRIEF ─────────────────────────────────────────────────────────
@@ -12004,7 +12129,7 @@ function onLogin(user){
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
   // Reset ST to blank so previous session data doesn't leak into a new account
-  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
   // One-time cleanup: remove any fake demo customers that got added accidentally
   var _fakeCodes={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
@@ -12226,7 +12351,7 @@ function doSignOut(){
     CURRENT_USER=null;
     SK='';
     rollingRoute=null;saveRolling();
-    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
     var tb=document.getElementById('trial-banner');if(tb)tb.style.display='none';
@@ -12301,7 +12426,7 @@ function confirmDeleteAccount(){
   sb.from('hc_state').delete().eq('id',uid).then(function(){
     sb.auth.signOut().then(function(){
       CURRENT_USER=null;SK='';
-      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
       // Clear local storage
       try{localStorage.removeItem('fieldiq_'+uid);}catch(e){}
       authTab('signin');
