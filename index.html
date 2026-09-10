@@ -1974,7 +1974,7 @@ function syncDown(){
       }
       lSave();rDash();rCust();rGrps();checkFirstRun();
     }catch(e){console.error('finish err:',e);}
-    if(sl)sl.textContent='Synced';
+    var _ls=localStorage.getItem('hrt_last_sync');if(sl)sl.textContent=_ls?'Synced '+_ls:'Synced';
   }
   function offlineFinish(reason){
     if(done)return;done=true;
@@ -2017,7 +2017,7 @@ function syncUp(){
     // Write entire ST as state_json — one column, no schema mapping needed
     sb.from('hc_state').upsert({id:uid,state_json:ST,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(res){
       if(res.error){window._syncPending=true;console.error('syncUp failed:',res.error.message);if(sl)sl.textContent='Sync error: '+res.error.message.slice(0,50);}
-      else{window._syncPending=false;if(sl)sl.textContent='Synced';}
+      else{window._syncPending=false;var _st=new Date();var _hh=_st.getHours(),_mm=_st.getMinutes();var _tstr=(_hh%12||12)+':'+(_mm<10?'0'+_mm:_mm)+(_hh<12?' AM':' PM');localStorage.setItem('hrt_last_sync',_tstr);if(sl)sl.textContent='Synced '+_tstr;}
     }).catch(function(err){window._syncPending=true;console.error('syncUp catch:',err);if(sl)sl.textContent='Sync error';});
   },1500);
 }
@@ -4135,7 +4135,7 @@ function syncDown(){
       }
       lSave();rDash();rCust();rGrps();checkFirstRun();
     }catch(e){console.error('finish err:',e);}
-    if(sl)sl.textContent='Synced';
+    var _ls=localStorage.getItem('hrt_last_sync');if(sl)sl.textContent=_ls?'Synced '+_ls:'Synced';
   }
   function offlineFinish(reason){
     if(done)return;done=true;
@@ -4178,7 +4178,7 @@ function syncUp(){
     // Write entire ST as state_json — one column, no schema mapping needed
     sb.from('hc_state').upsert({id:uid,state_json:ST,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(res){
       if(res.error){window._syncPending=true;console.error('syncUp failed:',res.error.message);if(sl)sl.textContent='Sync error: '+res.error.message.slice(0,50);}
-      else{window._syncPending=false;if(sl)sl.textContent='Synced';}
+      else{window._syncPending=false;var _st=new Date();var _hh=_st.getHours(),_mm=_st.getMinutes();var _tstr=(_hh%12||12)+':'+(_mm<10?'0'+_mm:_mm)+(_hh<12?' AM':' PM');localStorage.setItem('hrt_last_sync',_tstr);if(sl)sl.textContent='Synced '+_tstr;}
     }).catch(function(err){window._syncPending=true;console.error('syncUp catch:',err);if(sl)sl.textContent='Sync error';});
   },1500);
 }
