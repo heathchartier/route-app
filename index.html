@@ -13689,6 +13689,27 @@ if(document.readyState === 'loading'){
   _checkPortalMode();checkSubscription();
 }
 
+// ── ERROR REPORTING ──────────────────────────────────────────────────────────
+function _reportError(msg,src,line,col,err){
+  try{
+    if(!CURRENT_USER||!sb)return;
+    var payload={
+      user_id:CURRENT_USER.id,
+      ts:new Date().toISOString(),
+      msg:String(msg).slice(0,500),
+      src:String(src||'').slice(0,200),
+      line:line||0,
+      col:col||0,
+      stack:err&&err.stack?String(err.stack).slice(0,1000):'',
+      ua:navigator.userAgent.slice(0,200),
+      app_ver:(document.querySelector('meta[name=version]')||{}).content||'unknown'
+    };
+    sb.from('app_errors').insert(payload).then(function(){}).catch(function(){});
+  }catch(e){}
+}
+window.onerror=function(msg,src,line,col,err){_reportError(msg,src,line,col,err);return false;};
+window.addEventListener('unhandledrejection',function(ev){_reportError('UnhandledRejection: '+(ev.reason&&ev.reason.message?ev.reason.message:String(ev.reason)),'promise',0,0,ev.reason);});
+
 // Start auto-lock idle timer (no-op if no PIN or timer is off)
 _initAutoLockIdleReset();
 
