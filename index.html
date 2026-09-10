@@ -13556,10 +13556,18 @@ function _buildMyDayWith(lat,lng){
 
 <script>
 /* ── IAP BRIDGE & SUBSCRIPTION MANAGEMENT ────────────────────────────────── */
-var SUBSCRIPTION_STATUS = null;
+// States: null (unknown), 'trial', 'active', 'expired', 'cancelled', 'grace'
+var SUBSCRIPTION_STATUS = localStorage.getItem('fieldiq_sub_status') || null;
 var _isPortalMode = false;
 var TRIAL_START_DATE = null;
 var TRIAL_DURATION_DAYS = 14;
+var SUB_GRACE_DAYS = 3; // days after trial expiry before hard paywall
+
+function _setSubStatus(status){
+  SUBSCRIPTION_STATUS = status;
+  if(status)localStorage.setItem('fieldiq_sub_status', status);
+  else localStorage.removeItem('fieldiq_sub_status');
+}
 
 // Accounts with permanent free full access — add friends here
 var FREE_ACCESS_EMAILS = [
@@ -13577,6 +13585,18 @@ function isFreeAccess(){
 function checkSubscription(){
   if(_isPortalMode) return; // portal mode — never show auth or paywall to customers
   if(isFreeAccess()) return true; // permanent free accounts skip paywall entirely
+
+  // Active subscription — always allow
+  if(SUBSCRIPTION_STATUS === 'active'){
+    hidePaywall();
+    var banner = document.getElementById('trial-banner');
+    if(banner) banner.style.display = 'none';
+    // Still refresh from iOS in background
+    if(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers['iap-get-status'])
+      window.webkit.messageHandlers['iap-get-status'].postMessage({});
+    return true;
+  }
+
   // Load trial start date from localStorage
   var trialStart = localStorage.getItem('fieldiq_trial_start');
   if(trialStart){
@@ -13584,12 +13604,18 @@ function checkSubscription(){
     var daysSinceStart = Math.floor((Date.now() - TRIAL_START_DATE.getTime()) / 86400000);
 
     if(daysSinceStart >= TRIAL_DURATION_DAYS){
-      // Trial expired - show paywall unless subscribed
-      if(!SUBSCRIPTION_STATUS || SUBSCRIPTION_STATUS !== 'active'){
+      // Grace period: 3 days after expiry before hard block
+      if(daysSinceStart < TRIAL_DURATION_DAYS + SUB_GRACE_DAYS){
+        _setSubStatus('grace');
+        var graceLeft = (TRIAL_DURATION_DAYS + SUB_GRACE_DAYS) - daysSinceStart;
+        updateTrialBanner(-graceLeft); // negative = grace mode
+      } else {
+        _setSubStatus(SUBSCRIPTION_STATUS === 'cancelled' ? 'cancelled' : 'expired');
         showPaywall();
         return false;
       }
     }else{
+      _setSubStatus('trial');
       // Trial active - show countdown banner
       updateTrialBanner(TRIAL_DURATION_DAYS - daysSinceStart);
     }
@@ -13597,6 +13623,7 @@ function checkSubscription(){
     // First time user - start trial and show info screen
     TRIAL_START_DATE = new Date();
     localStorage.setItem('fieldiq_trial_start', TRIAL_START_DATE.toISOString());
+    _setSubStatus('trial');
 
     // Show trial info screen on first login (only if not seen before)
     if(!localStorage.getItem('fieldiq_trial_info_seen')){
@@ -13644,7 +13671,18 @@ function updateTrialBanner(daysLeft){
     return;
   }
 
-  daysSpan.textContent = daysLeft;
+  if(daysLeft < 0){
+    // Grace period — show urgent warning
+    banner.style.background = 'rgba(239,68,68,.15)';
+    banner.style.borderColor = 'rgba(239,68,68,.4)';
+    daysSpan.textContent = Math.abs(daysLeft)+' grace day'+(Math.abs(daysLeft)!==1?'s':'')+' left — ';
+    daysSpan.style.color = 'var(--red)';
+  } else {
+    daysSpan.textContent = daysLeft;
+    daysSpan.style.color = '';
+    banner.style.background = '';
+    banner.style.borderColor = '';
+  }
   banner.style.display = 'block';
 
   // Insert banner at top of body (after paywall overlay)
@@ -13656,16 +13694,20 @@ function updateTrialBanner(daysLeft){
 // iOS calls this with subscription status
 window.onIAPStatus = function(result){
   if(isFreeAccess()) return; // free accounts ignore IAP status — always have access
-  SUBSCRIPTION_STATUS = result.status;
+  _setSubStatus(result.status); // persist to localStorage
   if(result.status === 'active'){
     hidePaywall();
-    // Hide trial banner for subscribers
     var banner = document.getElementById('trial-banner');
     if(banner) banner.style.display = 'none';
+  }else if(result.status === 'cancelled'){
+    _setSubStatus('cancelled');
+    checkSubscription(); // re-evaluate (may show paywall or grace)
   }else if(TRIAL_START_DATE){
     var daysSinceStart = Math.floor((Date.now() - TRIAL_START_DATE.getTime()) / 86400000);
-    if(daysSinceStart >= TRIAL_DURATION_DAYS){
+    if(daysSinceStart >= TRIAL_DURATION_DAYS + SUB_GRACE_DAYS){
       showPaywall();
+    }else if(daysSinceStart >= TRIAL_DURATION_DAYS){
+      updateTrialBanner(-((TRIAL_DURATION_DAYS + SUB_GRACE_DAYS) - daysSinceStart));
     }else{
       updateTrialBanner(TRIAL_DURATION_DAYS - daysSinceStart);
     }
@@ -13693,8 +13735,8 @@ function startSubscribe(){
   if(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers['iap-purchase']){
     window.webkit.messageHandlers['iap-purchase'].postMessage({});
   }else{
-    // Not in iOS app - redirect to web signup
-    alert('Subscriptions are only available in the iOS app. Download FieldIQ from the App Store.');
+    // Not in iOS app
+    toast('Subscriptions are managed in the iOS app. Download FieldIQ from the App Store.');
     if(btn){
       btn.disabled = false;
       btn.textContent = 'Start Free Trial';
@@ -13711,14 +13753,13 @@ window.onIAPPurchaseResult = function(result){
   }
 
   if(result.success){
-    SUBSCRIPTION_STATUS = 'active';
+    _setSubStatus('active');
     hidePaywall();
-    // Hide trial banner
     var banner = document.getElementById('trial-banner');
     if(banner) banner.style.display = 'none';
     toast('Welcome to FieldIQ! Subscription active.');
   }else if(result.error === 'cancelled'){
-    // User cancelled - do nothing
+    // User cancelled purchase flow — do nothing, keep current state
   }else{
     toast('Purchase failed: ' + (result.error || 'Unknown error'));
   }
@@ -13736,11 +13777,13 @@ function restoreSubscribe(){
 // iOS calls this after restore attempt
 window.onIAPRestoreResult = function(result){
   if(result.success){
-    SUBSCRIPTION_STATUS = 'active';
+    _setSubStatus('active');
     hidePaywall();
+    var banner = document.getElementById('trial-banner');
+    if(banner) banner.style.display = 'none';
     toast('Subscription restored!');
   }else{
-    toast('No active subscription found.');
+    toast('No active subscription found. Start a new subscription to continue.');
   }
 };
 
