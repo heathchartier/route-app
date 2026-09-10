@@ -1192,7 +1192,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <div class="hdr">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><h1>Pricing</h1><div class="sub" id="pr-lbl">No price sheet loaded</div></div>
-      <button onclick="document.getElementById('pr-input').click()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px">&#128229; Upload</button>
+      <div style="display:flex;gap:6px">
+        <button onclick="document.getElementById('pr-input').click()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px">&#128229; Upload</button>
+        <button onclick="syncPriceListNow()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r2);padding:8px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" title="Sync price list to cloud">&#9729;</button>
+      </div>
     </div>
     <div class="price-ctrl">
       <div class="price-margin-wrap">
@@ -1913,6 +1916,8 @@ function _applyRemoteState(rem){
   ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});
   ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});ST.visitHours=Object.assign({},rem.visitHours||{},ST.visitHours||{});
   if(rem.cardOrder&&rem.cardOrder.length&&(!ST.cardOrder||!ST.cardOrder.length))ST.cardOrder=rem.cardOrder.slice();
+  // Restore price list from cloud if local is empty
+  if(rem.priceList&&rem.priceList.length&&!priceData.length){ST.priceList=rem.priceList;priceData=rem.priceList;try{localStorage.setItem(PRICE_KEY,JSON.stringify(priceData));}catch(e){}}
   ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
@@ -3327,7 +3332,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <div class="hdr">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><h1>Pricing</h1><div class="sub" id="pr-lbl">No price sheet loaded</div></div>
-      <button onclick="document.getElementById('pr-input').click()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px">&#128229; Upload</button>
+      <div style="display:flex;gap:6px">
+        <button onclick="document.getElementById('pr-input').click()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--teal);border-radius:var(--r2);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px">&#128229; Upload</button>
+        <button onclick="syncPriceListNow()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r2);padding:8px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" title="Sync price list to cloud">&#9729;</button>
+      </div>
     </div>
     <div class="price-ctrl">
       <div class="price-margin-wrap">
@@ -4051,6 +4059,8 @@ function _applyRemoteState(rem){
   ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});
   ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});ST.visitHours=Object.assign({},rem.visitHours||{},ST.visitHours||{});
   if(rem.cardOrder&&rem.cardOrder.length&&(!ST.cardOrder||!ST.cardOrder.length))ST.cardOrder=rem.cardOrder.slice();
+  // Restore price list from cloud if local is empty
+  if(rem.priceList&&rem.priceList.length&&!priceData.length){ST.priceList=rem.priceList;priceData=rem.priceList;try{localStorage.setItem(PRICE_KEY,JSON.stringify(priceData));}catch(e){}}
   ST.productReqs=Object.assign({},rem.productReqs||{},ST.productReqs||{});
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
@@ -6324,6 +6334,12 @@ function loadPricing(){
   try{var sm=localStorage.getItem('hrt_priceMargin');if(sm){var el=document.getElementById('pr-margin');if(el)el.value=sm;}}catch(e){}
   try{
     var s=localStorage.getItem(PRICE_KEY);
+    // Fall back to cloud-synced copy if local is empty
+    if(!s&&ST.priceList&&ST.priceList.length){
+      priceData=ST.priceList;
+      localStorage.setItem(PRICE_KEY,JSON.stringify(priceData));
+      console.log('Price list restored from cloud sync ('+priceData.length+' items)');
+    }
     if(s){
       var loaded=JSON.parse(s);
       if(loaded.length){
@@ -6345,7 +6361,18 @@ function loadPricing(){
   }catch(e){}
   try{var m=localStorage.getItem(PRICE_MAP_KEY);if(m)priceColMap=JSON.parse(m);}catch(e){}
 }
-function savePricing(){try{localStorage.setItem(PRICE_KEY,JSON.stringify(priceData));}catch(e){}}
+function savePricing(){
+  try{localStorage.setItem(PRICE_KEY,JSON.stringify(priceData));}catch(e){}
+  // Also save into ST so it syncs to Supabase and is available on all devices
+  ST.priceList=priceData.length?priceData:undefined;
+  lSave();syncUp();
+}
+function syncPriceListNow(){
+  if(!priceData.length){toast('No price list loaded — upload a CSV first');return;}
+  ST.priceList=priceData;
+  lSave();syncUp();
+  toast('&#9729; Price list synced to cloud ('+priceData.length+' items)');
+}
 function savePriceMap(){try{localStorage.setItem(PRICE_MAP_KEY,JSON.stringify(priceColMap));}catch(e){}}
 
 function rPrice(){
