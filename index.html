@@ -7797,53 +7797,92 @@ function getCityLL(city){
   var k=city.toLowerCase().trim();
   return CITY_LL[k]||null;
 }
+var _mapFilter='all';
+var _mapMarkers=[];
 function showMapOverlay(){
   var overlay=document.getElementById('map-overlay');
   if(overlay)overlay.className='on';
+  _mapFilter='all';
   setTimeout(function(){initRouteMap();},100);
 }
 function closeMapOverlay(){
   var overlay=document.getElementById('map-overlay');
   if(overlay)overlay.className='';
 }
+function setMapFilter(f){
+  _mapFilter=f;
+  var btns=['all','overdue','hot','group','never'];
+  btns.forEach(function(b){
+    var el=document.getElementById('mf-'+b);
+    if(!el)return;
+    var active=(b===f);
+    el.style.background=active?'var(--teal)':'var(--bg3)';
+    el.style.color=active?'#000':'var(--sub)';
+    el.style.border=active?'none':'1px solid var(--border2)';
+  });
+  _renderMapMarkers();
+}
+function _custMapColor(c){
+  if(ST.hot&&ST.hot[c.code])return'#6366f1';
+  var d=ds(c.code);
+  if(d>=1000000)return'#475569'; // never visited
+  var tier=getTier(c);
+  var tgt=tier==='A'?getTierTarget('A'):tier==='B'?getTierTarget('B'):getTierTarget('C');
+  if(d>=tgt)return'#ef4444';        // overdue
+  if(d>=tgt*0.75)return'#f59e0b';  // due soon
+  return'#10b981';                  // covered
+}
+function _renderMapMarkers(){
+  if(!_leafletMap)return;
+  _mapMarkers.forEach(function(m){m.remove();});
+  _mapMarkers=[];
+  var a=allC();
+  var lls=[];
+  var shown=0;
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    // get coordinates from ZIP first, fall back to city
+    var z=c.zip?String(c.zip).replace(/\D/g,'').slice(0,5):'';
+    var ll=z&&ZIP_LL[z]?ZIP_LL[z]:getCityLL(c.city);
+    if(!ll)continue;
+    // apply filter
+    if(_mapFilter==='overdue'){var d2=ds(c.code);var t2=getTierTarget(getTier(c));if(d2<t2||d2>=1000000)continue;}
+    else if(_mapFilter==='hot'){if(!ST.hot||!ST.hot[c.code])continue;}
+    else if(_mapFilter==='group'){if(c.group!==cG)continue;}
+    else if(_mapFilter==='never'){if(ds(c.code)<1000000)continue;}
+    var jitter=[(Math.random()-0.5)*0.008,(Math.random()-0.5)*0.008];
+    var pos=[ll[0]+jitter[0],ll[1]+jitter[1]];
+    lls.push(pos);
+    var color=_custMapColor(c);
+    var dStr=ds(c.code)<1000000?ds(c.code)+'d ago':'Never';
+    var popup='<div style="font-size:13px;font-weight:700;margin-bottom:3px">'+esc(c.name)+'</div>'
+      +'<div style="font-size:11px;color:#555;margin-bottom:2px">'+esc(c.city||'')+(c.group?' &bull; Grp '+c.group:'')+'</div>'
+      +'<div style="font-size:11px;color:#555;margin-bottom:6px">Last visit: '+dStr+(c.tier?' &bull; Tier '+c.tier:'')+'</div>'
+      +'<button onclick="closeMapOverlay();openM(\''+c.code+'\')" style="padding:5px 14px;background:#4a9eff;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;width:100%">Open Card</button>';
+    var marker=L.circleMarker(pos,{radius:7,fillColor:color,color:'rgba(255,255,255,.8)',weight:1.5,fillOpacity:0.9});
+    marker.bindPopup(popup,{maxWidth:200});
+    marker.addTo(_leafletMap);
+    _mapMarkers.push(marker);
+    shown++;
+  }
+  var countEl=document.getElementById('map-count');
+  if(countEl)countEl.textContent=shown+' account'+(shown!==1?'s':'')+' shown';
+  if(lls.length&&_mapFilter!=='all')_leafletMap.fitBounds(lls,{padding:[40,40],maxZoom:13});
+}
 function initRouteMap(){
   var container=document.getElementById('leaflet-map');
   if(!container)return;
   if(_leafletMap){_leafletMap.remove();_leafletMap=null;}
   if(typeof L==='undefined')return;
-  _leafletMap=L.map('leaflet-map').setView([33.85,-118.10],10);
+  // center on home zip if available, else SoCal default
+  var defLat=33.85,defLng=-118.10;
+  var hz=ST.userProfile&&ST.userProfile.homeZip?String(ST.userProfile.homeZip).slice(0,5):'';
+  if(hz&&ZIP_LL[hz]){defLat=ZIP_LL[hz][0];defLng=ZIP_LL[hz][1];}
+  _leafletMap=L.map('leaflet-map').setView([defLat,defLng],10);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
     attribution:'&copy; OpenStreetMap',maxZoom:18
   }).addTo(_leafletMap);
-  var a=allC();
-  var stops=[];
-  for(var i=0;i<a.length;i++){
-    var c=a[i];
-    var snz=ST.snoozed&&ST.snoozed[c.code];if(snz&&new Date(snz)>new Date())continue;
-    var visits=ST.visits[c.code]||[];
-    var alreadyVisited=visits.length&&visits[visits.length-1].type==='visited'&&ds(c.code)<1;
-    if(alreadyVisited)continue;
-    var gc=document.getElementById('g-lbl');
-    var grp=gc?parseInt(gc.textContent.replace('Grp ',''))||cG:cG;
-    if(c.group!==grp)continue;
-    stops.push(c);
-  }
-  var lls=[];
-  for(var i=0;i<stops.length;i++){
-    var c=stops[i];
-    var ll=getCityLL(c.city);
-    if(!ll)continue;
-    var jitter=[(Math.random()-0.5)*0.02,(Math.random()-0.5)*0.02];
-    var pos=[ll[0]+jitter[0],ll[1]+jitter[1]];
-    lls.push(pos);
-    var visits2=ST.visits[c.code]||[];
-    var dot=visits2.length?'visited':'never';
-    var color=dot==='visited'?'#10b981':'#4a9eff';
-    var marker=L.circleMarker(pos,{radius:10,fillColor:color,color:'#fff',weight:2,fillOpacity:0.9});
-    marker.bindPopup('<b>'+c.name+'</b><br><span style="font-size:12px;color:#666">'+c.city+'</span><br><button onclick="document.getElementById(\'map-overlay\').className=\'\';openM(\''+c.code+'\')" style="margin-top:6px;padding:5px 12px;background:#4a9eff;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700">Open</button>');
-    marker.addTo(_leafletMap);
-  }
-  if(lls.length)_leafletMap.fitBounds(lls,{padding:[30,30]});
+  _renderMapMarkers();
 }
 
 /* ── DUPLICATE DETECTOR ── */
@@ -13088,9 +13127,26 @@ function _buildMyDayWith(lat,lng){
 
 </script>
 <div id="map-overlay">
-  <div class="map-hdr">
-    <div style="font-size:17px;font-weight:800">&#128205; Route Map</div>
-    <button onclick="closeMapOverlay()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Close</button>
+  <div class="map-hdr" style="flex-direction:column;gap:8px;padding-bottom:8px">
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+      <div style="font-size:17px;font-weight:800">&#127758; Territory Heat Map</div>
+      <button onclick="closeMapOverlay()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r3);padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Close</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button id="mf-all" onclick="setMapFilter('all')" style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--teal);color:#000;border:none">All</button>
+      <button id="mf-overdue" onclick="setMapFilter('overdue')" style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--bg3);color:var(--sub);border:1px solid var(--border2)">Overdue</button>
+      <button id="mf-hot" onclick="setMapFilter('hot')" style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--bg3);color:var(--sub);border:1px solid var(--border2)">Hot Leads</button>
+      <button id="mf-group" onclick="setMapFilter('group')" style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--bg3);color:var(--sub);border:1px solid var(--border2)">This Group</button>
+      <button id="mf-never" onclick="setMapFilter('never')" style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--bg3);color:var(--sub);border:1px solid var(--border2)">Never Visited</button>
+    </div>
+    <div style="display:flex;gap:12px;font-size:10px;color:var(--sub);flex-wrap:wrap">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10b981;margin-right:3px;vertical-align:middle"></span>Visited &lt;30d</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f59e0b;margin-right:3px;vertical-align:middle"></span>Due soon</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-right:3px;vertical-align:middle"></span>Overdue</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#6366f1;margin-right:3px;vertical-align:middle"></span>Hot lead</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#475569;margin-right:3px;vertical-align:middle"></span>Never visited</span>
+    </div>
+    <div id="map-count" style="font-size:11px;color:var(--sub)"></div>
   </div>
   <div id="leaflet-map"></div>
 </div>
