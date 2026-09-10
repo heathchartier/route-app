@@ -10190,13 +10190,93 @@ function showQuoteCard(qid,page){
   var ov=document.createElement('div');ov.id='quote-card-ov';
   ov.style.cssText='position:fixed;inset:0;z-index:5500;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow-y:auto';
   ov.innerHTML='<div style="width:100%;max-width:380px">'
-    +'<div style="font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:12px">Screenshot to share &nbsp;&#183;&nbsp; Tap outside to close</div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:12px">Screenshot or send &nbsp;&#183;&nbsp; Tap outside to close</div>'
     +cardH
     +navH
-    +'<button onclick="document.getElementById(\'quote-card-ov\').remove()" style="width:100%;padding:12px;border-radius:var(--r2);border:1px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.5);font-size:13px;cursor:pointer;font-family:inherit;margin-top:12px">Close</button>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">'
+    +'<button onclick="emailQuote(\''+qid+'\')" style="padding:11px 6px;border-radius:var(--r2);background:rgba(74,158,255,.15);border:1px solid rgba(74,158,255,.3);color:#4a9eff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128231; Email</button>'
+    +'<button onclick="shareQuote(\''+qid+'\')" style="padding:11px 6px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.25);color:#00e5b8;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128228; Share</button>'
+    +'<button onclick="copyQuote(\''+qid+'\')" style="padding:11px 6px;border-radius:var(--r2);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128203; Copy</button>'
+    +'</div>'
+    +'<button onclick="document.getElementById(\'quote-card-ov\').remove()" style="width:100%;padding:12px;border-radius:var(--r2);border:1px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.5);font-size:13px;cursor:pointer;font-family:inherit;margin-top:8px">Close</button>'
     +'</div>';
   ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
   document.body.appendChild(ov);
+}
+
+function buildQuoteText(qid){
+  if(!ST.quotes||!ST.quotes[qid])return'';
+  var q=ST.quotes[qid];
+  var custName='Customer';
+  var custEmail='';
+  var a=allC();
+  for(var i=0;i<a.length;i++){
+    if(a[i].code===q.code){
+      custName=a[i].name;
+      // try contacts first, then top-level email
+      var contacts=(ST.contacts&&ST.contacts[q.code])||[];
+      for(var j=0;j<contacts.length;j++){if(contacts[j].email){custEmail=contacts[j].email;break;}}
+      if(!custEmail&&a[i].email)custEmail=a[i].email;
+      break;
+    }
+  }
+  var from=(ST.userProfile&&ST.userProfile.name)||'Your Rep';
+  var company=(ST.userProfile&&ST.userProfile.company)||'';
+  var dStr=new Date(q.date).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var lines=[];
+  lines.push('QUOTE — '+dStr);
+  lines.push('For: '+custName);
+  lines.push('From: '+from+(company?' / '+company:''));
+  lines.push('');
+  lines.push('ITEMS');
+  lines.push('──────────────────────');
+  q.items.forEach(function(it){
+    var lt=it.qty*(it.price||0);
+    lines.push(it.name+(it.price?' | Qty '+it.qty+' × '+fmt(it.price)+' = '+fmt(lt):''));
+  });
+  lines.push('──────────────────────');
+  var sub=q.items.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+  if(sub)lines.push('Subtotal: '+fmt(sub));
+  if(q.deliveryFee>0)lines.push('Delivery: '+fmt(q.deliveryFee));
+  if(!q.isResale&&q.taxRate>0){var tax=(sub+(q.deliveryFee||0))*q.taxRate/100;lines.push('Tax ('+q.taxRate+'%): '+fmt(tax));}
+  var grand=qGrandTotal(q);
+  if(grand)lines.push('TOTAL: '+fmt(grand));
+  if(q.isResale)lines.push('Resale / Tax Exempt');
+  return {text:lines.join('\n'),custEmail:custEmail,custName:custName,from:from,company:company,total:grand};
+}
+function emailQuote(qid){
+  var d=buildQuoteText(qid);
+  if(!d)return;
+  var subject=encodeURIComponent('Quote from '+d.company+(d.company?' for ':' — ')+d.custName);
+  var body=encodeURIComponent(d.text+'\n\nThank you for your business!');
+  var to=d.custEmail?encodeURIComponent(d.custEmail):'';
+  window.location.href='mailto:'+to+'?subject='+subject+'&body='+body;
+}
+function shareQuote(qid){
+  var d=buildQuoteText(qid);
+  if(!d)return;
+  var shareText=d.text;
+  if(navigator.share){
+    navigator.share({title:'Quote for '+d.custName,text:shareText}).catch(function(){});
+  } else {
+    // fallback: open as mailto
+    emailQuote(qid);
+  }
+}
+function copyQuote(qid){
+  var d=buildQuoteText(qid);
+  if(!d)return;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(d.text).then(function(){toast('&#128203; Quote copied');}).catch(function(){_fallbackCopyQuote(d.text);});
+  } else {
+    _fallbackCopyQuote(d.text);
+  }
+}
+function _fallbackCopyQuote(text){
+  var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');toast('&#128203; Quote copied');}catch(e){toast('Copy failed');}
+  document.body.removeChild(ta);
 }
 
 function rQuotesModal(code){
@@ -10224,6 +10304,7 @@ function rQuotesModal(code){
         ?'<div style="display:flex;gap:5px;margin-top:6px">'
         +'<button onclick="setQuoteOutcome(\''+q.id+'\',\'won\')" style="flex:1;padding:5px;border-radius:var(--r2);background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#10003; Won</button>'
         +'<button onclick="promptQuoteLoss(\''+q.id+'\')" style="flex:1;padding:5px;border-radius:var(--r2);background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#10007; Lost</button>'
+        +'<button onclick="emailQuote(\''+q.id+'\')" style="padding:5px 8px;border-radius:var(--r2);background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.25);color:var(--blue);font-size:11px;cursor:pointer;font-family:inherit">&#128231;</button>'
         +'<button onclick="showQuoteCard(\''+q.id+'\',0)" style="padding:5px 8px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:11px;cursor:pointer;font-family:inherit">View</button>'
         +'<button onclick="deleteQuote(\''+q.id+'\')" style="padding:5px 8px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:11px;cursor:pointer;font-family:inherit">Del</button>'
         +'</div>':'')
