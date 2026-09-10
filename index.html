@@ -1888,7 +1888,7 @@ function openM(code){
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
-  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?('Visited'+(l.rating?' '+(l.rating==='cold'?'&#128528;':l.rating==='neutral'?'&#128578;':'&#128293;'):'')):l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
+  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li" style="display:flex;align-items:center;gap:4px"><div style="flex:1"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?('Visited'+(l.rating?' '+(l.rating==='cold'?'&#128528;':l.rating==='neutral'?'&#128578;':'&#128293;'):'')):l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div><button onclick="deleteVisitEntry(\''+esc(code)+'\','+i+')" style="background:transparent;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:4px 6px;flex-shrink:0;line-height:1" title="Delete entry">&#10005;</button></div>';}
   var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);rQuotesModal(code);rModalPhoto(code);rProductRequests(code);rPricingSection(code);rStandingAlert(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
@@ -4049,7 +4049,7 @@ function openM(code){
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="ms-outlook://compose?to='+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
   var logs=ST.visits[code]||[],lh='';
-  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?('Visited'+(l.rating?' '+(l.rating==='cold'?'&#128528;':l.rating==='neutral'?'&#128578;':'&#128293;'):'')):l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div>';}
+  for(var i=logs.length-1;i>=Math.max(0,logs.length-8);i--){var l=logs[i];lh+='<div class="li" style="display:flex;align-items:center;gap:4px"><div style="flex:1"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+( l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b')+'">'+( l.type==='visited'?('Visited'+(l.rating?' '+(l.rating==='cold'?'&#128528;':l.rating==='neutral'?'&#128578;':'&#128293;'):'')):l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')):'Not Available')+'</div></div><button onclick="deleteVisitEntry(\''+esc(code)+'\','+i+')" style="background:transparent;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:4px 6px;flex-shrink:0;line-height:1" title="Delete entry">&#10005;</button></div>';}
   var ml=document.getElementById('m-log');if(ml)ml.innerHTML=lh||'<div style="color:#64748b;font-size:13px">No visits yet</div>';rContacts(code);rSamples(code);rOrders(code);rTodos(code);rBestTime(code);rModalHealth(code);rTags(code);rNoteHistory(code);rSalesTarget(code);rQuotesModal(code);rModalPhoto(code);rProductRequests(code);rPricingSection(code);rStandingAlert(code);
   var med=document.getElementById('m-edit');if(med)med.style.display='none';
   var mv2=document.getElementById('m-view');if(mv2)mv2.style.display='block';
@@ -7067,6 +7067,16 @@ function undoLastVisit(){
   if(arr.length>0){ST.visits[code]=arr.slice(0,-1);lSave();syncUp();rDash();}
   var t=document.getElementById('toast-undo');if(t)t.className='';
   window._lastVisit=null;clearTimeout(window._undoTimer);
+}
+function deleteVisitEntry(code,idx){
+  var arr=ST.visits[code]||[];
+  if(idx<0||idx>=arr.length)return;
+  if(!confirm('Delete this visit entry?'))return;
+  arr.splice(idx,1);
+  ST.visits[code]=arr;
+  lSave();syncUp();
+  if(mC===code)openM(code);
+  rDash();
 }
 
 /* ── DASHBOARD SEARCH ── */
