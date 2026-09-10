@@ -1420,8 +1420,8 @@ var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
 var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
-function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lSave(){try{var s=JSON.stringify(ST);localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
 function ds(code){var v=ST.visits[code];if(!v||!v.length)return 1000000;return Math.floor((Date.now()-new Date(v[v.length-1].date))/864e5);}
@@ -1970,12 +1970,17 @@ function syncUp(){
   clearTimeout(syncTimer);
   syncTimer=setTimeout(function(){
     var sl=document.getElementById('sync-lbl');
+    if(!navigator.onLine){
+      window._syncPending=true;
+      if(sl)sl.textContent='Offline — saved locally';
+      return;
+    }
     if(sl)sl.textContent='Syncing…';
     // Write entire ST as state_json — one column, no schema mapping needed
     sb.from('hc_state').upsert({id:uid,state_json:ST,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(res){
-      if(res.error){console.error('syncUp failed:',res.error.message);if(sl)sl.textContent='Sync error: '+res.error.message.slice(0,50);}
-      else{if(sl)sl.textContent='Synced';}
-    }).catch(function(err){console.error('syncUp catch:',err);if(sl)sl.textContent='Sync error';});
+      if(res.error){window._syncPending=true;console.error('syncUp failed:',res.error.message);if(sl)sl.textContent='Sync error: '+res.error.message.slice(0,50);}
+      else{window._syncPending=false;if(sl)sl.textContent='Synced';}
+    }).catch(function(err){window._syncPending=true;console.error('syncUp catch:',err);if(sl)sl.textContent='Sync error';});
   },1500);
 }
 
@@ -3506,8 +3511,8 @@ var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
 var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e){}}
-function lSave(){try{localStorage.setItem(SK,JSON.stringify(ST));}catch(e){}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lSave(){try{var s=JSON.stringify(ST);localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
 function ds(code){var v=ST.visits[code];if(!v||!v.length)return 1000000;return Math.floor((Date.now()-new Date(v[v.length-1].date))/864e5);}
@@ -4066,12 +4071,17 @@ function syncUp(){
   clearTimeout(syncTimer);
   syncTimer=setTimeout(function(){
     var sl=document.getElementById('sync-lbl');
+    if(!navigator.onLine){
+      window._syncPending=true;
+      if(sl)sl.textContent='Offline — saved locally';
+      return;
+    }
     if(sl)sl.textContent='Syncing…';
     // Write entire ST as state_json — one column, no schema mapping needed
     sb.from('hc_state').upsert({id:uid,state_json:ST,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(res){
-      if(res.error){console.error('syncUp failed:',res.error.message);if(sl)sl.textContent='Sync error: '+res.error.message.slice(0,50);}
-      else{if(sl)sl.textContent='Synced';}
-    }).catch(function(err){console.error('syncUp catch:',err);if(sl)sl.textContent='Sync error';});
+      if(res.error){window._syncPending=true;console.error('syncUp failed:',res.error.message);if(sl)sl.textContent='Sync error: '+res.error.message.slice(0,50);}
+      else{window._syncPending=false;if(sl)sl.textContent='Synced';}
+    }).catch(function(err){window._syncPending=true;console.error('syncUp catch:',err);if(sl)sl.textContent='Sync error';});
   },1500);
 }
 
@@ -13465,6 +13475,13 @@ if(document.readyState === 'loading'){
 }else{
   _checkPortalMode();checkSubscription();
 }
+
+// Flush any pending sync when connection comes back
+window.addEventListener('online',function(){
+  if(window._syncPending){window._syncPending=false;syncUp();}
+  var sl=document.getElementById('sync-lbl');
+  if(sl&&sl.textContent==='Offline — saved locally')sl.textContent='Back online — syncing…';
+});
 
 /* ── TESTING SHORTCUTS ─────────────────────────────────────────────────── */
 var _tapCount = 0;
