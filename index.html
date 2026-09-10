@@ -1440,7 +1440,7 @@ function toast(m){var t=document.getElementById('toast');t.textContent=m;t.class
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
 function ds(code){var v=ST.visits[code];if(!v||!v.length)return 1000000;return Math.floor((Date.now()-new Date(v[v.length-1].date))/864e5);}
 function dc(code){var d=ds(code);return d>=1000000?'#64748b':d<=14?'#10b981':d<=45?'#f59e0b':'#ef4444';}
-function mv(code,type){if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);});}}
+function mv(code,type){if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);})}}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function allC(){
@@ -3567,7 +3567,7 @@ function toast(m){var t=document.getElementById('toast');t.textContent=m;t.class
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
 function ds(code){var v=ST.visits[code];if(!v||!v.length)return 1000000;return Math.floor((Date.now()-new Date(v[v.length-1].date))/864e5);}
 function dc(code){var d=ds(code);return d>=1000000?'#64748b':d<=14?'#10b981':d<=45?'#f59e0b':'#ef4444';}
-function mv(code,type){if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);});}}
+function mv(code,type){if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);})}}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function allC(){
