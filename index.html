@@ -701,6 +701,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
+    <div id="d-nba" style="display:none"></div>
     <div class="card" id="d-goal-card">
       <div class="goal-row">
         <div><div class="lbl" style="margin:0">Weekly Goal</div><div class="goal-lbl" id="d-goal-sub">0 of 30 visits this week</div></div>
@@ -1234,6 +1235,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="mb2">
       <button class="abtn" id="m-vis" style="background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3)">Visited</button>
       <button class="abtn" id="m-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3)">Not Available</button>
+    </div>
+    <div style="margin-top:4px">
+      <button class="abtn" id="m-retry-today" style="width:100%;background:rgba(74,158,255,.1);color:var(--blue);border:1px solid rgba(74,158,255,.25);font-size:12px">&#8635; Try Again Today</button>
     </div>
     <div class="mb3">
       <button class="abtn" id="m-hot" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);font-size:12px">Hot Lead</button>
@@ -2799,6 +2803,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div id="d-recently" style="display:none"></div>
     <div id="d-brief" style="display:none"></div>
     <div class="streak-bar" id="d-streak"></div>
+    <div id="d-nba" style="display:none"></div>
     <div class="card" id="d-goal-card">
       <div class="goal-row">
         <div><div class="lbl" style="margin:0">Weekly Goal</div><div class="goal-lbl" id="d-goal-sub">0 of 30 visits this week</div></div>
@@ -3305,6 +3310,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="abtn" id="m-vis" style="background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3)">Visited</button>
       <button class="abtn" id="m-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3)">Not Available</button>
     </div>
+    <div style="margin-top:4px">
+      <button class="abtn" id="m-retry-today" style="width:100%;background:rgba(74,158,255,.1);color:var(--blue);border:1px solid rgba(74,158,255,.25);font-size:12px">&#8635; Try Again Today</button>
+    </div>
     <div class="mb3">
       <button class="abtn" id="m-hot" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);font-size:12px">Hot Lead</button>
       <button class="abtn" id="m-arc" style="background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-size:12px">Archive</button>
@@ -3586,7 +3594,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);
 }
 
 function rRoute(){
@@ -3595,8 +3603,11 @@ function rRoute(){
   for(var i=0;i<gc.length;i++){
     var c=gc[i],lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var snz=ST.snoozed&&ST.snoozed[c.code];if(snz&&new Date(snz)>new Date())continue;
-    if(lv&&lv.type==='not_available'){if(ds(c.code)<2)continue;}
-    else if(ds(c.code)<=visitWindow(c)&&ds(c.code)<1000000)continue;
+    var _tod=new Date().toISOString().split('T')[0];
+    var _sched=ST.scheduled&&ST.scheduled[c.code];
+    var _schedToday=_sched&&_sched.date===_tod;
+    if(lv&&lv.type==='not_available'){if(ds(c.code)<2&&!_schedToday)continue;}
+    else if(ds(c.code)<=visitWindow(c)&&ds(c.code)<1000000&&!_schedToday)continue;
     stops.push(c);
   }
   if(_routeSortMode==='gps'&&window._gpsPos){
@@ -4231,6 +4242,7 @@ function rNewCustomers(){
 // ── DASHBOARD CARD TOGGLES ────────────────────────────────────────────────
 var DASH_CARDS=[
   {key:'brief',label:'Morning Briefing'},
+  {key:'nba',label:'Next Best Action'},
   {key:'streak',label:'Visit Streak'},
   {key:'goal',label:'Weekly Goal'},
   {key:'newcusts',label:'New Accounts'},
@@ -4642,6 +4654,15 @@ document.getElementById('m-na').addEventListener('click',function(){
     toast('Scheduled retry in 3 days');
     closeM();rDash();rCust();
   }
+});
+document.getElementById('m-retry-today').addEventListener('click',function(){
+  if(!mC)return;
+  mv(mC,'not_available');
+  if(!ST.scheduled)ST.scheduled={};
+  ST.scheduled[mC]={date:new Date().toISOString().split('T')[0]};
+  lSave();syncUp();
+  toast('↻ Retry added to today\'s route');
+  closeM();rDash();rCust();
 });
 document.getElementById('m-hot').addEventListener('click',function(){if(!mC)return;ST.hot[mC]=!ST.hot[mC];lSave();syncUp();this.textContent=ST.hot[mC]?'Remove Hot':'Hot Lead';toast(ST.hot[mC]?'Hot lead set':'Removed');});
 document.getElementById('m-arc').addEventListener('click',function(){if(!mC||!confirm('Archive?'))return;ST.archived[mC]=true;lSave();syncUp();closeM();rCust();rDash();toast('Archived');});
@@ -5206,14 +5227,14 @@ function crSearch(){
 function addToCustomRoute(id,type){
   // Check not already added
   for(var i=0;i<customRoute.length;i++){if(customRoute[i].id===id)return;}
-  var name='',addr='',city='';
+  var name='',addr='',city='',zip='';
   if(type==='cust'){
-    var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===id){name=a[i].name;city=a[i].city||'';addr=[a[i].address,city,'CA'].filter(function(x){return x;}).join(', ');break;}}
+    var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===id){name=a[i].name;city=a[i].city||'';zip=a[i].zip||'';addr=[a[i].address,city,'CA'].filter(function(x){return x;}).join(', ');break;}}
   } else {
-    var v=allV();for(var i=0;i<v.length;i++){if(v[i].code===id){name=v[i].name;city=v[i].city||'';addr=[v[i].address,city,'CA'].filter(function(x){return x;}).join(', ');break;}}
+    var v=allV();for(var i=0;i<v.length;i++){if(v[i].code===id){name=v[i].name;city=v[i].city||'';zip=v[i].zip||'';addr=[v[i].address,city,'CA'].filter(function(x){return x;}).join(', ');break;}}
   }
   if(!addr){toast('No address for '+name);return;}
-  customRoute.push({id:id,type:type,name:name,addr:addr,city:city});
+  customRoute.push({id:id,type:type,name:name,addr:addr,city:city,zip:zip});
   renderCustomRoute();
   var srch=document.getElementById('cr-srch');if(srch)srch.value='';
   var res=document.getElementById('cr-results');if(res)res.style.display='none';
@@ -5250,7 +5271,7 @@ function renderCustomRoute(){
     h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">'
       +'<div style="width:22px;height:22px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+(i+1)+'</div>'
       +'<div style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex-shrink:0"></div>'
-      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(s.name)+'</div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(s.name)+((!s.zip&&s.type==='cust')?'<span title="No ZIP — GPS routing may be inaccurate" style="margin-left:5px;background:rgba(255,176,32,.2);color:var(--amber);border-radius:4px;padding:1px 4px;font-size:9px;font-weight:700;vertical-align:middle">NO ZIP</span>':'')+'</div>'
       +'<div style="font-size:11px;color:var(--sub)">'+(s.type==='vend'?'Supplier':'Customer')+(lastVisit?' &bull; '+(lastVisit.type==='visited'?'<span style="color:var(--green)">Visited</span>':'<span style="color:var(--amber)">N/A</span>'):'')+'</div></div>'
       +'<div style="display:flex;gap:4px;align-items:center">'+visitBtns
       +'<button data-cridx="'+i+'" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:2px 6px">&#10005;</button>'
@@ -9638,6 +9659,51 @@ function optimizeRouteByGPS(stops,callback){
     if(ordered.length>=8)ordered=twoOpt(ordered);
     callback(ordered);
   },function(){toast('Could not get GPS location');});
+}
+
+/* ── NEXT BEST ACTION ── */
+function rNBA(a){
+  var el=document.getElementById('d-nba');if(!el)return;
+  if(dashCardHidden('nba')){el.style.display='none';return;}
+  // Evaluate candidates in priority order
+  var action=null;
+  var todayStr=new Date().toISOString().split('T')[0];
+  // 1. Callbacks due today
+  var cbDue=0;for(var i=0;i<a.length;i++){var c=a[i];if(ST.scheduled&&ST.scheduled[c.code]&&ST.scheduled[c.code].date===todayStr)cbDue++;}
+  if(cbDue>0)action={icon:'&#128222;',msg:cbDue+' callback'+(cbDue>1?'s':'')+' scheduled for today',color:'var(--blue)',code:null,cta:'View Callbacks',ctaFn:'go(\'dash\');document.getElementById(\'d-retry\').scrollIntoView({behavior:\'smooth\'})'};
+  // 2. Hot lead not visited in 3+ days
+  if(!action){
+    for(var i=0;i<a.length;i++){var c=a[i];if(ST.hot&&ST.hot[c.code]){var d=ds(c.code);if(d>=3&&d<1000000){action={icon:'&#9733;',msg:'Hot lead '+esc(c.name)+' — not visited in '+d+'d',color:'var(--amber)',code:c.code,cta:'Open',ctaFn:'openM(\''+esc(c.code)+'\')'}; break;}}}
+  }
+  // 3. Highest-value A-tier overdue (lifetime >50k, >14d)
+  if(!action){
+    var best=null,bestSales=0;
+    for(var i=0;i<a.length;i++){var c=a[i];var d=ds(c.code);if(d>14&&d<1000000&&(c.lifetimeSales||0)>bestSales){bestSales=c.lifetimeSales||0;best={c:c,d:d};}}
+    if(best&&bestSales>30000)action={icon:'&#128202;',msg:'Top account '+esc(best.c.name)+' — '+best.d+'d since last visit',color:'var(--teal)',code:best.c.code,cta:'Open',ctaFn:'openM(\''+esc(best.c.code)+'\')'};
+  }
+  // 4. Customer with revenue target far behind (<40%) mid-year+
+  if(!action&&Object.keys(ST.revTargets||{}).length>0){
+    var now=new Date(),mo=now.getMonth();
+    if(mo>=3){// April+ — enough time to be meaningful
+      var worst=null,worstPct=100;
+      for(var i=0;i<a.length;i++){var c=a[i];var rt=ST.revTargets&&ST.revTargets[c.code];if(!rt)continue;var so=ST.salesOverrides&&ST.salesOverrides[c.code]||{};var ytd=so.sales2526!==undefined?so.sales2526:c.sales2526||0;var pct=Math.round((ytd/rt)*100);if(pct<worstPct&&pct<40){worstPct=pct;worst={c:c,pct:pct};}}
+      if(worst)action={icon:'&#127919;',msg:esc(worst.c.name)+' at '+worst.pct+'% of annual revenue target',color:'var(--red)',code:worst.c.code,cta:'Open',ctaFn:'openM(\''+esc(worst.c.code)+'\')'};
+    }
+  }
+  // 5. Two consecutive N/As on a high-value customer
+  if(!action){
+    for(var i=0;i<a.length;i++){var c=a[i];if((c.lifetimeSales||0)<15000)continue;var logs=ST.visits[c.code]||[];var l2=logs.slice(-2);if(l2.length>=2&&l2[0].type==='not_available'&&l2[1].type==='not_available'){action={icon:'&#9888;',msg:esc(c.name)+' — not available twice in a row',color:'var(--amber)',code:c.code,cta:'Open',ctaFn:'openM(\''+esc(c.code)+'\')'}; break;}}
+  }
+  if(!action){el.style.display='none';return;}
+  el.style.display='block';
+  el.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;cursor:'+(action.code?'pointer':'default')+'"'+(action.code?' onclick="'+action.ctaFn+'"':'')+' >'
+   +'<div style="width:36px;height:36px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">'+action.icon+'</div>'
+   +'<div style="flex:1;min-width:0">'
+   +'<div style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.8px;margin-bottom:2px">NEXT BEST ACTION</div>'
+   +'<div style="font-size:13px;font-weight:600;color:'+action.color+';line-height:1.3">'+action.msg+'</div>'
+   +'</div>'
+   +(action.code?'<div style="font-size:12px;color:var(--sub);flex-shrink:0">'+action.cta+' &#8250;</div>':'')
+   +'</div>';
 }
 
 /* ── SALES PACE ── */
