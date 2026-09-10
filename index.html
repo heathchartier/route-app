@@ -5113,7 +5113,7 @@ function doImport(hdrs,rows,fname,status){
   } else {
     for(var f in COLS){ci[f]=-1;for(var i=0;i<COLS[f].length;i++){for(var j=0;j<hdrs.length;j++){if(hdrs[j]===COLS[f][i]||hdrs[j].indexOf(COLS[f][i])>=0){ci[f]=j;break;}}if(ci[f]>=0)break;}
   }}
-  var added=0,updated=0,skipped=0,flagged=0,badAddr=0,a=allC(),newDiscrep=[],addedNames=[];
+  var added=0,updated=0,skipped=0,flagged=0,badAddr=0,badZip=0,a=allC(),newDiscrep=[],addedNames=[],badZipRows=[];
   var importDate=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
   function parseMoney(v){return parseFloat(String(v||'').replace(/[$,\s]/g,''))||0;}
@@ -5186,6 +5186,10 @@ function doImport(hdrs,rows,fname,status){
         sales2025:ci.sales2025>=0?parseMoney(row[ci.sales2025]):0,
         sales2526:ci.sales2526>=0?parseMoney(row[ci.sales2526]):0,
         distance:0,addedAt:new Date().toISOString()};
+      // ZIP validation
+      var z5=nc.zip?String(nc.zip).replace(/\D/g,'').slice(0,5):'';
+      if(!z5){nc.needsZipFix=true;badZip++;badZipRows.push(nc.name);}
+      else if(!ZIP_LL[z5]&&!ZIP_TO_GROUP[z5]){nc.needsZipFix=true;badZip++;badZipRows.push(nc.name+'('+z5+')');}
       if(!ST.addedCustomers)ST.addedCustomers=[];
       ST.addedCustomers.push(nc);added++;addedNames.push(nc.name);
     }
@@ -5200,12 +5204,14 @@ function doImport(hdrs,rows,fname,status){
 
   lSave();syncUp();rCust();rDash();rGrps();rDiscrepCard();
   if(badAddr>0){setTimeout(function(){toast(badAddr+' customer'+(badAddr>1?'s have':' has')+' no valid street address — placed in "Needs Address Fix" group so you can update them.');},1200);}
+  if(badZip>0){setTimeout(function(){toast('⚠ '+badZip+' customer'+(badZip>1?'s have':' has')+' missing or unrecognized ZIP — route group may be wrong. Review in Settings → ZIP / Group Health.');},badAddr>0?2800:1200);}
   if(IS_FIRST_RUN&&added>0){setTimeout(function(){generateRouteGroups(function(){var ob=document.getElementById('ob-overlay');if(ob)ob.style.display='none';go('dash');});},600);}
   var parts=[];
   if(added)parts.push(added+' new account'+(added!==1?'s':'')+' added');
   if(updated)parts.push(updated+' financial'+(updated!==1?'s':'')+' updated');
   if(flagged)parts.push(flagged+' order system discrepanc'+(flagged!==1?'ies':'y')+' flagged');
   if(badAddr)parts.push(badAddr+' need address fix');
+  if(badZip)parts.push(badZip+' bad/unknown ZIP'+(badZip>1?'s':''));
   if(skipped)parts.push(skipped+' matched/unchanged');
   status.style.color=flagged?'var(--amber)':(added||updated)?'var(--teal)':'var(--sub)';
   var msg=parts.length?parts.join(' · '):'Nothing to update — all data matches';
