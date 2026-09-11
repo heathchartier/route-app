@@ -7435,7 +7435,16 @@ function rNavBadge(){
   var nb=document.getElementById('nb-dash');if(!nb)return;
   var today=new Date().toISOString().split('T')[0];
   var a=allC(),hasDue=false;
-  for(var i=0;i<a.length;i++){var s=ST.scheduled&&ST.scheduled[a[i].code];if(s&&s.date&&s.date<=today){hasDue=true;break;}}
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    // scheduled follow-up
+    var s=ST.scheduled&&ST.scheduled[c.code];if(s&&s.date&&s.date<=today){hasDue=true;break;}
+    // callback due
+    var fu=ST.followups&&ST.followups[c.code];if(fu&&fu.split('T')[0]<=today){hasDue=true;break;}
+    // overdue task
+    var todos=ST.todos&&ST.todos[c.code]?ST.todos[c.code]:[];
+    if(todos.some(function(t){return !t.done&&t.dueDate&&t.dueDate<=today;})){hasDue=true;break;}
+  }
   var badge=nb.querySelector('.nav-badge');
   if(hasDue){if(!badge){badge=document.createElement('span');badge.className='nav-badge';nb.appendChild(badge);}}
   else{if(badge)badge.remove();}
