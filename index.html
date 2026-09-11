@@ -865,6 +865,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="chip" data-f="scheduled">Scheduled</button>
       <button class="chip" data-f="active">Active</button>
       <button class="chip" data-f="hot">Hot</button>
+      <button class="chip" data-f="pinned">Pinned</button>
       <button class="chip" data-f="never">Never</button>
       <button class="chip" data-f="tier_a">A Tier</button>
       <button class="chip" data-f="tier_b">B Tier</button>
@@ -1296,6 +1297,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div class="mb3">
       <button class="abtn" id="m-hot" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);font-size:12px">Hot Lead</button>
+      <button class="abtn" id="m-pin" style="background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-size:12px">&#128204; Pin</button>
       <button class="abtn" id="m-arc" style="background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-size:12px">Archive</button>
       <button class="abtn" id="m-rem" style="background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3);font-size:12px">Remove</button>
     </div>
@@ -1457,7 +1459,7 @@ var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
 var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1738,7 +1740,7 @@ function rIdle(a){
 }
 
 function rCust(){
-  var a=allC();a.sort(function(x,y){return (isNew(y)?1:0)-(isNew(x)?1:0);});
+  var a=allC();a.sort(function(x,y){var px=ST.pinned&&ST.pinned[x.code]?1:0,py=ST.pinned&&ST.pinned[y.code]?1:0;if(py!==px)return py-px;return (isNew(y)?1:0)-(isNew(x)?1:0);});
   var f=[],q=cS.toLowerCase();
   for(var i=0;i<a.length;i++){
     var c=a[i];
@@ -1749,6 +1751,7 @@ function rCust(){
     else if(cF==='overdue'){if(ds(c.code)<=45)continue;}
     else if(cF==='active'){if(!c.sales2526&&!c.lifetimeSales)continue;}
     else if(cF==='hot'){if(!ST.hot[c.code])continue;}
+    else if(cF==='pinned'){if(!ST.pinned||!ST.pinned[c.code])continue;}
     else if(cF==='never'){if(ds(c.code)<1000000)continue;}
     else if(cF==='scheduled'){var td=new Date().toISOString().split('T')[0];if(!ST.scheduled||!ST.scheduled[c.code]||ST.scheduled[c.code].date<td)continue;}
     else if(cF==='tier_a'){if(getTier(c)!=='A')continue;}
@@ -1791,7 +1794,8 @@ function rCPage(){
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>60?note.slice(0,60)+'…':note)+'</div>':'';
     var hoursBadge=isOutsideHours(c.code)?'<span style="background:rgba(251,191,36,.15);color:#fbbf24;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ CLOSED</span>':'';
     var tierWinBadge=isTierWindowLate(c)?'<span style="background:rgba(239,68,68,.12);color:#ef4444;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ PAST WINDOW</span>':'';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button><button class="vb" style="font-size:15px;padding:6px 7px;min-width:34px" onclick="event.stopPropagation();showQuickNote(\''+esc(c.code)+'\')" title="Quick note">&#9998;</button></div></div>';
+    var pinBadge=ST.pinned&&ST.pinned[c.code]?'<span style="font-size:11px;margin-left:4px;opacity:.7">&#128204;</span>':'';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+pinBadge+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button><button class="vb" style="font-size:15px;padding:6px 7px;min-width:34px" onclick="event.stopPropagation();showQuickNote(\''+esc(c.code)+'\')" title="Quick note">&#9998;</button></div></div>';
   }
   var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
   var cm=document.getElementById('c-more');if(cm)cm.style.display=fc.length>PG*(pg+1)?'block':'none';
@@ -1861,7 +1865,7 @@ function openM(code){
   var so=ST.salesOverrides&&ST.salesOverrides[code]||{};
   var sboxData=[['Lifetime','lifetimeSales',so.lifetimeSales!==undefined?so.lifetimeSales:c.lifetimeSales],['2024','sales2024',so.sales2024!==undefined?so.sales2024:c.sales2024],['2025','sales2025',so.sales2025!==undefined?so.sales2025:c.sales2025],['YTD','sales2526',so.sales2526!==undefined?so.sales2526:c.sales2526]];
   if(ms)ms.innerHTML=sboxData.map(function(x){var isOvr=so[x[1]]!==undefined;return'<div class="sbox" onclick="editSalesVal(\''+esc(code)+'\',\''+x[1]+'\')" style="cursor:pointer;position:relative">'+(isOvr?'<div style="position:absolute;top:4px;right:4px;font-size:8px;color:var(--teal);font-weight:800">EDIT</div>':'')+'<div class="sbl">'+x[0]+'</div><div class="sbv" style="'+(x[0]==='YTD'?'color:var(--teal)':'')+'">'+fmt(x[2])+'</div><div style="font-size:9px;color:var(--dim);margin-top:2px">tap to edit</div></div>';}).join('')+(trendHtml||quietHtml?'<div style="width:100%;margin-top:6px">'+trendHtml+quietHtml+'</div>':'');
-  var mh=document.getElementById('m-hot');if(mh)mh.textContent=ST.hot[code]?'Remove Hot':'Hot Lead';
+  var mh=document.getElementById('m-hot');if(mh)mh.textContent=ST.hot[code]?'Remove Hot':'Hot Lead';var mp=document.getElementById('m-pin');if(mp){mp.textContent=ST.pinned&&ST.pinned[code]?'📌 Unpin':'📌 Pin';mp.style.background=ST.pinned&&ST.pinned[code]?'rgba(99,102,241,.15)':'var(--bg3)';mp.style.color=ST.pinned&&ST.pinned[code]?'#818cf8':'var(--sub)';mp.style.borderColor=ST.pinned&&ST.pinned[code]?'rgba(99,102,241,.4)':'var(--border2)';}
   var mn2=document.getElementById('m-note');if(mn2)mn2.value=(ST.notes&&ST.notes[code])||'';
   var noteVal=(ST.notes&&ST.notes[code])||'';
   var mpv=document.getElementById('m-previsit'),mpt=document.getElementById('m-previsit-txt');
@@ -1936,7 +1940,7 @@ function _applyRemoteState(rem){
   ST.groupNames=Object.assign({},rem.groupNames||{},ST.groupNames||{});
   ST.salesTargets=Object.assign({},rem.salesTargets||{},ST.salesTargets||{});
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
-  ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});
+  ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});ST.pinned=Object.assign({},rem.pinned||{},ST.pinned||{});
   ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});ST.visitHours=Object.assign({},rem.visitHours||{},ST.visitHours||{});ST.tierWindows=Object.assign({},rem.tierWindows||{},ST.tierWindows||{});
   if(rem.cardOrder&&rem.cardOrder.length&&(!ST.cardOrder||!ST.cardOrder.length))ST.cardOrder=rem.cardOrder.slice();
   // Restore price list from cloud if local is empty
@@ -3068,6 +3072,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="chip" data-f="scheduled">Scheduled</button>
       <button class="chip" data-f="active">Active</button>
       <button class="chip" data-f="hot">Hot</button>
+      <button class="chip" data-f="pinned">Pinned</button>
       <button class="chip" data-f="never">Never</button>
       <button class="chip" data-f="tier_a">A Tier</button>
       <button class="chip" data-f="tier_b">B Tier</button>
@@ -3460,6 +3465,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div class="mb3">
       <button class="abtn" id="m-hot" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);font-size:12px">Hot Lead</button>
+      <button class="abtn" id="m-pin" style="background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-size:12px">&#128204; Pin</button>
       <button class="abtn" id="m-arc" style="background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-size:12px">Archive</button>
       <button class="abtn" id="m-rem" style="background:var(--red2);color:var(--red);border:1px solid rgba(255,77,106,.3);font-size:12px">Remove</button>
     </div>
@@ -3614,7 +3620,7 @@ var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
 var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -3905,7 +3911,7 @@ function rIdle(a){
 }
 
 function rCust(){
-  var a=allC();a.sort(function(x,y){return (isNew(y)?1:0)-(isNew(x)?1:0);});
+  var a=allC();a.sort(function(x,y){var px=ST.pinned&&ST.pinned[x.code]?1:0,py=ST.pinned&&ST.pinned[y.code]?1:0;if(py!==px)return py-px;return (isNew(y)?1:0)-(isNew(x)?1:0);});
   var f=[],q=cS.toLowerCase();
   for(var i=0;i<a.length;i++){
     var c=a[i];
@@ -3916,6 +3922,7 @@ function rCust(){
     else if(cF==='overdue'){if(ds(c.code)<=45)continue;}
     else if(cF==='active'){if(!c.sales2526&&!c.lifetimeSales)continue;}
     else if(cF==='hot'){if(!ST.hot[c.code])continue;}
+    else if(cF==='pinned'){if(!ST.pinned||!ST.pinned[c.code])continue;}
     else if(cF==='never'){if(ds(c.code)<1000000)continue;}
     else if(cF==='scheduled'){var td=new Date().toISOString().split('T')[0];if(!ST.scheduled||!ST.scheduled[c.code]||ST.scheduled[c.code].date<td)continue;}
     else if(cF==='tier_a'){if(getTier(c)!=='A')continue;}
@@ -3958,7 +3965,8 @@ function rCPage(){
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>60?note.slice(0,60)+'…':note)+'</div>':'';
     var hoursBadge=isOutsideHours(c.code)?'<span style="background:rgba(251,191,36,.15);color:#fbbf24;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ CLOSED</span>':'';
     var tierWinBadge=isTierWindowLate(c)?'<span style="background:rgba(239,68,68,.12);color:#ef4444;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ PAST WINDOW</span>':'';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button><button class="vb" style="font-size:15px;padding:6px 7px;min-width:34px" onclick="event.stopPropagation();showQuickNote(\''+esc(c.code)+'\')" title="Quick note">&#9998;</button></div></div>';
+    var pinBadge=ST.pinned&&ST.pinned[c.code]?'<span style="font-size:11px;margin-left:4px;opacity:.7">&#128204;</span>':'';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+pinBadge+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button><button class="vb" style="font-size:15px;padding:6px 7px;min-width:34px" onclick="event.stopPropagation();showQuickNote(\''+esc(c.code)+'\')" title="Quick note">&#9998;</button></div></div>';
   }
   var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
   var cm=document.getElementById('c-more');if(cm)cm.style.display=fc.length>PG*(pg+1)?'block':'none';
@@ -4028,7 +4036,7 @@ function openM(code){
   var so=ST.salesOverrides&&ST.salesOverrides[code]||{};
   var sboxData=[['Lifetime','lifetimeSales',so.lifetimeSales!==undefined?so.lifetimeSales:c.lifetimeSales],['2024','sales2024',so.sales2024!==undefined?so.sales2024:c.sales2024],['2025','sales2025',so.sales2025!==undefined?so.sales2025:c.sales2025],['YTD','sales2526',so.sales2526!==undefined?so.sales2526:c.sales2526]];
   if(ms)ms.innerHTML=sboxData.map(function(x){var isOvr=so[x[1]]!==undefined;return'<div class="sbox" onclick="editSalesVal(\''+esc(code)+'\',\''+x[1]+'\')" style="cursor:pointer;position:relative">'+(isOvr?'<div style="position:absolute;top:4px;right:4px;font-size:8px;color:var(--teal);font-weight:800">EDIT</div>':'')+'<div class="sbl">'+x[0]+'</div><div class="sbv" style="'+(x[0]==='YTD'?'color:var(--teal)':'')+'">'+fmt(x[2])+'</div><div style="font-size:9px;color:var(--dim);margin-top:2px">tap to edit</div></div>';}).join('')+(trendHtml||quietHtml?'<div style="width:100%;margin-top:6px">'+trendHtml+quietHtml+'</div>':'');
-  var mh=document.getElementById('m-hot');if(mh)mh.textContent=ST.hot[code]?'Remove Hot':'Hot Lead';
+  var mh=document.getElementById('m-hot');if(mh)mh.textContent=ST.hot[code]?'Remove Hot':'Hot Lead';var mp=document.getElementById('m-pin');if(mp){mp.textContent=ST.pinned&&ST.pinned[code]?'📌 Unpin':'📌 Pin';mp.style.background=ST.pinned&&ST.pinned[code]?'rgba(99,102,241,.15)':'var(--bg3)';mp.style.color=ST.pinned&&ST.pinned[code]?'#818cf8':'var(--sub)';mp.style.borderColor=ST.pinned&&ST.pinned[code]?'rgba(99,102,241,.4)':'var(--border2)';}
   var mn2=document.getElementById('m-note');if(mn2)mn2.value=(ST.notes&&ST.notes[code])||'';
   var noteVal=(ST.notes&&ST.notes[code])||'';
   var mpv=document.getElementById('m-previsit'),mpt=document.getElementById('m-previsit-txt');
@@ -4103,7 +4111,7 @@ function _applyRemoteState(rem){
   ST.groupNames=Object.assign({},rem.groupNames||{},ST.groupNames||{});
   ST.salesTargets=Object.assign({},rem.salesTargets||{},ST.salesTargets||{});
   ST.tierTargets=Object.assign({},rem.tierTargets||{},ST.tierTargets||{});
-  ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});
+  ST.standingAlerts=Object.assign({},rem.standingAlerts||{},ST.standingAlerts||{});ST.pinned=Object.assign({},rem.pinned||{},ST.pinned||{});
   ST.revTargets=Object.assign({},rem.revTargets||{},ST.revTargets||{});ST.visitHours=Object.assign({},rem.visitHours||{},ST.visitHours||{});ST.tierWindows=Object.assign({},rem.tierWindows||{},ST.tierWindows||{});
   if(rem.cardOrder&&rem.cardOrder.length&&(!ST.cardOrder||!ST.cardOrder.length))ST.cardOrder=rem.cardOrder.slice();
   // Restore price list from cloud if local is empty
@@ -4966,6 +4974,7 @@ document.getElementById('m-retry-today').addEventListener('click',function(){
   closeM();rDash();rCust();
 });
 document.getElementById('m-hot').addEventListener('click',function(){if(!mC)return;ST.hot[mC]=!ST.hot[mC];lSave();syncUp();this.textContent=ST.hot[mC]?'Remove Hot':'Hot Lead';toast(ST.hot[mC]?'Hot lead set':'Removed');});
+document.getElementById('m-pin').addEventListener('click',function(){if(!mC)return;if(!ST.pinned)ST.pinned={};ST.pinned[mC]=!ST.pinned[mC];if(!ST.pinned[mC])delete ST.pinned[mC];lSave();syncUp();var p=ST.pinned&&ST.pinned[mC];this.textContent=p?'📌 Unpin':'📌 Pin';this.style.background=p?'rgba(99,102,241,.15)':'var(--bg3)';this.style.color=p?'#818cf8':'var(--sub)';this.style.borderColor=p?'rgba(99,102,241,.4)':'var(--border2)';toast(p?'📌 Pinned to top':'Unpinned');rCust();});
 document.getElementById('m-arc').addEventListener('click',function(){if(!mC||!confirm('Archive?'))return;ST.archived[mC]=true;lSave();syncUp();closeM();rCust();rDash();toast('Archived');});
 document.getElementById('m-rem').addEventListener('click',function(){
   if(!mC)return;var a=allC(),c=null;for(var i=0;i<a.length;i++){if(a[i].code===mC){c=a[i];break;}}
