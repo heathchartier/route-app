@@ -4638,7 +4638,7 @@ function rWinBack(){
         +'<div class="rn">'+esc(c.name)+tierBadge(c)+'</div>'
         +'<div class="rm">'+esc(c.city||'')+' &bull; '+fmt(c.sales2024)+' in \'24 &bull; '+fmt(c.sales2526)+' YTD</div>'
       +'</div>'
-      +'<div style="font-size:12px;color:var(--sub)">&#8250;</div>'
+      +'<button onclick="event.stopPropagation();showFollowUpPicker(\''+c.code+'\')" style="background:rgba(139,92,246,.15);color:#8b5cf6;border:1px solid rgba(139,92,246,.3);border-radius:var(--r2);padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button>'
     +'</div>';
   }).join('');
   el.innerHTML='<div class="wb-card">'
@@ -4884,7 +4884,7 @@ function rHotLeads(){
       +'<div class="dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber)"></div>'
       +'<div class="ri"><div class="rn">&#9733; '+esc(c.name)+tierBadge(c)+'</div>'
       +'<div class="rm">'+esc(c.city||'')+' &bull; '+(d>=1000000?'Never visited':d+'d ago')+'</div></div>'
-      +'<div style="font-size:12px;color:var(--sub)">&#8250;</div>'
+      +'<button onclick="event.stopPropagation();showFollowUpPicker(\''+c.code+'\')" style="background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.3);border-radius:var(--r2);padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button>'
       +'</div>';
   }).join('');
   el.style.display='block';
@@ -10607,10 +10607,13 @@ function rTargetCard(){
   var h='';
   behind.slice(0,6).forEach(function(b){
     var pct=Math.round((b.done/b.target)*100);
-    h+='<div style="margin-bottom:10px;cursor:pointer" onclick="openM(\''+b.c.code+'\')">'
-     +'<div style="display:flex;justify-content:space-between;margin-bottom:3px">'
+    h+='<div style="margin-bottom:10px">'
+     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;cursor:pointer" onclick="openM(\''+b.c.code+'\')">'
      +'<div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(b.c.name)+'</div>'
+     +'<div style="display:flex;align-items:center;gap:8px">'
      +'<div style="font-size:12px;color:var(--sub)">'+b.done+'/'+b.target+'</div>'
+     +'<button onclick="event.stopPropagation();showFollowUpPicker(\''+b.c.code+'\')" style="background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:var(--r2);padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button>'
+     +'</div>'
      +'</div>'
      +'<div class="target-bar-track"><div class="target-bar-fill" style="width:'+pct+'%;background:var(--blue)"></div></div>'
      +'</div>';
@@ -10647,10 +10650,13 @@ function rRevTargetCard(){
   var h='<div style="font-size:10px;color:var(--sub);margin-bottom:8px">Year is '+yearPct+'% complete — accounts below '.concat(yearPct-15,'% pace shown</div>');
   behind.slice(0,6).forEach(function(b){
     var barColor=b.pct<yearPct-30?'var(--red)':b.pct<yearPct-15?'var(--amber)':'var(--teal)';
-    h+='<div style="margin-bottom:10px;cursor:pointer" onclick="openM(\''+b.c.code+'\')">'
+    h+='<div style="margin-bottom:10px">'
      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
-     +'<div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(b.c.name)+'</div>'
+     +'<div style="font-size:13px;font-weight:600;color:var(--text);cursor:pointer" onclick="openM(\''+b.c.code+'\')">'+esc(b.c.name)+'</div>'
+     +'<div style="display:flex;align-items:center;gap:8px">'
      +'<div style="font-size:12px;color:var(--sub)">'+fmt(b.ytd)+' / '+fmt(b.rt)+' ('+b.pct+'%)</div>'
+     +'<button onclick="event.stopPropagation();showFollowUpPicker(\''+b.c.code+'\')" style="background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:var(--r2);padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button>'
+     +'</div>'
      +'</div>'
      +'<div class="target-bar-track"><div class="target-bar-fill" style="width:'+b.pct+'%;background:'+barColor+'"></div></div>'
      +'</div>';
