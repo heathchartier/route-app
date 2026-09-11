@@ -1663,12 +1663,13 @@ function rRetry(a){
   if(countEl)countEl.textContent=retries.length+' due';
   var h='';
   for(var i=0;i<retries.length;i++){
-    var c=retries[i];
+    var c=retries[i];var retNote=ST.scheduled&&ST.scheduled[c.code]&&ST.scheduled[c.code].note?ST.scheduled[c.code].note:'';
     h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
       '<div class="dot" style="background:var(--blue)"></div>'+
       '<div class="ri">'+
         '<div class="rn">'+esc(c.name)+'</div>'+
-        '<div class="rm" style="color:#3b82f6">Retry today &bull; '+esc(c.city||'')+'</div>'+
+        (retNote?'<div class="rn2" style="color:var(--blue);font-style:italic">'+esc(retNote.length>60?retNote.slice(0,60)+'…':retNote)+'</div>':'')
+        +'<div class="rm" style="color:#3b82f6">Retry today &bull; '+esc(c.city||'')+'</div>'+
       '</div>'+
       '<div class="vbs">'+
         '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
@@ -3838,12 +3839,13 @@ function rRetry(a){
   if(countEl)countEl.textContent=retries.length+' due';
   var h='';
   for(var i=0;i<retries.length;i++){
-    var c=retries[i];
+    var c=retries[i];var retNote=ST.scheduled&&ST.scheduled[c.code]&&ST.scheduled[c.code].note?ST.scheduled[c.code].note:'';
     h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
       '<div class="dot" style="background:var(--blue)"></div>'+
       '<div class="ri">'+
         '<div class="rn">'+esc(c.name)+'</div>'+
-        '<div class="rm" style="color:#3b82f6">Retry today &bull; '+esc(c.city||'')+'</div>'+
+        (retNote?'<div class="rn2" style="color:var(--blue);font-style:italic">'+esc(retNote.length>60?retNote.slice(0,60)+'…':retNote)+'</div>':'')
+        +'<div class="rm" style="color:#3b82f6">Retry today &bull; '+esc(c.city||'')+'</div>'+
       '</div>'+
       '<div class="vbs">'+
         '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
@@ -4855,10 +4857,12 @@ function showFollowUpPicker(code){
     +'</div>';
   }).join('');
   var todayStr=new Date().toISOString().split('T')[0];
+  var existNote=(ST.scheduled&&ST.scheduled[code]&&ST.scheduled[code].note)||'';
   sheet.innerHTML='<div class="fu-inner">'
     +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
     +'<div style="font-size:18px;font-weight:700;margin-bottom:4px">Schedule Follow-Up</div>'
-    +'<div style="font-size:12px;color:var(--sub);margin-bottom:16px">'+esc(c.name)+'</div>'
+    +'<div style="font-size:12px;color:var(--sub);margin-bottom:12px">'+esc(c.name)+'</div>'
+    +'<input id="fu-note" type="text" placeholder="Reason / what to discuss (optional)" maxlength="120" value="'+esc(existNote)+'" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:9px 12px;font-size:13px;font-family:inherit;outline:none;width:100%;box-sizing:border-box;margin-bottom:12px">'
     +quickRows
     +'<div class="fu-opt" style="flex-direction:column;align-items:flex-start;gap:8px">'
       +'<div style="font-size:15px;font-weight:600">Pick a date</div>'
@@ -4867,12 +4871,13 @@ function showFollowUpPicker(code){
     +'<button style="width:100%;margin-top:14px;padding:13px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit" onclick="document.getElementById(\'fu-sheet\').remove()">Cancel</button>'
     +'</div>';
   sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  function _getFuNote(){var n=document.getElementById('fu-note');return n?n.value.trim():'';}
   // Quick option handlers
   sheet.querySelectorAll('.fu-opt[data-days]').forEach(function(opt){
     opt.addEventListener('click',function(){
       var days=+this.getAttribute('data-days');
       var d=new Date();d.setDate(d.getDate()+days);
-      scheduleFollowUp(code,d.toISOString().split('T')[0]);
+      scheduleFollowUp(code,d.toISOString().split('T')[0],_getFuNote());
       sheet.remove();
     });
   });
@@ -4880,7 +4885,7 @@ function showFollowUpPicker(code){
   sheet.querySelector('.fu-opt:last-of-type').addEventListener('click',function(e){
     if(e.target.tagName==='INPUT')return;
     var inp=document.getElementById('fu-date');
-    if(inp&&inp.value){scheduleFollowUp(code,inp.value);sheet.remove();}
+    if(inp&&inp.value){scheduleFollowUp(code,inp.value,_getFuNote());sheet.remove();}
     else inp&&inp.focus();
   });
   document.body.appendChild(sheet);
@@ -4889,9 +4894,9 @@ function fmtRelDate(days){
   var d=new Date();d.setDate(d.getDate()+days);
   return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 }
-function scheduleFollowUp(code,dateStr){
+function scheduleFollowUp(code,dateStr,note){
   if(!ST.scheduled)ST.scheduled={};
-  ST.scheduled[code]={date:dateStr};
+  ST.scheduled[code]={date:dateStr,note:note||''};
   lSave();syncUp();
   var d=new Date(dateStr+'T12:00:00');
   toast('Follow-up set for '+d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}));
@@ -7288,9 +7293,11 @@ function rFollowupAlert(){
     +'<div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">&#128197; Follow-Ups Due Today</div>'
     +due.slice(0,5).map(function(item){
       var c=item.c,d=ds(c.code);var dotCol=d===0?'var(--green)':d===null||d>14?'var(--red)':'var(--amber)';
+      var fuNote=ST.scheduled&&ST.scheduled[c.code]&&ST.scheduled[c.code].note?ST.scheduled[c.code].note:'';
       return'<div onclick="openM(\''+c.code+'\')" style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(74,158,255,.15);cursor:pointer">'
         +'<span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex-shrink:0"></span>'
         +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
+        +(fuNote?'<div style="font-size:11px;color:var(--blue);font-style:italic">'+esc(fuNote.length>60?fuNote.slice(0,60)+'…':fuNote)+'</div>':'')
         +'<div style="font-size:11px;color:var(--sub)">'+esc(c.city||'')+' &bull; Grp '+c.group+'</div></div>'
         +'<div style="display:flex;gap:4px">'
         +'<button onclick="event.stopPropagation();mv(\''+c.code+'\',\'visited\');if(ST.scheduled&&ST.scheduled[\''+c.code+'\'])delete ST.scheduled[\''+c.code+'\'];lSave();syncUp();rDash();" style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:var(--r2);padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Done</button>'
