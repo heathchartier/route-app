@@ -1438,6 +1438,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <button onclick="saveVisitRating('cold')" style="background:none;border:none;font-size:22px;cursor:pointer;padding:2px 4px;border-radius:8px;line-height:1">&#128528;</button>
   <button onclick="saveVisitRating('neutral')" style="background:none;border:none;font-size:22px;cursor:pointer;padding:2px 4px;border-radius:8px;line-height:1">&#128578;</button>
   <button onclick="saveVisitRating('hot')" style="background:none;border:none;font-size:22px;cursor:pointer;padding:2px 4px;border-radius:8px;line-height:1">&#128293;</button>
+  <button onclick="showVisitNote(_ratingCode)" style="background:none;border:none;color:var(--sub);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1" title="Add note">&#9998;</button>
   <button onclick="dismissRatingBar()" style="background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer;padding:2px 6px;line-height:1">&#215;</button>
 </div>
 
@@ -1889,7 +1890,7 @@ function openM(code){
     var pvLines=[];
     var pvLogs=ST.visits[code]||[];
     var pvLast=pvLogs.length?pvLogs[pvLogs.length-1]:null;
-    if(pvLast){var pvAgo=Math.floor((Date.now()-new Date(pvLast.date))/864e5);pvLines.push('<div style="display:flex;gap:8px;align-items:center"><span style="color:var(--sub);font-size:11px;min-width:80px">Last visit</span><span style="font-size:12px;font-weight:600;color:'+(pvLast.type==='visited'?'var(--green)':'var(--amber)')+'">'+( pvLast.type==='visited'?'✓ Visited':'✗ Not In')+(pvAgo===0?' (today)':pvAgo===1?' (yesterday)':' ('+pvAgo+'d ago)')+'</span></div>');}
+    if(pvLast){var pvAgo=Math.floor((Date.now()-new Date(pvLast.date))/864e5);pvLines.push('<div style="display:flex;gap:8px;align-items:flex-start"><span style="color:var(--sub);font-size:11px;min-width:80px">Last visit</span><div><span style="font-size:12px;font-weight:600;color:'+(pvLast.type==='visited'?'var(--green)':'var(--amber)')+'">'+( pvLast.type==='visited'?'✓ Visited':'✗ Not In')+(pvAgo===0?' (today)':pvAgo===1?' (yesterday)':' ('+pvAgo+'d ago)')+'</span>'+(pvLast.visitNote?'<div style="font-size:11px;color:var(--sub);font-style:italic;margin-top:2px">'+esc(pvLast.visitNote.length>80?pvLast.visitNote.slice(0,80)+'…':pvLast.visitNote)+'</div>':'')+'</div></div>');}
     var pvOrds=ST.orders[code]||[];
     if(pvOrds.length){var pvO=pvOrds[pvOrds.length-1];pvLines.push('<div style="display:flex;gap:8px;align-items:center"><span style="color:var(--sub);font-size:11px;min-width:80px">Last order</span><span style="font-size:12px;font-weight:600;color:var(--blue)">'+fmt(pvO.amount||0)+' — '+new Date(pvO.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+'</span></div>');}
     var pvTodos=ST.todos[code]||[];var pvOpen=pvTodos.filter(function(t){return !t.done;}).length;
@@ -4081,7 +4082,7 @@ function openM(code){
     var pvLines=[];
     var pvLogs=ST.visits[code]||[];
     var pvLast=pvLogs.length?pvLogs[pvLogs.length-1]:null;
-    if(pvLast){var pvAgo=Math.floor((Date.now()-new Date(pvLast.date))/864e5);pvLines.push('<div style="display:flex;gap:8px;align-items:center"><span style="color:var(--sub);font-size:11px;min-width:80px">Last visit</span><span style="font-size:12px;font-weight:600;color:'+(pvLast.type==='visited'?'var(--green)':'var(--amber)')+'">'+( pvLast.type==='visited'?'✓ Visited':'✗ Not In')+(pvAgo===0?' (today)':pvAgo===1?' (yesterday)':' ('+pvAgo+'d ago)')+'</span></div>');}
+    if(pvLast){var pvAgo=Math.floor((Date.now()-new Date(pvLast.date))/864e5);pvLines.push('<div style="display:flex;gap:8px;align-items:flex-start"><span style="color:var(--sub);font-size:11px;min-width:80px">Last visit</span><div><span style="font-size:12px;font-weight:600;color:'+(pvLast.type==='visited'?'var(--green)':'var(--amber)')+'">'+( pvLast.type==='visited'?'✓ Visited':'✗ Not In')+(pvAgo===0?' (today)':pvAgo===1?' (yesterday)':' ('+pvAgo+'d ago)')+'</span>'+(pvLast.visitNote?'<div style="font-size:11px;color:var(--sub);font-style:italic;margin-top:2px">'+esc(pvLast.visitNote.length>80?pvLast.visitNote.slice(0,80)+'…':pvLast.visitNote)+'</div>':'')+'</div></div>');}
     var pvOrds=ST.orders[code]||[];
     if(pvOrds.length){var pvO=pvOrds[pvOrds.length-1];pvLines.push('<div style="display:flex;gap:8px;align-items:center"><span style="color:var(--sub);font-size:11px;min-width:80px">Last order</span><span style="font-size:12px;font-weight:600;color:var(--blue)">'+fmt(pvO.amount||0)+' — '+new Date(pvO.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+'</span></div>');}
     var pvTodos=ST.todos[code]||[];var pvOpen=pvTodos.filter(function(t){return !t.done;}).length;
@@ -7157,7 +7158,8 @@ function deleteVisitEntry(code,idx){
 function _visitLogRow(code,l,i){
   var typeHtml=l.type==='visited'?('Visited'+(l.rating?' '+(l.rating==='cold'?'&#128528;':l.rating==='neutral'?'&#128578;':'&#128293;'):'')):l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')+(l.callNote?'<div style="font-size:11px;color:var(--sub);margin-top:2px">'+esc(l.callNote)+'</div>':'')):'Not Available';
   var col=l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b';
-  return'<div class="li" style="display:flex;align-items:center;gap:4px"><div style="flex:1"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+col+'">'+typeHtml+'</div></div><button onclick="deleteVisitEntry(\''+esc(code)+'\','+i+')" style="background:transparent;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:4px 6px;flex-shrink:0;line-height:1" title="Delete entry">&#10005;</button></div>';
+  var noteHtml=l.visitNote?'<div style="font-size:11px;color:var(--sub);margin-top:2px;font-style:italic">'+esc(l.visitNote.length>100?l.visitNote.slice(0,100)+'…':l.visitNote)+'</div>':'';
+  return'<div class="li" style="display:flex;align-items:center;gap:4px"><div style="flex:1"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+col+'">'+typeHtml+'</div>'+noteHtml+'</div><button onclick="deleteVisitEntry(\''+esc(code)+'\','+i+')" style="background:transparent;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:4px 6px;flex-shrink:0;line-height:1" title="Delete entry">&#10005;</button></div>';
 }
 function showAllVisits(code){
   var logs=ST.visits[code]||[];
@@ -9605,6 +9607,38 @@ function dismissRatingBar(){
   var bar=document.getElementById('visit-rating-bar');
   if(bar)bar.style.display='none';
   if(_ratingDismissCallback){var cb=_ratingDismissCallback;_ratingDismissCallback=null;cb();}
+}
+function showVisitNote(code){
+  if(!code)return;
+  var existing=document.getElementById('visit-note-sheet');if(existing)existing.remove();
+  var sheet=document.createElement('div');
+  sheet.id='visit-note-sheet';
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;display:flex;align-items:flex-end;';
+  sheet.innerHTML='<div style="width:100%;background:var(--bg2);border-radius:20px 20px 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))">'
+    +'<div style="font-size:14px;font-weight:700;margin-bottom:10px">&#9998; Visit Note — '+esc(code)+'</div>'
+    +'<textarea id="visit-note-inp" placeholder="What happened? Key takeaways, next steps..." rows="3" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:10px 12px;font-size:14px;font-family:inherit;outline:none;resize:none;margin-bottom:10px"></textarea>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="saveVisitNote(\''+esc(code)+'\')" style="flex:1;background:var(--blue);color:#fff;border:none;border-radius:var(--r2);padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Save Note</button>'
+    +'<button onclick="document.getElementById(\'visit-note-sheet\').remove()" style="background:var(--bg3);color:var(--sub);border:1px solid var(--border2);border-radius:var(--r2);padding:12px 20px;font-size:14px;cursor:pointer;font-family:inherit">Skip</button>'
+    +'</div></div>';
+  document.body.appendChild(sheet);
+  setTimeout(function(){var i=document.getElementById('visit-note-inp');if(i)i.focus();},100);
+}
+function saveVisitNote(code){
+  var inp=document.getElementById('visit-note-inp');
+  var note=inp?inp.value.trim():'';
+  if(note){
+    var logs=ST.visits[code];
+    if(logs&&logs.length){
+      for(var i=logs.length-1;i>=0;i--){
+        if(logs[i].type==='visited'||logs[i].type==='not_available'){logs[i].visitNote=note;break;}
+      }
+      lSave();syncUp();
+    }
+    toast('Note saved');
+  }
+  var sheet=document.getElementById('visit-note-sheet');if(sheet)sheet.remove();
+  if(mC===code)openM(code);
 }
 
 /* ── WEEK SUMMARY CARD ── */
