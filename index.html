@@ -1660,7 +1660,7 @@ function rRoute(){
           '<button class="btn-qnote" data-qn="'+c.code+'">&#128221;</button>'+
         '</div>'+
       '</div>'+
-      (c.phone?'<a href="tel:'+c.phone+'" data-dc="'+c.code+'" class="vb-call">&#128222;</a>':'')+
+      (c.phone?'<button onclick="event.stopPropagation();logCall(\''+c.code+'\',\''+c.phone+'\')" class="vb-call">&#128222;</button>':'')+
       '</div>'+
       '<div id="qnw-'+c.code+'" class="qnote-wrap"><input class="qnote-inp" type="text" placeholder="Quick note..."><button class="btn-qnsave" data-qns="'+c.code+'" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Save</button></div>';
   }
@@ -3865,7 +3865,7 @@ function rRoute(){
           '<button class="btn-qnote" data-qn="'+c.code+'">&#128221;</button>'+
         '</div>'+
       '</div>'+
-      (c.phone?'<a href="tel:'+c.phone+'" data-dc="'+c.code+'" class="vb-call">&#128222;</a>':'')+
+      (c.phone?'<button onclick="event.stopPropagation();logCall(\''+c.code+'\',\''+c.phone+'\')" class="vb-call">&#128222;</button>':'')+
       '</div>'+
       '<div id="qnw-'+c.code+'" class="qnote-wrap"><input class="qnote-inp" type="text" placeholder="Quick note..."><button class="btn-qnsave" data-qns="'+c.code+'" style="margin-top:4px;background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Save</button></div>';
   }
@@ -8567,16 +8567,18 @@ function dismissDupe(key){
 }
 
 /* ── CALL LOG ── */
-function logCall(code){
+function logCall(code,phone){
   if(!code)return;
   window._cbDays=0;
   var sheet=document.createElement('div');
   sheet.id='call-sheet';
   sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1100;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
   var cbBt='padding:7px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);color:var(--sub);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit';
+  var callNowHtml=phone?'<a href="tel:'+esc(phone)+'" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:var(--r2);background:rgba(129,140,248,.15);border:1px solid rgba(129,140,248,.3);color:#818cf8;font-size:15px;font-weight:800;text-decoration:none;margin-bottom:14px">&#128222; Call Now &mdash; <span style="font-weight:400;font-size:13px">'+esc(phone)+'</span></a>':'';
   sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
    +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">&#128222; Log Call</div>'
+   +callNowHtml
    +'<div style="font-size:12px;color:var(--sub);margin-bottom:16px">How did the call go?</div>'
    +'<div style="display:flex;flex-direction:column;gap:8px">'
    +'<button onclick="saveCall(\''+code+'\',\'reached\')" style="padding:14px;border-radius:var(--r2);background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left">&#9989;&nbsp; Reached — spoke with them</button>'
