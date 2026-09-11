@@ -870,7 +870,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="chip" data-f="tier_c">C Tier</button>
       <button class="chip" data-f="tagged">Tagged</button>
       <button class="chip" data-f="called">Called Today</button>
+      <button class="chip" id="bytag-chip" onclick="showTagFilterPicker(this)">By Tag &#9660;</button>
     </div>
+    <div id="tag-picker-row" style="display:none;padding:4px 16px 8px;flex-wrap:wrap;gap:6px"></div>
     <div style="padding:0 16px 8px">
       <button onclick="showNotesSearch()" style="width:100%;padding:9px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;text-align:left">&#128269; Search notes across all customers...</button>
     </div>
@@ -1752,6 +1754,7 @@ function rCust(){
     else if(cF==='tier_b'){if(getTier(c)!=='B')continue;}
     else if(cF==='tier_c'){if(getTier(c)!=='C')continue;}
     else if(cF==='tagged'){if(!ST.tags||!ST.tags[c.code]||!ST.tags[c.code].length)continue;}
+    else if(cF.length>4&&cF.slice(0,4)==='tag:'){var _tn=cF.slice(4);if(!ST.tags||!ST.tags[c.code]||ST.tags[c.code].indexOf(_tn)===-1)continue;}
     else if(cF==='called'){var todayStr=new Date().toDateString();var logs=ST.visits[c.code]||[];var calledToday=false;for(var ci=logs.length-1;ci>=0;ci--){if(new Date(logs[ci].date).toDateString()!==todayStr)break;if(logs[ci].type==='called'){calledToday=true;break;}}if(!calledToday)continue;}
     f.push(c);
   }
@@ -1787,7 +1790,7 @@ function rCPage(){
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>60?note.slice(0,60)+'…':note)+'</div>':'';
     var hoursBadge=isOutsideHours(c.code)?'<span style="background:rgba(251,191,36,.15);color:#fbbf24;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ CLOSED</span>':'';
     var tierWinBadge=isTierWindowLate(c)?'<span style="background:rgba(239,68,68,.12);color:#ef4444;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ PAST WINDOW</span>':'';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button><button class="vb" style="font-size:15px;padding:6px 7px;min-width:34px" onclick="event.stopPropagation();showQuickNote(\''+esc(c.code)+'\')" title="Quick note">&#9998;</button></div></div>';
   }
   var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
   var cm=document.getElementById('c-more');if(cm)cm.style.display=fc.length>PG*(pg+1)?'block':'none';
@@ -3067,7 +3070,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="chip" data-f="tier_c">C Tier</button>
       <button class="chip" data-f="tagged">Tagged</button>
       <button class="chip" data-f="called">Called Today</button>
+      <button class="chip" id="bytag-chip" onclick="showTagFilterPicker(this)">By Tag &#9660;</button>
     </div>
+    <div id="tag-picker-row" style="display:none;padding:4px 16px 8px;flex-wrap:wrap;gap:6px"></div>
     <div style="padding:0 16px 8px">
       <button onclick="showNotesSearch()" style="width:100%;padding:9px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r2);color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit;text-align:left">&#128269; Search notes across all customers...</button>
     </div>
@@ -3913,6 +3918,7 @@ function rCust(){
     else if(cF==='tier_b'){if(getTier(c)!=='B')continue;}
     else if(cF==='tier_c'){if(getTier(c)!=='C')continue;}
     else if(cF==='tagged'){if(!ST.tags||!ST.tags[c.code]||!ST.tags[c.code].length)continue;}
+    else if(cF.length>4&&cF.slice(0,4)==='tag:'){var _tn=cF.slice(4);if(!ST.tags||!ST.tags[c.code]||ST.tags[c.code].indexOf(_tn)===-1)continue;}
     else if(cF==='called'){var todayStr=new Date().toDateString();var logs=ST.visits[c.code]||[];var calledToday=false;for(var ci=logs.length-1;ci>=0;ci--){if(new Date(logs[ci].date).toDateString()!==todayStr)break;if(logs[ci].type==='called'){calledToday=true;break;}}if(!calledToday)continue;}
     f.push(c);
   }
@@ -3948,7 +3954,7 @@ function rCPage(){
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>60?note.slice(0,60)+'…':note)+'</div>':'';
     var hoursBadge=isOutsideHours(c.code)?'<span style="background:rgba(251,191,36,.15);color:#fbbf24;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ CLOSED</span>':'';
     var tierWinBadge=isTierWindowLate(c)?'<span style="background:rgba(239,68,68,.12);color:#ef4444;border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:4px">⏰ PAST WINDOW</span>':'';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button></div></div>';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:'+dc(c.code)+'"></div><div class="ri"><div class="rn">'+( ST.hot[c.code]?'&#9733; ':'')+ esc(c.name)+tierBadge(c)+newBadge(c)+hoursBadge+tierWinBadge+'</div><div class="rm">'+esc(c.city||'')+' &bull; Grp '+c.group+' &bull; '+meta+'</div>'+noteHtml+'</div><div class="vbs"><button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button><button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button><button class="vb" style="font-size:15px;padding:6px 7px;min-width:34px" onclick="event.stopPropagation();showQuickNote(\''+esc(c.code)+'\')" title="Quick note">&#9998;</button></div></div>';
   }
   var cl=document.getElementById('c-list');if(cl)cl.innerHTML=h;
   var cm=document.getElementById('c-more');if(cm)cm.style.display=fc.length>PG*(pg+1)?'block':'none';
@@ -4891,9 +4897,12 @@ document.querySelectorAll('nav a').forEach(function(a){
 });
 document.querySelectorAll('.chip').forEach(function(chip){
   chip.addEventListener('click',function(){
-    cF=this.getAttribute('data-f');pg=0;
+    var f=this.getAttribute('data-f');if(!f)return;
+    cF=f;pg=0;
     document.querySelectorAll('.chip').forEach(function(c){c.className='chip';});
-    this.className='chip on';rCust();
+    this.className='chip on';
+    var tpr=document.getElementById('tag-picker-row');if(tpr)tpr.style.display='none';
+    rCust();
   });
 });
 var csrch=document.getElementById('c-srch');if(csrch)csrch.addEventListener('input',function(){cS=this.value;pg=0;rCust();});
@@ -9033,6 +9042,60 @@ function promptLogCall(code){
 
 /* ── HEAT CALENDAR ── */
 var _hcalYear=new Date().getFullYear(),_hcalMonth=new Date().getMonth();
+/* ── QUICK NOTE ── */
+var _qNoteCode=null;
+function showQuickNote(code){
+  _qNoteCode=code;
+  var el=document.getElementById('qnote-ov');if(!el)return;
+  var a=allC(),name=code;
+  for(var i=0;i<a.length;i++){if(a[i].code===code){name=a[i].name;break;}}
+  var t=document.getElementById('qnote-title');if(t)t.textContent='Note — '+name;
+  var txt=document.getElementById('qnote-txt');if(txt)txt.value=(ST.notes&&ST.notes[code])||'';
+  el.style.display='flex';
+  setTimeout(function(){if(txt)txt.focus();},150);
+}
+function saveQNote(){
+  if(!_qNoteCode)return;
+  var txt=document.getElementById('qnote-txt');if(!txt)return;
+  var v=txt.value.trim();
+  if(!ST.notes)ST.notes={};
+  if(v)ST.notes[_qNoteCode]=v;else delete ST.notes[_qNoteCode];
+  lSave();syncUp();
+  closeQNote();
+  rCust();
+  toast('Note saved');
+}
+function clearQNote(){
+  var txt=document.getElementById('qnote-txt');if(txt)txt.value='';
+}
+function closeQNote(){
+  var el=document.getElementById('qnote-ov');if(el)el.style.display='none';
+  _qNoteCode=null;
+}
+
+/* ── TAG FILTER PICKER ── */
+function showTagFilterPicker(btn){
+  var row=document.getElementById('tag-picker-row');if(!row)return;
+  if(row.style.display==='flex'){row.style.display='none';return;}
+  var allTags={};
+  if(ST.tags){Object.keys(ST.tags).forEach(function(code){(ST.tags[code]||[]).forEach(function(t){allTags[t]=true;});});}
+  var tags=Object.keys(allTags).sort();
+  if(!tags.length){toast('No tags added yet');return;}
+  var curTag=cF.length>4&&cF.slice(0,4)==='tag:'?cF.slice(4):'';
+  row.innerHTML=tags.map(function(t){
+    var active=t===curTag;
+    return'<button onclick="selectTagFilter(\''+t.replace(/'/g,'&#39;')+'\')" style="background:'+(active?'var(--teal)':'var(--bg3)')+';color:'+(active?'#000':'var(--text)')+';border:1px solid '+(active?'var(--teal)':'var(--border2)')+';border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">'+esc(t)+'</button>';
+  }).join('');
+  row.style.display='flex';
+}
+function selectTagFilter(tag){
+  cF='tag:'+tag;pg=0;
+  document.querySelectorAll('.chip').forEach(function(c){c.className='chip';});
+  var bc=document.getElementById('bytag-chip');if(bc)bc.className='chip on';
+  var row=document.getElementById('tag-picker-row');if(row)row.style.display='none';
+  rCust();
+}
+
 function showHeatCalendar(){
   var ov=document.getElementById('heatcal-ov');
   if(ov)ov.className='on';
@@ -13498,6 +13561,21 @@ function _buildMyDayWith(lat,lng){
     <div class="hcal-grid" id="hcal-daynames"></div>
     <div class="hcal-grid" id="hcal-grid"></div>
     <div id="hcal-detail" style="padding:16px"></div>
+  </div>
+</div>
+
+<!-- ══ QUICK NOTE OVERLAY ════════════════════════════════════════════════ -->
+<div id="qnote-ov" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeQNote()">
+  <div style="background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:15px;font-weight:700" id="qnote-title">Quick Note</div>
+      <button onclick="closeQNote()" style="background:transparent;border:none;color:var(--sub);font-size:20px;cursor:pointer;line-height:1;padding:4px 6px">&times;</button>
+    </div>
+    <textarea id="qnote-txt" rows="3" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);font-size:14px;font-family:inherit;padding:10px;resize:none;outline:none" placeholder="Add a note..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button onclick="saveQNote()" style="flex:1;padding:12px;background:var(--teal);color:#000;border:none;border-radius:var(--r2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Save Note</button>
+      <button onclick="clearQNote()" style="padding:12px 14px;background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:var(--r2);font-size:13px;cursor:pointer;font-family:inherit">Clear</button>
+    </div>
   </div>
 </div>
 
