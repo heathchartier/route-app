@@ -10343,6 +10343,21 @@ function shareMonthlyReport(){
 }
 
 /* ── PUSH NOTIFICATIONS ── */
+var VAPID_PUB='BHgZLie09-LPfvNBp-1Tl6FA4MNbmZ09H64WNpBJfBFhwgPkIYdaNA8-tbCkaQqmifeEfJQdZ7uMKykgXw3pYHA';
+function _b64uToArr(s){var b=s.replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';var bin=atob(b),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
+function subscribeToPush(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!CURRENT_USER)return;
+  navigator.serviceWorker.ready.then(function(reg){
+    return reg.pushManager.getSubscription().then(function(existing){
+      if(existing)return existing;
+      return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:_b64uToArr(VAPID_PUB)});
+    });
+  }).then(function(sub){
+    if(!sub)return;
+    var j=sub.toJSON();
+    sb.from('push_subscriptions').upsert({user_id:CURRENT_USER.id,endpoint:j.endpoint,subscription:j},{onConflict:'endpoint'}).then(function(){});
+  }).catch(function(e){console.warn('push subscribe failed',e);});
+}
 function rNotifStatus(){
   var btn=document.getElementById('notif-btn');
   var status=document.getElementById('notif-status');
@@ -10374,6 +10389,7 @@ function requestNotifPermission(){
     if(perm==='granted'){
       sendTestNotification();
       localStorage.setItem('hrt_notif','1');
+      subscribeToPush();
     }
   });
 }
