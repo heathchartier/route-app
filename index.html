@@ -11088,12 +11088,13 @@ function rQuoteAlert(){
   if(!ST.quotes){el.style.display='none';return;}
   var today=new Date().toISOString().split('T')[0];
   var cutoff45=Date.now()-45*864e5;
-  var a=allC(),due=[],stale=[];
+  var a=allC(),due=[],stale=[],pipelineTotal=0,pipelineCount=0;
   Object.keys(ST.quotes).forEach(function(k){
     var q=ST.quotes[k];
     if(q.status!=='open'||q.dismissed)return;
     var cust=null;for(var i=0;i<a.length;i++){if(a[i].code===q.code){cust=a[i];break;}}
     if(!cust)return;
+    pipelineCount++;pipelineTotal+=qGrandTotal(q)||0;
     if(q.followupDate&&q.followupDate<=today){due.push({q:q,c:cust});}
     else if(!q.followupDate&&new Date(q.date).getTime()<cutoff45){stale.push({q:q,c:cust});}
   });
@@ -11101,7 +11102,7 @@ function rQuoteAlert(){
   due.sort(function(a,b){return a.q.followupDate.localeCompare(b.q.followupDate);});
   stale.sort(function(a,b){return new Date(a.q.date)-new Date(b.q.date);});
   el.style.display='block';
-  var h='';
+  var h=pipelineTotal>0?'<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:var(--r2);padding:8px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--sub)">&#128203; Open pipeline ('+pipelineCount+' quote'+(pipelineCount!==1?'s':'')+')</span><span style="font-size:15px;font-weight:800;color:var(--teal)">'+fmt(pipelineTotal)+'</span></div>':'';
   function qRow(item,borderColor,bg){
     var q=item.q,c=item.c;
     var total=qGrandTotal(q);
