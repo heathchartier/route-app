@@ -1615,7 +1615,9 @@ function rRoute(){
   }
   var bbna2=document.getElementById('btn-bulk-na');
   if(bbna2)bbna2.style.display=stops.length?'block':'none';
-  if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">All caught up in '+getGroupName(cG)+'!</div>';return;}
+  var todayDone=0;for(var j=0;j<gc.length;j++){if(ds(gc[j].code)===0)todayDone++;}
+  if(est&&todayDone>0&&stops.length){est.textContent=todayDone+' done · '+est.textContent;}
+  if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">'+(todayDone>0?'&#10003; '+todayDone+' visited — all caught up in '+getGroupName(cG)+'!':'All caught up in '+getGroupName(cG)+'!')+'</div>';return;}
   for(var i=0;i<stops.length;i++){
     var c=stops[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var meta=d>=1000000?'Never':lv&&lv.type==='not_available'?('Retry · '+new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})):(new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+d+'d');
@@ -3788,7 +3790,9 @@ function rRoute(){
   }
   var bbna2=document.getElementById('btn-bulk-na');
   if(bbna2)bbna2.style.display=stops.length?'block':'none';
-  if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">All caught up in '+getGroupName(cG)+'!</div>';return;}
+  var todayDone=0;for(var j=0;j<gc.length;j++){if(ds(gc[j].code)===0)todayDone++;}
+  if(est&&todayDone>0&&stops.length){est.textContent=todayDone+' done · '+est.textContent;}
+  if(!stops.length){el.innerHTML='<div style="color:#8896b3;font-size:13px;padding:8px 0;text-align:center">'+(todayDone>0?'&#10003; '+todayDone+' visited — all caught up in '+getGroupName(cG)+'!':'All caught up in '+getGroupName(cG)+'!')+'</div>';return;}
   for(var i=0;i<stops.length;i++){
     var c=stops[i],d=ds(c.code),lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var meta=d>=1000000?'Never':lv&&lv.type==='not_available'?('Retry · '+new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})):(new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+d+'d');
