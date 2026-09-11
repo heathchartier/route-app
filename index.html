@@ -10843,6 +10843,69 @@ function qCardTotals(q,items){
 /* ── QUOTE SYSTEM ── */
 var _qCode=null,_qItems=[];
 
+function duplicateQuote(qid){
+  if(!ST.quotes||!ST.quotes[qid])return;
+  var orig=ST.quotes[qid];
+  document.getElementById('quote-card-ov').remove();
+  // Pre-load items into builder globals, then open builder
+  _qCode=orig.code;
+  _qItems=orig.items.map(function(it){return{name:it.name,qty:it.qty,price:it.price||0,cost:it.cost||null};});
+  var existing=document.getElementById('quote-builder');if(existing)existing.remove();
+  var custName='Unknown',a=allC();
+  for(var i=0;i<a.length;i++){if(a[i].code===orig.code){custName=a[i].name;break;}}
+  var sh=document.createElement('div');sh.id='quote-builder';
+  sh.style.cssText='position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end';
+  var _initTax=orig.taxRate||0,_initTaxZip='';
+  var todayStr=new Date().toISOString().split('T')[0];
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;margin:0 auto;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+      +'<div><div style="font-size:17px;font-weight:800">&#128203; Revise Quote</div>'
+      +'<div style="font-size:11px;color:var(--sub);margin-top:2px">Duplicate of original &mdash; edit &amp; save as new</div></div>'
+      +(priceData.length?'<button onclick="openPLPickerQuote()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:12px;font-weight:700;padding:7px 11px;border-radius:var(--r2);cursor:pointer;font-family:inherit">&#128203; Price List</button>':'')
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Customer</div>'
+    +'<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:11px 12px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">'
+    +'<span style="font-size:14px;font-weight:600;color:var(--text)">'+esc(custName)+'</span></div>'
+    +'<div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Items</div>'
+    +'<div id="qb-rows"></div>'
+    +'<button onclick="addQRow()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px dashed var(--border2);color:var(--teal);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px">+ Add Item</button>'
+    +'<div style="background:var(--bg3);border-radius:var(--r2);padding:12px;margin-bottom:14px">'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:var(--sub)">Items Subtotal</span><span id="qb-subtotal" style="font-size:12px;font-weight:700">$0</span></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Delivery Fee</span>'
+    +'<input type="number" id="qb-delivery" inputmode="decimal" min="0" step="0.01" placeholder="$0.00" value="'+(orig.deliveryFee||'')+'" oninput="_updateQSummary()" style="width:90px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:5px 8px;color:var(--text);font-family:inherit;font-size:13px;text-align:right">'
+    +'</div>'
+    +'<div style="display:flex;align-items:center;margin-bottom:8px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Resale / Tax Exempt</span>'
+    +'<label class="tog"><input type="checkbox" id="qb-resale" onchange="_updateQSummary()"'+(orig.isResale?' checked':'')+' ><span class="tog-sl"></span></label>'
+    +'</div>'
+    +'<div id="qb-taxrow" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Tax Rate</span>'
+    +'<div style="display:flex;align-items:center;gap:4px">'
+    +'<input type="number" id="qb-taxrate" inputmode="decimal" min="0" max="30" step="0.01" value="'+_initTax+'" oninput="_updateQSummary()" style="width:58px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:5px 8px;color:var(--text);font-family:inherit;font-size:13px;text-align:right">'
+    +'<span style="font-size:12px;color:var(--sub)">%</span>'
+    +'<span id="qb-taxamt" style="font-size:13px;font-weight:700;min-width:56px;text-align:right">$0</span>'
+    +'</div></div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border2)">'
+    +'<span style="font-size:14px;font-weight:800">Total</span>'
+    +'<span id="qb-total" style="font-size:18px;font-weight:800;color:var(--green)">$0</span>'
+    +'</div></div>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Follow-up reminder</span>'
+    +'<select id="qb-fu" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);padding:7px 10px;font-family:inherit;font-size:13px">'
+    +'<option value="2">2 days</option><option value="3" selected>3 days</option><option value="5">5 days</option><option value="7">1 week</option><option value="0">No reminder</option>'
+    +'</select></div>'
+    +'<div style="margin-bottom:16px"><div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Quote Notes <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div>'
+    +'<textarea id="qb-notes" rows="2" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:9px 11px;font-size:13px;font-family:inherit;outline:none;resize:none">'+esc(orig.notes||'')+'</textarea>'
+    +'</div>'
+    +'<button onclick="saveNewQuote()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save Revised Quote</button>'
+    +'<button onclick="document.getElementById(\'quote-builder\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+    +'</div>';
+  sh.addEventListener('click',function(e){if(e.target===sh)sh.remove();});
+  document.body.appendChild(sh);
+  _renderQRows();
+  toast('Duplicate opened — edit and save as new quote');
+}
 function showQuoteBuilder(code){
   var existing=document.getElementById('quote-builder');if(existing)existing.remove();
   _qCode=code||null;
@@ -11114,6 +11177,7 @@ function showQuoteCard(qid,page){
     +'<button onclick="shareQuote(\''+qid+'\')" style="padding:11px 6px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.25);color:#00e5b8;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128228; Share</button>'
     +'<button onclick="copyQuote(\''+qid+'\')" style="padding:11px 6px;border-radius:var(--r2);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128203; Copy</button>'
     +'</div>'
+    +'<button onclick="duplicateQuote(\''+qid+'\')" style="width:100%;padding:11px;border-radius:var(--r2);background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);color:#c084fc;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">&#128203; Duplicate &amp; Revise</button>'
     +'<button onclick="document.getElementById(\'quote-card-ov\').remove()" style="width:100%;padding:12px;border-radius:var(--r2);border:1px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.5);font-size:13px;cursor:pointer;font-family:inherit;margin-top:8px">Close</button>'
     +'</div>';
   ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
