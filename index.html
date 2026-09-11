@@ -774,6 +774,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="card" id="d-pace-card" style="display:none"></div>
     <div class="card" id="d-due-card" style="display:none"></div>
     <div class="card" id="d-coverage-card" style="display:none"></div>
+    <div class="card" id="d-tiercov-card" style="display:none"></div>
     <div class="card" id="d-quiet-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--red)">&#9888; Going Quiet</div>
@@ -1581,7 +1582,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rTierCoverage();rNavBadge();
 }
 
 function rRoute(){
@@ -2276,7 +2277,8 @@ var DASH_CARDS=[
   {key:'tier',label:'Visit Cadence Overdue'},
   {key:'weekplan',label:'Weekly Plan'},
   {key:'samples',label:'Sample Follow-Ups'},
-  {key:'target',label:'Visit Goal Tracker'}
+  {key:'target',label:'Visit Goal Tracker'},
+  {key:'tiercov',label:'Monthly Tier Coverage'}
 ];
 function dashCardHidden(key){
   var h=ST.hiddenCards||{};return !!h[key];
@@ -2974,6 +2976,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div class="card" id="d-pace-card" style="display:none"></div>
     <div class="card" id="d-due-card" style="display:none"></div>
     <div class="card" id="d-coverage-card" style="display:none"></div>
+    <div class="card" id="d-tiercov-card" style="display:none"></div>
     <div class="card" id="d-quiet-card" style="display:none">
       <div class="card-hdr">
         <div class="lbl" style="margin:0;color:var(--red)">&#9888; Going Quiet</div>
@@ -3735,7 +3738,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rTierCoverage();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
 }
 
 function rRoute(){
@@ -9044,6 +9047,7 @@ function promptLogCall(code){
 var _hcalYear=new Date().getFullYear(),_hcalMonth=new Date().getMonth();
 /* ── QUICK NOTE ── */
 var _qNoteCode=null;
+var _QN_CHIPS=['Dropped samples','Requested quote','Good meeting — hot','Not in — retry later','Showed price list','Left voicemail','New contact made','Large project — stay close'];
 function showQuickNote(code){
   _qNoteCode=code;
   var el=document.getElementById('qnote-ov');if(!el)return;
@@ -9051,8 +9055,18 @@ function showQuickNote(code){
   for(var i=0;i<a.length;i++){if(a[i].code===code){name=a[i].name;break;}}
   var t=document.getElementById('qnote-title');if(t)t.textContent='Note — '+name;
   var txt=document.getElementById('qnote-txt');if(txt)txt.value=(ST.notes&&ST.notes[code])||'';
+  var chips=document.getElementById('qnote-chips');
+  if(chips)chips.innerHTML=_QN_CHIPS.map(function(c){
+    return'<button onclick="qnoteChip(\''+c.replace(/'/g,'&#39;')+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--sub);border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap">'+c+'</button>';
+  }).join('');
   el.style.display='flex';
   setTimeout(function(){if(txt)txt.focus();},150);
+}
+function qnoteChip(t){
+  var txt=document.getElementById('qnote-txt');if(!txt)return;
+  var cur=txt.value.trim();
+  txt.value=cur?(cur+'\n'+t):t;
+  txt.focus();
 }
 function saveQNote(){
   if(!_qNoteCode)return;
@@ -10316,6 +10330,61 @@ function rCoverageCard(){
   +(cold.length?'<div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Coldest Zones</div>'+coldH:'')
   +'<button onclick="showCoverageReport()" style="width:100%;margin-top:10px;padding:8px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--sub);font-size:12px;cursor:pointer;font-family:inherit">Full Territory Report ›</button>';
 }
+/* ── MONTHLY TIER COVERAGE ── */
+function rTierCoverage(){
+  var card=document.getElementById('d-tiercov-card');if(!card)return;
+  if(dashCardHidden('tiercov')){card.style.display='none';return;}
+  var a=allC();
+  var now=new Date(),y=now.getFullYear(),m=now.getMonth();
+  var moStart=new Date(y,m,1);
+  var tiers={A:{total:0,visited:0},B:{total:0,visited:0},C:{total:0,visited:0}};
+  var visitedThisMonth={};
+  for(var code in ST.visits){
+    var logs=ST.visits[code]||[];
+    for(var i=logs.length-1;i>=0;i--){
+      if(logs[i].type==='visited'){
+        var d=new Date(logs[i].date);
+        if(d>=moStart){visitedThisMonth[code]=true;}
+        break;
+      }
+    }
+  }
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    var tier=getTier(c);
+    if(!tiers[tier])continue;
+    tiers[tier].total++;
+    if(visitedThisMonth[c.code])tiers[tier].visited++;
+  }
+  var hasAny=tiers.A.total||tiers.B.total||tiers.C.total;
+  if(!hasAny){card.style.display='none';return;}
+  card.style.display='block';
+  var moName=now.toLocaleDateString('en-US',{month:'long'});
+  var tierRows=['A','B','C'].map(function(t){
+    var td=tiers[t];if(!td.total)return'';
+    var pct=Math.round(td.visited/td.total*100);
+    var col=pct>=75?'var(--teal)':pct>=40?'var(--amber)':'var(--red)';
+    var lbl=t==='' ? '' : (t+'-Tier');
+    return'<div style="margin-bottom:10px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+        +'<div style="display:flex;align-items:center;gap:6px">'
+          +'<span class="tier-'+t.toLowerCase()+'" style="font-size:11px">'+t+'</span>'
+          +'<span style="font-size:12px;color:var(--sub)">'+td.visited+' / '+td.total+' visited</span>'
+        +'</div>'
+        +'<span style="font-size:15px;font-weight:800;color:'+col+'">'+pct+'%</span>'
+      +'</div>'
+      +'<div style="background:var(--bg3);border-radius:20px;height:6px;overflow:hidden">'
+        +'<div style="height:100%;border-radius:20px;background:'+col+';width:'+pct+'%;transition:width .4s"></div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  card.innerHTML='<div class="card-hdr">'
+    +'<div class="lbl" style="margin:0">&#127775; Monthly Tier Coverage</div>'
+    +'<span style="font-size:11px;color:var(--sub)">'+moName+'</span>'
+  +'</div>'
+  +'<div style="margin-top:8px">'+tierRows+'</div>';
+}
+
 function showCoverageReport(){
   var existing=document.getElementById('coverage-report-ov');if(existing)existing.remove();
   var ov=document.createElement('div');ov.id='coverage-report-ov';
@@ -13571,6 +13640,7 @@ function _buildMyDayWith(lat,lng){
       <div style="font-size:15px;font-weight:700" id="qnote-title">Quick Note</div>
       <button onclick="closeQNote()" style="background:transparent;border:none;color:var(--sub);font-size:20px;cursor:pointer;line-height:1;padding:4px 6px">&times;</button>
     </div>
+    <div id="qnote-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
     <textarea id="qnote-txt" rows="3" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);font-size:14px;font-family:inherit;padding:10px;resize:none;outline:none" placeholder="Add a note..."></textarea>
     <div style="display:flex;gap:8px;margin-top:10px">
       <button onclick="saveQNote()" style="flex:1;padding:12px;background:var(--teal);color:#000;border:none;border-radius:var(--r2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Save Note</button>
