@@ -11585,20 +11585,46 @@ function rCommission(){
     '</div></div></div>';
 }
 function showCommissionSettings(){
-  var r=prompt('Your commission rate (%):', ST.commRate||3);
-  if(r===null)return;
-  var n=parseFloat(r);
-  if(isNaN(n)||n<=0||n>100){toast('Enter a valid rate (e.g. 3)');return;}
-  ST.commRate=n;lSave();rCommission();toast('Rate set to '+n+'%');
+  var cur=ST.commRate||3;
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">Commission Rate</div>'
+   +'<div style="font-size:13px;color:var(--sub);margin-bottom:18px">Used to estimate your commission earnings on orders.</div>'
+   +'<div style="display:flex;align-items:center;gap:0;border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-bottom:18px">'
+   +'<input id="comm-rate-inp" type="number" min="0.1" max="100" step="0.5" value="'+cur+'" style="flex:1;padding:12px 14px;background:var(--bg3);border:none;color:var(--text);font-size:20px;font-weight:700;font-family:inherit;outline:none;text-align:center">'
+   +'<div style="padding:12px 14px;background:var(--bg3);color:var(--sub);font-size:18px;font-weight:700;border-left:1px solid var(--border2)">%</div>'
+   +'</div>'
+   +'<div style="display:flex;gap:10px">'
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:13px;border-radius:var(--r2);background:var(--bg3);color:var(--sub);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2)">Cancel</button>'
+   +'<button onclick="(function(){var inp=document.getElementById(\'comm-rate-inp\');var n=parseFloat(inp.value);if(isNaN(n)||n<=0||n>100){toast(\'Enter a valid rate (e.g. 3)\');return;}ST.commRate=n;lSave();rCommission();toast(\'Rate set to \'+n+\'%\');document.querySelector(\'div[style*=z-index:1100]\').remove();})()" style="flex:2;padding:13px;border-radius:var(--r2);background:var(--green);color:#000;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none">Save</button>'
+   +'</div>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+  setTimeout(function(){var inp=document.getElementById('comm-rate-inp');if(inp){inp.focus();inp.select();}},80);
 }
 function setMarginFloor(){
   var cur=ST.quoteMarginFloor>0?ST.quoteMarginFloor:0;
-  var r=prompt('Minimum margin % for quotes (0 = off):', cur);
-  if(r===null)return;
-  var n=parseFloat(r);
-  if(isNaN(n)||n<0){toast('Enter a valid %');return;}
-  ST.quoteMarginFloor=n;lSave();
-  toast(n>0?'Margin floor set to '+n+'%':'Margin guard off');
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">Quote Margin Floor</div>'
+   +'<div style="font-size:13px;color:var(--sub);margin-bottom:18px">Warn before saving a quote below this margin %. Set to 0 to disable.</div>'
+   +'<div style="display:flex;align-items:center;gap:0;border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-bottom:18px">'
+   +'<input id="margin-floor-inp" type="number" min="0" max="100" step="1" value="'+cur+'" style="flex:1;padding:12px 14px;background:var(--bg3);border:none;color:var(--text);font-size:20px;font-weight:700;font-family:inherit;outline:none;text-align:center">'
+   +'<div style="padding:12px 14px;background:var(--bg3);color:var(--sub);font-size:18px;font-weight:700;border-left:1px solid var(--border2)">%</div>'
+   +'</div>'
+   +'<div style="display:flex;gap:10px">'
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:13px;border-radius:var(--r2);background:var(--bg3);color:var(--sub);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2)">Cancel</button>'
+   +'<button onclick="(function(){var inp=document.getElementById(\'margin-floor-inp\');var n=parseFloat(inp.value);if(isNaN(n)||n<0){toast(\'Enter a valid %\');return;}ST.quoteMarginFloor=n;lSave();toast(n>0?\'Margin floor set to \'+n+\'%\':\'Margin guard off\');document.querySelector(\'div[style*=z-index:1100]\').remove();})()" style="flex:2;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none">Save</button>'
+   +'</div>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+  setTimeout(function(){var inp=document.getElementById('margin-floor-inp');if(inp){inp.focus();inp.select();}},80);
 }
 
 /* ── LOST ACCOUNTS ALERT ── */
