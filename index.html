@@ -8337,11 +8337,16 @@ function rSampleCard(){
   var h='';
   pending.slice(0,6).forEach(function(p){
     var daysAgo=Math.floor((today-new Date(p.s.date))/(1000*60*60*24));
-    h+='<div class="cadence-row" onclick="openM(\''+p.c.code+'\')">'
-     +'<div class="cadence-name">'+esc(p.c.name)+'</div>'
-     +'<div class="sample-meta">'+esc(p.s.item)+'</div>'
-     +'<div class="cadence-days tier-behind">'+daysAgo+'d ago</div>'
-     +'</div>';
+    h+='<div style="padding:7px 0;border-bottom:1px solid var(--border)">'
+     +'<div style="display:flex;align-items:center;gap:6px;cursor:pointer" onclick="openM(\''+p.c.code+'\')">'
+     +'<div style="flex:1;min-width:0"><div class="cadence-name">'+esc(p.c.name)+'</div>'
+     +'<div class="sample-meta">'+esc(p.s.item)+'</div></div>'
+     +'<div class="cadence-days tier-behind" style="flex-shrink:0">'+daysAgo+'d ago</div>'
+     +'</div>'
+     +'<div style="display:flex;gap:6px;margin-top:5px">'
+     +'<button onclick="event.stopPropagation();markSampleStatus(\''+p.c.code+'\','+p.idx+',\'ordered\');rSampleCard();rDash();" style="flex:1;background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:var(--r2);padding:4px 0;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#10003; Ordered</button>'
+     +'<button onclick="event.stopPropagation();markSampleStatus(\''+p.c.code+'\','+p.idx+',\'no_interest\');rSampleCard();rDash();" style="flex:1;background:rgba(255,77,106,.1);color:var(--red);border:1px solid rgba(255,77,106,.25);border-radius:var(--r2);padding:4px 0;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">No Interest</button>'
+     +'</div></div>';
   });
   if(pending.length>6)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">+'+(pending.length-6)+' more</div>';
   list.innerHTML=h;
