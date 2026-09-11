@@ -1887,6 +1887,8 @@ function openM(code){
     if(pvOpen>0){pvLines.push('<div style="display:flex;gap:8px;align-items:center"><span style="color:var(--sub);font-size:11px;min-width:80px">Open todos</span><span style="font-size:12px;font-weight:600;color:var(--amber)">'+pvOpen+' item'+(pvOpen!==1?'s':'')+' pending</span></div>');}
     var pvComp=ST.competitors&&ST.competitors[code];
     if(pvComp){pvLines.push('<div style="display:flex;gap:8px;align-items:flex-start"><span style="color:var(--sub);font-size:11px;min-width:80px">Competitor</span><span style="font-size:12px;color:#f87171">⚔ '+esc(pvComp.length>60?pvComp.slice(0,60)+'…':pvComp)+'</span></div>');}
+    var pvOpenQ=0,pvOpenQVal=0;if(ST.quotes){Object.keys(ST.quotes).forEach(function(k){var q=ST.quotes[k];if(q.code===code&&q.status==='open'&&!q.dismissed){pvOpenQ++;pvOpenQVal+=qGrandTotal(q)||0;}});}
+    if(pvOpenQ>0){pvLines.push('<div style="display:flex;gap:8px;align-items:center"><span style="color:var(--sub);font-size:11px;min-width:80px">Open quotes</span><span style="font-size:12px;font-weight:600;color:var(--teal)">&#128203; '+pvOpenQ+' quote'+(pvOpenQ!==1?'s':'')+(pvOpenQVal?' · '+fmt(pvOpenQVal):'')+'</span></div>');}
     if(noteVal.trim()){pvLines.push('<div style="display:flex;gap:8px;align-items:flex-start"><span style="color:var(--sub);font-size:11px;min-width:80px">Note</span><span style="font-size:12px;color:var(--text)">'+esc(noteVal.length>100?noteVal.slice(0,100)+'…':noteVal)+'</span></div>');}
     if(pvLines.length){mpv.style.display='block';mpt.innerHTML=pvLines.join('<div style="height:5px"></div>');}
     else{mpv.style.display='none';}
@@ -4065,6 +4067,8 @@ function openM(code){
     if(pvOpen>0){pvLines.push('<div style="display:flex;gap:8px;align-items:center"><span style="color:var(--sub);font-size:11px;min-width:80px">Open todos</span><span style="font-size:12px;font-weight:600;color:var(--amber)">'+pvOpen+' item'+(pvOpen!==1?'s':'')+' pending</span></div>');}
     var pvComp=ST.competitors&&ST.competitors[code];
     if(pvComp){pvLines.push('<div style="display:flex;gap:8px;align-items:flex-start"><span style="color:var(--sub);font-size:11px;min-width:80px">Competitor</span><span style="font-size:12px;color:#f87171">⚔ '+esc(pvComp.length>60?pvComp.slice(0,60)+'…':pvComp)+'</span></div>');}
+    var pvOpenQ=0,pvOpenQVal=0;if(ST.quotes){Object.keys(ST.quotes).forEach(function(k){var q=ST.quotes[k];if(q.code===code&&q.status==='open'&&!q.dismissed){pvOpenQ++;pvOpenQVal+=qGrandTotal(q)||0;}});}
+    if(pvOpenQ>0){pvLines.push('<div style="display:flex;gap:8px;align-items:center"><span style="color:var(--sub);font-size:11px;min-width:80px">Open quotes</span><span style="font-size:12px;font-weight:600;color:var(--teal)">&#128203; '+pvOpenQ+' quote'+(pvOpenQ!==1?'s':'')+(pvOpenQVal?' · '+fmt(pvOpenQVal):'')+'</span></div>');}
     if(noteVal.trim()){pvLines.push('<div style="display:flex;gap:8px;align-items:flex-start"><span style="color:var(--sub);font-size:11px;min-width:80px">Note</span><span style="font-size:12px;color:var(--text)">'+esc(noteVal.length>100?noteVal.slice(0,100)+'…':noteVal)+'</span></div>');}
     if(pvLines.length){mpv.style.display='block';mpt.innerHTML=pvLines.join('<div style="height:5px"></div>');}
     else{mpv.style.display='none';}
