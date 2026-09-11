@@ -1716,7 +1716,7 @@ function rAttn(a){
   for(var i=0;i<items.length;i++){
     var c=items[i],lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var reason=lv&&lv.type==='not_available'?'Not avail twice':ds(c.code)+'d no visit';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:var(--red)"></div><div class="ri"><div class="rn">'+esc(c.name)+'</div><div class="rm" style="color:#ef4444">'+reason+' &bull; Grp '+c.group+'</div></div><div style="font-size:12px;color:#64748b">'+fmt(c.lifetimeSales)+'</div></div>';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:var(--red)"></div><div class="ri"><div class="rn">'+esc(c.name)+'</div><div class="rm" style="color:#ef4444">'+reason+' &bull; '+fmt(c.lifetimeSales)+'</div></div><button onclick="event.stopPropagation();showFollowUpPicker(\''+c.code+'\')" style="background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:var(--r2);padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button></div>';
   }
   document.getElementById('d-attn-list').innerHTML=h;
 }
@@ -3921,7 +3921,7 @@ function rAttn(a){
   for(var i=0;i<items.length;i++){
     var c=items[i],lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     var reason=lv&&lv.type==='not_available'?'Not avail twice':ds(c.code)+'d no visit';
-    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:var(--red)"></div><div class="ri"><div class="rn">'+esc(c.name)+'</div><div class="rm" style="color:#ef4444">'+reason+' &bull; Grp '+c.group+'</div></div><div style="font-size:12px;color:#64748b">'+fmt(c.lifetimeSales)+'</div></div>';
+    h+='<div class="row" data-code="'+c.code+'" data-action="open"><div class="dot" style="background:var(--red)"></div><div class="ri"><div class="rn">'+esc(c.name)+'</div><div class="rm" style="color:#ef4444">'+reason+' &bull; '+fmt(c.lifetimeSales)+'</div></div><button onclick="event.stopPropagation();showFollowUpPicker(\''+c.code+'\')" style="background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:var(--r2);padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button></div>';
   }
   document.getElementById('d-attn-list').innerHTML=h;
 }
@@ -7043,7 +7043,7 @@ function rQuietAccounts(){
           +'<div class="rm">'+esc(c.city||'')+' &bull; '+drop+'</div>'
           +'<div style="font-size:11px;color:var(--red);margin-top:2px">YTD: '+fmt(c.sales2526)+' &bull; '+lastVisit+'</div>'
         +'</div>'
-        +'<div style="font-size:12px;color:var(--sub)">&#8250;</div>'
+        +'<button onclick="event.stopPropagation();showFollowUpPicker(\''+c.code+'\')" style="background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:var(--r2);padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button>'
       +'</div>';
     }
     list.innerHTML=h;
