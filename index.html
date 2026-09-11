@@ -6746,17 +6746,17 @@ function showEOD(){
     (notAvail.length?'<div class="eod-sec">&#9711; Not Available ('+notAvail.length+')</div>'+rows(notAvail,'#f59e0b'):'')+
     (ordersToday.length?'<div class="eod-sec">&#128230; Orders ('+ordersToday.length+')</div>'+orderRows:'')+
     (noted.length?'<div class="eod-sec">&#128221; Notes ('+noted.length+')</div>'+notedRows:'')+
-    '<button class="eod-copy" onclick="copyEOD('+visited.length+','+notAvail.length+')">Copy as Text</button>'+
+    '<button class="eod-copy" onclick="copyEOD('+visited.length+','+notAvail.length+','+orderTotal+')">Copy as Text</button>'+
     '<button class="eod-copy" style="margin-top:8px;background:rgba(129,140,248,.15);color:#818cf8;border-color:rgba(129,140,248,.3)" onclick="shareEOD(calledToday.length,samplesDropped.length)">&#128279; Share Summary</button>'+
     '<button class="eod-close" onclick="this.closest(\'.eod-sheet\').remove()">Close</button>'+
   '</div>';
   document.body.appendChild(sheet);
   sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
 }
-function copyEOD(vn,nan){
+function copyEOD(vn,nan,orderTot){
   var a=allC(),today=new Date().toDateString();
   var dateStr=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  var lines=['Daily Route Summary — '+dateStr,'Visited: '+vn+' | Not Available: '+nan,''];
+  var lines=['Daily Route Summary — '+dateStr,'Visited: '+vn+' | Not Available: '+nan+(orderTot?' | Orders: $'+Number(orderTot).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):''),''];
   var visited=[];
   for(var i=0;i<a.length;i++){
     var logs=ST.visits[a[i].code]||[];
