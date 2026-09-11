@@ -9962,7 +9962,10 @@ function rReorderPrompts(){
       +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
       +'<div style="font-size:11px;color:var(--sub)">Last order '+item.daysSinceLast+'d ago &bull; avg every '+item.avgGap+'d'+(item.lastAmt?' &bull; '+fmt(item.lastAmt):'')+'</div>'
       +'</div>'
-      +'<span style="font-size:11px;font-weight:700;color:var(--green);flex-shrink:0">'+pct+'%</span>'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+      +'<span style="font-size:11px;font-weight:700;color:var(--green)">'+pct+'%</span>'
+      +'<button onclick="event.stopPropagation();showFollowUpPicker(\''+c.code+'\')" style="background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:var(--r2);padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit">F/U</button>'
+      +'</div>'
       +'</div>'
       +'<div style="height:3px;background:var(--bg3);border-radius:2px">'
       +'<div style="height:3px;width:'+pct+'%;background:'+barColor+';border-radius:2px;transition:width .3s"></div>'
@@ -10699,8 +10702,11 @@ function rProductReqCard(){
   card.style.display='block';
   var h='';
   pending.slice(0,8).forEach(function(p){
-    h+='<div style="padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openM(\''+p.c.code+'\')">'
+    h+='<div style="padding:7px 0;border-bottom:1px solid var(--border)" onclick="openM(\''+p.c.code+'\')">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer">'
       +'<div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(p.c.name)+'</div>'
+      +'<button onclick="event.stopPropagation();showFollowUpPicker(\''+p.c.code+'\')" style="background:rgba(192,132,252,.12);color:#c084fc;border:1px solid rgba(192,132,252,.3);border-radius:var(--r2);padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button>'
+      +'</div>'
       +'<div style="margin-top:3px;display:flex;flex-wrap:wrap;gap:4px">';
     p.reqs.slice(0,3).forEach(function(r){
       h+='<span style="background:rgba(192,132,252,.12);color:#c084fc;border:1px solid rgba(192,132,252,.25);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:600">'+esc(r.product.length>25?r.product.slice(0,25)+'…':r.product)+'</span>';
@@ -11973,7 +11979,7 @@ function rLostAccounts(){
       '<div class="dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></div>'+
       '<div class="ri"><div class="rn">'+esc(x.c.name)+'</div>'+
       '<div class="rm">Last order '+fmt(x.lastAmt)+' · '+x.days+'d ago</div></div>'+
-      '<div style="font-size:11px;color:var(--red);font-weight:700">'+x.days+'d</div></div>';
+      '<button onclick="event.stopPropagation();showFollowUpPicker(\''+x.c.code+'\')" style="background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button></div>';
   }).join('');
   el.innerHTML='<div class="card" style="background:linear-gradient(135deg,rgba(255,77,106,.08),rgba(255,77,106,.03));border-color:rgba(255,77,106,.25)">'+
     '<div class="card-hdr"><div class="lbl" style="color:var(--red);margin:0">&#128679; Lost Accounts (60d+)</div>'+
@@ -12745,7 +12751,7 @@ function rUpsellNudges(){
       '<div class="dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber)"></div>'+
       '<div class="ri"><div class="rn">'+esc(x.c.name)+'</div>'+
       '<div class="rm" style="color:var(--amber)">'+esc(x.reason)+'</div></div>'+
-      '<div style="font-size:18px">&#128161;</div></div>';
+      '<button onclick="event.stopPropagation();showFollowUpPicker(\''+x.c.code+'\')" style="background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.3);border-radius:var(--r2);padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button></div>';
   }).join('');
   el.innerHTML='<div class="card" style="background:linear-gradient(135deg,rgba(255,176,32,.08),rgba(255,176,32,.03));border-color:rgba(255,176,32,.25)">'+
     '<div class="card-hdr"><div class="lbl" style="color:var(--amber);margin:0">&#128161; Upsell Nudges</div>'+
