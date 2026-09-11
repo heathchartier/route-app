@@ -7376,7 +7376,11 @@ function rCompetitorCard(){
   el.style.display='block';
   var cnt=document.getElementById('d-comp-count');if(cnt)cnt.textContent=comp.length;
   var list=document.getElementById('d-comp-list');if(!list)return;
-  list.innerHTML=comp.slice(0,8).map(function(item){
+  // Frequency breakdown of competitor names
+  var freq={};comp.forEach(function(item){var name=item.comp.toLowerCase().trim();freq[name]=(freq[name]||0)+1;});
+  var topComps=Object.keys(freq).sort(function(a,b){return freq[b]-freq[a];}).slice(0,3);
+  var freqHtml=topComps.length>1?'<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">'+topComps.map(function(k){return'<span style="background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.25);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700">&#9876; '+esc(k)+' &times;'+freq[k]+'</span>';}).join('')+'</div>':'';
+  list.innerHTML=freqHtml+comp.slice(0,8).map(function(item){
     var c=item.c,cv=item.comp,d=ds(c.code);
     var dTxt=d===null?'Never':d===0?'Today':d+'d ago';
     return'<div class="comp-row" onclick="openM(\''+c.code+'\')">'
