@@ -6941,6 +6941,8 @@ function rWeekSchedule(){
   if(!total){card.style.display='none';return;}
   card.style.display='block';
 
+  var todayKey=today.toISOString().split('T')[0];
+  var todayCusts=byDay[todayKey]||[];
   var h='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:4px">';
   for(var i=0;i<5;i++){
     var dateKey=days[i].toISOString().split('T')[0];
@@ -6959,6 +6961,10 @@ function rWeekSchedule(){
     h+='</div>';
   }
   h+='</div>';
+  if(todayCusts.length){
+    window._schedTodayCusts=todayCusts;
+    h+='<button onclick="showMapPicker(window._schedTodayCusts||[])" style="width:100%;margin-top:8px;padding:10px;border-radius:var(--r2);border:1px solid rgba(74,158,255,.3);background:var(--blue2);color:var(--blue);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">&#128197; Route Today\'s '+todayCusts.length+' Follow-Up'+(todayCusts.length!==1?'s':'')+'</button>';
+  }
   body.innerHTML=h;
 }
 
