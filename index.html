@@ -643,7 +643,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 </div>
 
 <!-- PAGES - all visible by default, JS will hide non-active ones -->
-<div id="toast-undo"><span id="toast-undo-msg">Logged</span><button id="toast-undo-btn" onclick="undoLastVisit()">UNDO</button></div>
+<div id="toast-undo"><span id="toast-undo-msg">Logged</span><button id="toast-undo-note" onclick="undoNotePrompt()" style="display:none;background:rgba(129,140,248,.2);color:#818cf8;border:1px solid rgba(129,140,248,.35);border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">+Note</button><button id="toast-undo-btn" onclick="undoLastVisit()">UNDO</button></div>
 
 <div id="p-dash" style="padding-bottom:80px">
   <div class="hdr">
@@ -2907,7 +2907,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 </div>
 
 <!-- PAGES - all visible by default, JS will hide non-active ones -->
-<div id="toast-undo"><span id="toast-undo-msg">Logged</span><button id="toast-undo-btn" onclick="undoLastVisit()">UNDO</button></div>
+<div id="toast-undo"><span id="toast-undo-msg">Logged</span><button id="toast-undo-note" onclick="undoNotePrompt()" style="display:none;background:rgba(129,140,248,.2);color:#818cf8;border:1px solid rgba(129,140,248,.35);border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">+Note</button><button id="toast-undo-btn" onclick="undoLastVisit()">UNDO</button></div>
 
 <div id="p-dash" style="display:none;padding-bottom:80px">
   <div class="hdr">
@@ -7293,9 +7293,19 @@ function showUndoToast(code,type){
   var t=document.getElementById('toast-undo');if(!t)return;
   clearTimeout(window._undoTimer);
   window._lastVisit={code:code,type:type};
-  t.querySelector('#toast-undo-msg').textContent='Logged: '+type;
+  var msgEl=t.querySelector('#toast-undo-msg');
+  if(msgEl)msgEl.textContent=type==='visited'?'✓ Visited':type==='not_available'?'— Not Available':type==='called'?'📞 Called':'Logged';
+  var nb=document.getElementById('toast-undo-note');
+  if(nb)nb.style.display=(type==='not_available'||type==='called')?'inline-flex':'none';
   t.className='on';
   window._undoTimer=setTimeout(function(){t.className='';window._lastVisit=null;},5000);
+}
+function undoNotePrompt(){
+  if(!window._lastVisit)return;
+  var code=window._lastVisit.code;
+  var t=document.getElementById('toast-undo');if(t)t.className='';
+  clearTimeout(window._undoTimer);
+  showVisitNote(code);
 }
 function undoLastVisit(){
   if(!window._lastVisit)return;
