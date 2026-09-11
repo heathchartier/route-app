@@ -11115,9 +11115,49 @@ function setQuoteOutcome(qid,status,reason){
   ST.quotes[qid].status=status;
   if(reason!==undefined)ST.quotes[qid].lostReason=reason||'';
   lSave();syncUp();
+  var code=ST.quotes[qid].code;
   toast(status==='won'?'&#127881; Sale won!':'Quote marked lost');
-  rQuotesModal(ST.quotes[qid].code);
+  rQuotesModal(code);
   rDash();
+  if(status==='won')_offerOrderFromQuote(qid);
+}
+function _offerOrderFromQuote(qid){
+  var q=ST.quotes&&ST.quotes[qid];if(!q)return;
+  var total=qGrandTotal(q);
+  var existing=document.getElementById('_q2o-sheet');if(existing)existing.remove();
+  var sh=document.createElement('div');sh.id='_q2o-sheet';
+  sh.style.cssText='position:fixed;inset:0;z-index:6500;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 20px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:520px;border-top:1px solid var(--border2)">'
+    +'<div style="text-align:center;font-size:26px;margin-bottom:8px">&#127881;</div>'
+    +'<div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:4px">Log this as an order?</div>'
+    +'<div style="font-size:13px;color:var(--sub);text-align:center;margin-bottom:16px">Auto-fills the order from your quote items ('+(total?fmt(total):q.items.length+' items')+')</div>'
+    +'<button onclick="orderFromQuote(\''+qid+'\');document.getElementById(\'_q2o-sheet\').remove()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--green);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">&#128230; Yes, Log Order</button>'
+    +'<button onclick="document.getElementById(\'_q2o-sheet\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">No Thanks</button>'
+    +'</div>';
+  sh.addEventListener('click',function(e){if(e.target===sh)sh.remove();});
+  document.body.appendChild(sh);
+}
+function orderFromQuote(qid){
+  var q=ST.quotes&&ST.quotes[qid];if(!q)return;
+  var code=q.code;
+  if(!ST.orders)ST.orders={};
+  if(!ST.orders[code])ST.orders[code]=[];
+  var itemStr=q.items.map(function(it){
+    var base=(it.name||'').trim();
+    if(it.qty&&it.price)base+=' ('+it.qty+' @ $'+Number(it.price).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+')';
+    return base;
+  }).filter(Boolean).join(', ');
+  var total=qGrandTotal(q);
+  ST.orders[code].push({
+    date:new Date().toISOString(),
+    item:itemStr||'Quote #'+qid.slice(-6),
+    amount:total,
+    note:'From quote',
+    items:q.items.map(function(it){return{item:(it.name||'').trim(),qty:it.qty||1,unit:'ea',unitPrice:it.price||0,lineTotal:(it.qty||1)*(it.price||0)};})
+  });
+  lSave();syncUp();
+  toast('&#128230; Order logged from quote');
+  rOrders(code);rDash();
 }
 
 function promptQuoteLoss(qid){
