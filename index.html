@@ -1769,7 +1769,7 @@ function rCust(){
   var f=[],q=cS.toLowerCase();
   for(var i=0;i<a.length;i++){
     var c=a[i];
-    if(q&&c.name.toLowerCase().indexOf(q)<0&&c.code.toLowerCase().indexOf(q)<0&&(c.city||'').toLowerCase().indexOf(q)<0)continue;
+    if(q){var _note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';if(c.name.toLowerCase().indexOf(q)<0&&c.code.toLowerCase().indexOf(q)<0&&(c.city||'').toLowerCase().indexOf(q)<0&&_note.toLowerCase().indexOf(q)<0)continue;}
     var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     if(cF==='visited'){if(!lv||lv.type!=='visited')continue;}
     else if(cF==='not_avail'){if(!lv||lv.type!=='not_available')continue;}
@@ -3970,7 +3970,7 @@ function rCust(){
   var f=[],q=cS.toLowerCase();
   for(var i=0;i<a.length;i++){
     var c=a[i];
-    if(q&&c.name.toLowerCase().indexOf(q)<0&&c.code.toLowerCase().indexOf(q)<0&&(c.city||'').toLowerCase().indexOf(q)<0)continue;
+    if(q){var _note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';if(c.name.toLowerCase().indexOf(q)<0&&c.code.toLowerCase().indexOf(q)<0&&(c.city||'').toLowerCase().indexOf(q)<0&&_note.toLowerCase().indexOf(q)<0)continue;}
     var lv=ST.visits[c.code]&&ST.visits[c.code].length?ST.visits[c.code][ST.visits[c.code].length-1]:null;
     if(cF==='visited'){if(!lv||lv.type!=='visited')continue;}
     else if(cF==='not_avail'){if(!lv||lv.type!=='not_available')continue;}
