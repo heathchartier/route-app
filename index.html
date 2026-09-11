@@ -2118,8 +2118,8 @@ function doExport(){
   var today=new Date();
   var todayStr=today.toISOString().split('T')[0];
   function csvQ(v){return'"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
-  var cols=['Code','Name','Address','City','Zip','Phone','Group','Tier','Hot Lead',
-    'YTD Sales','Prior Year Sales','Lifetime Sales',
+  var cols=['Code','Name','Address','City','Zip','Phone','Group','Tier','Hot Lead','Pinned',
+    'YTD Sales','Prior Year Sales','Lifetime Sales','Revenue Target ($)',
     'Last Visit Date','Last Visit Type','Total Visits','Days Since Last Visit',
     'Last Order Date','Order Count','Total Order Value ($)',
     'Latest Note','Tags','Competitor Intel',
@@ -2151,8 +2151,8 @@ function doExport(){
     var addr=[c.address,c.address2].filter(Boolean).join(' ');
     rows.push([
       code,c.name||'',addr,c.city||'',c.zip||'',c.phone||'',c.group||'',getTier(c),
-      ST.hot&&ST.hot[code]?'Yes':'No',
-      Math.round(c.sales2526||0),Math.round(c.sales2025||0),Math.round(c.lifetimeSales||0),
+      ST.hot&&ST.hot[code]?'Yes':'No',ST.pinned&&ST.pinned[code]?'Yes':'No',
+      Math.round(c.sales2526||0),Math.round(c.sales2025||0),Math.round(c.lifetimeSales||0),Math.round((ST.revTargets&&ST.revTargets[code])||0),
       lvDate,lv?lv.type:'',visits.length,daysSince,
       loDate,orders.length,Math.round(orderTotal),
       latestNote.replace(/\n/g,' ').slice(0,250),tagStr,comp,
@@ -4289,8 +4289,8 @@ function doExport(){
   var today=new Date();
   var todayStr=today.toISOString().split('T')[0];
   function csvQ(v){return'"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
-  var cols=['Code','Name','Address','City','Zip','Phone','Group','Tier','Hot Lead',
-    'YTD Sales','Prior Year Sales','Lifetime Sales',
+  var cols=['Code','Name','Address','City','Zip','Phone','Group','Tier','Hot Lead','Pinned',
+    'YTD Sales','Prior Year Sales','Lifetime Sales','Revenue Target ($)',
     'Last Visit Date','Last Visit Type','Total Visits','Days Since Last Visit',
     'Last Order Date','Order Count','Total Order Value ($)',
     'Latest Note','Tags','Competitor Intel',
@@ -4322,8 +4322,8 @@ function doExport(){
     var addr=[c.address,c.address2].filter(Boolean).join(' ');
     rows.push([
       code,c.name||'',addr,c.city||'',c.zip||'',c.phone||'',c.group||'',getTier(c),
-      ST.hot&&ST.hot[code]?'Yes':'No',
-      Math.round(c.sales2526||0),Math.round(c.sales2025||0),Math.round(c.lifetimeSales||0),
+      ST.hot&&ST.hot[code]?'Yes':'No',ST.pinned&&ST.pinned[code]?'Yes':'No',
+      Math.round(c.sales2526||0),Math.round(c.sales2025||0),Math.round(c.lifetimeSales||0),Math.round((ST.revTargets&&ST.revTargets[code])||0),
       lvDate,lv?lv.type:'',visits.length,daysSince,
       loDate,orders.length,Math.round(orderTotal),
       latestNote.replace(/\n/g,' ').slice(0,250),tagStr,comp,
