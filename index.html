@@ -8076,6 +8076,37 @@ function removePlanGroup(day,group,cont){
   if(cont){cont.innerHTML='';var g=ST.weekPlan[day]||[];for(var i=0;i<g.length;i++){var sp=document.createElement('span');sp.style.cssText='background:var(--teal2);color:var(--teal);border-radius:20px;padding:2px 8px;font-size:12px;font-weight:700;cursor:pointer';sp.textContent=getGroupName(g[i])+' \xd7';(function(gv){sp.onclick=function(){removePlanGroup(day,gv,cont);};})(g[i]);cont.appendChild(sp);}}
 }
 
+function showGroupDetail(g){
+  g=parseInt(g);if(!g)return;
+  var a=allC(),custs=[];for(var i=0;i<a.length;i++){if(a[i].group===g)custs.push(a[i]);}
+  if(!custs.length){toast('No customers in Group '+g);return;}
+  custs.sort(function(a,b){return ds(a.code)-ds(b.code);});
+  var today=new Date().toISOString().split('T')[0];
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;display:flex;align-items:flex-end;justify-content:center';
+  var rows=custs.map(function(c){
+    var d=ds(c.code);
+    var dot=d===0?'#10b981':d>14?'#ef4444':'#f59e0b';
+    var meta=d>=1000000?'Never visited':d===0?'Visited today':d+'d ago';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="closeSheet(this);setTimeout(function(){openM(\''+c.code+'\');},200)">'
+      +'<span style="width:9px;height:9px;border-radius:50%;background:'+dot+';flex-shrink:0"></span>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--sub)">'+meta+'</div></div>'
+      +(c.phone?'<a href="tel:'+esc(c.phone)+'" onclick="event.stopPropagation()" style="color:var(--blue);font-size:16px;text-decoration:none">&#128222;</a>':'')
+      +'</div>';
+  }).join('');
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2);max-height:75vh;display:flex;flex-direction:column">'
+    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px"></div>'
+    +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">Group '+g+' — '+esc(getGroupName(g))+'</div>'
+    +'<div style="font-size:12px;color:var(--sub);margin-bottom:12px">'+custs.length+' accounts</div>'
+    +'<div style="overflow-y:auto;flex:1">'+rows+'</div>'
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;margin-top:14px;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Close</button>'
+    +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+function closeSheet(el){var s=el.closest('div[style*="position:fixed"]');if(s)s.remove();}
+
 /* ── CONTACTS ── */
 function rContacts(code){
   var sect=document.getElementById('m-contacts-sect');
