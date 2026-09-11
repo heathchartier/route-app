@@ -7981,26 +7981,32 @@ function runNotesSearch(q){
   if(!q||q.trim().length<2){res.innerHTML='<div style="color:var(--sub);font-size:13px;text-align:center;padding:20px">Type to search...</div>';return;}
   var term=q.trim().toLowerCase();
   var a=allC(),hits=[];
-  for(var i=0;i<a.length;i++){
-    var c=a[i];
-    var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
-    var gn=ST.groupNotes&&ST.groupNotes[c.group]?ST.groupNotes[c.group]:'';
-    var combined=(note+' '+gn).toLowerCase();
-    if(combined.indexOf(term)!==-1){
-      var snippet=note||gn;
-      var idx=snippet.toLowerCase().indexOf(term);
-      var pre=snippet.substring(Math.max(0,idx-30),idx);
-      var match=snippet.substring(idx,idx+term.length);
-      var post=snippet.substring(idx+term.length,idx+term.length+40);
-      hits.push({c:c,pre:pre,match:match,post:post});
-    }
+  var codeMap={};for(var i=0;i<a.length;i++)codeMap[a[i].code]=a[i];
+  var seenCodes={};
+  function _addHit(code,snippet,tag){
+    var c=codeMap[code];if(!c)return;
+    var idx=snippet.toLowerCase().indexOf(term);if(idx===-1)return;
+    if(seenCodes[code])return; // one hit per customer (highest priority source wins)
+    seenCodes[code]=true;
+    var pre=snippet.substring(Math.max(0,idx-25),idx);
+    var match=snippet.substring(idx,idx+term.length);
+    var post=snippet.substring(idx+term.length,idx+term.length+40);
+    hits.push({c:c,pre:pre,match:match,post:post,tag:tag});
   }
+  // Priority 1: main notes
+  for(var code in ST.notes){if(ST.notes[code])_addHit(code,ST.notes[code],'Note');}
+  // Priority 2: visit notes
+  for(var code in ST.visits){var logs=ST.visits[code]||[];for(var i=0;i<logs.length;i++){if(logs[i].visitNote&&!seenCodes[code])_addHit(code,logs[i].visitNote,'Visit note');}}
+  // Priority 3: quote notes
+  if(ST.quotes){Object.keys(ST.quotes).forEach(function(k){var q=ST.quotes[k];if(q.notes&&!seenCodes[q.code])_addHit(q.code,q.notes,'Quote note');});}
+  // Priority 4: group notes (match to first customer in group)
+  if(ST.groupNotes){for(var code in ST.groupNotes){if(ST.groupNotes[code]){var gc=codeMap[code];if(!gc){for(var i=0;i<a.length;i++){if(a[i].group===parseInt(code)){gc=a[i];break;}}}if(gc&&!seenCodes[gc.code])_addHit(gc.code,ST.groupNotes[code],'Group note');}}}
   if(!hits.length){res.innerHTML='<div style="color:var(--sub);font-size:13px;text-align:center;padding:20px">No notes match "'+esc(q)+'"</div>';return;}
   var h='';
   for(var i=0;i<hits.length;i++){
     var h2=hits[i];
     h+='<div class="nsrch-row" onclick="this.closest(\'div[style*=fixed]\').remove();openM(\''+h2.c.code+'\')">'
-     +'<div class="nsrch-name">'+esc(h2.c.name)+'</div>'
+     +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div class="nsrch-name">'+esc(h2.c.name)+'</div>'+(h2.tag?'<span style="font-size:10px;color:var(--teal);font-weight:700;background:var(--teal2);border-radius:8px;padding:1px 6px">'+esc(h2.tag)+'</span>':'')+'</div>'
      +'<div class="nsrch-snippet">'+(h2.pre?'...':'')+esc(h2.pre)+'<span class="nsrch-highlight">'+esc(h2.match)+'</span>'+esc(h2.post)+(h2.post?'...':'')+'</div>'
      +'</div>';
   }
