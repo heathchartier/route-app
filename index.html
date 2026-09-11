@@ -4820,6 +4820,13 @@ function rMorningBrief(){
     if(ST.scheduled&&ST.scheduled[a[i].code]&&ST.scheduled[a[i].code].date===today)scheduledToday++;
   }
   var sg2=smartGroup();
+  // Count tasks+callbacks due today
+  var tasksDue=0;
+  a.forEach(function(c){
+    var todos=ST.todos&&ST.todos[c.code]?ST.todos[c.code]:[];
+    tasksDue+=todos.filter(function(t){return !t.done&&t.dueDate&&t.dueDate<=today;}).length;
+    if(ST.followups&&ST.followups[c.code]&&ST.followups[c.code].split('T')[0]<=today)tasksDue++;
+  });
   // Top A-tier accounts overdue 30+ days
   var topA=a.filter(function(c){return getTier(c)==='A'&&ds(c.code)>30;});
   topA.sort(function(a,b){return b.lifetimeSales-a.lifetimeSales;});
@@ -4843,6 +4850,7 @@ function rMorningBrief(){
       +'<div class="brief-stat"><div class="brief-n" style="color:var(--teal)">'+sg2+'</div><div class="brief-l">Rec. Group</div></div>'
       +'<div class="brief-stat"><div class="brief-n" style="color:var(--red)">'+overdue+'</div><div class="brief-l">Overdue</div></div>'
       +'<div class="brief-stat"><div class="brief-n" style="color:var(--blue)">'+scheduledToday+'</div><div class="brief-l">Scheduled</div></div>'
+      +(tasksDue?'<div class="brief-stat"><div class="brief-n" style="color:var(--amber)">'+tasksDue+'</div><div class="brief-l">Tasks Due</div></div>':'')
     +'</div>'
     +(topA.length?'<div style="font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">A-Tier accounts overdue</div>'+acctRows:'')
     +'</div>';
