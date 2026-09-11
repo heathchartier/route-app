@@ -792,6 +792,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Accounts behind their monthly visit target</div>
     <div id="d-target-list"></div>
   </div>
+  <div class="card" id="d-revtarget-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:var(--green)">&#127919; Revenue Targets Behind Pace</div>
+      <span id="d-revtarget-count" style="background:rgba(0,209,122,.15);color:var(--green);border:1px solid rgba(0,209,122,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Accounts with revenue targets running below expected annual pace</div>
+    <div id="d-revtarget-list"></div>
+  </div>
   <div class="card" id="d-samples-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128230; Sample Follow-Ups</div>
@@ -1584,7 +1592,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rTierCoverage();rNavBadge();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rNavBadge();
 }
 
 function rRoute(){
@@ -2295,6 +2303,7 @@ var DASH_CARDS=[
   {key:'weekplan',label:'Weekly Plan'},
   {key:'samples',label:'Sample Follow-Ups'},
   {key:'target',label:'Visit Goal Tracker'},
+  {key:'revtarget',label:'Revenue Targets Behind'},
   {key:'tiercov',label:'Monthly Tier Coverage'}
 ];
 function dashCardHidden(key){
@@ -3010,6 +3019,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Accounts behind their monthly visit target</div>
     <div id="d-target-list"></div>
+  </div>
+  <div class="card" id="d-revtarget-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:var(--green)">&#127919; Revenue Targets Behind Pace</div>
+      <span id="d-revtarget-count" style="background:rgba(0,209,122,.15);color:var(--green);border:1px solid rgba(0,209,122,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Accounts with revenue targets running below expected annual pace</div>
+    <div id="d-revtarget-list"></div>
   </div>
   <div class="card" id="d-samples-card" style="display:none">
     <div class="card-hdr">
@@ -3757,7 +3774,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rTierCoverage();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
 }
 
 function rRoute(){
@@ -10129,6 +10146,46 @@ function rTargetCard(){
      +'<div style="font-size:12px;color:var(--sub)">'+b.done+'/'+b.target+'</div>'
      +'</div>'
      +'<div class="target-bar-track"><div class="target-bar-fill" style="width:'+pct+'%;background:var(--blue)"></div></div>'
+     +'</div>';
+  });
+  if(behind.length>6)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:4px">+'+(behind.length-6)+' more</div>';
+  list.innerHTML=h;
+}
+
+/* ── REVENUE TARGET DASHBOARD CARD ── */
+function rRevTargetCard(){
+  var card=document.getElementById('d-revtarget-card');
+  var list=document.getElementById('d-revtarget-list');
+  var cnt=document.getElementById('d-revtarget-count');
+  if(!card||!list||!cnt)return;
+  if(dashCardHidden('revtarget')){card.style.display='none';return;}
+  var targets=ST.revTargets||{};
+  if(!Object.keys(targets).length){card.style.display='none';return;}
+  // Expected pace: fraction of year elapsed
+  var now=new Date(),dayOfYear=Math.floor((now-new Date(now.getFullYear(),0,0))/864e5);
+  var yearPct=Math.min(100,Math.round(dayOfYear/365*100));
+  var a=allC(),behind=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i],rt=parseInt(targets[c.code]||0);
+    if(!rt)continue;
+    var so=ST.salesOverrides&&ST.salesOverrides[c.code]||{};
+    var ytd=so.sales2526!==undefined?Number(so.sales2526):Number(c.sales2526)||0;
+    var pct=Math.round(ytd/rt*100);
+    if(pct<yearPct-15)behind.push({c:c,ytd:ytd,rt:rt,pct:pct,gap:yearPct-pct});
+  }
+  if(!behind.length){card.style.display='none';return;}
+  behind.sort(function(a,b){return a.pct-b.pct;});
+  cnt.textContent=behind.length;
+  card.style.display='block';
+  var h='<div style="font-size:10px;color:var(--sub);margin-bottom:8px">Year is '+yearPct+'% complete — accounts below '.concat(yearPct-15,'% pace shown</div>');
+  behind.slice(0,6).forEach(function(b){
+    var barColor=b.pct<yearPct-30?'var(--red)':b.pct<yearPct-15?'var(--amber)':'var(--teal)';
+    h+='<div style="margin-bottom:10px;cursor:pointer" onclick="openM(\''+b.c.code+'\')">'
+     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
+     +'<div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(b.c.name)+'</div>'
+     +'<div style="font-size:12px;color:var(--sub)">'+fmt(b.ytd)+' / '+fmt(b.rt)+' ('+b.pct+'%)</div>'
+     +'</div>'
+     +'<div class="target-bar-track"><div class="target-bar-fill" style="width:'+b.pct+'%;background:'+barColor+'"></div></div>'
      +'</div>';
   });
   if(behind.length>6)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:4px">+'+(behind.length-6)+' more</div>';
