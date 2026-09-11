@@ -1621,13 +1621,15 @@ function rRoute(){
     var meta=d>=1000000?'Never':lv&&lv.type==='not_available'?('Retry · '+new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})):(new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+d+'d');
     var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>55?note.slice(0,55)+'…':note)+'</div>':'';
+    var _sa=ST.standingAlerts&&ST.standingAlerts[c.code]?ST.standingAlerts[c.code]:'';
+    var alertHtml=_sa?'<div style="font-size:11px;font-weight:700;color:#f87171;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:2px 7px;margin-top:3px;display:inline-block">&#9888; '+esc(_sa.length>60?_sa.slice(0,60)+'…':_sa)+'</div>':'';
     h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
       '<div class="snum">'+(i+1)+'</div>'+
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
       '<div class="ri">'+
         '<div class="rn">'+(ST.hot[c.code]?'&#9733; ':'')+esc(c.name)+tierBadge(c)+'</div>'+
         '<div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+
-        noteHtml+
+        noteHtml+alertHtml+
         '<div class="rte-acts">'+
           '<button class="vb bv" data-code="'+c.code+'" data-action="vis">&#10003; Done</button>'+
           '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
@@ -3792,13 +3794,15 @@ function rRoute(){
     var meta=d>=1000000?'Never':lv&&lv.type==='not_available'?('Retry · '+new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})):(new Date(lv.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+d+'d');
     var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
     var noteHtml=note?'<div class="rn2">&#128221; '+esc(note.length>55?note.slice(0,55)+'…':note)+'</div>':'';
+    var _sa=ST.standingAlerts&&ST.standingAlerts[c.code]?ST.standingAlerts[c.code]:'';
+    var alertHtml=_sa?'<div style="font-size:11px;font-weight:700;color:#f87171;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:4px;padding:2px 7px;margin-top:3px;display:inline-block">&#9888; '+esc(_sa.length>60?_sa.slice(0,60)+'…':_sa)+'</div>':'';
     h+='<div class="row" data-code="'+c.code+'" data-action="open">'+
       '<div class="snum">'+(i+1)+'</div>'+
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
       '<div class="ri">'+
         '<div class="rn">'+(ST.hot[c.code]?'&#9733; ':'')+esc(c.name)+tierBadge(c)+'</div>'+
         '<div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+
-        noteHtml+
+        noteHtml+alertHtml+
         '<div class="rte-acts">'+
           '<button class="vb bv" data-code="'+c.code+'" data-action="vis">&#10003; Done</button>'+
           '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
