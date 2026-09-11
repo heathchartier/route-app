@@ -7985,6 +7985,7 @@ function rTierCard(){
      +'<div class="cadence-name">'+esc(b.c.name)+'</div>'
      +'<div class="cadence-meta"><span style="background:var(--teal2);color:var(--teal);border-radius:20px;padding:1px 8px;font-size:10px;font-weight:700">'+b.c.tier+'</span></div>'
      +'<div class="cadence-days tier-behind">'+over+'</div>'
+     +'<button onclick="event.stopPropagation();showFollowUpPicker(\''+b.c.code+'\')" style="background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:var(--r2);padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">F/U</button>'
      +'</div>';
   }
   if(behind.length>8)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">+'+(behind.length-8)+' more</div>';
