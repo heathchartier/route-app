@@ -5793,12 +5793,21 @@ function rCallbacksAlert(){
       +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
       +'<div style="font-size:11px;color:var(--sub)">'+esc(c.city||'')+' &bull; Grp '+c.group+'</div></div>'
       +'<span style="font-size:11px;font-weight:700;color:'+lblCol+';flex-shrink:0">'+lbl+'</span>'
+      +'<button onclick="event.stopPropagation();snoozeCallback(\''+c.code+'\',1)" style="background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.3);border-radius:var(--r2);padding:4px 8px;font-size:11px;color:#fb923c;cursor:pointer;font-family:inherit;flex-shrink:0">+1d</button>'
       +'<button onclick="event.stopPropagation();delete ST.followups[\''+c.code+'\'];lSave();syncUp();rDash();" style="background:transparent;border:1px solid var(--border2);border-radius:var(--r2);padding:4px 8px;font-size:11px;color:var(--sub);cursor:pointer;font-family:inherit;flex-shrink:0">Dismiss</button>'
       +'</div>';
   });
   if(due.length>5)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(due.length-5)+' more</div>';
   h+='</div>';
   el.innerHTML=h;
+}
+
+function snoozeCallback(code,days){
+  if(!ST.followups)return;
+  var d=new Date();d.setDate(d.getDate()+(days||1));
+  ST.followups[code]=d.toISOString();
+  lSave();syncUp();rDash();
+  toast('Snoozed to tomorrow');
 }
 
 /* ── TODAY'S ORDERS CARD ── */
