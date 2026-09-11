@@ -11152,7 +11152,10 @@ function rComingDue(){
     h+='<div class="row" data-code="'+item.c.code+'" data-action="open" style="padding:8px 0;border-bottom:1px solid var(--border)">'
       +'<div class="dot" style="background:'+dc(item.c.code)+'"></div>'
       +'<div class="ri"><div class="rn">'+esc(item.c.name)+'</div><div class="rm">'+esc(item.c.city||'')+'</div></div>'
-      +'<div style="font-size:11px;font-weight:700;color:'+uc+';flex-shrink:0">'+lbl+'</div></div>';
+      +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+      +'<div style="font-size:11px;font-weight:700;color:'+uc+'">'+lbl+'</div>'
+      +'<button onclick="event.stopPropagation();mv(\''+item.c.code+'\',\'visited\')" style="background:rgba(0,229,184,.12);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:4px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit">Done</button>'
+      +'</div></div>';
   });
   el.innerHTML=h;
 }
