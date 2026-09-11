@@ -6843,16 +6843,33 @@ function copyEOD(vn,nan,orderTot){
   var a=allC(),today=new Date().toDateString();
   var dateStr=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   var lines=['Daily Route Summary — '+dateStr,'Visited: '+vn+' | Not Available: '+nan+(orderTot?' | Orders: $'+Number(orderTot).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):''),''];
-  var visited=[];
+  var visited=[],notAvail=[],ordersToday=[];
   for(var i=0;i<a.length;i++){
     var logs=ST.visits[a[i].code]||[];
     for(var j=logs.length-1;j>=0;j--){
       if(new Date(logs[j].date).toDateString()!==today)break;
       if(logs[j].type==='visited')visited.push({c:a[i],log:logs[j]});
+      else if(logs[j].type==='not_available')notAvail.push(a[i]);
       break;
     }
+    var ords=ST.orders&&ST.orders[a[i].code]?ST.orders[a[i].code]:[];
+    for(var oi=0;oi<ords.length;oi++){if(new Date(ords[oi].date).toDateString()===today)ordersToday.push({c:a[i],o:ords[oi]});}
   }
-  if(visited.length){lines.push('VISITED:');for(var i=0;i<visited.length;i++){var vv=visited[i],c=vv.c,l=vv.log;var n=ST.notes&&ST.notes[c.code]?'  → '+ST.notes[c.code]:'';var vn2=l.visitNote?'  ✏ '+l.visitNote:'';lines.push('• '+c.name+(c.city?' ('+c.city+')':'')+n+vn2);}lines.push('');}
+  if(visited.length){
+    lines.push('VISITED:');
+    for(var i=0;i<visited.length;i++){var vv=visited[i],c=vv.c,l=vv.log;var n=ST.notes&&ST.notes[c.code]?'  → '+ST.notes[c.code]:'';var vn2=l.visitNote?'  ✏ '+l.visitNote:'';lines.push('• '+c.name+(c.city?' ('+c.city+')':'')+n+vn2);}
+    lines.push('');
+  }
+  if(notAvail.length){
+    lines.push('NOT AVAILABLE:');
+    for(var i=0;i<notAvail.length;i++){lines.push('• '+notAvail[i].name+(notAvail[i].city?' ('+notAvail[i].city+')':''));}
+    lines.push('');
+  }
+  if(ordersToday.length){
+    lines.push('ORDERS:');
+    for(var i=0;i<ordersToday.length;i++){var ot=ordersToday[i];lines.push('• '+ot.c.name+': '+ot.o.item+(ot.o.amount?' ($'+Number(ot.o.amount).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+')':''));}
+    lines.push('');
+  }
   navigator.clipboard.writeText(lines.join('\n')).then(function(){toast('Copied to clipboard');}).catch(function(){toast('Copy failed');});
 }
 
