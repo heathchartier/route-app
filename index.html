@@ -5677,10 +5677,15 @@ function addTodo(code){
   var sh=document.createElement('div');
   sh.id='todo-sheet';
   sh.style.cssText='position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.6);display:flex;align-items:flex-end';
+  var todayStr=new Date().toISOString().split('T')[0];
   sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;margin:0 auto">'
     +'<div style="font-size:16px;font-weight:800;margin-bottom:14px">Add Task</div>'
-    +'<input id="todo-inp" class="fi" type="text" placeholder="e.g. Follow up on quote, Check on order..." style="font-size:15px">'
-    +'<div style="display:flex;gap:8px;margin-top:12px">'
+    +'<input id="todo-inp" class="fi" type="text" placeholder="e.g. Follow up on quote, Check on order..." style="font-size:15px;margin-bottom:10px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Due date <span style="font-size:11px">(optional)</span></span>'
+    +'<input type="date" id="todo-due" class="fi" style="margin:0;width:auto;padding:6px 10px;font-size:13px" min="'+todayStr+'">'
+    +'</div>'
+    +'<div style="display:flex;gap:8px">'
     +'<button onclick="saveTodo(\''+code+'\')" style="flex:1;padding:12px;border-radius:var(--r2);background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">Save Task</button>'
     +'<button onclick="document.getElementById(\'todo-sheet\').remove()" style="padding:12px 16px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);font-family:inherit;font-size:14px;cursor:pointer">Cancel</button>'
     +'</div></div>';
@@ -5694,7 +5699,9 @@ function saveTodo(code){
   if(!text){toast('Enter a task');return;}
   if(!ST.todos)ST.todos={};
   if(!ST.todos[code])ST.todos[code]=[];
-  ST.todos[code].push({text:text,date:new Date().toISOString(),done:false});
+  var dueDateEl=document.getElementById('todo-due');
+  var dueDate=dueDateEl&&dueDateEl.value?dueDateEl.value:null;
+  ST.todos[code].push({text:text,date:new Date().toISOString(),done:false,dueDate:dueDate});
   lSave();syncUp();
   var sh=document.getElementById('todo-sheet');if(sh)sh.remove();
   rTodos(code);rTodoAlert();rNavBadge();
@@ -5719,11 +5726,17 @@ function rTodos(code){
   if(!todos.length){el.innerHTML='<div style="color:var(--sub);font-size:12px">No tasks</div>';return;}
   var h='';
   // open tasks
+  var todStr=new Date().toISOString().split('T')[0];
   todos.forEach(function(t,i){
     if(t.done)return;
-    h+='<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">'
-      +'<button onclick="completeTodo(\''+code+'\','+i+')" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--teal);background:transparent;cursor:pointer;flex-shrink:0;margin-top:1px" title="Mark done"></button>'
-      +'<div style="flex:1;font-size:13px;color:var(--text)">'+esc(t.text)+'</div>'
+    var isOverdue=t.dueDate&&t.dueDate<todStr;
+    var isDueToday=t.dueDate&&t.dueDate===todStr;
+    var dueLbl=isOverdue?'<span style="font-size:10px;font-weight:700;color:var(--red);margin-left:4px">OVERDUE</span>'
+      :isDueToday?'<span style="font-size:10px;font-weight:700;color:var(--amber);margin-left:4px">TODAY</span>'
+      :t.dueDate?'<span style="font-size:10px;color:var(--sub);margin-left:4px">due '+t.dueDate.slice(5).replace('-','/')+'</span>':'';
+    h+='<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)'+(isOverdue?';background:rgba(239,68,68,.04);margin:0 -4px;padding-left:4px;padding-right:4px;border-radius:4px':'')+';">'
+      +'<button onclick="completeTodo(\''+code+'\','+i+')" style="width:20px;height:20px;border-radius:50%;border:2px solid '+(isOverdue?'var(--red)':'var(--teal)')+';background:transparent;cursor:pointer;flex-shrink:0;margin-top:1px" title="Mark done"></button>'
+      +'<div style="flex:1;font-size:13px;color:var(--text)">'+esc(t.text)+dueLbl+'</div>'
       +'<button onclick="deleteTodo(\''+code+'\','+i+')" style="background:transparent;border:none;color:var(--dim);cursor:pointer;font-size:14px;flex-shrink:0">&#10005;</button>'
       +'</div>';
   });
@@ -5744,29 +5757,39 @@ function rTodos(code){
 function rTodoAlert(){
   var el=document.getElementById('d-todo-alert');if(!el)return;
   if(!ST.todos){el.style.display='none';return;}
-  var a=allC(),open=[];
+  var a=allC(),open=[],overdueCount=0;
+  var todStr=new Date().toISOString().split('T')[0];
   a.forEach(function(c){
     var todos=ST.todos[c.code]||[];
-    var openCount=todos.filter(function(t){return !t.done;}).length;
-    if(openCount>0)open.push({c:c,count:openCount});
+    var openTasks=todos.filter(function(t){return !t.done;});
+    if(openTasks.length){
+      var hasOverdue=openTasks.some(function(t){return t.dueDate&&t.dueDate<=todStr;});
+      if(hasOverdue)overdueCount+=openTasks.filter(function(t){return t.dueDate&&t.dueDate<=todStr;}).length;
+      open.push({c:c,count:openTasks.length,hasOverdue:hasOverdue});
+    }
   });
   if(!open.length){el.style.display='none';return;}
-  open.sort(function(a,b){return b.count-a.count;});
+  // overdue customers first, then by task count
+  open.sort(function(a,b){return (b.hasOverdue?1:0)-(a.hasOverdue?1:0)||b.count-a.count;});
   el.style.display='block';
-  var h='<div style="background:rgba(129,140,248,.1);border:1px solid rgba(129,140,248,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:12px">'
-    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#818cf8;margin-bottom:6px">&#9745; Open Tasks</div>';
+  var headerColor=overdueCount?'var(--red)':'#818cf8';
+  var headerBg=overdueCount?'rgba(239,68,68,.1)':'rgba(129,140,248,.1)';
+  var headerBorder=overdueCount?'rgba(239,68,68,.3)':'rgba(129,140,248,.3)';
+  var headerRowBorder=overdueCount?'rgba(239,68,68,.15)':'rgba(129,140,248,.15)';
+  var h='<div style="background:'+headerBg+';border:1px solid '+headerBorder+';border-radius:var(--r2);padding:10px 12px;margin-bottom:12px">'
+    +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:'+headerColor+';margin-bottom:6px">&#9745; Open Tasks'+(overdueCount?' &mdash; '+overdueCount+' overdue':'')+'</div>';
   open.slice(0,5).forEach(function(item){
     var c=item.c;
-    h+='<div onclick="openM(\''+c.code+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(129,140,248,.15);cursor:pointer">'
+    h+='<div onclick="openM(\''+c.code+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid '+headerRowBorder+';cursor:pointer">'
       +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
       +'<div style="font-size:11px;color:var(--sub)">'+esc(c.city||'')+' &bull; Grp '+c.group+'</div></div>'
-      +'<span style="background:rgba(129,140,248,.2);color:#818cf8;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700">'+item.count+'</span>'
+      +(item.hasOverdue?'<span style="font-size:10px;font-weight:700;color:var(--red);flex-shrink:0">OVERDUE</span>':'')
+      +'<span style="background:rgba(129,140,248,.2);color:#818cf8;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700;flex-shrink:0">'+item.count+'</span>'
       +'</div>';
   });
   if(open.length>5)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(open.length-5)+' more</div>';
   h+='</div>';
   el.innerHTML=h;
-  el.querySelectorAll('[onclick]').forEach(function(r){});
 }
 
 /* ── CALLBACKS DUE ALERT ── */
