@@ -6769,7 +6769,7 @@ function showEOD(){
     (ordersToday.length?'<div class="eod-sec">&#128230; Orders ('+ordersToday.length+')</div>'+orderRows:'')+
     (noted.length?'<div class="eod-sec">&#128221; Notes ('+noted.length+')</div>'+notedRows:'')+
     '<button class="eod-copy" onclick="copyEOD('+visited.length+','+notAvail.length+','+orderTotal+')">Copy as Text</button>'+
-    '<button class="eod-copy" style="margin-top:8px;background:rgba(129,140,248,.15);color:#818cf8;border-color:rgba(129,140,248,.3)" onclick="shareEOD(calledToday.length,samplesDropped.length)">&#128279; Share Summary</button>'+
+    '<button class="eod-copy" style="margin-top:8px;background:rgba(129,140,248,.15);color:#818cf8;border-color:rgba(129,140,248,.3)" onclick="shareEOD('+calledToday.length+','+samplesDropped.length+')">&#128279; Share Summary</button>'+
     '<button class="eod-close" onclick="this.closest(\'.eod-sheet\').remove()">Close</button>'+
   '</div>';
   document.body.appendChild(sheet);
