@@ -1484,7 +1484,7 @@ function toast(m){var t=document.getElementById('toast');t.textContent=m;t.class
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
 function ds(code){var v=ST.visits[code];if(!v||!v.length)return 1000000;return Math.floor((Date.now()-new Date(v[v.length-1].date))/864e5);}
 function dc(code){var d=ds(code);return d>=1000000?'#64748b':d<=14?'#10b981':d<=45?'#f59e0b':'#ef4444';}
-function mv(code,type){if(!window._mvD)window._mvD={};var k=code+':'+type;if(window._mvD[k]&&Date.now()-window._mvD[k]<3000)return;window._mvD[k]=Date.now();if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);})}}
+function mv(code,type){if(!window._mvD)window._mvD={};var k=code+':'+type;if(window._mvD[k]&&Date.now()-window._mvD[k]<3000)return;window._mvD[k]=Date.now();if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){var _ratingCb=function(){setTimeout(function(){showCompetitorPrompt(code);},400);};var _alert=ST.standingAlerts&&ST.standingAlerts[code];if(_alert){showStandingAlertBanner(code,_alert,function(){showVisitRating(code,_ratingCb);});}else{showVisitRating(code,_ratingCb);}}}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function allC(){
@@ -3679,7 +3679,7 @@ function toast(m){var t=document.getElementById('toast');t.textContent=m;t.class
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
 function ds(code){var v=ST.visits[code];if(!v||!v.length)return 1000000;return Math.floor((Date.now()-new Date(v[v.length-1].date))/864e5);}
 function dc(code){var d=ds(code);return d>=1000000?'#64748b':d<=14?'#10b981':d<=45?'#f59e0b':'#ef4444';}
-function mv(code,type){if(!window._mvD)window._mvD={};var k=code+':'+type;if(window._mvD[k]&&Date.now()-window._mvD[k]<3000)return;window._mvD[k]=Date.now();if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){showVisitRating(code,function(){setTimeout(function(){showCompetitorPrompt(code);},400);})}}
+function mv(code,type){if(!window._mvD)window._mvD={};var k=code+':'+type;if(window._mvD[k]&&Date.now()-window._mvD[k]<3000)return;window._mvD[k]=Date.now();if(!ST.visits[code])ST.visits[code]=[];ST.visits[code].push({date:new Date().toISOString(),type:type});lSave();syncUp();try{if(navigator.vibrate)navigator.vibrate(type==='visited'?[40]:[20]);}catch(e){}showUndoToast(code,type);trackRecent(code);if(type==='visited'){var _ratingCb=function(){setTimeout(function(){showCompetitorPrompt(code);},400);};var _alert=ST.standingAlerts&&ST.standingAlerts[code];if(_alert){showStandingAlertBanner(code,_alert,function(){showVisitRating(code,_ratingCb);});}else{showVisitRating(code,_ratingCb);}}}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function allC(){
@@ -7411,6 +7411,31 @@ function savePastVisit(code){
   if(sheet)sheet.remove();
   showAllVisits(code);
   toast('Past visit logged');
+}
+
+/* ── STANDING ALERT BANNER (quick-visit flow) ── */
+function showStandingAlertBanner(code,alertText,onDismiss){
+  var existing=document.getElementById('sab-banner');if(existing)existing.remove();
+  var banner=document.createElement('div');
+  banner.id='sab-banner';
+  banner.style.cssText='position:fixed;left:0;right:0;bottom:calc(80px + env(safe-area-inset-bottom,0px));z-index:1050;display:flex;justify-content:center;padding:0 12px;pointer-events:none';
+  banner.innerHTML='<div style="background:#1e1a0e;border:1.5px solid #f59e0b;border-radius:14px;padding:14px 16px;width:100%;max-width:480px;box-shadow:0 4px 24px rgba(0,0,0,.5);pointer-events:auto;display:flex;align-items:flex-start;gap:10px">'
+    +'<div style="font-size:20px;line-height:1;flex-shrink:0">⚠️</div>'
+    +'<div style="flex:1;min-width:0">'
+    +'<div style="font-size:11px;font-weight:700;color:#f59e0b;letter-spacing:.05em;margin-bottom:4px;text-transform:uppercase">Standing Alert</div>'
+    +'<div style="font-size:14px;font-weight:600;color:#fef3c7;line-height:1.35">'+esc(alertText)+'</div>'
+    +'</div>'
+    +'<button id="sab-dismiss" style="background:rgba(245,158,11,.2);color:#f59e0b;border:1px solid rgba(245,158,11,.4);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap">Got it</button>'
+    +'</div>';
+  document.body.appendChild(banner);
+  var timer=setTimeout(dismiss,5000);
+  function dismiss(){
+    clearTimeout(timer);
+    var b=document.getElementById('sab-banner');if(b)b.remove();
+    if(onDismiss){var cb=onDismiss;onDismiss=null;cb();}
+  }
+  var btn=document.getElementById('sab-dismiss');
+  if(btn)btn.addEventListener('click',dismiss);
 }
 
 /* ── DASHBOARD SEARCH ── */
