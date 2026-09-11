@@ -5045,15 +5045,44 @@ document.getElementById('m-retry-today').addEventListener('click',function(){
 });
 document.getElementById('m-hot').addEventListener('click',function(){if(!mC)return;ST.hot[mC]=!ST.hot[mC];lSave();syncUp();this.textContent=ST.hot[mC]?'Remove Hot':'Hot Lead';toast(ST.hot[mC]?'Hot lead set':'Removed');});
 document.getElementById('m-pin').addEventListener('click',function(){if(!mC)return;if(!ST.pinned)ST.pinned={};ST.pinned[mC]=!ST.pinned[mC];if(!ST.pinned[mC])delete ST.pinned[mC];lSave();syncUp();var p=ST.pinned&&ST.pinned[mC];this.textContent=p?'📌 Unpin':'📌 Pin';this.style.background=p?'rgba(99,102,241,.15)':'var(--bg3)';this.style.color=p?'#818cf8':'var(--sub)';this.style.borderColor=p?'rgba(99,102,241,.4)':'var(--border2)';toast(p?'📌 Pinned to top':'Unpinned');rCust();});
-document.getElementById('m-arc').addEventListener('click',function(){if(!mC||!confirm('Archive?'))return;ST.archived[mC]=true;lSave();syncUp();closeM();rCust();rDash();toast('Archived');});
-document.getElementById('m-rem').addEventListener('click',function(){
-  if(!mC)return;var a=allC(),c=null;for(var i=0;i<a.length;i++){if(a[i].code===mC){c=a[i];break;}}
-  if(!confirm('Remove '+(c?c.name:mC)+'?')){return;}
-  var idx=-1;for(var i=0;i<(ST.addedCustomers||[]).length;i++){if(ST.addedCustomers[i].code===mC){idx=i;break;}}
-  if(idx>=0)ST.addedCustomers.splice(idx,1);else{if(!ST.removed)ST.removed={};ST.removed[mC]=true;}
-  delete ST.visits[mC];if(ST.notes)delete ST.notes[mC];if(ST.hot)delete ST.hot[mC];if(ST.archived)delete ST.archived[mC];if(ST.edits)delete ST.edits[mC];
-  lSave();syncUp();closeM();rCust();rDash();rGrps();toast('Removed');
-});
+document.getElementById('m-arc').addEventListener('click',function(){if(!mC)return;confirmArchive(mC);});
+document.getElementById('m-rem').addEventListener('click',function(){if(!mC)return;confirmRemove(mC);});
+function confirmArchive(code){
+  var a=allC(),c=null;for(var i=0;i<a.length;i++){if(a[i].code===code){c=a[i];break;}}
+  var name=c?c.name:code;
+  var existing=document.getElementById('_arc-sheet');if(existing)existing.remove();
+  var sh=document.createElement('div');sh.id='_arc-sheet';
+  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1200;display:flex;align-items:flex-end;justify-content:center';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="text-align:center;font-size:26px;margin-bottom:10px">&#128230;</div>'
+   +'<div style="font-size:17px;font-weight:800;text-align:center;margin-bottom:6px">Archive '+esc(name)+'?</div>'
+   +'<div style="font-size:13px;color:var(--sub);text-align:center;margin-bottom:20px">They\'ll be hidden from your route and lists. All history is kept — you can unarchive from Settings.</div>'
+   +'<div style="display:flex;gap:10px">'
+   +'<button onclick="document.getElementById(\'_arc-sheet\').remove()" style="flex:1;padding:13px;border-radius:var(--r2);background:var(--bg3);color:var(--sub);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2)">Cancel</button>'
+   +'<button onclick="(function(){var _cd=\''+esc(code)+'\';if(!ST.archived)ST.archived={};ST.archived[_cd]=true;lSave();syncUp();document.getElementById(\'_arc-sheet\').remove();closeM();rCust();rDash();toast(\'Archived\');})()" style="flex:1;padding:13px;border-radius:var(--r2);background:rgba(251,146,60,.2);color:#fb923c;border:1px solid rgba(251,146,60,.4);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">Archive</button>'
+   +'</div></div>';
+  sh.addEventListener('click',function(e){if(e.target===sh)sh.remove();});
+  document.body.appendChild(sh);
+}
+function confirmRemove(code){
+  var a=allC(),c=null;for(var i=0;i<a.length;i++){if(a[i].code===code){c=a[i];break;}}
+  var name=c?c.name:code;
+  var existing=document.getElementById('_rem-sheet');if(existing)existing.remove();
+  var sh=document.createElement('div');sh.id='_rem-sheet';
+  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1200;display:flex;align-items:flex-end;justify-content:center';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="text-align:center;font-size:26px;margin-bottom:10px">&#128465;</div>'
+   +'<div style="font-size:17px;font-weight:800;text-align:center;margin-bottom:6px">Remove '+esc(name)+'?</div>'
+   +'<div style="font-size:13px;color:var(--sub);text-align:center;margin-bottom:20px">This removes them from your account. Visit history and notes will be deleted. <strong style="color:var(--red)">Cannot be undone.</strong></div>'
+   +'<div style="display:flex;gap:10px">'
+   +'<button onclick="document.getElementById(\'_rem-sheet\').remove()" style="flex:1;padding:13px;border-radius:var(--r2);background:var(--bg3);color:var(--sub);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2)">Cancel</button>'
+   +'<button onclick="(function(){var cd=\''+esc(code)+'\';var idx=-1;for(var i=0;i<(ST.addedCustomers||[]).length;i++){if(ST.addedCustomers[i].code===cd){idx=i;break;}}if(idx>=0)ST.addedCustomers.splice(idx,1);else{if(!ST.removed)ST.removed={};ST.removed[cd]=true;}delete ST.visits[cd];if(ST.notes)delete ST.notes[cd];if(ST.hot)delete ST.hot[cd];if(ST.archived)delete ST.archived[cd];if(ST.edits)delete ST.edits[cd];lSave();syncUp();document.getElementById(\'_rem-sheet\').remove();closeM();rCust();rDash();rGrps();toast(\'Removed\');})()" style="flex:1;padding:13px;border-radius:var(--r2);background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.35);font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">Remove</button>'
+   +'</div></div>';
+  sh.addEventListener('click',function(e){if(e.target===sh)sh.remove();});
+  document.body.appendChild(sh);
+}
 document.getElementById('m-rte').addEventListener('click',function(){
   if(!mC)return;var a=allC(),c=null;
   for(var i=0;i<a.length;i++){if(a[i].code===mC){c=a[i];break;}}
