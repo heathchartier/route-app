@@ -9090,14 +9090,14 @@ function rBirthdayAlert(){
           var parts=ct.birthday.split('-');
           if(parts.length>=2){
             var days=daysUntilDate(parseInt(parts[0]),parseInt(parts[1]));
-            if(days<=7)alerts.push({type:'birthday',name:ct.name,company:c.name,code:c.code,days:days});
+            if(days<=7)alerts.push({type:'birthday',name:ct.name,company:c.name,code:c.code,days:days,phone:ct.phone||null});
           }
         }
         if(ct.anniversary){
           var parts2=ct.anniversary.split('-');
           if(parts2.length>=2){
             var days2=daysUntilDate(parseInt(parts2[0]),parseInt(parts2[1]));
-            if(days2<=7)alerts.push({type:'anniversary',name:ct.name,company:c.name,code:c.code,days:days2});
+            if(days2<=7)alerts.push({type:'anniversary',name:ct.name,company:c.name,code:c.code,days:days2,phone:ct.phone||null});
           }
         }
       }
@@ -9114,6 +9114,7 @@ function rBirthdayAlert(){
       +'<div style="font-size:18px;flex-shrink:0;width:28px">'+icon+'</div>'
       +'<div class="ri"><div class="rn" style="font-size:13px">'+esc(al.name)+' <span style="color:var(--sub);font-weight:400">at '+esc(al.company)+'</span></div>'
       +'<div class="rm" style="color:var(--amber)">'+(al.type==='birthday'?'Birthday':'Anniversary')+' — '+lbl+'</div></div>'
+      +(al.phone?'<button onclick="event.stopPropagation();logCall(\''+al.code+'\',\''+esc(al.phone)+'\')" style="background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:var(--r2);padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">Call</button>':'')
     +'</div>';
   });
   h+='</div>';
