@@ -800,6 +800,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Accounts with revenue targets running below expected annual pace</div>
     <div id="d-revtarget-list"></div>
   </div>
+  <div class="card" id="d-prodreq-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:#c084fc">&#128230; Pending Product Requests</div>
+      <span id="d-prodreq-count" style="background:rgba(192,132,252,.15);color:#c084fc;border:1px solid rgba(192,132,252,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Products customers have asked for that haven't been filled yet</div>
+    <div id="d-prodreq-list"></div>
+  </div>
   <div class="card" id="d-samples-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128230; Sample Follow-Ups</div>
@@ -1593,7 +1601,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rNavBadge();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rNavBadge();
 }
 
 function rRoute(){
@@ -2305,6 +2313,7 @@ var DASH_CARDS=[
   {key:'samples',label:'Sample Follow-Ups'},
   {key:'target',label:'Visit Goal Tracker'},
   {key:'revtarget',label:'Revenue Targets Behind'},
+  {key:'prodreq',label:'Pending Product Requests'},
   {key:'tiercov',label:'Monthly Tier Coverage'}
 ];
 function dashCardHidden(key){
@@ -3028,6 +3037,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     </div>
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Accounts with revenue targets running below expected annual pace</div>
     <div id="d-revtarget-list"></div>
+  </div>
+  <div class="card" id="d-prodreq-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:#c084fc">&#128230; Pending Product Requests</div>
+      <span id="d-prodreq-count" style="background:rgba(192,132,252,.15);color:#c084fc;border:1px solid rgba(192,132,252,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Products customers have asked for that haven't been filled yet</div>
+    <div id="d-prodreq-list"></div>
   </div>
   <div class="card" id="d-samples-card" style="display:none">
     <div class="card-hdr">
@@ -3775,7 +3792,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
 }
 
 function rRoute(){
@@ -10233,6 +10250,39 @@ function rRevTargetCard(){
      +'</div>';
   });
   if(behind.length>6)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:4px">+'+(behind.length-6)+' more</div>';
+  list.innerHTML=h;
+}
+
+function rProductReqCard(){
+  var card=document.getElementById('d-prodreq-card');
+  var list=document.getElementById('d-prodreq-list');
+  var cnt=document.getElementById('d-prodreq-count');
+  if(!card||!list||!cnt)return;
+  if(dashCardHidden('prodreq')){card.style.display='none';return;}
+  if(!ST.productReqs||!Object.keys(ST.productReqs).length){card.style.display='none';return;}
+  var a=allC(),pending=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i],reqs=ST.productReqs[c.code]||[];
+    var open=reqs.filter(function(r){return r.status!=='filled';});
+    if(open.length)pending.push({c:c,reqs:open});
+  }
+  if(!pending.length){card.style.display='none';return;}
+  pending.sort(function(a,b){return(b.c.lifetimeSales||0)-(a.c.lifetimeSales||0);});
+  var totalReqs=0;pending.forEach(function(p){totalReqs+=p.reqs.length;});
+  cnt.textContent=totalReqs;
+  card.style.display='block';
+  var h='';
+  pending.slice(0,8).forEach(function(p){
+    h+='<div style="padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openM(\''+p.c.code+'\')">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--text)">'+esc(p.c.name)+'</div>'
+      +'<div style="margin-top:3px;display:flex;flex-wrap:wrap;gap:4px">';
+    p.reqs.slice(0,3).forEach(function(r){
+      h+='<span style="background:rgba(192,132,252,.12);color:#c084fc;border:1px solid rgba(192,132,252,.25);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:600">'+esc(r.product.length>25?r.product.slice(0,25)+'…':r.product)+'</span>';
+    });
+    if(p.reqs.length>3)h+='<span style="font-size:11px;color:var(--sub)">+'+( p.reqs.length-3)+' more</span>';
+    h+='</div></div>';
+  });
+  if(pending.length>8)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">+'+(pending.length-8)+' more accounts</div>';
   list.innerHTML=h;
 }
 
