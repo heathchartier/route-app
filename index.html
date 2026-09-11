@@ -7412,7 +7412,7 @@ function showDashSearch(){
   sheet.id='dash-search-sheet';
   sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;display:flex;flex-direction:column;justify-content:flex-start;padding-top:60px;';
   sheet.innerHTML='<div style="background:var(--bg2);margin:0 16px;border-radius:16px;padding:16px;max-height:80vh;display:flex;flex-direction:column">'
-    +'<input id="dss-inp" type="text" placeholder="Search customers..." autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:11px 14px;font-size:15px;font-family:inherit;outline:none;margin-bottom:10px">'
+    +'<input id="dss-inp" type="text" placeholder="Search by name, city, or note..." autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:11px 14px;font-size:15px;font-family:inherit;outline:none;margin-bottom:10px">'
     +'<div id="dss-res" style="overflow-y:auto;flex:1"></div>'
     +'<button onclick="document.getElementById(\'dash-search-sheet\').remove()" style="width:100%;margin-top:10px;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
     +'</div>';
@@ -7424,12 +7424,36 @@ function showDashSearch(){
     var q=this.value.toLowerCase().trim();
     var res=document.getElementById('dss-res');
     if(!q){res.innerHTML='';return;}
-    var all=allC(),hits=all.filter(function(c){return(c.name||'').toLowerCase().includes(q)||(c.code||'').toLowerCase().includes(q)||(c.city||'').toLowerCase().includes(q);}).slice(0,20);
-    res.innerHTML=hits.length?hits.map(function(c){
-      var d=ds(c.code);var dTxt=d===null?'Never':d===0?'Today':d+'d ago';
-      return'<div onclick="document.getElementById(\'dash-search-sheet\').remove();openM(\''+c.code+'\')" style="display:flex;justify-content:space-between;align-items:center;padding:11px 4px;border-bottom:1px solid var(--border);cursor:pointer">'
+    var all=allC();
+    var scored=[];
+    all.forEach(function(c){
+      var nameMatch=(c.name||'').toLowerCase().includes(q);
+      var codeMatch=(c.code||'').toLowerCase().includes(q);
+      var cityMatch=(c.city||'').toLowerCase().includes(q);
+      var note=ST.notes&&ST.notes[c.code]?ST.notes[c.code]:'';
+      var noteMatch=note.toLowerCase().includes(q);
+      var histMatch=false;var histSnip='';
+      if(!noteMatch&&ST.noteHistory&&ST.noteHistory[c.code]){
+        var nh=ST.noteHistory[c.code];
+        for(var ni=nh.length-1;ni>=0;ni--){
+          if((nh[ni].text||'').toLowerCase().includes(q)){histMatch=true;histSnip=nh[ni].text;break;}
+        }
+      }
+      if(nameMatch||codeMatch||cityMatch||noteMatch||histMatch){
+        var snip=noteMatch?note:(histMatch?histSnip:'');
+        scored.push({c:c,primary:nameMatch||codeMatch,noteSnip:snip});
+      }
+    });
+    scored.sort(function(a,b){return (b.primary?1:0)-(a.primary?1:0);});
+    var hits=scored.slice(0,20);
+    res.innerHTML=hits.length?hits.map(function(item){
+      var c=item.c;var d=ds(c.code);var dTxt=d===null||d>=1000000?'Never':d===0?'Today':d+'d ago';
+      var snipHtml=item.noteSnip?'<div style="font-size:11px;color:var(--sub);margin-top:2px;font-style:italic">&#128203; '+esc(item.noteSnip.length>80?item.noteSnip.slice(0,80)+'…':item.noteSnip)+'</div>':'';
+      return'<div onclick="document.getElementById(\'dash-search-sheet\').remove();openM(\''+esc(c.code)+'\')" style="padding:11px 4px;border-bottom:1px solid var(--border);cursor:pointer">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
         +'<div><div style="font-size:14px;font-weight:600">'+esc(c.name)+'</div><div style="font-size:12px;color:var(--sub)">'+esc(c.city||'')+' &bull; Grp '+c.group+'</div></div>'
-        +'<div style="font-size:12px;color:var(--sub);flex-shrink:0">'+dTxt+'</div>'
+        +'<div style="font-size:12px;color:var(--sub);flex-shrink:0;margin-left:8px">'+dTxt+'</div>'
+        +'</div>'+snipHtml
         +'</div>';
     }).join(''):'<div style="color:var(--sub);font-size:13px;padding:12px 4px">No results</div>';
   });
