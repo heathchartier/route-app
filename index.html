@@ -6694,7 +6694,7 @@ function confirmPriceImport(){
 
 function showEOD(){
   var a=allC(),today=new Date().toDateString();
-  var visited=[],notAvail=[],noted=[],calledToday=[],samplesDropped=[];
+  var visited=[],notAvail=[],noted=[],calledToday=[],samplesDropped=[],ordersToday=[],orderTotal=0;
   for(var i=0;i<a.length;i++){
     var c=a[i],logs=ST.visits[c.code]||[];
     for(var j=logs.length-1;j>=0;j--){
@@ -6705,6 +6705,8 @@ function showEOD(){
       break;
     }
     var samps=ST.samples&&ST.samples[c.code]?ST.samples[c.code]:[];for(var si=0;si<samps.length;si++){if(new Date(samps[si].date).toDateString()===today)samplesDropped.push({c:c,s:samps[si]});}
+    var ords=ST.orders&&ST.orders[c.code]?ST.orders[c.code]:[];
+    for(var oi=0;oi<ords.length;oi++){if(new Date(ords[oi].date).toDateString()===today){ordersToday.push({c:c,o:ords[oi]});orderTotal+=Number(ords[oi].amount)||0;}}
   }
   for(var code in ST.notes){
     if(ST.notes[code]){
@@ -6724,10 +6726,14 @@ function showEOD(){
   var notedRows=noted.map(function(x){
     return '<div class="eod-row"><div class="eod-dot" style="background:var(--amber)"></div><div><div class="eod-name">'+esc(x.c.name)+'</div><div class="eod-note">'+esc(x.note)+'</div></div></div>';
   }).join('');
+  var orderRows=ordersToday.map(function(x){
+    return '<div class="eod-row"><div class="eod-dot" style="background:var(--green)"></div><div><div class="eod-name">'+esc(x.c.name)+'</div><div class="eod-note" style="color:var(--green);font-weight:700">'+esc(x.o.item)+(x.o.amount?' · $'+Number(x.o.amount).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'')+'</div></div></div>';
+  }).join('');
   sheet.innerHTML='<div class="eod-inner">'+
     '<div class="eod-handle"></div>'+
     '<div class="eod-title">End of Day</div>'+
     '<div class="eod-sub">'+dateStr+'</div>'+
+    (orderTotal>0?'<div style="background:rgba(0,209,122,.1);border:1px solid rgba(0,209,122,.25);border-radius:var(--r2);padding:10px 14px;margin-bottom:12px;text-align:center"><div style="font-size:12px;color:var(--sub);margin-bottom:2px">Orders logged today</div><div style="font-size:26px;font-weight:800;color:var(--green)">$'+orderTotal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div></div>':'')+
     '<div style="display:flex;gap:16px;margin-bottom:4px">'+
       '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green)">'+visited.length+'</div><div style="font-size:11px;color:var(--sub)">Visited</div></div>'+
       '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--amber)">'+notAvail.length+'</div><div style="font-size:11px;color:var(--sub)">Not Avail</div></div>'+
@@ -6736,6 +6742,7 @@ function showEOD(){
     '</div>'+
     (visited.length?'<div class="eod-sec">&#10003; Visited ('+visited.length+')</div>'+rows(visited,'#10b981'):'<div class="eod-sec" style="color:var(--sub)">No visits logged today</div>')+
     (notAvail.length?'<div class="eod-sec">&#9711; Not Available ('+notAvail.length+')</div>'+rows(notAvail,'#f59e0b'):'')+
+    (ordersToday.length?'<div class="eod-sec">&#128230; Orders ('+ordersToday.length+')</div>'+orderRows:'')+
     (noted.length?'<div class="eod-sec">&#128221; Notes ('+noted.length+')</div>'+notedRows:'')+
     '<button class="eod-copy" onclick="copyEOD('+visited.length+','+notAvail.length+')">Copy as Text</button>'+
     '<button class="eod-copy" style="margin-top:8px;background:rgba(129,140,248,.15);color:#818cf8;border-color:rgba(129,140,248,.3)" onclick="shareEOD(calledToday.length,samplesDropped.length)">&#128279; Share Summary</button>'+
