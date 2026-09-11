@@ -7133,11 +7133,24 @@ function rWeekGoal(){
 }
 function promptGoal(){
   var cur=ST.weeklyGoal||30;
-  var v=prompt('Weekly visit goal (current: '+cur+'):',String(cur));
-  if(v===null)return;
-  var n=parseInt(v);
-  if(isNaN(n)||n<1){toast('Invalid goal');return;}
-  ST.weeklyGoal=n;lSave();rWeekGoal();toast('Goal set to '+n);
+  var existing=document.getElementById('goal-sheet');if(existing)existing.remove();
+  var sh=document.createElement('div');sh.id='goal-sheet';
+  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;align-items:flex-end;justify-content:center';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:400px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))">'
+    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+    +'<div style="font-size:16px;font-weight:800;margin-bottom:14px">&#127919; Weekly Visit Goal</div>'
+    +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">'
+    +'<button onclick="var i=document.getElementById(\'goal-inp\');var v=Math.max(1,(parseInt(i.value)||30)-5);i.value=v" style="width:44px;height:44px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:20px;font-weight:700;cursor:pointer;flex-shrink:0">−</button>'
+    +'<input id="goal-inp" type="number" inputmode="numeric" min="1" max="200" value="'+cur+'" style="flex:1;text-align:center;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:10px;color:var(--text);font-family:inherit;font-size:22px;font-weight:800">'
+    +'<button onclick="var i=document.getElementById(\'goal-inp\');i.value=Math.min(200,(parseInt(i.value)||30)+5)" style="width:44px;height:44px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:20px;font-weight:700;cursor:pointer;flex-shrink:0">+</button>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="var n=parseInt(document.getElementById(\'goal-inp\').value);if(!isNaN(n)&&n>=1){ST.weeklyGoal=n;lSave();rWeekGoal();toast(\'Goal set to \'+n);}document.getElementById(\'goal-sheet\').remove();" style="flex:1;padding:12px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none">Save</button>'
+    +'<button onclick="document.getElementById(\'goal-sheet\').remove()" style="padding:12px 18px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);font-size:14px;cursor:pointer;font-family:inherit">Cancel</button>'
+    +'</div></div>';
+  sh.addEventListener('click',function(e){if(e.target===sh)sh.remove();});
+  document.body.appendChild(sh);
+  setTimeout(function(){var i=document.getElementById('goal-inp');if(i){i.focus();i.select();}},50);
 }
 
 // ── COVERAGE MAP ─────────────────────────────────────────────────────────
