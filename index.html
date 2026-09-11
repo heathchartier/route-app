@@ -5817,11 +5817,28 @@ function rTodoAlert(){
     +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:'+headerColor+';margin-bottom:6px">&#9745; Open Tasks'+(overdueCount?' &mdash; '+overdueCount+' overdue':'')+'</div>';
   open.slice(0,5).forEach(function(item){
     var c=item.c;
-    h+='<div onclick="openM(\''+c.code+'\')" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid '+headerRowBorder+';cursor:pointer">'
-      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div>'
-      +'<div style="font-size:11px;color:var(--sub)">'+esc(c.city||'')+' &bull; Grp '+c.group+'</div></div>'
+    var todos=ST.todos[c.code]||[];
+    // Find the first actionable task (overdue/today first, then any open)
+    var topTask=null,topIdx=-1;
+    for(var ti=0;ti<todos.length;ti++){
+      if(todos[ti].done)continue;
+      var t=todos[ti];
+      var isUrgent=t.dueDate&&t.dueDate<=todStr;
+      if(isUrgent&&!topTask){topTask=t;topIdx=ti;}
+      if(!topTask){topTask=t;topIdx=ti;}
+      if(topTask&&!topTask.dueDate&&isUrgent){topTask=t;topIdx=ti;}
+    }
+    var remaining=item.count-(topTask?1:0);
+    h+='<div style="padding:6px 0;border-bottom:1px solid '+headerRowBorder+'">'
+      +'<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="openM(\''+c.code+'\')">'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+esc(c.name)+'</div></div>'
       +(item.hasOverdue?'<span style="font-size:10px;font-weight:700;color:var(--red);flex-shrink:0">OVERDUE</span>':'')
-      +'<span style="background:rgba(129,140,248,.2);color:#818cf8;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700;flex-shrink:0">'+item.count+'</span>'
+      +(remaining>0?'<span style="background:rgba(129,140,248,.2);color:#818cf8;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700;flex-shrink:0">+'+remaining+'</span>':'')
+      +'</div>'
+      +(topTask?'<div style="display:flex;align-items:center;gap:6px;margin-top:3px">'
+        +'<button onclick="event.stopPropagation();completeTodo(\''+esc(c.code)+'\','+topIdx+');rDash()" style="width:18px;height:18px;border-radius:50%;border:2px solid '+(topTask.dueDate&&topTask.dueDate<=todStr?'var(--red)':'var(--teal)')+';background:transparent;cursor:pointer;flex-shrink:0" title="Mark done"></button>'
+        +'<div style="font-size:12px;color:var(--sub);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(topTask.text)+'</div>'
+        +'</div>':'')
       +'</div>';
   });
   if(open.length>5)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(open.length-5)+' more</div>';
