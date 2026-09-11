@@ -7714,7 +7714,10 @@ function rCompetitorCard(){
     return'<div class="comp-row" onclick="openM(\''+c.code+'\')">'
       +'<div style="flex:1;min-width:0"><div class="comp-name">'+esc(c.name)+'</div>'
       +'<div class="comp-meta">'+esc(c.city||'')+' &bull; Last: '+dTxt+'</div></div>'
-      +'<div class="comp-tag">'+esc(cv.length>22?cv.slice(0,22)+'...':cv)+'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+      +'<div class="comp-tag">'+esc(cv.length>18?cv.slice(0,18)+'...':cv)+'</div>'
+      +'<button onclick="event.stopPropagation();showFollowUpPicker(\''+c.code+'\')" style="background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:var(--r2);padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit">F/U</button>'
+      +'</div>'
       +'</div>';
   }).join('')+(comp.length>8?'<div style="font-size:11px;color:var(--sub);text-align:center;padding-top:8px">+'+(comp.length-8)+' more</div>':'');
 }
