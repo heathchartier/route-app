@@ -8336,7 +8336,8 @@ function rOrders(code){
   var el=document.getElementById('m-orders-list');if(!el)return;
   var orders=ST.orders&&ST.orders[code]?ST.orders[code]:[];
   if(!orders.length){el.innerHTML='<div style="color:var(--sub);font-size:12px">No orders yet</div>';return;}
-  var h='';
+  var totalAmt=0;for(var k=0;k<orders.length;k++){if(orders[k].amount)totalAmt+=Number(orders[k].amount)||0;}
+  var h=totalAmt>0?'<div style="background:rgba(0,209,122,.08);border:1px solid rgba(0,209,122,.2);border-radius:var(--r2);padding:6px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--sub)">'+orders.length+' order'+(orders.length!==1?'s':'')+' logged</span><span style="font-size:13px;font-weight:800;color:var(--green)">$'+totalAmt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' total</span></div>':'';
   var recent=orders.slice().reverse().slice(0,8);
   for(var i=0;i<recent.length;i++){
     var o=recent[i];
