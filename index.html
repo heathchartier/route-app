@@ -888,6 +888,8 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="chip" data-f="tier_c">C Tier</button>
       <button class="chip" data-f="tagged">Tagged</button>
       <button class="chip" data-f="called">Called Today</button>
+      <button class="chip" data-f="open_quote">Open Quote</button>
+      <button class="chip" data-f="callback_due">Callback Due</button>
       <button class="chip" id="bytag-chip" onclick="showTagFilterPicker(this)">By Tag &#9660;</button>
     </div>
     <div id="tag-picker-row" style="display:none;padding:4px 16px 8px;flex-wrap:wrap;gap:6px"></div>
@@ -1785,6 +1787,8 @@ function rCust(){
     else if(cF==='tagged'){if(!ST.tags||!ST.tags[c.code]||!ST.tags[c.code].length)continue;}
     else if(cF.length>4&&cF.slice(0,4)==='tag:'){var _tn=cF.slice(4);if(!ST.tags||!ST.tags[c.code]||ST.tags[c.code].indexOf(_tn)===-1)continue;}
     else if(cF==='called'){var todayStr=new Date().toDateString();var logs=ST.visits[c.code]||[];var calledToday=false;for(var ci=logs.length-1;ci>=0;ci--){if(new Date(logs[ci].date).toDateString()!==todayStr)break;if(logs[ci].type==='called'){calledToday=true;break;}}if(!calledToday)continue;}
+    else if(cF==='open_quote'){var hasOpenQ=false;if(ST.quotes){var _qks=Object.keys(ST.quotes);for(var _qi=0;_qi<_qks.length;_qi++){if(ST.quotes[_qks[_qi]].code===c.code&&ST.quotes[_qks[_qi]].status==='open'){hasOpenQ=true;break;}}}if(!hasOpenQ)continue;}
+    else if(cF==='callback_due'){var _cbDate=ST.followups&&ST.followups[c.code];var _cbToday=new Date().toISOString().split('T')[0];if(!_cbDate||_cbDate.split('T')[0]>_cbToday)continue;}
     f.push(c);
   }
   fc=f;
@@ -3126,6 +3130,8 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button class="chip" data-f="tier_c">C Tier</button>
       <button class="chip" data-f="tagged">Tagged</button>
       <button class="chip" data-f="called">Called Today</button>
+      <button class="chip" data-f="open_quote">Open Quote</button>
+      <button class="chip" data-f="callback_due">Callback Due</button>
       <button class="chip" id="bytag-chip" onclick="showTagFilterPicker(this)">By Tag &#9660;</button>
     </div>
     <div id="tag-picker-row" style="display:none;padding:4px 16px 8px;flex-wrap:wrap;gap:6px"></div>
@@ -3986,6 +3992,8 @@ function rCust(){
     else if(cF==='tagged'){if(!ST.tags||!ST.tags[c.code]||!ST.tags[c.code].length)continue;}
     else if(cF.length>4&&cF.slice(0,4)==='tag:'){var _tn=cF.slice(4);if(!ST.tags||!ST.tags[c.code]||ST.tags[c.code].indexOf(_tn)===-1)continue;}
     else if(cF==='called'){var todayStr=new Date().toDateString();var logs=ST.visits[c.code]||[];var calledToday=false;for(var ci=logs.length-1;ci>=0;ci--){if(new Date(logs[ci].date).toDateString()!==todayStr)break;if(logs[ci].type==='called'){calledToday=true;break;}}if(!calledToday)continue;}
+    else if(cF==='open_quote'){var hasOpenQ=false;if(ST.quotes){var _qks=Object.keys(ST.quotes);for(var _qi=0;_qi<_qks.length;_qi++){if(ST.quotes[_qks[_qi]].code===c.code&&ST.quotes[_qks[_qi]].status==='open'){hasOpenQ=true;break;}}}if(!hasOpenQ)continue;}
+    else if(cF==='callback_due'){var _cbDate=ST.followups&&ST.followups[c.code];var _cbToday=new Date().toISOString().split('T')[0];if(!_cbDate||_cbDate.split('T')[0]>_cbToday)continue;}
     f.push(c);
   }
   fc=f;
