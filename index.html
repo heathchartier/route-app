@@ -11738,8 +11738,10 @@ function toggleProductReq(code,idx){
   if(!ST.productReqs||!ST.productReqs[code])return;
   var r=ST.productReqs[code][idx];
   r.status=r.status==='filled'?'open':'filled';
+  if(r.status==='filled')toast('Marked filled');
   lSave();syncUp();
   rProductRequests(code);
+  rProductReqCard();
 }
 function deleteProductReq(code,idx){
   if(!ST.productReqs||!ST.productReqs[code])return;
