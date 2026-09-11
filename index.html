@@ -7259,7 +7259,38 @@ function _visitLogRow(code,l,i){
   var typeHtml=l.type==='visited'?('Visited'+(l.rating?' '+(l.rating==='cold'?'&#128528;':l.rating==='neutral'?'&#128578;':'&#128293;'):'')):l.type==='called'?('&#128222; '+(l.outcome==='reached'?'Called - Reached':l.outcome==='voicemail'?'Called - Voicemail':l.outcome==='noanswer'?'Called - No Answer':'Called')+(l.callNote?'<div style="font-size:11px;color:var(--sub);margin-top:2px">'+esc(l.callNote)+'</div>':'')):'Not Available';
   var col=l.type==='visited'?'#10b981':l.type==='called'?'#818cf8':'#f59e0b';
   var noteHtml=l.visitNote?'<div style="font-size:11px;color:var(--sub);margin-top:2px;font-style:italic">'+esc(l.visitNote.length>100?l.visitNote.slice(0,100)+'…':l.visitNote)+'</div>':'';
-  return'<div class="li" style="display:flex;align-items:center;gap:4px"><div style="flex:1"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+col+'">'+typeHtml+'</div>'+noteHtml+'</div><button onclick="deleteVisitEntry(\''+esc(code)+'\','+i+')" style="background:transparent;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:4px 6px;flex-shrink:0;line-height:1" title="Delete entry">&#10005;</button></div>';
+  return'<div class="li" style="display:flex;align-items:center;gap:4px"><div style="flex:1"><div class="ld">'+new Date(l.date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div><div class="ls" style="color:'+col+'">'+typeHtml+'</div>'+noteHtml+'</div>'
+   +'<button onclick="editVisitNote(\''+esc(code)+'\','+i+')" style="background:transparent;border:none;color:var(--sub);font-size:12px;cursor:pointer;padding:4px 6px;flex-shrink:0;line-height:1" title="Add/edit note">&#128221;</button>'
+   +'<button onclick="deleteVisitEntry(\''+esc(code)+'\','+i+')" style="background:transparent;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:4px 6px;flex-shrink:0;line-height:1" title="Delete entry">&#10005;</button></div>';
+}
+function editVisitNote(code,idx){
+  var logs=ST.visits&&ST.visits[code]?ST.visits[code]:[];
+  if(idx<0||idx>=logs.length)return;
+  var cur=logs[idx].visitNote||'';
+  var existing=document.getElementById('evn-sheet');if(existing)existing.remove();
+  var sheet=document.createElement('div');sheet.id='evn-sheet';
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">Visit Note</div>'
+   +'<div style="font-size:13px;color:var(--sub);margin-bottom:14px">'+new Date(logs[idx].date).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})+'</div>'
+   +'<textarea id="evn-inp" rows="4" placeholder="Add a note about this visit..." style="width:100%;box-sizing:border-box;padding:11px 13px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;outline:none;resize:none;margin-bottom:14px">'+esc(cur)+'</textarea>'
+   +'<div style="display:flex;gap:10px">'
+   +'<button onclick="document.getElementById(\'evn-sheet\').remove()" style="flex:1;padding:13px;border-radius:var(--r2);background:var(--bg3);color:var(--sub);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2)">Cancel</button>'
+   +'<button onclick="saveVisitNote(\''+esc(code)+'\','+idx+')" style="flex:2;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none">Save</button>'
+   +'</div></div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+  setTimeout(function(){var ta=document.getElementById('evn-inp');if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}},80);
+}
+function saveVisitNote(code,idx){
+  var logs=ST.visits&&ST.visits[code]?ST.visits[code]:[];
+  if(idx<0||idx>=logs.length)return;
+  var note=((document.getElementById('evn-inp')||{}).value||'').trim();
+  if(note)logs[idx].visitNote=note;else delete logs[idx].visitNote;
+  lSave();syncUp();
+  var sheet=document.getElementById('evn-sheet');if(sheet)sheet.remove();
+  showAllVisits(code);toast(note?'Note saved':'Note removed');
 }
 function showAllVisits(code){
   var logs=ST.visits[code]||[];
@@ -8515,6 +8546,7 @@ function rOrders(code){
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
         +'<div style="font-size:13px;font-weight:600;flex:1;color:var(--text)">'+esc(o.item)+'</div>'
         +(o.amount?'<div style="font-size:13px;font-weight:800;color:var(--green);flex-shrink:0">$'+o.amount.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>':'')
+        +'<button onclick="editOrder(\''+esc(code)+'\','+origIdx+')" style="background:transparent;border:none;color:var(--sub);font-size:13px;cursor:pointer;padding:2px 4px;flex-shrink:0" title="Edit order">&#9998;</button>'
         +'<button onclick="deleteOrder(\''+esc(code)+'\','+origIdx+')" style="background:transparent;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 4px;flex-shrink:0" title="Delete order">&#10005;</button>'
       +'</div>'
       +(o.note?'<div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(o.note)+'</div>':'')
@@ -8534,6 +8566,44 @@ function deleteOrder(code,idx){
   lSave();syncUp();
   rOrders(code);
 }
+function editOrder(code,idx){
+  var arr=ST.orders&&ST.orders[code]?ST.orders[code]:[];
+  if(idx<0||idx>=arr.length)return;
+  var o=arr[idx];
+  var existing=document.getElementById('edit-order-sheet');if(existing)existing.remove();
+  var sheet=document.createElement('div');sheet.id='edit-order-sheet';
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;display:flex;align-items:flex-end;justify-content:center';
+  var fi='width:100%;box-sizing:border-box;padding:11px 13px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:10px;outline:none';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:14px">Edit Order</div>'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Description</div>'
+   +'<input id="eo-item" type="text" value="'+esc(o.item||'')+'" style="'+fi+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Amount ($)</div>'
+   +'<input id="eo-amt" type="number" min="0" step="0.01" value="'+(o.amount||'')+'" style="'+fi+'">'
+   +'<div style="font-size:12px;color:var(--sub);margin-bottom:4px">Note (optional)</div>'
+   +'<input id="eo-note" type="text" value="'+esc(o.note||'')+'" placeholder="Optional note" style="'+fi+'margin-bottom:16px">'
+   +'<div style="display:flex;gap:10px">'
+   +'<button onclick="document.getElementById(\'edit-order-sheet\').remove()" style="flex:1;padding:13px;border-radius:var(--r2);background:var(--bg3);color:var(--sub);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2)">Cancel</button>'
+   +'<button onclick="saveEditOrder(\''+esc(code)+'\','+idx+')" style="flex:2;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:none">Save</button>'
+   +'</div></div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+  setTimeout(function(){var inp=document.getElementById('eo-item');if(inp)inp.focus();},80);
+}
+function saveEditOrder(code,idx){
+  var arr=ST.orders&&ST.orders[code]?ST.orders[code]:[];
+  if(idx<0||idx>=arr.length)return;
+  var item=(document.getElementById('eo-item')||{}).value||'';
+  var amt=parseFloat((document.getElementById('eo-amt')||{}).value||'');
+  var note=((document.getElementById('eo-note')||{}).value||'').trim();
+  if(!item.trim()){toast('Description required');return;}
+  arr[idx]=Object.assign({},arr[idx],{item:item.trim(),amount:isNaN(amt)?arr[idx].amount:amt,note:note||undefined});
+  if(!arr[idx].note)delete arr[idx].note;
+  lSave();syncUp();
+  var sheet=document.getElementById('edit-order-sheet');if(sheet)sheet.remove();
+  rOrders(code);toast('Order updated');
+}
 function showAllOrders(code){
   var el=document.getElementById('m-orders-list');if(!el)return;
   var orders=ST.orders&&ST.orders[code]?ST.orders[code]:[];
@@ -8548,6 +8618,7 @@ function showAllOrders(code){
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
         +'<div style="font-size:13px;font-weight:600;flex:1;color:var(--text)">'+esc(o.item)+'</div>'
         +(o.amount?'<div style="font-size:13px;font-weight:800;color:var(--green);flex-shrink:0">$'+o.amount.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div>':'')
+        +'<button onclick="editOrder(\''+esc(code)+'\','+origIdx+')" style="background:transparent;border:none;color:var(--sub);font-size:13px;cursor:pointer;padding:2px 4px;flex-shrink:0" title="Edit order">&#9998;</button>'
         +'<button onclick="deleteOrder(\''+esc(code)+'\','+origIdx+')" style="background:transparent;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 4px;flex-shrink:0" title="Delete order">&#10005;</button>'
       +'</div>'
       +(o.note?'<div style="font-size:12px;color:var(--sub);margin-top:2px">'+esc(o.note)+'</div>':'')
