@@ -1699,6 +1699,8 @@ function rRetry(a){
       '<div class="vbs">'+
         '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
         '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
+        '<button onclick="event.stopPropagation();snoozeFollowup(\''+c.code+'\')" style="flex:1;padding:4px;border-radius:var(--r2);background:rgba(74,158,255,.1);color:var(--blue);border:1px solid rgba(74,158,255,.25);font-size:11px;cursor:pointer;font-family:inherit">+1d</button>'+
+        '<button onclick="event.stopPropagation();if(ST.scheduled&&ST.scheduled[\''+c.code+'\'])delete ST.scheduled[\''+c.code+'\'];lSave();syncUp();rDash();" style="flex:1;padding:4px;border-radius:var(--r2);background:transparent;color:var(--sub);border:1px solid var(--border2);font-size:11px;cursor:pointer;font-family:inherit">Dismiss</button>'+
       '</div>'+
     '</div>';
   }
@@ -3907,6 +3909,8 @@ function rRetry(a){
       '<div class="vbs">'+
         '<button class="vb bv" data-code="'+c.code+'" data-action="vis">Done</button>'+
         '<button class="vb bn" data-code="'+c.code+'" data-action="na">N/A</button>'+
+        '<button onclick="event.stopPropagation();snoozeFollowup(\''+c.code+'\')" style="flex:1;padding:4px;border-radius:var(--r2);background:rgba(74,158,255,.1);color:var(--blue);border:1px solid rgba(74,158,255,.25);font-size:11px;cursor:pointer;font-family:inherit">+1d</button>'+
+        '<button onclick="event.stopPropagation();if(ST.scheduled&&ST.scheduled[\''+c.code+'\'])delete ST.scheduled[\''+c.code+'\'];lSave();syncUp();rDash();" style="flex:1;padding:4px;border-radius:var(--r2);background:transparent;color:var(--sub);border:1px solid var(--border2);font-size:11px;cursor:pointer;font-family:inherit">Dismiss</button>'+
       '</div>'+
     '</div>';
   }
@@ -8402,6 +8406,7 @@ function rSampleCard(){
      +'<div style="display:flex;gap:6px;margin-top:5px">'
      +'<button onclick="event.stopPropagation();markSampleStatus(\''+p.c.code+'\','+p.idx+',\'ordered\');rSampleCard();rDash();" style="flex:1;background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:var(--r2);padding:4px 0;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#10003; Ordered</button>'
      +'<button onclick="event.stopPropagation();markSampleStatus(\''+p.c.code+'\','+p.idx+',\'no_interest\');rSampleCard();rDash();" style="flex:1;background:rgba(255,77,106,.1);color:var(--red);border:1px solid rgba(255,77,106,.25);border-radius:var(--r2);padding:4px 0;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">No Interest</button>'
+     +'<button onclick="event.stopPropagation();ST.samples[\''+p.c.code+'\']['+p.idx+'].date=new Date().toISOString().split(\'T\')[0];lSave();syncUp();rSampleCard();rDash();" style="flex:1;background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.25);border-radius:var(--r2);padding:4px 0;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Not Yet</button>'
      +'</div></div>';
   });
   if(pending.length>6)h+='<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">+'+(pending.length-6)+' more</div>';
