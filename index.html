@@ -10837,11 +10837,14 @@ function showQuoteBuilder(code){
     +'<span style="font-size:14px;font-weight:800">Total</span>'
     +'<span id="qb-total" style="font-size:18px;font-weight:800;color:var(--green)">$0</span>'
     +'</div></div>'
-    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
     +'<span style="font-size:13px;color:var(--sub);flex:1">Follow-up reminder</span>'
     +'<select id="qb-fu" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);padding:7px 10px;font-family:inherit;font-size:13px">'
     +'<option value="2">2 days</option><option value="3" selected>3 days</option><option value="5">5 days</option><option value="7">1 week</option><option value="0">No reminder</option>'
     +'</select></div>'
+    +'<div style="margin-bottom:16px"><div style="font-size:11px;color:var(--sub);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Quote Notes <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div>'
+    +'<textarea id="qb-notes" placeholder="E.g. needs net-30 terms, comparing vs. competitor, follow up with Tom..." rows="2" style="width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:9px 11px;font-size:13px;font-family:inherit;outline:none;resize:none"></textarea>'
+    +'</div>'
     +'<button onclick="saveNewQuote()" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">Save &amp; Preview Card</button>'
     +'<button onclick="document.getElementById(\'quote-builder\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
     +'</div>';
@@ -10993,7 +10996,8 @@ function saveNewQuote(){
       if(margin<mFloor&&!confirm('⚠️ Margin is '+margin.toFixed(1)+'% — below your '+mFloor+'% floor.\n\nSave anyway?'))return;
     }
   }
-  var q={id:qid,code:_qCode,date:new Date().toISOString(),items:valid.map(function(it){return{name:it.name.trim(),qty:it.qty,price:it.price,cost:it.cost||null};}),followupDate:fuDate,status:'open',lostReason:'',dismissed:false,deliveryFee:delivery,taxRate:taxRate,isResale:isResale};
+  var qNotes=((document.getElementById('qb-notes')||{}).value||'').trim();
+  var q={id:qid,code:_qCode,date:new Date().toISOString(),items:valid.map(function(it){return{name:it.name.trim(),qty:it.qty,price:it.price,cost:it.cost||null};}),followupDate:fuDate,status:'open',lostReason:'',dismissed:false,deliveryFee:delivery,taxRate:taxRate,isResale:isResale,notes:qNotes||null};
   if(!ST.quotes)ST.quotes={};
   ST.quotes[qid]=q;
   lSave();syncUp();
@@ -11041,6 +11045,7 @@ function showQuoteCard(qid,page){
     +'<div style="height:1px;background:rgba(0,229,184,.25);margin-bottom:12px"></div>'
     +itemsH
     +(isLast?qCardTotals(q,allItems):'')
+    +(isLast&&q.notes?'<div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:8px;border-left:3px solid rgba(0,229,184,.4)"><div style="font-size:10px;color:#4a9eff;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px">Notes</div><div style="font-size:12px;color:#9ca3af;line-height:1.4">'+esc(q.notes)+'</div></div>':'')
     +'<div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:#4b5563">'+(ST.userProfile&&ST.userProfile.name?esc(ST.userProfile.name):'Your Name')+' &nbsp;&bull;&nbsp; '+(ST.userProfile&&ST.userProfile.company?esc(ST.userProfile.company):'Your Company')+'</div>'
     +'</div>';
   var navH='';
@@ -11105,6 +11110,7 @@ function buildQuoteText(qid){
   var grand=qGrandTotal(q);
   if(grand)lines.push('TOTAL: '+fmt(grand));
   if(q.isResale)lines.push('Resale / Tax Exempt');
+  if(q.notes){lines.push('');lines.push('Notes: '+q.notes);}
   return {text:lines.join('\n'),custEmail:custEmail,custName:custName,from:from,company:company,total:grand};
 }
 function emailQuote(qid){
@@ -11160,6 +11166,7 @@ function rQuotesModal(code){
       +'<div style="flex:1;min-width:0;cursor:pointer" onclick="showQuoteCard(\''+q.id+'\',0)">'
       +'<div style="font-size:13px;font-weight:600">'+(total?fmt(total)+' &mdash; ':'')+q.items.length+' item'+(q.items.length!==1?'s':'')+'</div>'
       +'<div style="font-size:11px;color:var(--sub)">'+dStr+(q.followupDate&&q.status==='open'?' &bull; Follow-up '+q.followupDate.slice(5).replace('-','/'):'')+'</div>'
+      +(q.notes?'<div style="font-size:11px;color:var(--sub);font-style:italic;margin-top:2px">'+esc(q.notes.length>70?q.notes.slice(0,70)+'…':q.notes)+'</div>':'')
       +'</div>'
       +'<span style="font-size:11px;font-weight:700;color:'+sc+';flex-shrink:0">'+slbl+'</span>'
       +'</div>'
