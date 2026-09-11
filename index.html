@@ -1313,6 +1313,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="margin-top:4px">
       <button class="abtn" id="m-retry-today" style="width:100%;background:rgba(74,158,255,.1);color:var(--blue);border:1px solid rgba(74,158,255,.25);font-size:12px">&#8635; Try Again Today</button>
     </div>
+    <div style="margin-top:4px">
+      <button class="abtn" id="m-call-log" style="width:100%;background:rgba(129,140,248,.1);color:#818cf8;border:1px solid rgba(129,140,248,.25);font-size:12px">&#128222; Log Call</button>
+    </div>
     <div class="mb3">
       <button class="abtn" id="m-hot" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);font-size:12px">Hot Lead</button>
       <button class="abtn" id="m-pin" style="background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-size:12px">&#128204; Pin</button>
@@ -3516,6 +3519,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="margin-top:4px">
       <button class="abtn" id="m-retry-today" style="width:100%;background:rgba(74,158,255,.1);color:var(--blue);border:1px solid rgba(74,158,255,.25);font-size:12px">&#8635; Try Again Today</button>
     </div>
+    <div style="margin-top:4px">
+      <button class="abtn" id="m-call-log" style="width:100%;background:rgba(129,140,248,.1);color:#818cf8;border:1px solid rgba(129,140,248,.25);font-size:12px">&#128222; Log Call</button>
+    </div>
     <div class="mb3">
       <button class="abtn" id="m-hot" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3);font-size:12px">Hot Lead</button>
       <button class="abtn" id="m-pin" style="background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-size:12px">&#128204; Pin</button>
@@ -5054,6 +5060,7 @@ document.getElementById('m-retry-today').addEventListener('click',function(){
   toast('↻ Retry added to today\'s route');
   closeM();rDash();rCust();
 });
+var _mcl=document.getElementById('m-call-log');if(_mcl)_mcl.addEventListener('click',function(){if(!mC)return;var a=allC(),c=null;for(var i=0;i<a.length;i++){if(a[i].code===mC){c=a[i];break;}}logCall(mC,c&&c.phone?c.phone:null);});
 document.getElementById('m-hot').addEventListener('click',function(){if(!mC)return;ST.hot[mC]=!ST.hot[mC];lSave();syncUp();this.textContent=ST.hot[mC]?'Remove Hot':'Hot Lead';toast(ST.hot[mC]?'Hot lead set':'Removed');});
 document.getElementById('m-pin').addEventListener('click',function(){if(!mC)return;if(!ST.pinned)ST.pinned={};ST.pinned[mC]=!ST.pinned[mC];if(!ST.pinned[mC])delete ST.pinned[mC];lSave();syncUp();var p=ST.pinned&&ST.pinned[mC];this.textContent=p?'📌 Unpin':'📌 Pin';this.style.background=p?'rgba(99,102,241,.15)':'var(--bg3)';this.style.color=p?'#818cf8':'var(--sub)';this.style.borderColor=p?'rgba(99,102,241,.4)':'var(--border2)';toast(p?'📌 Pinned to top':'Unpinned');rCust();});
 document.getElementById('m-arc').addEventListener('click',function(){if(!mC)return;confirmArchive(mC);});
