@@ -137,6 +137,14 @@ async function sendPush(
 
 // ── Morning brief builder ─────────────────────────────────────────────────────
 
+function shouldSendToday(ST: Record<string, any>): boolean {
+  const day = new Date().getUTCDay() // 0=Sun, 6=Sat
+  const pref = ST.notifSchedule || 'daily'
+  if (pref === 'weekdays') return day >= 1 && day <= 5
+  if (pref === 'weekends') return day === 0 || day === 6
+  return true
+}
+
 function buildMessage(ST: Record<string, any>): { title: string; body: string } {
   const today    = new Date()
   const todayStr = today.toISOString().split('T')[0]
@@ -197,6 +205,7 @@ Deno.serve(async () => {
         .single()
 
       if (!stateRow?.state_json) continue
+      if (!shouldSendToday(stateRow.state_json)) continue
 
       const { title, body } = buildMessage(stateRow.state_json)
       const ok = await sendPush(row.subscription, title, body)

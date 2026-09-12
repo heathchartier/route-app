@@ -1104,6 +1104,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Get a daily notification showing overdue accounts and today's follow-ups</div>
       <button onclick="requestNotifPermission()" id="notif-btn" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128276; Enable Notifications</button>
       <div id="notif-status" class="notif-status"></div>
+      <div id="notif-sched" style="display:none;margin-top:10px">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600">Send on:</div>
+        <div style="display:flex;gap:6px">
+          <button id="nsched-daily" onclick="setNotifSchedule('daily')" style="flex:1;padding:6px 0;border-radius:var(--r2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2);background:var(--bg3);color:var(--sub)">Every Day</button>
+          <button id="nsched-weekdays" onclick="setNotifSchedule('weekdays')" style="flex:1;padding:6px 0;border-radius:var(--r2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2);background:var(--bg3);color:var(--sub)">Weekdays</button>
+          <button id="nsched-weekends" onclick="setNotifSchedule('weekends')" style="flex:1;padding:6px 0;border-radius:var(--r2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2);background:var(--bg3);color:var(--sub)">Weekends</button>
+        </div>
+      </div>
     </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
@@ -3351,6 +3359,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="font-size:12px;color:var(--sub);margin-bottom:10px">Get a daily notification showing overdue accounts and today's follow-ups</div>
       <button onclick="requestNotifPermission()" id="notif-btn" style="width:100%;padding:9px;border-radius:var(--r2);background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.3);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">&#128276; Enable Notifications</button>
       <div id="notif-status" class="notif-status"></div>
+      <div id="notif-sched" style="display:none;margin-top:10px">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600">Send on:</div>
+        <div style="display:flex;gap:6px">
+          <button id="nsched-daily" onclick="setNotifSchedule('daily')" style="flex:1;padding:6px 0;border-radius:var(--r2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2);background:var(--bg3);color:var(--sub)">Every Day</button>
+          <button id="nsched-weekdays" onclick="setNotifSchedule('weekdays')" style="flex:1;padding:6px 0;border-radius:var(--r2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2);background:var(--bg3);color:var(--sub)">Weekdays</button>
+          <button id="nsched-weekends" onclick="setNotifSchedule('weekends')" style="flex:1;padding:6px 0;border-radius:var(--r2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2);background:var(--bg3);color:var(--sub)">Weekends</button>
+        </div>
+      </div>
     </div>
     <div class="card" style="margin-top:4px">
       <div class="lbl" style="color:var(--amber)">&#128270; Duplicate Detector</div>
@@ -10361,6 +10377,7 @@ function subscribeToPush(){
 function rNotifStatus(){
   var btn=document.getElementById('notif-btn');
   var status=document.getElementById('notif-status');
+  var sched=document.getElementById('notif-sched');
   if(!btn||!status)return;
   if(!('Notification' in window)){
     status.textContent='Notifications not supported on this browser';
@@ -10372,14 +10389,32 @@ function rNotifStatus(){
     status.style.cssText='background:rgba(16,185,129,.15);color:#10b981;padding:8px 12px;border-radius:var(--r2);margin-top:8px;font-size:12px;font-weight:700';
     btn.textContent='Test Notification';
     btn.onclick=function(){sendTestNotification();};
+    if(sched){
+      sched.style.display='block';
+      var cur=ST.notifSchedule||'daily';
+      ['daily','weekdays','weekends'].forEach(function(v){
+        var b=document.getElementById('nsched-'+v);
+        if(!b)return;
+        if(v===cur){b.style.background='rgba(74,158,255,.15)';b.style.color='var(--blue)';b.style.borderColor='rgba(74,158,255,.4)';}
+        else{b.style.background='var(--bg3)';b.style.color='var(--sub)';b.style.borderColor='var(--border2)';}
+      });
+    }
   }else if(Notification.permission==='denied'){
     status.textContent='Notifications blocked — enable in your browser settings';
     status.style.cssText='background:var(--red2);color:var(--red);padding:8px 12px;border-radius:var(--r2);margin-top:8px;font-size:12px';
     btn.style.display='none';
+    if(sched)sched.style.display='none';
   }else{
     status.textContent='Tap to enable — you will get a daily reminder with overdue accounts and follow-ups';
     status.style.cssText='background:var(--bg3);color:var(--sub);padding:8px 12px;border-radius:var(--r2);margin-top:8px;font-size:12px';
+    if(sched)sched.style.display='none';
   }
+}
+function setNotifSchedule(val){
+  ST.notifSchedule=val;
+  lSave();syncUp();
+  rNotifStatus();
+  toast('Notification schedule updated');
 }
 function requestNotifPermission(){
   if(!('Notification' in window)){toast('Not supported on this browser');return;}
