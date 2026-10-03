@@ -1276,6 +1276,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;color:var(--dim)">&#128161; This is for your <strong style="color:var(--sub)">product price sheet</strong> only. To import your customer list, go to <strong style="color:var(--sub)">Settings &rarr; Import Customer List</strong>.</div>
     </div>
   </div>
+  <div id="pr-cat-bar" style="display:none;overflow-x:auto;white-space:nowrap;padding:8px 14px 0;-webkit-overflow-scrolling:touch;scrollbar-width:none"></div>
   <div id="pr-list-wrap" style="display:none;margin:4px 14px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--r)">
     <div id="pr-list"></div>
   </div>
@@ -3492,6 +3493,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;color:var(--dim)">&#128161; This is for your <strong style="color:var(--sub)">product price sheet</strong> only. To import your customer list, go to <strong style="color:var(--sub)">Settings &rarr; Import Customer List</strong>.</div>
     </div>
   </div>
+  <div id="pr-cat-bar" style="display:none;overflow-x:auto;white-space:nowrap;padding:8px 14px 0;-webkit-overflow-scrolling:touch;scrollbar-width:none"></div>
   <div id="pr-list-wrap" style="display:none;margin:4px 14px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--r)">
     <div id="pr-list"></div>
   </div>
@@ -6591,9 +6593,12 @@ function shareNextStop(){
 // ── PRICING ──────────────────────────────────────────────────────────────────
 var PRICE_KEY='hrt_pricing';
 var PRICE_MAP_KEY='hrt_priceMap';
-var priceData=[]; // normalized: [{_code,_desc,_uom,_cost}]
+var priceData=[]; // normalized: [{_code,_desc,_uom,_cost,_cat}]
 var priceColMap=null;
 var _priceQtys={}; // idx→qty string, in-memory only
+var _priceFilterCat=''; // '' = all categories
+var _priceUploadMode='replace'; // 'replace' | 'category'
+var _priceUploadCatName=''; // category name when mode='category'
 
 function loadPricing(){
   // Restore saved margin %
@@ -6646,10 +6651,12 @@ function rPrice(){
   var wrap=document.getElementById('pr-list-wrap');
   var lbl=document.getElementById('pr-lbl');
   var bar=document.getElementById('pr-total-bar');
+  var catBar=document.getElementById('pr-cat-bar');
   if(!priceData.length){
     if(empty)empty.style.display='block';
     if(wrap)wrap.style.display='none';
     if(bar)bar.style.display='none';
+    if(catBar)catBar.style.display='none';
     if(lbl)lbl.textContent='No price sheet loaded';
     return;
   }
@@ -6658,11 +6665,29 @@ function rPrice(){
   try{localStorage.setItem('hrt_priceMargin',margin);}catch(e){}
   var multiplier=1+margin/100;
   var q=(document.getElementById('pr-srch').value||'').toLowerCase().trim();
+  // Category chips
+  var cats=_getPriceCategories();
+  if(catBar){
+    if(cats.length){
+      catBar.style.display='block';
+      var chipStyle='display:inline-block;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border2);margin-right:6px;margin-bottom:4px;white-space:nowrap;';
+      catBar.innerHTML=['<button onclick="_setPriceCat(\'\')" style="'+chipStyle+'background:'+(_priceFilterCat===''?'var(--teal)':'var(--bg3)')+';color:'+(_priceFilterCat===''?'#000':'var(--sub)')+'">All ('+priceData.length+')</button>']
+        .concat(cats.map(function(cat){
+          var cnt=priceData.filter(function(r){return(r._cat||'').trim()===cat;}).length;
+          var active=_priceFilterCat===cat;
+          return'<button onclick="_setPriceCat(\''+esc(cat)+'\')" style="'+chipStyle+'background:'+(active?'var(--teal)':'var(--bg3)')+';color:'+(active?'#000':'var(--sub)')+'">'+esc(cat)+' ('+cnt+')</button>';
+        })).join('');
+    }else{
+      catBar.style.display='none';
+    }
+  }
   var filtered=priceData.filter(function(r){
+    if(_priceFilterCat&&(r._cat||'').trim()!==_priceFilterCat)return false;
     if(!q)return true;
-    return(r._code+' '+r._desc+' '+r._uom).toLowerCase().indexOf(q)>=0;
+    return(r._code+' '+r._desc+' '+r._uom+' '+(r._cat||'')).toLowerCase().indexOf(q)>=0;
   });
-  if(lbl)lbl.textContent=filtered.length+(filtered.length!==priceData.length?' of '+priceData.length:'')+' item'+(priceData.length!==1?'s':'');
+  var totalShown=_priceFilterCat?priceData.filter(function(r){return(r._cat||'').trim()===_priceFilterCat;}).length:priceData.length;
+  if(lbl)lbl.textContent=filtered.length+(filtered.length!==totalShown?' of '+totalShown:'')+' item'+(totalShown!==1?'s':'')+(_priceFilterCat?' · '+_priceFilterCat:'');
   if(empty)empty.style.display='none';
   if(wrap)wrap.style.display='block';
   var list=document.getElementById('pr-list');
@@ -6733,15 +6758,70 @@ function clearPriceQtys(){
   if(bar)bar.style.display='none';
 }
 
+function _setPriceCat(cat){_priceFilterCat=cat;rPrice();}
+
 function handlePriceImport(inp){
   var file=inp.files[0];if(!file)return;
   inp.value='';
   var ext=file.name.split('.').pop().toLowerCase();
-  if(ext==='csv'){
-    var r=new FileReader();r.onload=function(e){_parsePriceCSVRaw(e.target.result,file.name);};r.readAsText(file);
-  }else if(ext==='xlsx'){
-    var r2=new FileReader();r2.onload=function(e){_parsePriceXLSXRaw(e.target.result,file.name);};r2.readAsArrayBuffer(file);
-  }else{toast('Use .xlsx or .csv only');}
+  if(ext!=='csv'&&ext!=='xlsx'){toast('Use .xlsx or .csv only');return;}
+  // Show upload mode selector first, then parse
+  var existingCats=_getPriceCategories();
+  var sh=document.createElement('div');
+  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var catChips=existingCats.length?'<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">'+existingCats.map(function(c){return'<button onclick="document.getElementById(\'pr-catname-in\').value=\''+esc(c)+'\'" style="padding:5px 12px;border-radius:16px;border:1px solid var(--border2);background:var(--bg3);color:var(--sub);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">'+esc(c)+'</button>';}).join('')+'</div>':'';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'+
+    '<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'+
+    '<div style="font-size:18px;font-weight:800;margin-bottom:4px">What are you uploading?</div>'+
+    '<div style="font-size:12px;color:var(--sub);margin-bottom:16px">'+esc(file.name)+'</div>'+
+    '<div id="pr-mode-replace" onclick="_selectPriceMode(\'replace\')" style="padding:14px;border-radius:12px;border:2px solid var(--teal);background:rgba(0,229,184,.07);margin-bottom:10px;cursor:pointer">'+
+      '<div style="font-size:14px;font-weight:800;color:var(--teal)">&#8635; Replace full price list</div>'+
+      '<div style="font-size:12px;color:var(--sub);margin-top:3px">Replaces all existing items with this file</div>'+
+    '</div>'+
+    '<div id="pr-mode-cat" onclick="_selectPriceMode(\'category\')" style="padding:14px;border-radius:12px;border:2px solid var(--border2);background:var(--bg3);margin-bottom:12px;cursor:pointer">'+
+      '<div style="font-size:14px;font-weight:800;color:var(--text)">&#43; Upload a category</div>'+
+      '<div style="font-size:12px;color:var(--sub);margin-top:3px">Adds or replaces one product category, keeps everything else</div>'+
+      '<div id="pr-catname-wrap" style="display:none;margin-top:10px">'+
+        '<input id="pr-catname-in" type="text" placeholder="Category name (e.g. Melamine Panels)" maxlength="60"'+
+          ' style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none">'+
+        catChips+
+      '</div>'+
+    '</div>'+
+    '<button onclick="_confirmPriceMode()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:8px">Continue</button>'+
+    '<button onclick="if(window._priceUploadModeSheet){window._priceUploadModeSheet.remove();window._priceUploadModeSheet=null;document.body.style.overflow=\'\'}" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);color:var(--sub);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'+
+  '</div>';
+  window._priceUploadModeSheet=sh;
+  window._priceUploadModeFile={file:file,ext:ext};
+  document.body.style.overflow='hidden';
+  document.body.appendChild(sh);
+}
+
+function _selectPriceMode(mode){
+  _priceUploadMode=mode;
+  var r=document.getElementById('pr-mode-replace');
+  var c=document.getElementById('pr-mode-cat');
+  var cw=document.getElementById('pr-catname-wrap');
+  if(r)r.style.border='2px solid '+(mode==='replace'?'var(--teal)':'var(--border2)');
+  if(r)r.style.background=mode==='replace'?'rgba(0,229,184,.07)':'var(--bg3)';
+  if(c)c.style.border='2px solid '+(mode==='category'?'var(--teal)':'var(--border2)');
+  if(c)c.style.background=mode==='category'?'rgba(0,229,184,.07)':'var(--bg3)';
+  if(cw)cw.style.display=mode==='category'?'block':'none';
+}
+
+function _confirmPriceMode(){
+  if(_priceUploadMode==='category'){
+    var nameEl=document.getElementById('pr-catname-in');
+    var name=(nameEl?nameEl.value:'').trim();
+    if(!name){toast('Enter a category name first');return;}
+    _priceUploadCatName=name;
+  }
+  if(window._priceUploadModeSheet){window._priceUploadModeSheet.remove();window._priceUploadModeSheet=null;document.body.style.overflow='';}
+  var f=window._priceUploadModeFile;if(!f)return;
+  if(f.ext==='csv'){
+    var r=new FileReader();r.onload=function(e){_parsePriceCSVRaw(e.target.result,f.file.name);};r.readAsText(f.file);
+  }else{
+    var r2=new FileReader();r2.onload=function(e){_parsePriceXLSXRaw(e.target.result,f.file.name);};r2.readAsArrayBuffer(f.file);
+  }
 }
 
 var _pendingPriceRaw=null;
@@ -6855,19 +6935,64 @@ function confirmPriceImport(){
   if(ci.cost<0){toast('Please map a Cost / Price column');return;}
   if(window._priceMapperSheet){window._priceMapperSheet.remove();document.body.style.overflow='';window._priceMapperSheet=null;}
   priceColMap=ci;savePriceMap();
-  priceData=pi.rows.map(function(row){
+  var newItems=pi.rows.map(function(row){
+    var cat=ci.cat>=0?(row[ci.cat]||'').trim():'';
+    // In category mode, assign the typed name if file has no category column or item has no category
+    if(_priceUploadMode==='category'&&!cat)cat=_priceUploadCatName;
     return{
       _code:ci.code>=0?(row[ci.code]||''):'',
       _desc:ci.desc>=0?(row[ci.desc]||''):'',
       _uom: ci.uom>=0?(row[ci.uom]||''):'',
       _cost:ci.cost>=0?(row[ci.cost]||''):'',
-      _cat: ci.cat>=0?(row[ci.cat]||'').trim():''
+      _cat: cat
     };
   }).filter(function(r){return r._cost||r._desc||r._code;});
+
+  var added=0,updated=0,removed=0,unchanged=0;
+  if(_priceUploadMode==='category'){
+    var catToReplace=_priceUploadCatName;
+    // Build old price map for change detection (by code within this category)
+    var oldCatItems=priceData.filter(function(r){return(r._cat||'').trim()===catToReplace;});
+    var oldMap={};oldCatItems.forEach(function(r){if(r._code)oldMap[r._code]=r._cost;});
+    // Count changes
+    newItems.forEach(function(r){
+      if(!r._code){added++;return;}
+      if(oldMap[r._code]===undefined){added++;}
+      else if(oldMap[r._code]!==r._cost){updated++;}
+      else{unchanged++;}
+    });
+    removed=oldCatItems.filter(function(r){return r._code&&!newItems.find(function(n){return n._code===r._code;});}).length;
+    // Merge: keep items from other categories, replace this category
+    var kept=priceData.filter(function(r){return(r._cat||'').trim()!==catToReplace;});
+    priceData=kept.concat(newItems);
+    // Switch filter to the newly uploaded category
+    _priceFilterCat=catToReplace;
+    var msg='&#10003; '+catToReplace+': '+newItems.length+' items loaded';
+    if(updated)msg+=' · '+updated+' price'+(updated!==1?'s':'')+' updated';
+    if(added)msg+=' · '+added+' new';
+    if(removed)msg+=' · '+removed+' removed';
+    toast(msg);
+  }else{
+    // Replace all — detect changes by code
+    var oldMap2={};priceData.forEach(function(r){if(r._code)oldMap2[r._code]=r._cost;});
+    newItems.forEach(function(r){
+      if(!r._code){added++;return;}
+      if(oldMap2[r._code]===undefined){added++;}
+      else if(oldMap2[r._code]!==r._cost){updated++;}
+      else{unchanged++;}
+    });
+    removed=Object.keys(oldMap2).filter(function(k){return!newItems.find(function(n){return n._code===k;});}).length;
+    priceData=newItems;
+    _priceFilterCat='';
+    var msg2='&#10003; '+priceData.length+' items loaded';
+    if(updated)msg2+=' · '+updated+' price'+(updated!==1?'s':'')+' updated';
+    if(added&&oldMap2&&Object.keys(oldMap2).length)msg2+=' · '+added+' new';
+    if(removed)msg2+=' · '+removed+' removed';
+    toast(msg2);
+  }
   _priceQtys={};
   savePricing();
   rPrice();
-  toast('Loaded '+priceData.length+' items from '+pi.fname);
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
