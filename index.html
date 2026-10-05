@@ -298,6 +298,12 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .tier-a{display:inline-block;background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
 .tier-b{display:inline-block;background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
 .tier-c{display:inline-block;background:var(--bg3);color:var(--sub);border:1px solid var(--border);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
+.seg-vip{display:inline-block;background:rgba(0,229,184,.18);color:var(--teal);border:1px solid rgba(0,229,184,.45);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-grow{display:inline-block;background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-new{display:inline-block;background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-dcl{display:inline-block;background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-lost{display:inline-block;background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.35);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-dorm{display:inline-block;background:var(--bg3);color:var(--sub);border:1px solid var(--border);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
 
 /* ── WEEKLY GOAL ── */
 .goal-bar-wrap{background:var(--bg3);border-radius:6px;height:8px;overflow:hidden;margin:8px 0 4px}
@@ -1299,6 +1305,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="flex:1;min-width:0">
         <div class="mname" id="m-n"></div>
         <div class="mcode" id="m-c"></div>
+        <div id="m-intel" style="margin-top:4px;font-size:12px;color:var(--sub);display:none"></div>
         <div id="m-besttime"></div>
         <div id="m-health"></div>
       </div>
@@ -1360,6 +1367,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="fl">Phone</div><input class="fi" id="ef-phone" type="tel">
       <div class="fl">Email</div><input class="fi" id="ef-email" type="email">
       <div class="fl">Group (1-61)</div><input class="fi" id="ef-grp" type="number" min="1" max="61" style="width:100px">
+      <div class="fl">Segment</div><select class="fi" id="ef-seg"><option value="">— None —</option><option value="VIP">VIP-Protect</option><option value="Growing">Growing-Invest</option><option value="New-Nurture">New-Nurture</option><option value="Declining">Declining-Save</option><option value="Lost">Lost-Win Back</option><option value="Dormant">Dormant-Long Shot</option></select>
+      <div class="fl">Vertical</div><input class="fi" id="ef-vert" type="text" placeholder="e.g. Cabinet Shop">
+      <div class="fl">Opportunity $</div><input class="fi" id="ef-opp" type="number" min="0" placeholder="0" style="width:140px">
       <div class="mb2" style="margin-top:4px">
         <button class="btn btn-b" id="m-sav">Save</button>
         <button class="btn btn-g" id="m-can">Cancel</button>
@@ -1487,10 +1497,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1663,8 +1673,8 @@ function rRoute(){
       '<div class="snum">'+(i+1)+'</div>'+
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
       '<div class="ri">'+
-        '<div class="rn">'+(ST.hot[c.code]?'&#9733; ':'')+esc(c.name)+tierBadge(c)+_rHrsBadge+_rTierBadge+_rBdayBadge+'</div>'+
-        '<div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+
+        '<div class="rn">'+(ST.hot[c.code]?'&#9733; ':'')+esc(c.name)+tierBadge(c)+segmentBadge(c.code)+_rHrsBadge+_rTierBadge+_rBdayBadge+'</div>'+
+        '<div class="rm">'+esc(c.city||'')+(ST.custVerticals[c.code]?' &bull; '+esc(ST.custVerticals[c.code]):'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+
         noteHtml+alertHtml+
         '<div class="rte-acts">'+
           '<button class="vb bv" data-code="'+c.code+'" data-action="vis">&#10003; Done</button>'+
@@ -1893,6 +1903,8 @@ function openM(code){
   mC=code;window._curCode=code;
   var mn=document.getElementById('m-n');if(mn)mn.textContent=c.name;
   var mc=document.getElementById('m-c');if(mc)mc.innerHTML=esc(c.code)+' / '+getGroupName(c.group)+' '+tierBadge(c);
+  var mi=document.getElementById('m-intel');
+  if(mi){var intelParts=[];var seg=ST.custSegments[code];var vert=ST.custVerticals[code];var opp=ST.custOpportunities[code];if(seg)intelParts.push(segmentBadge(code));if(vert)intelParts.push('<span style="color:var(--sub)">'+esc(vert)+'</span>');if(opp&&opp>0)intelParts.push('<span style="color:var(--teal);font-weight:700">$'+Math.round(opp).toLocaleString()+' opp</span>');if(intelParts.length){mi.innerHTML=intelParts.join(' &bull; ');mi.style.display='';}else{mi.innerHTML='';mi.style.display='none';}}
   var addr=[c.address,c.address2,c.city,'CA',c.zip].filter(function(x){return x;}).join(', ');
   var ms=document.getElementById('m-s');
   // Trend: compare current year (sales2526) vs prior year (sales2025)
@@ -1996,6 +2008,7 @@ function _applyRemoteState(rem){
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
   ST.custItemPrices=Object.assign({},rem.custItemPrices||{},ST.custItemPrices||{});
+  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});
   ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
   ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
@@ -2691,6 +2704,12 @@ nav a svg{width:22px;height:22px;stroke-width:1.8}
 .tier-a{display:inline-block;background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
 .tier-b{display:inline-block;background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
 .tier-c{display:inline-block;background:var(--bg3);color:var(--sub);border:1px solid var(--border);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.5px;vertical-align:middle;margin-left:5px}
+.seg-vip{display:inline-block;background:rgba(0,229,184,.18);color:var(--teal);border:1px solid rgba(0,229,184,.45);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-grow{display:inline-block;background:rgba(74,158,255,.15);color:var(--blue);border:1px solid rgba(74,158,255,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-new{display:inline-block;background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-dcl{display:inline-block;background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.4);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-lost{display:inline-block;background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.35);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
+.seg-dorm{display:inline-block;background:var(--bg3);color:var(--sub);border:1px solid var(--border);border-radius:4px;font-size:9px;font-weight:800;padding:2px 6px;letter-spacing:.3px;vertical-align:middle;margin-left:5px}
 
 /* ── WEEKLY GOAL ── */
 .goal-bar-wrap{background:var(--bg3);border-radius:6px;height:8px;overflow:hidden;margin:8px 0 4px}
@@ -3516,6 +3535,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div style="flex:1;min-width:0">
         <div class="mname" id="m-n"></div>
         <div class="mcode" id="m-c"></div>
+        <div id="m-intel" style="margin-top:4px;font-size:12px;color:var(--sub);display:none"></div>
         <div id="m-besttime"></div>
         <div id="m-health"></div>
       </div>
@@ -3577,6 +3597,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="fl">Phone</div><input class="fi" id="ef-phone" type="tel">
       <div class="fl">Email</div><input class="fi" id="ef-email" type="email">
       <div class="fl">Group (1-61)</div><input class="fi" id="ef-grp" type="number" min="1" max="61" style="width:100px">
+      <div class="fl">Segment</div><select class="fi" id="ef-seg"><option value="">— None —</option><option value="VIP">VIP-Protect</option><option value="Growing">Growing-Invest</option><option value="New-Nurture">New-Nurture</option><option value="Declining">Declining-Save</option><option value="Lost">Lost-Win Back</option><option value="Dormant">Dormant-Long Shot</option></select>
+      <div class="fl">Vertical</div><input class="fi" id="ef-vert" type="text" placeholder="e.g. Cabinet Shop">
+      <div class="fl">Opportunity $</div><input class="fi" id="ef-opp" type="number" min="0" placeholder="0" style="width:140px">
       <div class="mb2" style="margin-top:4px">
         <button class="btn btn-b" id="m-sav">Save</button>
         <button class="btn btn-g" id="m-can">Cancel</button>
@@ -3696,10 +3719,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -3882,8 +3905,8 @@ function rRoute(){
       '<div class="snum">'+(i+1)+'</div>'+
       '<div class="dot" style="background:'+dc(c.code)+'"></div>'+
       '<div class="ri">'+
-        '<div class="rn">'+(ST.hot[c.code]?'&#9733; ':'')+esc(c.name)+tierBadge(c)+_rHrsBadge+_rTierBadge+_rBdayBadge+'</div>'+
-        '<div class="rm">'+esc(c.city||'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+
+        '<div class="rn">'+(ST.hot[c.code]?'&#9733; ':'')+esc(c.name)+tierBadge(c)+segmentBadge(c.code)+_rHrsBadge+_rTierBadge+_rBdayBadge+'</div>'+
+        '<div class="rm">'+esc(c.city||'')+(ST.custVerticals[c.code]?' &bull; '+esc(ST.custVerticals[c.code]):'')+' &bull; '+meta+' &bull; '+fmt(c.sales2526)+'</div>'+
         noteHtml+alertHtml+
         '<div class="rte-acts">'+
           '<button class="vb bv" data-code="'+c.code+'" data-action="vis">&#10003; Done</button>'+
@@ -4112,6 +4135,8 @@ function openM(code){
   mC=code;window._curCode=code;
   var mn=document.getElementById('m-n');if(mn)mn.textContent=c.name;
   var mc=document.getElementById('m-c');if(mc)mc.innerHTML=esc(c.code)+' / '+getGroupName(c.group)+' '+tierBadge(c);
+  var mi=document.getElementById('m-intel');
+  if(mi){var intelParts=[];var seg=ST.custSegments[code];var vert=ST.custVerticals[code];var opp=ST.custOpportunities[code];if(seg)intelParts.push(segmentBadge(code));if(vert)intelParts.push('<span style="color:var(--sub)">'+esc(vert)+'</span>');if(opp&&opp>0)intelParts.push('<span style="color:var(--teal);font-weight:700">$'+Math.round(opp).toLocaleString()+' opp</span>');if(intelParts.length){mi.innerHTML=intelParts.join(' &bull; ');mi.style.display='';}else{mi.innerHTML='';mi.style.display='none';}}
   var addr=[c.address,c.address2,c.city,'CA',c.zip].filter(function(x){return x;}).join(', ');
   var ms=document.getElementById('m-s');
   // Trend: compare current year (sales2526) vs prior year (sales2025)
@@ -4215,6 +4240,7 @@ function _applyRemoteState(rem){
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
   ST.custItemPrices=Object.assign({},rem.custItemPrices||{},ST.custItemPrices||{});
+  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});
   ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
   ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
@@ -5154,6 +5180,9 @@ document.getElementById('m-edt').addEventListener('click',function(){
     ['name','addr','addr2','city','state','zip','phone','email'].forEach(function(f,i){var k=['name','address','address2','city','state','zip','phone','email'][i];var el=document.getElementById('ef-'+f);if(el)el.value=c[k]||''});
     var eg=document.getElementById('ef-grp');if(eg)eg.value=c.group||1;
     var ezh=document.getElementById('ef-zh');if(ezh)ezh.style.display='none';
+    var efseg=document.getElementById('ef-seg');if(efseg)efseg.value=ST.custSegments[mC]||'';
+    var efvert=document.getElementById('ef-vert');if(efvert)efvert.value=ST.custVerticals[mC]||'';
+    var efopp=document.getElementById('ef-opp');if(efopp)efopp.value=ST.custOpportunities[mC]||'';
   }
 });
 var efz=document.getElementById('ef-zip');
@@ -5188,6 +5217,9 @@ document.getElementById('m-sav').addEventListener('click',function(){
   } else if(manualGr>=1){
     ed.group=manualGr;toast('Saved');
   } else {toast('Saved');}
+  var eseg=document.getElementById('ef-seg');if(eseg){var sv=eseg.value;if(sv)ST.custSegments[mC]=sv;else delete ST.custSegments[mC];}
+  var evert=document.getElementById('ef-vert');if(evert){var vv=evert.value.trim();if(vv)ST.custVerticals[mC]=vv;else delete ST.custVerticals[mC];}
+  var eopp=document.getElementById('ef-opp');if(eopp){var ov=parseFloat(eopp.value);if(!isNaN(ov)&&ov>0)ST.custOpportunities[mC]=ov;else delete ST.custOpportunities[mC];}
   if(!ST.edits)ST.edits={};ST.edits[mC]=ed;lSave();syncUp();
   document.getElementById('m-edit').style.display='none';document.getElementById('m-view').style.display='block';document.getElementById('m-edt').textContent='Edit';
   openM(mC);rCust();rDash();rGrps();
@@ -7275,6 +7307,12 @@ function tierBadge(c){
   var t=getTier(c);
   return '<span class="tier-'+t.toLowerCase()+'">'+t+'</span>';
 }
+function segmentBadge(code){
+  var s=ST.custSegments[code]||'';
+  if(!s)return '';
+  var cls={VIP:'seg-vip',Growing:'seg-grow','New-Nurture':'seg-new',Declining:'seg-dcl',Lost:'seg-lost',Dormant:'seg-dorm'}[s]||'seg-dorm';
+  return '<span class="'+cls+'">'+s+'</span>';
+}
 
 // ── EMAIL EOD ─────────────────────────────────────────────────────────────
 function emailEOD(){
@@ -8087,7 +8125,7 @@ function saveTierTarget(tier,val){
   lSave();syncUp();rDash();
 }
 function saveTierWindow(tier,val){
-  if(!ST.tierWindows)ST.tierWindows={};
+  if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};
   var v=val.trim();
   if(v)ST.tierWindows[tier]=v;else delete ST.tierWindows[tier];
   lSave();syncUp();
@@ -13910,7 +13948,7 @@ function onLogin(user){
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
   // Reset ST to blank so previous session data doesn't leak into a new account
-  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
   // One-time cleanup: remove any fake demo customers that got added accidentally
   var _fakeCodes={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
@@ -14132,7 +14170,7 @@ function doSignOut(){
     CURRENT_USER=null;
     SK='';
     rollingRoute=null;saveRolling();
-    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
     var tb=document.getElementById('trial-banner');if(tb)tb.style.display='none';
@@ -14207,7 +14245,7 @@ function confirmDeleteAccount(){
   sb.from('hc_state').delete().eq('id',uid).then(function(){
     sb.auth.signOut().then(function(){
       CURRENT_USER=null;SK='';
-      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
       // Clear local storage
       try{localStorage.removeItem('fieldiq_'+uid);}catch(e){}
       authTab('signin');
