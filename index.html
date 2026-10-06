@@ -11398,11 +11398,12 @@ function bulkResharePortals(){
     var itemMargins=ST.custItemMargins&&ST.custItemMargins[c.code]||{};
     var token=(ST.portalTokens[c.code]&&ST.portalTokens[c.code]!==null)?ST.portalTokens[c.code]:_genToken();
     ST.portalTokens[c.code]=token;
-    var portalRow={token:token,customer_name:c.name,customer_code:c.code,margin_pct:margin,items:priceData,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins};
+    var prevSentCats=(ST.custPriceSent[c.code]&&ST.custPriceSent[c.code].categories)||[];
+    var filteredItems=prevSentCats.length?priceData.filter(function(r){return prevSentCats.indexOf((r._cat||'').trim())!==-1;}):priceData;
+    var portalRow={token:token,customer_name:c.name,customer_code:c.code,margin_pct:margin,items:filteredItems,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins};
     sb.from('price_portals').upsert(portalRow,{onConflict:'token'}).then(function(res){
       if(!res.error){
-        var sentCats2=_getPriceCategories();
-        ST.custPriceSent[c.code]={lastSent:new Date().toISOString(),categories:sentCats2,itemCount:priceData.length};
+        ST.custPriceSent[c.code]={lastSent:new Date().toISOString(),categories:prevSentCats,itemCount:filteredItems.length};
       }
       done++;
       if(done===total){lSave();syncUp();rDash();toast('&#10003; Updated pricing for '+done+' customer'+(done!==1?'s':''));}
@@ -13312,33 +13313,69 @@ function generatePortalLink(code){
   if(!priceData.length){toast('Load a price list in the Pricing tab first');return;}
   var c=null;var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===code){c=a[i];break;}}
   if(!c){toast('Customer not found');return;}
-  // Reuse existing token so the customer's link never changes
+  var cats=_getPriceCategories();
+  if(!cats.length){_doGeneratePortal(code,[]);return;}
+  // Category picker — pre-check what was last sent (or all if first time)
+  var lastSent=(ST.custPriceSent&&ST.custPriceSent[code]&&ST.custPriceSent[code].categories)||[];
+  var preCheck=lastSent.length?lastSent:cats; // default: all checked on first share
+  var sheet=document.createElement('div');
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1300;display:flex;align-items:flex-end;justify-content:center';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(36px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+   +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
+   +'<div style="font-size:17px;font-weight:800;margin-bottom:4px">Select Categories to Share</div>'
+   +'<div style="font-size:13px;color:var(--sub);margin-bottom:16px">Choose which product lines to include in <strong style="color:var(--text)">'+esc(c.name)+'</strong>\'s portal.'+(lastSent.length?'<br><span style="color:var(--teal)">&#9679; Showing last sent selection</span>':'')+'</div>'
+   +'<div id="pgp-cats" style="margin-bottom:16px">'
+     +cats.map(function(cat){
+       var checked=preCheck.indexOf(cat)!==-1;
+       var count=priceData.filter(function(r){return(r._cat||'').trim()===cat;}).length;
+       return'<label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">'
+         +'<input type="checkbox" data-cat="'+esc(cat)+'" '+(checked?'checked':'')+' style="width:18px;height:18px;accent-color:var(--teal);cursor:pointer;flex-shrink:0">'
+         +'<div><div style="font-size:14px;font-weight:600;color:var(--text)">'+esc(cat)+'</div>'
+           +'<div style="font-size:11px;color:var(--sub);margin-top:1px">'+count+' item'+(count!==1?'s':'')+'</div></div>'
+       +'</label>';
+     }).join('')
+   +'</div>'
+   +'<button onclick="_pgpConfirm(\''+esc(code)+'\')" style="width:100%;padding:13px;border-radius:var(--r2);background:var(--teal);color:#000;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;border:none;margin-bottom:8px">&#128279; Generate Portal</button>'
+   +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:11px;border-radius:var(--r2);border:1px solid var(--border2);background:transparent;color:var(--sub);font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'
+   +'</div>';
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.remove();});
+  document.body.appendChild(sheet);
+}
+function _pgpConfirm(code){
+  var boxes=document.querySelectorAll('#pgp-cats input[type=checkbox]');
+  var selected=[];
+  boxes.forEach(function(b){if(b.checked)selected.push(b.getAttribute('data-cat'));});
+  if(!selected.length){toast('Select at least one category');return;}
+  var sheet=document.querySelector('div[style*="z-index:1300"]');if(sheet)sheet.remove();
+  _doGeneratePortal(code,selected);
+}
+function _doGeneratePortal(code,selectedCats){
+  var c=null;var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===code){c=a[i];break;}}
+  if(!c)return;
   if(!ST.portalTokens)ST.portalTokens={};
   var token=(ST.portalTokens[code]&&ST.portalTokens[code]!==null)?ST.portalTokens[code]:_genToken();
   ST.portalTokens[code]=token;
   var margin=getCustMargin(code);
   var custName=c.name;
-  // Store portal in Supabase price_portals table
+  // Filter items to selected categories (or all if no category filter)
+  var filteredItems=selectedCats.length
+    ?priceData.filter(function(r){return selectedCats.indexOf((r._cat||'').trim())!==-1;})
+    :priceData;
   var catMargins=ST.custCatMargins&&ST.custCatMargins[code]||{};
   var pinnedPrices=ST.custItemPrices&&ST.custItemPrices[code]||{};
   var itemMargins=ST.custItemMargins&&ST.custItemMargins[code]||{};
-  var portalRow={token:token,customer_name:custName,customer_code:code,margin_pct:margin,items:priceData,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins};
+  var portalRow={token:token,customer_name:custName,customer_code:code,margin_pct:margin,items:filteredItems,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins};
   sb.from('price_portals').upsert(portalRow,{onConflict:'token'}).then(function(res){
     if(res.error){
-      console.error('Portal write error:',res.error);
-      // Clear the token so it doesn't show as active when write failed
-      ST.portalTokens[code]=null;
-      lSave();
-      toast('Portal error: '+res.error.message+' — try the Supabase fix below');
-      return;
+      ST.portalTokens[code]=null;lSave();
+      toast('Portal error: '+res.error.message);return;
     }
-    if(!ST.custPriceSent)ST.custPriceSent={};if(!ST.priceChangeHistory)ST.priceChangeHistory=[];
-    var _sentCats=_getPriceCategories();
-    ST.custPriceSent[code]={lastSent:new Date().toISOString(),categories:_sentCats.length?_sentCats:[],itemCount:priceData.length};
+    if(!ST.custPriceSent)ST.custPriceSent={};
+    ST.custPriceSent[code]={lastSent:new Date().toISOString(),categories:selectedCats,itemCount:filteredItems.length};
     lSave();syncUp();
     rPricingSection(code);
     copyPortalLink(code);
-    toast('Portal link copied! Share with '+custName);
+    toast('Portal link copied! Share with '+custName+(selectedCats.length?' ('+selectedCats.length+' categor'+(selectedCats.length===1?'y':'ies')+')'  :''));
   });
 }
 function copyPortalLink(code){
