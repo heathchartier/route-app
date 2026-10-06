@@ -817,7 +817,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <div class="card" id="d-price-alerts-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128203; Pricing Needs Update</div>
-      <span id="d-price-alerts-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span id="d-price-alerts-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+        <button onclick="bulkResharePortals()" id="d-price-alerts-bulk" style="display:none;background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.35);border-radius:var(--r2);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Re-share All</button>
+      </div>
     </div>
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers with portal links whose prices changed since last shared</div>
     <div id="d-price-alerts-list"></div>
@@ -3110,7 +3113,10 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <div class="card" id="d-price-alerts-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128203; Pricing Needs Update</div>
-      <span id="d-price-alerts-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span id="d-price-alerts-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+        <button onclick="bulkResharePortals()" id="d-price-alerts-bulk" style="display:none;background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.35);border-radius:var(--r2);padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Re-share All</button>
+      </div>
     </div>
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers with portal links whose prices changed since last shared</div>
     <div id="d-price-alerts-list"></div>
@@ -11266,6 +11272,8 @@ function rPriceAlerts(){
   if(!stale.length){card.style.display='none';return;}
   cnt.textContent=stale.length;
   card.style.display='block';
+  var bulkBtn=document.getElementById('d-price-alerts-bulk');
+  if(bulkBtn)bulkBtn.style.display=stale.length>1?'':'none';
   var h='';
   stale.forEach(function(s){
     var d=new Date(s.lastSent);
@@ -11282,6 +11290,46 @@ function rPriceAlerts(){
     +'</div>';
   });
   list.innerHTML=h;
+}
+
+function bulkResharePortals(){
+  if(!priceData.length){toast('Load a price list first');return;}
+  var hist=ST.priceChangeHistory||[];
+  if(!hist.length||!ST.portalTokens||!ST.custPriceSent){toast('No stale portals found');return;}
+  var a=allC();var targets=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    if(!ST.portalTokens[c.code]||ST.portalTokens[c.code]===null)continue;
+    var sent=ST.custPriceSent[c.code];
+    if(!sent||!sent.lastSent)continue;
+    var sentTs=new Date(sent.lastSent).getTime();
+    var sentCats=sent.categories||[];
+    var isStale=hist.some(function(e){
+      return new Date(e.ts).getTime()>sentTs&&(e.cat==='(all)'||sentCats.length===0||sentCats.indexOf(e.cat)>=0);
+    });
+    if(isStale)targets.push(c);
+  }
+  if(!targets.length){toast('No stale portals to update');return;}
+  var done=0,total=targets.length;
+  toast('Updating '+total+' portal'+(total!==1?'s':'')+'...');
+  if(!ST.custPriceSent)ST.custPriceSent={};
+  targets.forEach(function(c){
+    var margin=getCustMargin(c.code);
+    var catMargins=ST.custCatMargins&&ST.custCatMargins[c.code]||{};
+    var pinnedPrices=ST.custItemPrices&&ST.custItemPrices[c.code]||{};
+    var itemMargins=ST.custItemMargins&&ST.custItemMargins[c.code]||{};
+    var token=(ST.portalTokens[c.code]&&ST.portalTokens[c.code]!==null)?ST.portalTokens[c.code]:_genToken();
+    ST.portalTokens[c.code]=token;
+    var portalRow={token:token,customer_name:c.name,customer_code:c.code,margin_pct:margin,items:priceData,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins};
+    sb.from('price_portals').upsert(portalRow,{onConflict:'token'}).then(function(res){
+      if(!res.error){
+        var sentCats2=_getPriceCategories();
+        ST.custPriceSent[c.code]={lastSent:new Date().toISOString(),categories:sentCats2,itemCount:priceData.length};
+      }
+      done++;
+      if(done===total){lSave();syncUp();rDash();toast('&#10003; Updated pricing for '+done+' customer'+(done!==1?'s':''));}
+    });
+  });
 }
 
 /* ── SYNC DIAGNOSTIC & CACHE CLEAR ── */
@@ -11843,6 +11891,11 @@ function duplicateQuote(qid){
     +'<span style="font-size:14px;font-weight:800">Total</span>'
     +'<span id="qb-total" style="font-size:18px;font-weight:800;color:var(--green)">$0</span>'
     +'</div></div>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Quote valid for</span>'
+    +'<select id="qb-validity" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);padding:7px 10px;font-family:inherit;font-size:13px">'
+    +'<option value="7">7 days</option><option value="14">14 days</option><option value="30" selected>30 days</option><option value="60">60 days</option><option value="0">No expiry</option>'
+    +'</select></div>'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
     +'<span style="font-size:13px;color:var(--sub);flex:1">Follow-up reminder</span>'
     +'<select id="qb-fu" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);padding:7px 10px;font-family:inherit;font-size:13px">'
@@ -11901,6 +11954,11 @@ function showQuoteBuilder(code){
     +'<span style="font-size:14px;font-weight:800">Total</span>'
     +'<span id="qb-total" style="font-size:18px;font-weight:800;color:var(--green)">$0</span>'
     +'</div></div>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+    +'<span style="font-size:13px;color:var(--sub);flex:1">Quote valid for</span>'
+    +'<select id="qb-validity" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);padding:7px 10px;font-family:inherit;font-size:13px">'
+    +'<option value="7">7 days</option><option value="14">14 days</option><option value="30" selected>30 days</option><option value="60">60 days</option><option value="0">No expiry</option>'
+    +'</select></div>'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
     +'<span style="font-size:13px;color:var(--sub);flex:1">Follow-up reminder</span>'
     +'<select id="qb-fu" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);padding:7px 10px;font-family:inherit;font-size:13px">'
@@ -12044,12 +12102,15 @@ function saveNewQuote(){
   var valid=_qItems.filter(function(it){return it.name.trim();});
   if(!valid.length){toast('Add at least one item');return;}
   var fuDays=parseInt((document.getElementById('qb-fu')||{}).value||'3');
+  var validityDays=parseInt((document.getElementById('qb-validity')||{}).value||'30');
   var delivery=parseFloat((document.getElementById('qb-delivery')||{}).value||0)||0;
   var isResale=!!(document.getElementById('qb-resale')&&document.getElementById('qb-resale').checked);
   var taxRate=isResale?0:(parseFloat((document.getElementById('qb-taxrate')||{}).value||0)||0);
   var qid='q_'+Date.now();
   var fuDate=null;
   if(fuDays>0){var d=new Date();d.setDate(d.getDate()+fuDays);fuDate=d.toISOString().split('T')[0];}
+  var validUntil=null;
+  if(validityDays>0){var vd=new Date();vd.setDate(vd.getDate()+validityDays);validUntil=vd.toISOString().split('T')[0];}
   // margin guard — warn if any cost-tracked items fall below floor
   var mFloor=ST.quoteMarginFloor>0?parseFloat(ST.quoteMarginFloor):0;
   if(mFloor>0){
@@ -12061,7 +12122,7 @@ function saveNewQuote(){
     }
   }
   var qNotes=((document.getElementById('qb-notes')||{}).value||'').trim();
-  var q={id:qid,code:_qCode,date:new Date().toISOString(),items:valid.map(function(it){return{name:it.name.trim(),qty:it.qty,price:it.price,cost:it.cost||null};}),followupDate:fuDate,status:'open',lostReason:'',dismissed:false,deliveryFee:delivery,taxRate:taxRate,isResale:isResale,notes:qNotes||null};
+  var q={id:qid,code:_qCode,date:new Date().toISOString(),items:valid.map(function(it){return{name:it.name.trim(),qty:it.qty,price:it.price,cost:it.cost||null};}),followupDate:fuDate,validUntil:validUntil,status:'open',lostReason:'',dismissed:false,deliveryFee:delivery,taxRate:taxRate,isResale:isResale,notes:qNotes||null};
   if(!ST.quotes)ST.quotes={};
   ST.quotes[qid]=q;
   lSave();syncUp();
@@ -12104,6 +12165,7 @@ function showQuoteCard(qid,page){
     +'</div>'
     +'<div style="text-align:right;flex-shrink:0;padding-left:12px">'
     +'<div style="font-size:12px;color:#6b7280">'+dStr+'</div>'
+    +(q.validUntil?'<div style="font-size:11px;color:'+(new Date(q.validUntil)<new Date()?'#ef4444':'#9ca3af')+';margin-top:2px">'+(new Date(q.validUntil)<new Date()?'Expired ':'Valid until ')+new Date(q.validUntil).toLocaleDateString('en-US',{month:'short',day:'numeric'})+'</div>':'')
     +'</div>'
     +'</div>'
     +'<div style="height:1px;background:rgba(0,229,184,.25);margin-bottom:12px"></div>'
@@ -12253,8 +12315,9 @@ function rQuoteAlert(){
   var el=document.getElementById('d-quotes-alert');if(!el)return;
   if(!ST.quotes){el.style.display='none';return;}
   var today=new Date().toISOString().split('T')[0];
+  var in7Days=new Date(Date.now()+7*864e5).toISOString().split('T')[0];
   var cutoff45=Date.now()-45*864e5;
-  var a=allC(),due=[],stale=[],pipelineTotal=0,pipelineCount=0;
+  var a=allC(),due=[],stale=[],expiring=[],pipelineTotal=0,pipelineCount=0;
   Object.keys(ST.quotes).forEach(function(k){
     var q=ST.quotes[k];
     if(q.status!=='open'||q.dismissed)return;
@@ -12263,8 +12326,9 @@ function rQuoteAlert(){
     pipelineCount++;pipelineTotal+=qGrandTotal(q)||0;
     if(q.followupDate&&q.followupDate<=today){due.push({q:q,c:cust});}
     else if(!q.followupDate&&new Date(q.date).getTime()<cutoff45){stale.push({q:q,c:cust});}
+    if(q.validUntil&&q.validUntil<=in7Days){expiring.push({q:q,c:cust,expired:q.validUntil<today});}
   });
-  if(!due.length&&!stale.length){el.style.display='none';return;}
+  if(!due.length&&!stale.length&&!expiring.length){el.style.display='none';return;}
   due.sort(function(a,b){return a.q.followupDate.localeCompare(b.q.followupDate);});
   stale.sort(function(a,b){return new Date(a.q.date)-new Date(b.q.date);});
   el.style.display='block';
@@ -12289,6 +12353,29 @@ function rQuoteAlert(){
     due.slice(0,4).forEach(function(item){h+=qRow(item,'rgba(251,191,36,.12)');});
     if(due.length>4)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(due.length-4)+' more</div>';
     h+='</div>';
+  }
+  if(expiring.length){
+    var expiredItems=expiring.filter(function(x){return x.expired;});
+    var soonItems=expiring.filter(function(x){return !x.expired;});
+    if(expiredItems.length){
+      h+='<div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:10px">'
+        +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#ef4444;margin-bottom:6px">&#9203; Expired Quotes</div>';
+      expiredItems.slice(0,3).forEach(function(item){
+        h+=qRow(item,'rgba(239,68,68,.1)');
+      });
+      if(expiredItems.length>3)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(expiredItems.length-3)+' more</div>';
+      h+='</div>';
+    }
+    if(soonItems.length){
+      h+='<div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:var(--r2);padding:10px 12px;margin-bottom:10px">'
+        +'<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--amber);margin-bottom:6px">&#9203; Expiring Within 7 Days</div>';
+      soonItems.slice(0,3).forEach(function(item){
+        var expStr=new Date(item.q.validUntil).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        h+=qRow(item,'rgba(245,158,11,.12)');
+      });
+      if(soonItems.length>3)h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">+'+(soonItems.length-3)+' more</div>';
+      h+='</div>';
+    }
   }
   if(stale.length){
     h+='<div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:var(--r2);padding:10px 12px;margin-bottom:10px">'
