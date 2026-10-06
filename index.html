@@ -11494,8 +11494,31 @@ function runSyncDiag(){
     sb.from('hc_state').upsert({id:CURRENT_USER.id,updated_at:new Date().toISOString()},{onConflict:'id'}).then(function(r2){
       if(r2.error){lines.push('\nWRITE: FAILED — '+r2.error.message);}
       else{lines.push('\nWRITE: OK — Supabase connection working');}
-      lines.push('\n--- Tap Force Upload if cloud data looks wrong ---');
+      // Step 3 — check optional feature tables
+      lines.push('\nChecking feature tables...');
       _showDiag(lines.join('\n'));
+      var tableChecks=[
+        {name:'portal_views',sql:"CREATE TABLE portal_views (\n  token text PRIMARY KEY,\n  viewed_at timestamptz DEFAULT now()\n);\nALTER TABLE portal_views ENABLE ROW LEVEL SECURITY;\nCREATE POLICY \"Public all\" ON portal_views FOR ALL TO anon USING (true) WITH CHECK (true);"},
+        {name:'portal_quote_requests',sql:"CREATE TABLE portal_quote_requests (\n  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),\n  token text NOT NULL,\n  customer_name text,\n  items jsonb,\n  submitted_at timestamptz DEFAULT now(),\n  dismissed boolean DEFAULT false\n);\nALTER TABLE portal_quote_requests ENABLE ROW LEVEL SECURITY;\nCREATE POLICY \"Public insert\" ON portal_quote_requests FOR INSERT TO anon WITH CHECK (true);\nCREATE POLICY \"Auth all\" ON portal_quote_requests FOR ALL TO authenticated USING (true) WITH CHECK (true);"}
+      ];
+      var checked=0;
+      tableChecks.forEach(function(t){
+        sb.from(t.name).select('count').limit(1).then(function(res){
+          lines.pop(); // remove "Checking..."
+          if(res.error&&res.error.code==='42P01'){
+            lines.push('\nTABLE '+t.name+': ❌ MISSING\nRun this SQL in Supabase SQL Editor:\n'+t.sql);
+          }else if(res.error){
+            lines.push('\nTABLE '+t.name+': ⚠️ Error — '+res.error.message);
+          }else{
+            lines.push('\nTABLE '+t.name+': ✅ OK');
+          }
+          checked++;
+          if(checked===tableChecks.length){
+            lines.push('\n--- Tap Force Upload if cloud data looks wrong ---');
+          }
+          _showDiag(lines.join('\n'));
+        });
+      });
     });
   });
 }
