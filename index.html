@@ -1322,6 +1322,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="previsit-txt" id="m-previsit-txt"></div>
     </div>
     <div class="msect"><div class="msect-lbl">Sales</div><div class="sgrid" id="m-s"></div></div>
+    <div id="m-ar-sect" style="display:none;margin-top:6px;padding:10px 12px;background:var(--bg3);border-radius:var(--r2);border:1px solid var(--border)"></div>
     <div class="mb2">
       <button class="abtn" id="m-vis" style="background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3)">Visited</button>
       <button class="abtn" id="m-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3)">Not Available</button>
@@ -1497,10 +1498,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.custAR)ST.custAR={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1905,6 +1906,8 @@ function openM(code){
   var mc=document.getElementById('m-c');if(mc)mc.innerHTML=esc(c.code)+' / '+getGroupName(c.group)+' '+tierBadge(c);
   var mi=document.getElementById('m-intel');
   if(mi){var intelParts=[];var seg=ST.custSegments[code];var vert=ST.custVerticals[code];var opp=ST.custOpportunities[code];if(seg)intelParts.push(segmentBadge(code));if(vert)intelParts.push('<span style="color:var(--sub)">'+esc(vert)+'</span>');if(opp&&opp>0)intelParts.push('<span style="color:var(--teal);font-weight:700">$'+Math.round(opp).toLocaleString()+' opp</span>');if(intelParts.length){mi.innerHTML=intelParts.join(' &bull; ');mi.style.display='';}else{mi.innerHTML='';mi.style.display='none';}}
+  var arSect=document.getElementById('m-ar-sect');
+  if(arSect){var ar=ST.custAR[code];if(ar&&ar.total>0){var arBuckets=[{l:'0-30',v:ar.d0_30||0,c:'#10b981'},{l:'31-60',v:ar.d31_60||0,c:'var(--amber)'},{l:'61-90',v:ar.d61_90||0,c:'#f97316'},{l:'91-120',v:ar.d91_120||0,c:'var(--red)'},{l:'121+',v:ar.d121plus||0,c:'#b91c1c'}];var arH='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px">AR Balance</span><span style="font-size:14px;font-weight:800;color:var(--text)">$'+Math.round(ar.total).toLocaleString()+'</span>'+(ar.terms?'<span style="font-size:11px;color:var(--sub);padding:2px 7px;background:var(--bg2);border-radius:4px;border:1px solid var(--border)">'+esc(ar.terms)+'</span>':'')+'</div><div style="display:flex;gap:4px">';arBuckets.forEach(function(b){if(b.v>0)arH+='<div style="flex:1;text-align:center;padding:5px 3px;background:rgba(0,0,0,.15);border-radius:6px;border-top:2px solid '+b.c+'"><div style="font-size:9px;color:var(--sub);margin-bottom:2px">'+b.l+'</div><div style="font-size:11px;font-weight:700;color:'+b.c+'">$'+Math.round(b.v/1000)+'k</div></div>';});arH+='</div>';arSect.innerHTML=arH;arSect.style.display='';}else{arSect.innerHTML='';arSect.style.display='none';}}
   var addr=[c.address,c.address2,c.city,'CA',c.zip].filter(function(x){return x;}).join(', ');
   var ms=document.getElementById('m-s');
   // Trend: compare current year (sales2526) vs prior year (sales2025)
@@ -2008,7 +2011,7 @@ function _applyRemoteState(rem){
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
   ST.custItemPrices=Object.assign({},rem.custItemPrices||{},ST.custItemPrices||{});
-  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});
+  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});ST.custAR=Object.assign({},rem.custAR||{},ST.custAR||{});
   ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
   ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
@@ -3552,6 +3555,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="previsit-txt" id="m-previsit-txt"></div>
     </div>
     <div class="msect"><div class="msect-lbl">Sales</div><div class="sgrid" id="m-s"></div></div>
+    <div id="m-ar-sect" style="display:none;margin-top:6px;padding:10px 12px;background:var(--bg3);border-radius:var(--r2);border:1px solid var(--border)"></div>
     <div class="mb2">
       <button class="abtn" id="m-vis" style="background:var(--green2);color:var(--green);border:1px solid rgba(0,209,122,.3)">Visited</button>
       <button class="abtn" id="m-na" style="background:var(--amber2);color:var(--amber);border:1px solid rgba(255,176,32,.3)">Not Available</button>
@@ -3719,10 +3723,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.custAR)ST.custAR={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -4137,6 +4141,8 @@ function openM(code){
   var mc=document.getElementById('m-c');if(mc)mc.innerHTML=esc(c.code)+' / '+getGroupName(c.group)+' '+tierBadge(c);
   var mi=document.getElementById('m-intel');
   if(mi){var intelParts=[];var seg=ST.custSegments[code];var vert=ST.custVerticals[code];var opp=ST.custOpportunities[code];if(seg)intelParts.push(segmentBadge(code));if(vert)intelParts.push('<span style="color:var(--sub)">'+esc(vert)+'</span>');if(opp&&opp>0)intelParts.push('<span style="color:var(--teal);font-weight:700">$'+Math.round(opp).toLocaleString()+' opp</span>');if(intelParts.length){mi.innerHTML=intelParts.join(' &bull; ');mi.style.display='';}else{mi.innerHTML='';mi.style.display='none';}}
+  var arSect=document.getElementById('m-ar-sect');
+  if(arSect){var ar=ST.custAR[code];if(ar&&ar.total>0){var arBuckets=[{l:'0-30',v:ar.d0_30||0,c:'#10b981'},{l:'31-60',v:ar.d31_60||0,c:'var(--amber)'},{l:'61-90',v:ar.d61_90||0,c:'#f97316'},{l:'91-120',v:ar.d91_120||0,c:'var(--red)'},{l:'121+',v:ar.d121plus||0,c:'#b91c1c'}];var arH='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px">AR Balance</span><span style="font-size:14px;font-weight:800;color:var(--text)">$'+Math.round(ar.total).toLocaleString()+'</span>'+(ar.terms?'<span style="font-size:11px;color:var(--sub);padding:2px 7px;background:var(--bg2);border-radius:4px;border:1px solid var(--border)">'+esc(ar.terms)+'</span>':'')+'</div><div style="display:flex;gap:4px">';arBuckets.forEach(function(b){if(b.v>0)arH+='<div style="flex:1;text-align:center;padding:5px 3px;background:rgba(0,0,0,.15);border-radius:6px;border-top:2px solid '+b.c+'"><div style="font-size:9px;color:var(--sub);margin-bottom:2px">'+b.l+'</div><div style="font-size:11px;font-weight:700;color:'+b.c+'">$'+Math.round(b.v/1000)+'k</div></div>';});arH+='</div>';arSect.innerHTML=arH;arSect.style.display='';}else{arSect.innerHTML='';arSect.style.display='none';}}
   var addr=[c.address,c.address2,c.city,'CA',c.zip].filter(function(x){return x;}).join(', ');
   var ms=document.getElementById('m-s');
   // Trend: compare current year (sales2526) vs prior year (sales2025)
@@ -4240,7 +4246,7 @@ function _applyRemoteState(rem){
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
   ST.custItemPrices=Object.assign({},rem.custItemPrices||{},ST.custItemPrices||{});
-  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});
+  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});ST.custAR=Object.assign({},rem.custAR||{},ST.custAR||{});
   ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
   ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
@@ -5326,25 +5332,23 @@ function guessGroup(zip){
   var best=null,bv=0;for(var g in counts){if(counts[g]>bv){bv=counts[g];best=parseInt(g);}}
   return best||61;
 }
-function doImport(hdrs,rows,fname,status){
-  var COLS={code:['code','customercode','acct','custcode','custno','customerno','customernumber','accountno','accountnumber','cust'],
-    name:['name','customername','company','businessname','accountname','custname'],
-    address:['address','addr','street','address1','addr1'],
-    address2:['address2','addr2','suite','unit','apt','ste','addressline2'],
-    city:['city'],zip:['zip','zipcode','postalcode'],
-    phone:['phone','tel','telephone'],email:['email'],group:['group','route','routeno'],
-    lifetimeSales:['lifetimesales','lifetime','totalnetrevenue','totalrevenue','alltime'],
-    sales2024:['sales2024','2024','fy24','2324'],
-    sales2025:['sales2025','2025','fy25','2425'],
-    sales2526:['sales2526','20252026','ytd','2526','fy26','currentyear','thisyear','current']};
-  var ci={};
-  if(window._importColOverride){
-    ci=window._importColOverride;
-  } else {
-    for(var f in COLS){ci[f]=-1;for(var i=0;i<COLS[f].length;i++){for(var j=0;j<hdrs.length;j++){if(hdrs[j]===COLS[f][i]||hdrs[j].indexOf(COLS[f][i])>=0){ci[f]=j;break;}}if(ci[f]>=0)break;}
-  }}
+function doImport(hdrs,rows,fname,status,ci,fc){
+  if(!ci){
+    ci={};
+    var norm=hdrs.map(function(h){return h.toLowerCase().replace(/[^a-z0-9]/g,'');});
+    _FIELD_DEFS.forEach(function(fd){
+      ci[fd.key]=-1;
+      for(var i=0;i<fd.aliases.length;i++){
+        for(var j=0;j<norm.length;j++){
+          if(norm[j]===fd.aliases[i]||norm[j].indexOf(fd.aliases[i])>=0){ci[fd.key]=j;break;}
+        }
+        if(ci[fd.key]>=0)break;
+      }
+    });
+  }
+  if(!fc)fc={contact:true,sales:true,ar:true,intel:true,newaccts:true};
   if(rows.length>3000&&!confirm('This file has '+rows.length.toLocaleString()+' rows — large imports may take a moment. Continue?'))return;
-  var added=0,updated=0,skipped=0,flagged=0,badAddr=0,badZip=0,a=allC(),newDiscrep=[],addedNames=[],badZipRows=[];
+  var added=0,updated=0,skipped=0,flagged=0,badAddr=0,badZip=0,a=allC(),newDiscrep=[],addedNames=[],badZipRows=[],newAccounts=[];
   var importDate=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
   function parseMoney(v){return parseFloat(String(v||'').replace(/[$,\s]/g,''))||0;}
@@ -5363,51 +5367,55 @@ function doImport(hdrs,rows,fname,status){
     }
 
     if(ex){
-      // Update financials via ST.edits
-      var finUpdated=false;
-      var salesFields=['lifetimeSales','sales2024','sales2025','sales2526'];
-      for(var k=0;k<salesFields.length;k++){
-        var fld=salesFields[k];
-        if(ci[fld]>=0){
-          var val=parseMoney(row[ci[fld]]);
-          if(val>0){
-            if(!ST.edits)ST.edits={};
-            if(!ST.edits[ex.code])ST.edits[ex.code]={};
-            ST.edits[ex.code][fld]=val;
-            finUpdated=true;
-          }
+      var anyUpdated=false;
+      // Sales fields
+      if(fc.sales){
+        var salesFlds=['lifetimeSales','sales2024','sales2025','sales2526'];
+        for(var k=0;k<salesFlds.length;k++){
+          var fld=salesFlds[k];
+          if(ci[fld]>=0){var val=parseMoney(row[ci[fld]]);if(val>0){if(!ST.edits)ST.edits={};if(!ST.edits[ex.code])ST.edits[ex.code]={};ST.edits[ex.code][fld]=val;anyUpdated=true;}}
         }
       }
-      // Check contact discrepancies
-      var contactFields=['name','address','city','zip','phone','email'];
-      var fieldLabels={name:'Name',address:'Address',city:'City',zip:'Zip',phone:'Phone',email:'Email'};
-      var diffs=[];
-      for(var k=0;k<contactFields.length;k++){
-        var fld2=contactFields[k];
-        if(ci[fld2]<0)continue;
-        var importedVal=String(row[ci[fld2]]||'').trim();
-        var appVal=String((ST.edits&&ST.edits[ex.code]&&ST.edits[ex.code][fld2]!=null?ST.edits[ex.code][fld2]:ex[fld2])||'').trim();
-        if(importedVal&&importedVal!==appVal){
-          diffs.push({field:fieldLabels[fld2],app:appVal,epicor:importedVal});
+      // AR fields
+      if(fc.ar){
+        var arEntry={};var hasAny=false;
+        var arMap={ar_total:'total',ar_0_30:'d0_30',ar_31_60:'d31_60',ar_61_90:'d61_90',ar_91_120:'d91_120',ar_121plus:'d121plus'};
+        for(var ak in arMap){if(ci[ak]>=0){var arv=parseMoney(row[ci[ak]]);if(arv>=0){arEntry[arMap[ak]]=arv;hasAny=true;}}}
+        if(ci.payment_terms>=0&&row[ci.payment_terms]){arEntry.terms=String(row[ci.payment_terms]).trim();hasAny=true;}
+        if(hasAny){ST.custAR[ex.code]=Object.assign(ST.custAR[ex.code]||{},arEntry);anyUpdated=true;}
+      }
+      // Intel fields
+      if(fc.intel){
+        if(ci.segment>=0&&row[ci.segment]){ST.custSegments[ex.code]=String(row[ci.segment]).trim();anyUpdated=true;}
+        if(ci.vertical>=0&&row[ci.vertical]){ST.custVerticals[ex.code]=String(row[ci.vertical]).trim();anyUpdated=true;}
+        if(ci.opportunity>=0&&row[ci.opportunity]){var oppv=parseMoney(row[ci.opportunity]);if(oppv>0){ST.custOpportunities[ex.code]=oppv;anyUpdated=true;}}
+        if(ci.talking_point>=0&&row[ci.talking_point]){var tp=String(row[ci.talking_point]).trim();if(tp){if(!ST.standingAlerts)ST.standingAlerts={};ST.standingAlerts[ex.code]=tp;anyUpdated=true;}}
+      }
+      // Contact discrepancies (only if contact updates chosen)
+      if(fc.contact){
+        var contactFields=['name','address','city','zip','phone','email'];
+        var fieldLabels={name:'Name',address:'Address',city:'City',zip:'Zip',phone:'Phone',email:'Email'};
+        var diffs=[];
+        for(var k=0;k<contactFields.length;k++){
+          var fld2=contactFields[k];
+          if(ci[fld2]<0)continue;
+          var importedVal=String(row[ci[fld2]]||'').trim();
+          var appVal=String((ST.edits&&ST.edits[ex.code]&&ST.edits[ex.code][fld2]!=null?ST.edits[ex.code][fld2]:ex[fld2])||'').trim();
+          if(importedVal&&importedVal!==appVal){diffs.push({field:fieldLabels[fld2],app:appVal,epicor:importedVal});}
         }
-      }
-      if(diffs.length){
-        newDiscrep.push({code:ex.code,name:ex.name,date:importDate,diffs:diffs});
-        flagged++;
-      } else if(finUpdated){
-        updated++;
-      } else {
-        skipped++;
-      }
+        if(diffs.length){newDiscrep.push({code:ex.code,name:ex.name,date:importDate,diffs:diffs});flagged++;}
+        else if(anyUpdated){updated++;}
+        else{skipped++;}
+      } else if(anyUpdated){updated++;}
+      else{skipped++;}
     } else {
-      // New account
+      // New account — collect for chooser or add directly
       if(!name){skipped++;continue;}
       var importZip=ci.zip>=0?row[ci.zip]:'';
       var rawA1=ci.address>=0?String(row[ci.address]||'').trim():'';
       var rawA2=ci.address2>=0?String(row[ci.address2]||'').trim():'';
       var addrR=_resolveImportAddr(rawA1,rawA2);
-      if(addrR.needsFix)badAddr++;
-      var nc={code:code||('IMP'+Date.now().toString().slice(-6)),name:name,
+      var nc2={code:code||('IMP'+Date.now().toString().slice(-6)),name:name,
         group:ci.group>=0&&row[ci.group]?parseInt(row[ci.group])||guessGroup(importZip):guessGroup(importZip),
         stop:999,address:addrR.address,address2:addrR.address2,needsAddressFix:addrR.needsFix||undefined,
         city:ci.city>=0?row[ci.city]:'',state:'CA',zip:ci.zip>=0?row[ci.zip]:'',
@@ -5416,13 +5424,16 @@ function doImport(hdrs,rows,fname,status){
         sales2024:ci.sales2024>=0?parseMoney(row[ci.sales2024]):0,
         sales2025:ci.sales2025>=0?parseMoney(row[ci.sales2025]):0,
         sales2526:ci.sales2526>=0?parseMoney(row[ci.sales2526]):0,
-        distance:0,addedAt:new Date().toISOString()};
-      // ZIP validation
-      var z5=nc.zip?String(nc.zip).replace(/\D/g,'').slice(0,5):'';
-      if(!z5){nc.needsZipFix=true;badZip++;badZipRows.push(nc.name);}
-      else if(!ZIP_LL[z5]&&!ZIP_TO_GROUP[z5]){nc.needsZipFix=true;badZip++;badZipRows.push(nc.name+'('+z5+')');}
-      if(!ST.addedCustomers)ST.addedCustomers=[];
-      ST.addedCustomers.push(nc);added++;addedNames.push(nc.name);
+        distance:0,addedAt:new Date().toISOString(),
+        _importSeg:fc.intel&&ci.segment>=0?String(row[ci.segment]||'').trim():'',
+        _importVert:fc.intel&&ci.vertical>=0?String(row[ci.vertical]||'').trim():'',
+        _importOpp:fc.intel&&ci.opportunity>=0?parseMoney(row[ci.opportunity]):0,
+        _importTP:fc.intel&&ci.talking_point>=0?String(row[ci.talking_point]||'').trim():''};
+      var z5=nc2.zip?String(nc2.zip).replace(/\D/g,'').slice(0,5):'';
+      if(!z5){nc2.needsZipFix=true;badZip++;}
+      else if(!ZIP_LL[z5]&&!ZIP_TO_GROUP[z5]){nc2.needsZipFix=true;badZip++;}
+      if(addrR.needsFix)badAddr++;
+      newAccounts.push(nc2);
     }
   }
 
@@ -5433,22 +5444,96 @@ function doImport(hdrs,rows,fname,status){
   _epicorDiscrep=Object.values(dmap);
   localStorage.setItem('hrt_discrep',JSON.stringify(_epicorDiscrep));
 
+  // Handle new accounts
+  if(newAccounts.length&&fc.newaccts){
+    if(IS_FIRST_RUN){
+      // First run: add all without chooser
+      _commitNewAccounts(newAccounts);added=newAccounts.length;
+      newAccounts.forEach(function(nc){addedNames.push(nc.name);});
+      _finishImport(status,added,updated,flagged,badAddr,badZip,skipped,addedNames,newAccounts);
+    } else {
+      // Show new account chooser
+      lSave();syncUp();rCust();rDash();rGrps();rDiscrepCard();
+      showNewAccountChooser(newAccounts,status,updated,flagged,badAddr,badZip,skipped);
+      return;
+    }
+  } else {
+    _finishImport(status,added,updated,flagged,badAddr,badZip,skipped,addedNames,[]);
+  }
+}
+function _commitNewAccounts(accounts){
+  accounts.forEach(function(nc){
+    var c=Object.assign({},nc);
+    var seg=c._importSeg;var vert=c._importVert;var opp=c._importOpp;var tp=c._importTP;
+    delete c._importSeg;delete c._importVert;delete c._importOpp;delete c._importTP;
+    if(!ST.addedCustomers)ST.addedCustomers=[];
+    ST.addedCustomers.push(c);
+    if(seg)ST.custSegments[c.code]=seg;
+    if(vert)ST.custVerticals[c.code]=vert;
+    if(opp>0)ST.custOpportunities[c.code]=opp;
+    if(tp){if(!ST.standingAlerts)ST.standingAlerts={};ST.standingAlerts[c.code]=tp;}
+  });
+}
+function _finishImport(status,added,updated,flagged,badAddr,badZip,skipped,addedNames,newAccounts){
   lSave();syncUp();rCust();rDash();rGrps();rDiscrepCard();
-  if(badAddr>0){setTimeout(function(){toast(badAddr+' customer'+(badAddr>1?'s have':' has')+' no valid street address — placed in "Needs Address Fix" group so you can update them.');},1200);}
-  if(badZip>0){setTimeout(function(){toast('⚠ '+badZip+' customer'+(badZip>1?'s have':' has')+' missing or unrecognized ZIP — route group may be wrong. Review in Settings → ZIP / Group Health.');},badAddr>0?2800:1200);}
+  if(badAddr>0){setTimeout(function(){toast(badAddr+' customer'+(badAddr>1?'s have':' has')+' no valid street address — placed in "Needs Address Fix" group.');},1200);}
+  if(badZip>0){setTimeout(function(){toast('⚠ '+badZip+' customer'+(badZip>1?'s have':' has')+' missing or unrecognized ZIP.');},badAddr>0?2800:1200);}
   if(IS_FIRST_RUN&&added>0){setTimeout(function(){generateRouteGroups(function(){var ob=document.getElementById('ob-overlay');if(ob)ob.style.display='none';go('dash');});},600);}
   var parts=[];
   if(added)parts.push(added+' new account'+(added!==1?'s':'')+' added');
-  if(updated)parts.push(updated+' financial'+(updated!==1?'s':'')+' updated');
-  if(flagged)parts.push(flagged+' order system discrepanc'+(flagged!==1?'ies':'y')+' flagged');
+  if(updated)parts.push(updated+' record'+(updated!==1?'s':'')+' updated');
+  if(flagged)parts.push(flagged+' contact discrepanc'+(flagged!==1?'ies':'y')+' flagged');
   if(badAddr)parts.push(badAddr+' need address fix');
   if(badZip)parts.push(badZip+' bad/unknown ZIP'+(badZip>1?'s':''));
-  if(skipped)parts.push(skipped+' matched/unchanged');
+  if(skipped)parts.push(skipped+' unchanged');
   status.style.color=flagged?'var(--amber)':(added||updated)?'var(--teal)':'var(--sub)';
   var msg=parts.length?parts.join(' · '):'Nothing to update — all data matches';
-  if(addedNames.length)msg+='\nAdded: '+addedNames.join(', ')+' — search their names in Customers tab';
+  if(addedNames.length&&addedNames.length<=5)msg+='\nAdded: '+addedNames.join(', ');
   status.style.whiteSpace='pre-line';
   status.textContent=msg;
+}
+function showNewAccountChooser(accounts,status,updated,flagged,badAddr,badZip,skipped){
+  var sh=document.createElement('div');
+  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var rows='';
+  accounts.forEach(function(nc,idx){
+    var seg=nc._importSeg?'<span class="seg-'+(nc._importSeg==='VIP'?'vip':nc._importSeg==='Growing'?'grow':nc._importSeg==='New-Nurture'?'new':nc._importSeg==='Declining'?'dcl':nc._importSeg==='Lost'?'lost':'dorm')+'">'+esc(nc._importSeg)+'</span> ':'';
+    rows+='<label style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer">'+
+      '<input type="checkbox" data-idx="'+idx+'" checked style="width:16px;height:16px;accent-color:var(--teal);flex-shrink:0">'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:13px;font-weight:700">'+esc(nc.name)+' '+seg+'</div>'+
+        '<div style="font-size:11px;color:var(--sub)">'+esc(nc.code)+' &bull; '+esc(nc.city||'?')+
+        (nc._importVert?' &bull; '+esc(nc._importVert):'')+
+        (nc._importOpp>0?' &bull; <span style="color:var(--teal)">$'+Math.round(nc._importOpp).toLocaleString()+' opp</span>':'')+
+        '</div>'+
+      '</div>'+
+    '</label>';
+  });
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'+
+    '<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'+
+      '<div style="font-size:18px;font-weight:800">'+accounts.length+' New Account'+(accounts.length!==1?'s':'')+' Found</div>'+
+      '<label style="font-size:12px;color:var(--sub);cursor:pointer"><input type="checkbox" id="na-all" checked onchange="document.querySelectorAll(\'[data-idx]\').forEach(function(c){c.checked=this.checked;}.bind(this))"> All</label>'+
+    '</div>'+
+    '<div style="font-size:12px;color:var(--sub);margin-bottom:12px">These accounts are in your file but not yet in FieldIQ. Check the ones you want to add.</div>'+
+    rows+
+    '<button onclick="confirmNewAccounts(window._pendingNewAccounts,window._naStatus,window._naUpdated,window._naFlagged,window._naBadAddr,window._naBadZip,window._naSkipped,this.closest(\'div[style*=fixed]\'))" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-top:14px;margin-bottom:8px">Add Selected Accounts</button>'+
+    '<button onclick="confirmNewAccounts([],window._naStatus,window._naUpdated,window._naFlagged,window._naBadAddr,window._naBadZip,window._naSkipped,this.closest(\'div[style*=fixed]\'))" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Skip — Don\'t Add Any</button>'+
+  '</div>';
+  window._pendingNewAccounts=accounts;window._naStatus=status;window._naUpdated=updated;window._naFlagged=flagged;window._naBadAddr=badAddr;window._naBadZip=badZip;window._naSkipped=skipped;
+  document.body.appendChild(sh);
+  sh.addEventListener('click',function(ev){if(ev.target===sh)sh.remove();});
+}
+function confirmNewAccounts(allAccounts,status,updated,flagged,badAddr,badZip,skipped,sheetEl){
+  if(sheetEl)sheetEl.remove();
+  var selected=[];
+  var checks=document.querySelectorAll('[data-idx]');
+  if(allAccounts.length&&checks.length){
+    checks.forEach(function(c){if(c.checked)selected.push(allAccounts[parseInt(c.getAttribute('data-idx'))]);});
+  }
+  _commitNewAccounts(selected);
+  var addedNames=selected.map(function(nc){return nc.name;});
+  _finishImport(status,selected.length,updated,flagged,badAddr,badZip,skipped,addedNames,[]);
 }
 function rDiscrepCard(){
   var card=document.getElementById('discrep-card');if(!card)return;
@@ -8125,7 +8210,7 @@ function saveTierTarget(tier,val){
   lSave();syncUp();rDash();
 }
 function saveTierWindow(tier,val){
-  if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};
+  if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.custAR)ST.custAR={};
   var v=val.trim();
   if(v)ST.tierWindows[tier]=v;else delete ST.tierWindows[tier];
   lSave();syncUp();
@@ -13253,7 +13338,18 @@ var _FIELD_DEFS=[
   {key:'lifetimeSales', label:'Lifetime Sales', aliases:['lifetimesales','lifetime','totalnetrevenue','totalrevenue','alltime','total']},
   {key:'sales2024', label:'FY 2023-24 Sales', aliases:['sales2024','2024','fy24','2324','lastyear']},
   {key:'sales2025', label:'FY 2024-25 Sales', aliases:['sales2025','2025','fy25','2425']},
-  {key:'sales2526', label:'Current Year Sales (YTD)', aliases:['sales2526','20252026','ytd','2526','fy26','currentyear','thisyear','current','ytdsales']}
+  {key:'sales2526', label:'Current Year Sales (YTD)', aliases:['sales2526','20252026','ytd','2526','fy26','currentyear','thisyear','current','ytdsales']},
+  {key:'ar_total',  label:'AR Balance (Total)',      aliases:['arbalance','artotal','balance','outstandingbalance','totaldue','arbalancetotal','totalar','openar','openbalance']},
+  {key:'ar_0_30',   label:'AR 0–30 Days (Current)',  aliases:['ar030','030','0to30','current0to30','ar0to30','arbalance030','age030','aging030']},
+  {key:'ar_31_60',  label:'AR 31–60 Days',           aliases:['ar3160','3160','31to60','ar31to60','arbalance3160','age3160','aging3160']},
+  {key:'ar_61_90',  label:'AR 61–90 Days',           aliases:['ar6190','6190','61to90','ar61to90','arbalance6190','age6190','aging6190']},
+  {key:'ar_91_120', label:'AR 91–120 Days',          aliases:['ar91120','91120','91to120','ar91to120','arbalance91120','age91120','aging91120']},
+  {key:'ar_121plus',label:'AR 121+ Days',            aliases:['ar121','ar121plus','121plus','over120','over121','ar121andover','arbalance121','age121']},
+  {key:'payment_terms',label:'Payment Terms',        aliases:['paymentterms','terms','netterms','creditterm','creditterms','invoiceterms','payterms']},
+  {key:'segment',   label:'Segment / Account Type',  aliases:['segment','tier','stratification','accounttier','customersegment','accounttype','segmenttype','accountsegment']},
+  {key:'vertical',  label:'Vertical / Industry',     aliases:['vertical','industry','type','customertype','businesstype','industrytype','sector','market','trade']},
+  {key:'opportunity',label:'Opportunity $ (Upside)', aliases:['opportunity','opp','opportunitydollar','upside','potential','oppvalue','oppdollar','estimatedopportunity']},
+  {key:'talking_point',label:'Talking Point / Approach', aliases:['talkingpoint','approach','suggestedapproach','strategy','callnotes','visitstrategy','talktrack','recommendation']}
 ];
 function _autoDetectCols(hdrs){
   var ci={};
@@ -13275,7 +13371,9 @@ function showColumnMapper(hdrs,rows,fname,statusEl){
   var sh=document.createElement('div');
   sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
   var coreFields=_FIELD_DEFS.slice(0,8);
-  var salesFields=_FIELD_DEFS.slice(8);
+  var salesFields=_FIELD_DEFS.slice(8,12);
+  var arFields=_FIELD_DEFS.slice(12,19);
+  var intelFields=_FIELD_DEFS.slice(19);
   function colOpts(selectedIdx){
     var o='<option value="-1">(not in file)</option>';
     hdrs.forEach(function(h,i){o+='<option value="'+i+'"'+(i===selectedIdx?' selected':'')+'>'+esc(h)+'</option>';});
@@ -13305,13 +13403,17 @@ function showColumnMapper(hdrs,rows,fname,statusEl){
     mapRows(coreFields)+
     '<div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:12px 0 4px">Sales Data</div>'+
     mapRows(salesFields)+
+    '<div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:12px 0 4px">AR &amp; Financial</div>'+
+    mapRows(arFields)+
+    '<div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:12px 0 4px">Account Intel</div>'+
+    mapRows(intelFields)+
     '<div style="margin:12px 0;padding:10px 12px;background:rgba(255,176,32,.1);border:1px solid rgba(255,176,32,.3);border-radius:8px;font-size:12px;color:var(--text);line-height:1.6">'+
       '<strong>&#9888; Address tip:</strong> Make sure Address 1 contains complete street addresses (e.g. "123 Main St"). '+
       'PO Boxes and business names in that column can\'t be used for routing and will be placed in a <em>Needs Address Fix</em> group. '+
       'If your file has a second address column (suite / unit), map it to Address 2 — we\'ll combine them automatically.'+
     '</div>'+
     '<button id="ai-map-btn" onclick="aiMapColumns()" style="width:100%;padding:11px;border-radius:10px;border:1px solid rgba(74,158,255,.3);background:rgba(74,158,255,.12);color:var(--blue);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:8px">&#10024; AI Auto-Map Columns</button>'+
-    '<button onclick="confirmImport()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:8px">&#10003; Confirm &amp; Import</button>'+
+    '<button onclick="confirmImport()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:8px">&#10003; Next: Choose What to Update</button>'+
     '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'+
   '</div>';
   window._pendingImport={rows:rows,hdrs:hdrs,fname:fname,statusEl:statusEl};
@@ -13328,10 +13430,53 @@ function confirmImport(){
   });
   ST.savedColMap=ci;lSave();
   if(window._colMapperSheet){window._colMapperSheet.remove();window._colMapperSheet=null;}
-  var normHdrs=pi.hdrs.map(function(h){return h.toLowerCase().replace(/[^a-z0-9]/g,'');});
-  window._importColOverride=ci;
-  doImport(normHdrs,pi.rows,pi.fname,pi.statusEl);
-  window._importColOverride=null;
+  window._pendingImportCI=ci;
+  showFieldChooser(pi);
+}
+function showFieldChooser(pi){
+  var ci=window._pendingImportCI||{};
+  var hasAR=ci.ar_total>=0||ci.ar_0_30>=0||ci.ar_31_60>=0||ci.ar_61_90>=0||ci.ar_91_120>=0||ci.ar_121plus>=0;
+  var hasIntel=ci.segment>=0||ci.vertical>=0||ci.opportunity>=0||ci.talking_point>=0;
+  var hasContact=ci.name>=0||ci.address>=0||ci.city>=0||ci.zip>=0||ci.phone>=0||ci.email>=0;
+  var hasSales=ci.lifetimeSales>=0||ci.sales2024>=0||ci.sales2025>=0||ci.sales2526>=0;
+  var sh=document.createElement('div');
+  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:10000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  function chk(id,label,desc,checked,disabled){
+    return '<label style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);cursor:'+(disabled?'default':'pointer')+'">'+
+      '<input type="checkbox" id="fc-'+id+'"'+(checked?' checked':'')+' style="margin-top:2px;width:16px;height:16px;accent-color:var(--teal);flex-shrink:0"'+( disabled?' disabled':'')+'>'+
+      '<div><div style="font-size:13px;font-weight:700;color:'+(disabled?'var(--dim)':'var(--text)')+'">'+label+'</div>'+
+      '<div style="font-size:11px;color:var(--sub);margin-top:2px">'+desc+'</div></div></label>';
+  }
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;padding:20px 20px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'+
+    '<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'+
+    '<div style="font-size:18px;font-weight:800;margin-bottom:4px">Choose What to Update</div>'+
+    '<div style="font-size:12px;color:var(--sub);margin-bottom:14px">Your notes, visit history, custom pricing, and route assignments are always protected — never touched by import.</div>'+
+    chk('contact','Contact Info','Name, address, phone, email — flags conflicts with app edits',hasContact,false)+
+    chk('sales','Sales Figures','Lifetime, 2024, 2025, current year YTD',hasSales,false)+
+    (hasAR?chk('ar','AR &amp; Financials','Balance, aging buckets (0-30, 31-60, etc.), payment terms',true,false):'<div style="padding:10px 0;border-bottom:1px solid var(--border);color:var(--dim);font-size:12px">AR &amp; Financials — not detected in file</div>')+
+    (hasIntel?chk('intel','Account Intel','Segment, vertical, opportunity $, talking point',true,false):'<div style="padding:10px 0;border-bottom:1px solid var(--border);color:var(--dim);font-size:12px">Account Intel — not detected in file</div>')+
+    chk('newaccts','New Accounts','Show me new accounts found in the file so I can select which to add',true,false)+
+    '<div style="margin-top:6px;padding:10px 12px;background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.2);border-radius:8px;font-size:11px;color:var(--sub);line-height:1.7">'+
+      '<strong style="color:var(--text)">Always protected (never imported):</strong> Notes &bull; Contacts &bull; Custom pricing &bull; Visit logs &bull; Tags &bull; Route groups</div>'+
+    '<button onclick="runSmartImport()" style="width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--teal),#00c9a5);color:#000;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-top:14px;margin-bottom:8px">&#8659; Import Now</button>'+
+    '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--bg3);color:var(--sub);border:1px solid var(--border2);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>'+
+  '</div>';
+  window._fieldChooserSheet=sh;
+  document.body.appendChild(sh);
+  sh.addEventListener('click',function(ev){if(ev.target===sh){sh.remove();window._fieldChooserSheet=null;}});
+}
+function runSmartImport(){
+  var pi=window._pendingImport;if(!pi)return;
+  var fc={
+    contact:document.getElementById('fc-contact')&&document.getElementById('fc-contact').checked,
+    sales:document.getElementById('fc-sales')&&document.getElementById('fc-sales').checked,
+    ar:document.getElementById('fc-ar')&&document.getElementById('fc-ar').checked,
+    intel:document.getElementById('fc-intel')&&document.getElementById('fc-intel').checked,
+    newaccts:document.getElementById('fc-newaccts')&&document.getElementById('fc-newaccts').checked
+  };
+  if(window._fieldChooserSheet){window._fieldChooserSheet.remove();window._fieldChooserSheet=null;}
+  var ci=window._pendingImportCI||{};
+  doImport(pi.hdrs.map(function(h){return h.toLowerCase().replace(/[^a-z0-9]/g,'');}),pi.rows,pi.fname,pi.statusEl,ci,fc);
 }
 
 /* ── AI IMPORT ASSIST ── */
@@ -13365,7 +13510,7 @@ function aiMapColumns(){
   var btn=document.getElementById('ai-map-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ Mapping...';}
   var sampleRows=pi.rows.slice(0,3);
-  var prompt='Map these CSV headers to CRM fields.\n\nHeaders: '+JSON.stringify(pi.hdrs)+'\nSample data (first 3 rows): '+JSON.stringify(sampleRows)+'\n\nAvailable fields and what they mean:\n- code: customer/account ID or number\n- name: business/company name\n- address: street address line 1\n- address2: suite, unit, floor (address line 2)\n- city: city\n- zip: zip or postal code\n- phone: phone number\n- email: email address\n- group: route group or territory number\n- lifetimeSales: all-time or lifetime revenue/sales\n- sales2024: fiscal year 2024 sales\n- sales2025: fiscal year 2025 sales\n- sales2526: fiscal year 2025-2026 or current year sales (YTD, current year)\n\nReturn ONLY a JSON object mapping field names to 0-based column indices. Example: {"code":0,"name":1}. Include only matched fields. No explanation.';
+  var prompt='Map these CSV headers to CRM fields.\n\nHeaders: '+JSON.stringify(pi.hdrs)+'\nSample data (first 3 rows): '+JSON.stringify(sampleRows)+'\n\nAvailable fields and what they mean:\n- code: customer/account ID or number\n- name: business/company name\n- address: street address line 1\n- address2: suite, unit, floor (address line 2)\n- city: city\n- zip: zip or postal code\n- phone: phone number\n- email: email address\n- group: route group or territory number\n- lifetimeSales: all-time or lifetime revenue/sales\n- sales2024: fiscal year 2024 sales\n- sales2025: fiscal year 2025 sales\n- sales2526: fiscal year 2025-2026 or current year sales (YTD, current year)\n- ar_total: total AR balance / total outstanding amount owed\n- ar_0_30: AR aging 0-30 days (current)\n- ar_31_60: AR aging 31-60 days\n- ar_61_90: AR aging 61-90 days\n- ar_91_120: AR aging 91-120 days\n- ar_121plus: AR aging 121+ days (past due)\n- payment_terms: customer payment terms (e.g. NET 30, COD)\n- segment: customer segment or tier (e.g. VIP, Growing, Declining)\n- vertical: industry or business type (e.g. Cabinet Shop, Millwork)\n- opportunity: estimated opportunity or upside dollar value\n- talking_point: suggested approach or talking point for the rep\n\nReturn ONLY a JSON object mapping field names to 0-based column indices. Example: {"code":0,"name":1}. Include only matched fields. No explanation.';
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'x-api-key':key,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
@@ -13948,7 +14093,7 @@ function onLogin(user){
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
   // Reset ST to blank so previous session data doesn't leak into a new account
-  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
   // One-time cleanup: remove any fake demo customers that got added accidentally
   var _fakeCodes={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
@@ -14170,7 +14315,7 @@ function doSignOut(){
     CURRENT_USER=null;
     SK='';
     rollingRoute=null;saveRolling();
-    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
     var tb=document.getElementById('trial-banner');if(tb)tb.style.display='none';
@@ -14245,7 +14390,7 @@ function confirmDeleteAccount(){
   sb.from('hc_state').delete().eq('id',uid).then(function(){
     sb.auth.signOut().then(function(){
       CURRENT_USER=null;SK='';
-      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
       // Clear local storage
       try{localStorage.removeItem('fieldiq_'+uid);}catch(e){}
       authTab('signin');
