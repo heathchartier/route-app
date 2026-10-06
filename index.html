@@ -12286,10 +12286,11 @@ function showQuoteCard(qid,page){
     +'<div style="font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:12px">Screenshot or send &nbsp;&#183;&nbsp; Tap outside to close</div>'
     +cardH
     +navH
-    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px">'
-    +'<button onclick="emailQuote(\''+qid+'\')" style="padding:11px 6px;border-radius:var(--r2);background:rgba(74,158,255,.15);border:1px solid rgba(74,158,255,.3);color:#4a9eff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128231; Email</button>'
-    +'<button onclick="shareQuote(\''+qid+'\')" style="padding:11px 6px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.25);color:#00e5b8;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128228; Share</button>'
-    +'<button onclick="copyQuote(\''+qid+'\')" style="padding:11px 6px;border-radius:var(--r2);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128203; Copy</button>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:12px">'
+    +'<button onclick="emailQuote(\''+qid+'\')" style="padding:11px 4px;border-radius:var(--r2);background:rgba(74,158,255,.15);border:1px solid rgba(74,158,255,.3);color:#4a9eff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#128231; Email</button>'
+    +'<button onclick="shareQuote(\''+qid+'\')" style="padding:11px 4px;border-radius:var(--r2);background:rgba(0,229,184,.12);border:1px solid rgba(0,229,184,.25);color:#00e5b8;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#128228; Share</button>'
+    +'<button onclick="printQuote(\''+qid+'\')" style="padding:11px 4px;border-radius:var(--r2);background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);color:#c084fc;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#128424; Print</button>'
+    +'<button onclick="copyQuote(\''+qid+'\')" style="padding:11px 4px;border-radius:var(--r2);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">&#128203; Copy</button>'
     +'</div>'
     +'<button onclick="duplicateQuote(\''+qid+'\')" style="width:100%;padding:11px;border-radius:var(--r2);background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.25);color:#c084fc;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">&#128203; Duplicate &amp; Revise</button>'
     +'<button onclick="document.getElementById(\'quote-card-ov\').remove()" style="width:100%;padding:12px;border-radius:var(--r2);border:1px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.5);font-size:13px;cursor:pointer;font-family:inherit;margin-top:8px">Close</button>'
@@ -12372,6 +12373,58 @@ function _fallbackCopyQuote(text){
   document.body.appendChild(ta);ta.focus();ta.select();
   try{document.execCommand('copy');toast('&#128203; Quote copied');}catch(e){toast('Copy failed');}
   document.body.removeChild(ta);
+}
+function printQuote(qid){
+  if(!ST.quotes||!ST.quotes[qid])return;
+  var q=ST.quotes[qid];
+  var custName='Customer';var a=allC();
+  for(var i=0;i<a.length;i++){if(a[i].code===q.code){custName=a[i].name;break;}}
+  var from=(ST.userProfile&&ST.userProfile.name)||'';
+  var company=(ST.userProfile&&ST.userProfile.company)||'';
+  var phone=(ST.userProfile&&ST.userProfile.phone)||'';
+  var dStr=new Date(q.date).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var sub=q.items.reduce(function(s,it){return s+(it.qty*(it.price||0));},0);
+  var delivery=q.deliveryFee||0;
+  var taxableAmt=sub+delivery;
+  var taxAmt=(!q.isResale&&q.taxRate>0)?taxableAmt*q.taxRate/100:0;
+  var grand=sub+delivery+taxAmt;
+  var rows=q.items.map(function(it){
+    var lt=it.qty*(it.price||0);
+    return'<tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb">'+escPrint(it.name)+'</td>'
+      +'<td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:center">'+it.qty+'</td>'
+      +'<td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right">'+fmt(it.price||0)+'</td>'
+      +'<td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:600">'+fmt(lt)+'</td></tr>';
+  }).join('');
+  function escPrint(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  var validHtml=q.validUntil?'<p style="color:#6b7280;font-size:13px">Valid until: '+new Date(q.validUntil).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'</p>':'';
+  var html='<!DOCTYPE html><html><head><title>Quote — '+escPrint(custName)+'</title>'
+    +'<style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;color:#111;font-size:14px}table{width:100%;border-collapse:collapse}th{background:#f3f4f6;padding:8px;text-align:left;border-bottom:2px solid #d1d5db}td{padding:6px 8px}.total-row td{font-weight:700;font-size:15px}@media print{body{margin:0}}</style>'
+    +'</head><body>'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px">'
+      +'<div><div style="font-size:22px;font-weight:800;margin-bottom:4px">QUOTE</div>'
+        +'<div style="color:#6b7280">'+dStr+'</div>'+validHtml+'</div>'
+      +'<div style="text-align:right"><strong style="font-size:16px">'+escPrint(company||from)+'</strong>'
+        +(company&&from?'<br><span style="color:#6b7280">'+escPrint(from)+'</span>':'')
+        +(phone?'<br><span style="color:#6b7280">'+escPrint(phone)+'</span>':'')+'</div>'
+    +'</div>'
+    +'<div style="margin-bottom:20px"><strong>Prepared for:</strong><br>'
+      +'<span style="font-size:18px;font-weight:700">'+escPrint(custName)+'</span></div>'
+    +'<table><thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Total</th></tr></thead><tbody>'
+    +rows+'</tbody></table>'
+    +'<div style="margin-top:12px;margin-left:auto;width:240px">'
+      +'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e5e7eb"><span>Subtotal</span><span>'+fmt(sub)+'</span></div>'
+      +(delivery?'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e5e7eb"><span>Delivery</span><span>'+fmt(delivery)+'</span></div>':'')
+      +(taxAmt?'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e5e7eb"><span>Tax ('+q.taxRate+'%)</span><span>'+fmt(taxAmt)+'</span></div>':'')
+      +(q.isResale?'<div style="color:#059669;font-size:12px;padding:4px 0">Resale / Tax Exempt</div>':'')
+      +'<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:16px;font-weight:800;border-top:2px solid #111"><span>TOTAL</span><span>'+fmt(grand)+'</span></div>'
+    +'</div>'
+    +(q.notes?'<div style="margin-top:20px;padding:10px 14px;background:#f9fafb;border-radius:8px;border-left:3px solid #10b981"><strong>Notes:</strong> '+escPrint(q.notes)+'</div>':'')
+    +'<div style="margin-top:40px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:12px;color:#9ca3af;text-align:center">Thank you for your business!</div>'
+    +'</body></html>';
+  var pw=window.open('','_blank','width=750,height=900');
+  if(!pw){toast('Allow pop-ups to print');return;}
+  pw.document.write(html);pw.document.close();
+  pw.onload=function(){pw.print();};
 }
 
 function rQuotesModal(code){
@@ -13549,8 +13602,9 @@ function _renderPortal(el,custName,marginPct,items,portalData){
    +'<div style="padding:16px 16px 10px;border-top:1px solid rgba(255,255,255,.07);margin-top:8px">'
      +'<div style="font-size:11px;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Export</div>'
      +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
-       +'<button onclick="_portalExportCSV()" style="flex:1;min-width:100px;padding:10px 8px;background:rgba(0,229,184,.1);color:#00e5b8;border:1px solid rgba(0,229,184,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128196; CSV</button>'
-       +'<button onclick="_portalExportQBO()" style="flex:1;min-width:100px;padding:10px 8px;background:rgba(74,158,255,.1);color:#4a9eff;border:1px solid rgba(74,158,255,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128203; QuickBooks</button>'
+       +'<button onclick="_portalExportXLSX()" style="flex:1;min-width:90px;padding:10px 8px;background:rgba(99,102,241,.1);color:#818cf8;border:1px solid rgba(99,102,241,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128202; Excel</button>'
+       +'<button onclick="_portalExportCSV()" style="flex:1;min-width:90px;padding:10px 8px;background:rgba(0,229,184,.1);color:#00e5b8;border:1px solid rgba(0,229,184,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128196; CSV</button>'
+       +'<button onclick="_portalExportQBO()" style="flex:1;min-width:90px;padding:10px 8px;background:rgba(74,158,255,.1);color:#4a9eff;border:1px solid rgba(74,158,255,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128203; QuickBooks</button>'
      +'</div>'
    +'</div>'
    +'<div style="padding:14px 16px;text-align:center;font-size:11px;color:#334155">Prices shown are your custom rates. All prices subject to change.</div>'
@@ -13606,6 +13660,22 @@ function _portalSubmitQuote(){
 
 /* ── PORTAL EXPORTS (called from customer-facing portal page) ── */
 var _portalExportData=null; // set by _renderPortal to hold {items, custName, getPortalSell}
+function _portalExportXLSX(){
+  if(!_portalExportData)return;
+  if(typeof XLSX==='undefined'){alert('Excel export unavailable — try CSV instead');return;}
+  var rows=[['Code','Description','UOM','Category','Your Price']];
+  _portalExportData.items.forEach(function(r){
+    var sell=_portalExportData.getPortalSell(r);
+    rows.push([r._code||'',r._desc||'',r._uom||'',r._cat||'',sell>0?sell:'']);
+  });
+  var ws=XLSX.utils.aoa_to_sheet(rows);
+  // Column widths
+  ws['!cols']=[{wch:12},{wch:40},{wch:8},{wch:20},{wch:12}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Price List');
+  var fname=(_portalExportData.custName||'PriceList').replace(/[^a-z0-9]/gi,'_')+'_Prices.xlsx';
+  XLSX.writeFile(wb,fname);
+}
 function _portalExportCSV(){
   if(!_portalExportData)return;
   var rows=[['Code','Description','UOM','Category','Your Price']];
