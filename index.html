@@ -13602,9 +13602,10 @@ function _renderPortal(el,custName,marginPct,items,portalData){
    +'<div style="padding:16px 16px 10px;border-top:1px solid rgba(255,255,255,.07);margin-top:8px">'
      +'<div style="font-size:11px;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Export</div>'
      +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
-       +'<button onclick="_portalExportXLSX()" style="flex:1;min-width:90px;padding:10px 8px;background:rgba(99,102,241,.1);color:#818cf8;border:1px solid rgba(99,102,241,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128202; Excel</button>'
-       +'<button onclick="_portalExportCSV()" style="flex:1;min-width:90px;padding:10px 8px;background:rgba(0,229,184,.1);color:#00e5b8;border:1px solid rgba(0,229,184,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128196; CSV</button>'
-       +'<button onclick="_portalExportQBO()" style="flex:1;min-width:90px;padding:10px 8px;background:rgba(74,158,255,.1);color:#4a9eff;border:1px solid rgba(74,158,255,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128203; QuickBooks</button>'
+       +'<button onclick="_portalPrint()" style="flex:1;min-width:80px;padding:10px 8px;background:rgba(255,176,32,.1);color:#ffb020;border:1px solid rgba(255,176,32,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128424; PDF</button>'
+       +'<button onclick="_portalExportXLSX()" style="flex:1;min-width:80px;padding:10px 8px;background:rgba(99,102,241,.1);color:#818cf8;border:1px solid rgba(99,102,241,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128202; Excel</button>'
+       +'<button onclick="_portalExportCSV()" style="flex:1;min-width:80px;padding:10px 8px;background:rgba(0,229,184,.1);color:#00e5b8;border:1px solid rgba(0,229,184,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128196; CSV</button>'
+       +'<button onclick="_portalExportQBO()" style="flex:1;min-width:80px;padding:10px 8px;background:rgba(74,158,255,.1);color:#4a9eff;border:1px solid rgba(74,158,255,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128203; QuickBooks</button>'
      +'</div>'
    +'</div>'
    +'<div style="padding:14px 16px;text-align:center;font-size:11px;color:#334155">Prices shown are your custom rates. All prices subject to change.</div>'
@@ -13660,6 +13661,45 @@ function _portalSubmitQuote(){
 
 /* ── PORTAL EXPORTS (called from customer-facing portal page) ── */
 var _portalExportData=null; // set by _renderPortal to hold {items, custName, getPortalSell}
+function _portalPrint(){
+  if(!_portalExportData)return;
+  var d=_portalExportData;
+  var hasCats=d.items.some(function(r){return r._cat&&r._cat.trim();});
+  var today=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  function ep(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  var body='';
+  if(hasCats){
+    var groups={};var order=[];
+    d.items.forEach(function(r){var c=(r._cat||'').trim()||'General';if(!groups[c]){groups[c]=[];order.push(c);}groups[c].push(r);});
+    order.forEach(function(cat){
+      body+='<h3 style="margin:20px 0 6px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:#374151;border-bottom:2px solid #10b981;padding-bottom:4px">'+ep(cat)+'</h3>';
+      body+='<table><thead><tr><th>Code</th><th>Description</th><th>UOM</th><th style="text-align:right">Your Price</th></tr></thead><tbody>';
+      groups[cat].forEach(function(r){var sell=d.getPortalSell(r);body+='<tr><td>'+ep(r._code)+'</td><td>'+ep(r._desc)+'</td><td>'+ep(r._uom)+'</td><td style="text-align:right;font-weight:600">'+fmt(sell)+'</td></tr>';});
+      body+='</tbody></table>';
+    });
+  }else{
+    body='<table><thead><tr><th>Code</th><th>Description</th><th>UOM</th><th style="text-align:right">Your Price</th></tr></thead><tbody>';
+    d.items.forEach(function(r){var sell=d.getPortalSell(r);body+='<tr><td>'+ep(r._code)+'</td><td>'+ep(r._desc)+'</td><td>'+ep(r._uom)+'</td><td style="text-align:right;font-weight:600">'+fmt(sell)+'</td></tr>';});
+    body+='</tbody></table>';
+  }
+  var html='<!DOCTYPE html><html><head><title>Price List — '+ep(d.custName)+'</title>'
+    +'<style>body{font-family:Arial,sans-serif;max-width:800px;margin:30px auto;color:#111;font-size:13px}'
+    +'table{width:100%;border-collapse:collapse;margin-bottom:8px}'
+    +'th{background:#f3f4f6;padding:6px 8px;text-align:left;border-bottom:2px solid #d1d5db;font-size:12px}'
+    +'td{padding:5px 8px;border-bottom:1px solid #f0f0f0}tr:nth-child(even) td{background:#f9fafb}'
+    +'@media print{body{margin:0}}</style>'
+    +'</head><body>'
+    +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;border-bottom:2px solid #111;padding-bottom:12px">'
+      +'<div><div style="font-size:20px;font-weight:800">Price List</div><div style="font-size:14px;color:#6b7280">Prepared for: <strong style="color:#111">'+ep(d.custName)+'</strong></div></div>'
+      +'<div style="text-align:right;color:#6b7280;font-size:12px">'+today+'<br>Prices are your custom rates</div>'
+    +'</div>'
+    +body
+    +'<div style="margin-top:24px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">All prices subject to change. Contact your rep for the most current pricing.</div>'
+    +'</body></html>';
+  var pw=window.open('','_blank','width=850,height=1000');
+  if(!pw){alert('Allow pop-ups to print');return;}
+  pw.document.write(html);pw.document.close();pw.onload=function(){pw.print();};
+}
 function _portalExportXLSX(){
   if(!_portalExportData)return;
   if(typeof XLSX==='undefined'){alert('Excel export unavailable — try CSV instead');return;}
