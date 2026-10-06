@@ -814,6 +814,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Products customers have asked for that haven't been filled yet</div>
     <div id="d-prodreq-list"></div>
   </div>
+  <div class="card" id="d-price-alerts-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:var(--amber)">&#128203; Pricing Needs Update</div>
+      <span id="d-price-alerts-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers with portal links whose prices changed since last shared</div>
+    <div id="d-price-alerts-list"></div>
+  </div>
   <div class="card" id="d-samples-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128230; Sample Follow-Ups</div>
@@ -1297,6 +1305,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <div id="pr-list-wrap" style="display:none;margin:4px 14px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--r)">
     <div id="pr-list"></div>
   </div>
+  <div id="pr-hist-wrap" style="display:none;margin:10px 14px 80px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 14px 4px"></div>
 </div>
 
 <nav>
@@ -1510,10 +1519,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},custPriceSent:{},priceChangeHistory:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.custAR)ST.custAR={};if(!ST.custTargets)ST.custTargets={};if(!ST.custPurchaseHistory)ST.custPurchaseHistory={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.custAR)ST.custAR={};if(!ST.custTargets)ST.custTargets={};if(!ST.custPurchaseHistory)ST.custPurchaseHistory={};if(!ST.custPriceSent)ST.custPriceSent={};if(!ST.priceChangeHistory)ST.priceChangeHistory=[];if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -1638,7 +1647,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rNavBadge();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rPriceAlerts();rNavBadge();
 }
 
 function rRoute(){
@@ -2023,7 +2032,7 @@ function _applyRemoteState(rem){
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
   ST.custItemPrices=Object.assign({},rem.custItemPrices||{},ST.custItemPrices||{});
-  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});ST.custAR=Object.assign({},rem.custAR||{},ST.custAR||{});ST.custTargets=Object.assign({},rem.custTargets||{},ST.custTargets||{});ST.custPurchaseHistory=Object.assign({},rem.custPurchaseHistory||{},ST.custPurchaseHistory||{});
+  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});ST.custAR=Object.assign({},rem.custAR||{},ST.custAR||{});ST.custTargets=Object.assign({},rem.custTargets||{},ST.custTargets||{});ST.custPurchaseHistory=Object.assign({},rem.custPurchaseHistory||{},ST.custPurchaseHistory||{});ST.custPriceSent=Object.assign({},rem.custPriceSent||{},ST.custPriceSent||{});
   ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
   ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
@@ -3098,6 +3107,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Products customers have asked for that haven't been filled yet</div>
     <div id="d-prodreq-list"></div>
   </div>
+  <div class="card" id="d-price-alerts-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:var(--amber)">&#128203; Pricing Needs Update</div>
+      <span id="d-price-alerts-count" style="background:rgba(255,176,32,.2);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers with portal links whose prices changed since last shared</div>
+    <div id="d-price-alerts-list"></div>
+  </div>
   <div class="card" id="d-samples-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128230; Sample Follow-Ups</div>
@@ -3747,10 +3764,10 @@ var CURRENT_USER=null;
 var AUTH_MODE='signin';
 var IS_FIRST_RUN=false;
 var LEGACY_ADMIN_EMAIL='heathchartier@gmail.com';
-var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+var ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},custPriceSent:{},priceChangeHistory:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
 var cG=1,cF='all',cS='',pg=0,fc=[],mC=null,PG=80;
 
-function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.custAR)ST.custAR={};if(!ST.custTargets)ST.custTargets={};if(!ST.custPurchaseHistory)ST.custPurchaseHistory={};if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
+function lLoad(){try{var s=localStorage.getItem(SK);if(s){var p=JSON.parse(s);if(p&&typeof p==='object')ST=p;}}catch(e){var bak=localStorage.getItem(SK+'_bak');if(bak){try{var pb=JSON.parse(bak);if(pb&&typeof pb==='object'){ST=pb;localStorage.setItem(SK,bak);console.warn('Restored state from backup after parse error');setTimeout(function(){toast('⚠️ Data recovered from backup — please review your recent entries.');},2000);}}catch(e2){}}};try{if(!ST.scheduled)ST.scheduled={};if(!ST.contacts)ST.contacts={};if(!ST.tierTargets)ST.tierTargets={};if(!ST.weekPlan)ST.weekPlan={};if(!ST.samples)ST.samples={};if(!ST.dismissedDupes)ST.dismissedDupes=[];if(!ST.tags)ST.tags={};if(!ST.groupNames)ST.groupNames={};if(!ST.noteHistory)ST.noteHistory={};if(!ST.salesTargets)ST.salesTargets={};if(!ST.orders)ST.orders={};if(!ST.followups)ST.followups={};if(!ST.todos)ST.todos={};if(!ST.quotes)ST.quotes={};if(!ST.mileage)ST.mileage={};if(!ST.photos)ST.photos={};if(!ST.expenses)ST.expenses=[];if(!ST.productReqs)ST.productReqs={};if(!ST.custMargins)ST.custMargins={};if(!ST.custCatMargins)ST.custCatMargins={};if(!ST.custItemPrices)ST.custItemPrices={};if(!ST.salesOverrides)ST.salesOverrides={};if(!ST.portalTokens)ST.portalTokens={};if(!ST.standingAlerts)ST.standingAlerts={};if(!ST.pinned)ST.pinned={};if(!ST.revTargets)ST.revTargets={};if(!ST.visitHours)ST.visitHours={};if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.custAR)ST.custAR={};if(!ST.custTargets)ST.custTargets={};if(!ST.custPurchaseHistory)ST.custPurchaseHistory={};if(!ST.custPriceSent)ST.custPriceSent={};if(!ST.priceChangeHistory)ST.priceChangeHistory=[];if(!ST.cardOrder)ST.cardOrder=[];if(ST.commRate===undefined)ST.commRate=3;if(ST.quoteMarginFloor===undefined)ST.quoteMarginFloor=0;if(ST.autoLockMinutes===undefined)ST.autoLockMinutes=0;if(!ST.userProfile)ST.userProfile={name:'Heath Chartier',company:'Royal Plywood',erpName:'Epicor',territory:'Southern California',homeZip:'',homeAddress:'',stopsPerDay:10};if(!ST.userProfile.homeAddress)ST.userProfile.homeAddress='';if(!ST.userProfile.stopsPerDay)ST.userProfile.stopsPerDay=10;}catch(e2){console.error('lLoad guard err',e2);}}
 function lSave(){try{var s=JSON.stringify(ST);if(s.length>3670016&&!window._stWarn){window._stWarn=true;setTimeout(function(){toast('⚠ App data is large ('+Math.round(s.length/1024)+'KB) — export a backup from Settings to stay safe.');},0);}localStorage.setItem(SK+'_bak',localStorage.getItem(SK)||'');localStorage.setItem(SK,s);}catch(e){}}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.className='on';clearTimeout(t._t);t._t=setTimeout(function(){t.className='';},2500);}
 function fmt(n){return n>0?'$'+Math.round(n).toLocaleString():'$0';}
@@ -3875,7 +3892,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rPriceAlerts();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
 }
 
 function rRoute(){
@@ -4270,7 +4287,7 @@ function _applyRemoteState(rem){
   ST.custMargins=Object.assign({},rem.custMargins||{},ST.custMargins||{});
   ST.custCatMargins=Object.assign({},rem.custCatMargins||{},ST.custCatMargins||{});
   ST.custItemPrices=Object.assign({},rem.custItemPrices||{},ST.custItemPrices||{});
-  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});ST.custAR=Object.assign({},rem.custAR||{},ST.custAR||{});ST.custTargets=Object.assign({},rem.custTargets||{},ST.custTargets||{});ST.custPurchaseHistory=Object.assign({},rem.custPurchaseHistory||{},ST.custPurchaseHistory||{});
+  ST.custSegments=Object.assign({},rem.custSegments||{},ST.custSegments||{});ST.custVerticals=Object.assign({},rem.custVerticals||{},ST.custVerticals||{});ST.custOpportunities=Object.assign({},rem.custOpportunities||{},ST.custOpportunities||{});ST.custAR=Object.assign({},rem.custAR||{},ST.custAR||{});ST.custTargets=Object.assign({},rem.custTargets||{},ST.custTargets||{});ST.custPurchaseHistory=Object.assign({},rem.custPurchaseHistory||{},ST.custPurchaseHistory||{});ST.custPriceSent=Object.assign({},rem.custPriceSent||{},ST.custPriceSent||{});
   ST.salesOverrides=Object.assign({},rem.salesOverrides||{},ST.salesOverrides||{});
   ST.portalTokens=Object.assign({},rem.portalTokens||{},ST.portalTokens||{});
   ST.samples=Object.assign({},rem.samples||{},ST.samples||{});
@@ -6982,6 +6999,7 @@ function rPrice(){
     }).join('');
   }
   updatePriceTotal();
+  rPriceHistory();
 }
 
 function updatePriceTotal(){
@@ -7015,6 +7033,51 @@ function clearPriceQtys(){
 }
 
 function _setPriceCat(cat){_priceFilterCat=cat;rPrice();}
+
+function rPriceHistory(){
+  var wrap=document.getElementById('pr-hist-wrap');if(!wrap)return;
+  var hist=ST.priceChangeHistory||[];
+  if(!hist.length){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  var rows=hist.slice(0,10).map(function(e){
+    var d=new Date(e.ts);
+    var dstr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    var changes=[];
+    if(e.added)changes.push('<span style="color:var(--teal)">+'+e.added+' new</span>');
+    if(e.updated)changes.push('<span style="color:var(--amber)">'+e.updated+' updated</span>');
+    if(e.removed)changes.push('<span style="color:var(--red)">'+e.removed+' removed</span>');
+    var catLbl=e.cat==='(all)'?'All items':esc(e.cat);
+    var hasItems=e.changes&&e.changes.length>0;
+    var itemsId='pch-'+d.getTime();
+    return'<div style="padding:8px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">'
+        +'<div>'
+          +'<div style="font-size:13px;font-weight:700;color:var(--text)">'+catLbl+'</div>'
+          +'<div style="font-size:11px;margin-top:2px">'+changes.join(' &bull; ')+'</div>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--dim);white-space:nowrap;flex-shrink:0">'+dstr+'</div>'
+      +'</div>'
+      +(hasItems?'<button onclick="var el=document.getElementById(\''+itemsId+'\');el.style.display=el.style.display===\'none\'?\'block\':\'none\'" style="background:transparent;border:none;color:var(--teal);font-size:11px;padding:4px 0;cursor:pointer;font-family:inherit;font-weight:600">Show price changes &#9660;</button>':'')
+      +(hasItems?'<div id="'+itemsId+'" style="display:none;margin-top:4px;font-size:11px">'
+        +e.changes.slice(0,50).map(function(ch){
+          var oldN=parseFloat(String(ch.old||'').replace(/[$,]/g,''));
+          var newN=parseFloat(String(ch.new_||'').replace(/[$,]/g,''));
+          var pct=(!isNaN(oldN)&&oldN>0)?((newN-oldN)/oldN*100).toFixed(1):null;
+          var dir=!isNaN(oldN)&&!isNaN(newN)?(newN>oldN?'&#9650;':'&#9660;'):'';
+          var color=!isNaN(oldN)&&!isNaN(newN)?(newN>oldN?'var(--red)':'var(--teal)'):'var(--sub)';
+          return'<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)">'
+            +'<div style="flex:1;min-width:0"><span style="color:var(--teal);font-weight:600">'+esc(ch.code)+'</span> <span style="color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:140px;vertical-align:bottom">'+esc(ch.desc||'')+'</span></div>'
+            +'<div style="flex-shrink:0;color:'+color+';font-weight:700">'+dir+' '+esc(String(ch.new_))+' <span style="color:var(--dim);font-weight:400">(was '+esc(String(ch.old))+')'+( pct!==null?' '+pct+'%':'' )+'</span></div>'
+          +'</div>';
+        }).join('')
+        +(e.changes.length>50?'<div style="color:var(--dim);padding:3px 0">...and '+(e.changes.length-50)+' more</div>':'')
+        +'</div>':'')
+    +'</div>';
+  });
+  wrap.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Price Change History</div>'
+    +rows.join('')
+    +(hist.length>10?'<div style="font-size:11px;color:var(--dim);padding:6px 0">'+hist.length+' total uploads — showing 10 most recent</div>':'');
+}
 
 function handlePriceImport(inp){
   var file=inp.files[0];if(!file)return;
@@ -7245,6 +7308,18 @@ function confirmPriceImport(){
     if(added&&oldMap2&&Object.keys(oldMap2).length)msg2+=' · '+added+' new';
     if(removed)msg2+=' · '+removed+' removed';
     toast(msg2);
+  }
+  // Log price change history entry (cap at 60 entries, item-level changes use already-computed oldMap/oldMap2 vars)
+  if(updated>0||added>0||removed>0){
+    if(!ST.priceChangeHistory)ST.priceChangeHistory=[];
+    var _chgEntry={ts:new Date().toISOString(),mode:_priceUploadMode,cat:_priceUploadMode==='category'?_priceUploadCatName:'(all)',added:added,updated:updated,removed:removed,changes:[]};
+    if(_priceUploadMode==='category'){
+      newItems.forEach(function(r){if(r._code&&oldMap[r._code]!==undefined&&oldMap[r._code]!==r._cost&&_chgEntry.changes.length<200){_chgEntry.changes.push({code:r._code,desc:r._desc,old:oldMap[r._code],new_:r._cost});}});
+    }else{
+      newItems.forEach(function(r){if(r._code&&oldMap2[r._code]!==undefined&&oldMap2[r._code]!==r._cost&&_chgEntry.changes.length<200){_chgEntry.changes.push({code:r._code,desc:r._desc,old:oldMap2[r._code],new_:r._cost});}});
+    }
+    ST.priceChangeHistory.unshift(_chgEntry);
+    if(ST.priceChangeHistory.length>60)ST.priceChangeHistory=ST.priceChangeHistory.slice(0,60);
   }
   _priceQtys={};
   savePricing();
@@ -8349,7 +8424,7 @@ function saveTierTarget(tier,val){
   lSave();syncUp();rDash();
 }
 function saveTierWindow(tier,val){
-  if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.custAR)ST.custAR={};if(!ST.custTargets)ST.custTargets={};if(!ST.custPurchaseHistory)ST.custPurchaseHistory={};
+  if(!ST.tierWindows)ST.tierWindows={};if(!ST.custSegments)ST.custSegments={};if(!ST.custVerticals)ST.custVerticals={};if(!ST.custOpportunities)ST.custOpportunities={};if(!ST.custAR)ST.custAR={};if(!ST.custTargets)ST.custTargets={};if(!ST.custPurchaseHistory)ST.custPurchaseHistory={};if(!ST.custPriceSent)ST.custPriceSent={};if(!ST.priceChangeHistory)ST.priceChangeHistory=[];
   var v=val.trim();
   if(v)ST.tierWindows[tier]=v;else delete ST.tierWindows[tier];
   lSave();syncUp();
@@ -11162,6 +11237,53 @@ function rProductReqCard(){
   list.innerHTML=h;
 }
 
+/* ── PRICE UPDATE ALERTS ── */
+function rPriceAlerts(){
+  var card=document.getElementById('d-price-alerts-card');
+  var list=document.getElementById('d-price-alerts-list');
+  var cnt=document.getElementById('d-price-alerts-count');
+  if(!card||!list||!cnt)return;
+  if(dashCardHidden('pricealerts')){card.style.display='none';return;}
+  var hist=ST.priceChangeHistory||[];
+  if(!hist.length||!ST.portalTokens||!ST.custPriceSent){card.style.display='none';return;}
+  var a=allC();var stale=[];
+  for(var i=0;i<a.length;i++){
+    var c=a[i];
+    if(!ST.portalTokens[c.code]||ST.portalTokens[c.code]===null)continue;
+    var sent=ST.custPriceSent[c.code];
+    if(!sent||!sent.lastSent)continue;
+    var sentTs=new Date(sent.lastSent).getTime();
+    var sentCats=sent.categories||[];
+    var staleCats=[];
+    hist.forEach(function(e){
+      if(new Date(e.ts).getTime()<=sentTs)return;
+      if(e.cat==='(all)'||(staleCats.indexOf(e.cat)===-1&&(sentCats.length===0||sentCats.indexOf(e.cat)>=0))){
+        if(staleCats.indexOf(e.cat)===-1)staleCats.push(e.cat);
+      }
+    });
+    if(staleCats.length)stale.push({c:c,cats:staleCats,lastSent:sent.lastSent});
+  }
+  if(!stale.length){card.style.display='none';return;}
+  cnt.textContent=stale.length;
+  card.style.display='block';
+  var h='';
+  stale.forEach(function(s){
+    var d=new Date(s.lastSent);
+    var dstr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    var catStr=s.cats[0]==='(all)'?'all items':s.cats.map(function(cat){return esc(cat);}).join(', ');
+    h+='<div style="padding:7px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+        +'<div onclick="openM(\''+esc(s.c.code)+'\')" style="cursor:pointer;flex:1;min-width:0">'
+          +'<div style="font-size:13px;font-weight:700;color:var(--text)">'+esc(s.c.name)+'</div>'
+          +'<div style="font-size:11px;color:var(--sub);margin-top:1px">'+catStr+' updated since last share ('+dstr+')</div>'
+        +'</div>'
+        +'<button onclick="event.stopPropagation();generatePortalLink(\''+esc(s.c.code)+'\')" style="background:rgba(255,176,32,.15);color:var(--amber);border:1px solid rgba(255,176,32,.3);border-radius:var(--r2);padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap">Re-share</button>'
+      +'</div>'
+    +'</div>';
+  });
+  list.innerHTML=h;
+}
+
 /* ── SYNC DIAGNOSTIC & CACHE CLEAR ── */
 function _showDiag(txt){
   var el=document.getElementById('sync-diag-modal');
@@ -12660,6 +12782,24 @@ function rPricingSection(code){
   var displayM=custMargin!==null?custMargin:globalM;
   var hasPortal=ST.portalTokens&&ST.portalTokens[code]&&ST.portalTokens[code]!==null;
   var marginLbl=custMargin!==null?'<span style="color:var(--teal);font-weight:800">'+displayM+'%</span> <span style="font-size:10px;color:var(--teal)">(custom)</span>':'<span style="color:var(--sub);font-weight:700">'+displayM+'%</span> <span style="font-size:10px;color:var(--dim)">(global default)</span>';
+  var priceSentData=ST.custPriceSent&&ST.custPriceSent[code];
+  var priceSentHtml='';
+  if(priceSentData&&priceSentData.lastSent){
+    var sentDate=new Date(priceSentData.lastSent);
+    var sentStr=sentDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    var sentCats=priceSentData.categories||[];
+    priceSentHtml='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">'
+     +'<div style="font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Pricing Sent</div>'
+     +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">'
+       +'<div>'
+         +(sentCats.length
+           ?sentCats.map(function(cat){return'<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px"><span style="font-size:11px;color:var(--green)">&#10003;</span><span style="font-size:12px;color:var(--text)">'+esc(cat)+'</span></div>';}).join('')
+           :'<div style="font-size:12px;color:var(--sub)">Full price list ('+priceSentData.itemCount+' items)</div>')
+       +'</div>'
+       +'<div style="font-size:11px;color:var(--dim);white-space:nowrap;flex-shrink:0">'+sentStr+'</div>'
+     +'</div>'
+    +'</div>';
+  }
 
   // Categories (only show if price list has categories)
   var cats=_getPriceCategories();
@@ -12743,6 +12883,7 @@ function rPricingSection(code){
    +'</div>'
    +catHtml
    +pinsHtml
+   +priceSentHtml
    +'<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0 0">'
      +'<div>'
        +'<div style="font-size:12px;color:var(--sub)">Customer Price Portal</div>'
@@ -12754,7 +12895,9 @@ function rPricingSection(code){
           +'<button onclick="revokePortal(\''+esc(code)+'\')" style="background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128465;</button>'
         +'</div>'
        :'<button onclick="generatePortalLink(\''+esc(code)+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128279; Generate</button>')
-   +'</div>';
+   +'</div>'
+   +(hasPortal?'<div id="m-portal-viewed-'+esc(code)+'" style="display:none;font-size:11px;color:var(--sub);margin-top:4px;padding-top:6px;border-top:1px solid var(--border)"></div>':'');
+  if(hasPortal){var _pvToken=ST.portalTokens[code];setTimeout(function(){_loadPortalViewedAt(code,_pvToken);},0);}
 }
 
 /* ── EDIT CUSTOMER MARKUP % ── */
@@ -13024,6 +13167,9 @@ function generatePortalLink(code){
       toast('Portal error: '+res.error.message+' — try the Supabase fix below');
       return;
     }
+    if(!ST.custPriceSent)ST.custPriceSent={};if(!ST.priceChangeHistory)ST.priceChangeHistory=[];
+    var _sentCats=_getPriceCategories();
+    ST.custPriceSent[code]={lastSent:new Date().toISOString(),categories:_sentCats.length?_sentCats:[],itemCount:priceData.length};
     lSave();syncUp();
     rPricingSection(code);
     copyPortalLink(code);
@@ -13045,6 +13191,18 @@ function revokePortal(code){
   ST.portalTokens[code]=null; // null = explicitly revoked (prevents sync from restoring it)
   lSave();syncUp();
   rPricingSection(code);toast('Portal link revoked');
+}
+
+function _loadPortalViewedAt(code,token){
+  sb.from('portal_views').select('viewed_at').eq('token',token).single().then(function(res){
+    if(res.error||!res.data)return;
+    var el=document.getElementById('m-portal-viewed-'+code);
+    if(!el)return;
+    var d=new Date(res.data.viewed_at);
+    var dstr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    el.innerHTML='&#128064; Portal last viewed: <strong>'+dstr+'</strong>';
+    el.style.display='block';
+  });
 }
 
 /* ── PORTAL VIEW (triggered by ?portal=TOKEN in URL) ── */
@@ -13085,6 +13243,8 @@ function _checkPortalMode(){
     }
     var d=res.data;
     _renderPortal(portalDiv,d.customer_name,d.margin_pct,d.items,{catMargins:d.cat_margins||{},pinnedPrices:d.pinned_prices||{}});
+    // Track portal view — fire-and-forget upsert to portal_views table
+    try{sb.from('portal_views').upsert({token:token,viewed_at:new Date().toISOString()},{onConflict:'token'}).then(function(){});}catch(e){}
   });
 }
 function _renderPortal(el,custName,marginPct,items,portalData){
@@ -13095,6 +13255,8 @@ function _renderPortal(el,custName,marginPct,items,portalData){
   var pinnedPrices=portalData.pinnedPrices||{};
   var catMargins=portalData.catMargins||{};
   var itemMargins=portalData.itemMargins||{};
+  // Expose data for portal export functions
+  _portalExportData={items:items,custName:custName,getPortalSell:null};
   function getPortalSell(r){
     var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
     if(isNaN(cost)||cost<=0)return 0;
@@ -13108,6 +13270,7 @@ function _renderPortal(el,custName,marginPct,items,portalData){
     // Layer 1: flat
     return parseFloat((cost*(1+margin/100)).toFixed(2));
   }
+  _portalExportData.getPortalSell=getPortalSell;
   function buildList(){
     var filtered=items.filter(function(r){
       if(!q)return true;
@@ -13146,7 +13309,14 @@ function _renderPortal(el,custName,marginPct,items,portalData){
      +'<div id="portal-count" style="font-size:11px;color:#64748b;margin-top:6px">'+items.length+' items'+(_getPriceCategories&&_getPriceCategories().length?' across '+_getPriceCategories().length+' categories':'')+'</div>'
    +'</div>'
    +'<div id="portal-list" style="padding:0 16px">'+buildList()+'</div>'
-   +'<div style="padding:20px 16px;text-align:center;font-size:11px;color:#334155">Prices shown are your custom rates. All prices subject to change.</div>'
+   +'<div style="padding:16px 16px 10px;border-top:1px solid rgba(255,255,255,.07);margin-top:8px">'
+     +'<div style="font-size:11px;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Export</div>'
+     +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+       +'<button onclick="_portalExportCSV()" style="flex:1;min-width:100px;padding:10px 8px;background:rgba(0,229,184,.1);color:#00e5b8;border:1px solid rgba(0,229,184,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128196; CSV</button>'
+       +'<button onclick="_portalExportQBO()" style="flex:1;min-width:100px;padding:10px 8px;background:rgba(74,158,255,.1);color:#4a9eff;border:1px solid rgba(74,158,255,.25);border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128203; QuickBooks</button>'
+     +'</div>'
+   +'</div>'
+   +'<div style="padding:14px 16px;text-align:center;font-size:11px;color:#334155">Prices shown are your custom rates. All prices subject to change.</div>'
    +'</div>';
   var srch=document.getElementById('portal-srch');
   if(srch){
@@ -13158,6 +13328,36 @@ function _renderPortal(el,custName,marginPct,items,portalData){
       if(cnt)cnt.textContent=f.length+(q?' matching':'')+(f.length!==items.length?' of '+items.length:'')+(items.length===1?' item':' items');
     });
   }
+}
+
+/* ── PORTAL EXPORTS (called from customer-facing portal page) ── */
+var _portalExportData=null; // set by _renderPortal to hold {items, custName, getPortalSell}
+function _portalExportCSV(){
+  if(!_portalExportData)return;
+  var rows=[['Code','Description','UOM','Category','Your Price']];
+  _portalExportData.items.forEach(function(r){
+    var sell=_portalExportData.getPortalSell(r);
+    rows.push([r._code||'',r._desc||'',r._uom||'',(r._cat||'').trim(),sell>0?sell.toFixed(2):'']);
+  });
+  var csv=rows.map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(',');}).join('\r\n');
+  _downloadText(csv,'pricelist_'+(_portalExportData.custName||'prices').replace(/\s+/g,'_')+'.csv','text/csv');
+}
+function _portalExportQBO(){
+  if(!_portalExportData)return;
+  // QuickBooks Online item import format: Name, Description, Price, Unit
+  var rows=[['Name','Description','Price','Unit']];
+  _portalExportData.items.forEach(function(r){
+    var sell=_portalExportData.getPortalSell(r);
+    if(sell<=0)return;
+    rows.push([r._code||r._desc||'',r._desc||'',sell.toFixed(2),r._uom||'Each']);
+  });
+  var csv=rows.map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(',');}).join('\r\n');
+  _downloadText(csv,'qbo_import_'+(_portalExportData.custName||'prices').replace(/\s+/g,'_')+'.csv','text/csv');
+}
+function _downloadText(text,filename,mime){
+  var blob=new Blob([text],{type:mime||'text/plain'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},100);
 }
 
 /* ── UPSELL NUDGES ── */
@@ -14232,7 +14432,7 @@ function onLogin(user){
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
   // Reset ST to blank so previous session data doesn't leak into a new account
-  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+  ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},custPriceSent:{},priceChangeHistory:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
   // One-time cleanup: remove any fake demo customers that got added accidentally
   var _fakeCodes={PCL001:1,WSB002:1,SCD003:1,DVM004:1,IEW005:1,HDL006:1,SDL007:1,OCB008:1,TBC009:1,VFS010:1,RWP011:1,LBM012:1,BAK013:1,SBB014:1,RHL015:1};
@@ -14454,7 +14654,7 @@ function doSignOut(){
     CURRENT_USER=null;
     SK='';
     rollingRoute=null;saveRolling();
-    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+    ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},custPriceSent:{},priceChangeHistory:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
     var ep=document.getElementById('auth-email');if(ep)ep.value='';
     var pp=document.getElementById('auth-pass').value='';
     var tb=document.getElementById('trial-banner');if(tb)tb.style.display='none';
@@ -14529,7 +14729,7 @@ function confirmDeleteAccount(){
   sb.from('hc_state').delete().eq('id',uid).then(function(){
     sb.auth.signOut().then(function(){
       CURRENT_USER=null;SK='';
-      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
+      ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},custPriceSent:{},priceChangeHistory:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
       // Clear local storage
       try{localStorage.removeItem('fieldiq_'+uid);}catch(e){}
       authTab('signin');
