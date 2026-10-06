@@ -14275,6 +14275,8 @@ function showProfileSettings(){
     '<input id="prof-name" class="fi" value="'+esc(p.name||'')+'" placeholder="e.g. Heath Chartier">'+
     '<div class="fl">Company Name</div>'+
     '<input id="prof-company" class="fi" value="'+esc(p.company||'')+'" placeholder="e.g. Royal Plywood">'+
+    '<div class="fl">Your Phone <span style="color:var(--sub);font-weight:400">(shown on quotes)</span></div>'+
+    '<input id="prof-phone" class="fi" type="tel" value="'+esc(p.phone||'')+'" placeholder="e.g. (714) 555-1234">'+
     '<div class="fl">Order / Account System (ERP)</div>'+
     '<input id="prof-erp" class="fi" value="'+esc(p.erpName||'')+'" placeholder="e.g. Epicor, SAP, Salesforce">'+
     '<div class="fl">Territory Name</div>'+
@@ -14297,6 +14299,7 @@ function saveProfileSettings(){
   if(!ST.userProfile)ST.userProfile={};
   var name=(document.getElementById('prof-name').value||'').trim();
   var company=(document.getElementById('prof-company').value||'').trim();
+  var phone=(document.getElementById('prof-phone')?document.getElementById('prof-phone').value||'':'').trim();
   var erpName=(document.getElementById('prof-erp').value||'').trim();
   var territory=(document.getElementById('prof-territory').value||'').trim();
   var homeZip=(document.getElementById('prof-zip').value||'').trim();
@@ -14306,7 +14309,7 @@ function saveProfileSettings(){
   if(!stopsPerDay||stopsPerDay<3){toast('Enter how many customers you visit per day (3 or more)');return;}
   var prevSpd=ST.userProfile.stopsPerDay||10;
   var prevHomeZip=(ST.userProfile.homeZip||'').replace(/\D/g,'').slice(0,5);
-  ST.userProfile={name:name,company:company,erpName:erpName||'Order System',territory:territory,homeZip:homeZip,homeAddress:homeAddress,stopsPerDay:stopsPerDay,homeZipLat:ST.userProfile.homeZipLat,homeZipLng:ST.userProfile.homeZipLng};
+  ST.userProfile={name:name,company:company,phone:phone,erpName:erpName||'Order System',territory:territory,homeZip:homeZip,homeAddress:homeAddress,stopsPerDay:stopsPerDay,homeZipLat:ST.userProfile.homeZipLat,homeZipLng:ST.userProfile.homeZipLng};
   lSave();syncUp();
   if(sb&&CURRENT_USER)sb.auth.updateUser({data:{userProfile:ST.userProfile,groupNames:ST.groupNames||{}}}).catch(function(){});
   // Geocode home zip if it changed
