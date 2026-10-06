@@ -814,6 +814,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Products customers have asked for that haven't been filled yet</div>
     <div id="d-prodreq-list"></div>
   </div>
+  <div class="card" id="d-portal-requests-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:var(--teal)">&#128272; Portal Quote Requests</div>
+      <span id="d-portal-req-count" style="background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers who submitted quote requests from their portal</div>
+    <div id="d-portal-req-list"></div>
+  </div>
   <div class="card" id="d-price-alerts-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128203; Pricing Needs Update</div>
@@ -1650,7 +1658,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rPriceAlerts();rNavBadge();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rPortalRequests();rPriceAlerts();rNavBadge();
 }
 
 function rRoute(){
@@ -3110,6 +3118,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Products customers have asked for that haven't been filled yet</div>
     <div id="d-prodreq-list"></div>
   </div>
+  <div class="card" id="d-portal-requests-card" style="display:none">
+    <div class="card-hdr">
+      <div class="lbl" style="margin:0;color:var(--teal)">&#128272; Portal Quote Requests</div>
+      <span id="d-portal-req-count" style="background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers who submitted quote requests from their portal</div>
+    <div id="d-portal-req-list"></div>
+  </div>
   <div class="card" id="d-price-alerts-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128203; Pricing Needs Update</div>
@@ -3898,7 +3914,7 @@ function rDash(){
     '<div class="stat" data-gf="visited"><div class="stat-n" style="color:var(--green)">'+vt+'</div><div class="stat-l">Visited</div></div>'+
     '<div class="stat" data-gf="not_avail"><div class="stat-n" style="color:var(--amber)">'+nt+'</div><div class="stat-l">Not Avail</div></div>'+
     '<div class="stat" data-gf="overdue"><div class="stat-n" style="color:var(--red)">'+od+'</div><div class="stat-l">Overdue</div></div>';
-  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rPriceAlerts();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
+  maybeApplySmartGroup();rRoute();rCarryOver();rRetry(a);rAttn(a);rIdle(a);rRolling();rStreak();updateNextStopBtn();rWeekGoal();rWeekSchedule();rQuietAccounts();rMorningBrief();rHotLeads();rWinBack();rTrendChart();rLeaderboard();rNewCustomers();rRecentlyViewed();rRouteNote();rFollowupAlert();rCompetitorCard();rTierCard();rWeekPlan();rSampleCard();rTargetCard();rRevTargetCard();rTierCoverage();rProductReqCard();rPortalRequests();rPriceAlerts();rNavBadge();rBirthdayAlert();rTodoAlert();rCallbacksAlert();rTodaysOrders();rQuoteAlert();rBackupAlert();rRouteSummary();rMileageCard();rReorderPrompts();rQuoteAnalytics();rWeekSummaryCard();rSalesPace();rComingDue();rCoverageCard();rCommission();rLostAccounts();rExpensesCard();rUpsellNudges();rMonthlyReport();rNBA(a);applyCardOrder();
 }
 
 function rRoute(){
@@ -11243,6 +11259,68 @@ function rProductReqCard(){
   list.innerHTML=h;
 }
 
+/* ── PORTAL QUOTE REQUESTS (rep side) ── */
+var _portalReqCache=null;var _portalReqCacheTs=0;
+function rPortalRequests(){
+  var card=document.getElementById('d-portal-requests-card');
+  var list=document.getElementById('d-portal-req-list');
+  var cnt=document.getElementById('d-portal-req-count');
+  if(!card||!list||!cnt)return;
+  if(!ST.portalTokens||!Object.values(ST.portalTokens).some(function(t){return t&&t!==null;})){card.style.display='none';return;}
+  // Only re-fetch if cache is older than 60 seconds
+  var now=Date.now();
+  if(_portalReqCache&&(now-_portalReqCacheTs)<60000){_renderPortalReqs(_portalReqCache,card,list,cnt);return;}
+  sb.from('portal_quote_requests').select('*').order('submitted_at',{ascending:false}).limit(20).then(function(res){
+    if(res.error||!res.data){card.style.display='none';return;}
+    _portalReqCache=res.data;_portalReqCacheTs=Date.now();
+    _renderPortalReqs(res.data,card,list,cnt);
+  });
+}
+function _renderPortalReqs(data,card,list,cnt){
+  if(!data||!data.length){card.style.display='none';return;}
+  // Match requests to active portal tokens
+  var tokenToCode={};
+  if(ST.portalTokens){Object.keys(ST.portalTokens).forEach(function(code){if(ST.portalTokens[code]&&ST.portalTokens[code]!==null)tokenToCode[ST.portalTokens[code]]=code;});}
+  var relevant=data.filter(function(r){return tokenToCode[r.token]&&!r.dismissed;});
+  if(!relevant.length){card.style.display='none';return;}
+  cnt.textContent=relevant.length;card.style.display='block';
+  var a=allC();
+  var h=relevant.slice(0,6).map(function(r){
+    var code=tokenToCode[r.token]||'';
+    var cust=null;for(var i=0;i<a.length;i++){if(a[i].code===code){cust=a[i];break;}}
+    var custName=cust?cust.name:(r.customer_name||'Unknown');
+    var d=new Date(r.submitted_at);var dstr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    var itemCount=(r.items&&r.items.length)||0;
+    var total=r.items?r.items.reduce(function(s,it){return s+(it.qty||0)*(it.price||0);},0):0;
+    return'<div style="padding:7px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;align-items:flex-start;gap:8px">'
+        +'<div style="flex:1;min-width:0;cursor:pointer" onclick="openM(\''+esc(code)+'\')">'
+          +'<div style="font-size:13px;font-weight:700;color:var(--text)">'+esc(custName)+'</div>'
+          +'<div style="font-size:11px;color:var(--sub);margin-top:1px">'+itemCount+' item'+(itemCount!==1?'s':'')+(total?' &bull; $'+total.toFixed(2):'')+(dstr?' &bull; '+dstr:'')+'</div>'
+        +'</div>'
+        +'<button onclick="event.stopPropagation();_acceptPortalRequest(\''+esc(code)+'\',\''+r.id+'\')" style="background:var(--teal2);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:var(--r2);padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">Quote</button>'
+        +'<button onclick="event.stopPropagation();_dismissPortalRequest(\''+r.id+'\')" style="background:transparent;border:1px solid var(--border2);border-radius:var(--r2);padding:5px 7px;font-size:12px;color:var(--sub);cursor:pointer;font-family:inherit;flex-shrink:0">&#215;</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  list.innerHTML=h;
+}
+function _acceptPortalRequest(custCode,reqId){
+  if(!ST.quotes&&!ST||!reqId)return;
+  var data=_portalReqCache&&_portalReqCache.filter(function(r){return r.id===reqId;})[0];
+  if(!data||!data.items||!data.items.length){toast('No items in request');return;}
+  _qCode=custCode;
+  _qItems=data.items.map(function(it){return{name:it.name||it.code||'Item',qty:it.qty||1,price:it.price||0,cost:null};});
+  showQuoteBuilder(custCode);
+  setTimeout(function(){_renderQRows();},100);
+  _dismissPortalRequest(reqId);
+}
+function _dismissPortalRequest(reqId){
+  sb.from('portal_quote_requests').update({dismissed:true}).eq('id',reqId).then(function(){
+    _portalReqCache=null;rDash();
+  });
+}
+
 /* ── PRICE UPDATE ALERTS ── */
 function rPriceAlerts(){
   var card=document.getElementById('d-price-alerts-card');
@@ -13342,8 +13420,11 @@ function _renderPortal(el,custName,marginPct,items,portalData){
   var pinnedPrices=portalData.pinnedPrices||{};
   var catMargins=portalData.catMargins||{};
   var itemMargins=portalData.itemMargins||{};
-  // Expose data for portal export functions
+  // Expose data for portal export + cart functions
   _portalExportData={items:items,custName:custName,getPortalSell:null};
+  _portalCart={};_portalToken=null;_portalCustName=custName;
+  // Token is set from _checkPortalMode's URL param
+  var _pParams=new URLSearchParams(window.location.search);_portalToken=_pParams.get('portal');
   function getPortalSell(r){
     var cost=parseFloat(String(r._cost||'').replace(/[$,]/g,''));
     if(isNaN(cost)||cost<=0)return 0;
@@ -13377,13 +13458,17 @@ function _renderPortal(el,custName,marginPct,items,portalData){
     return filtered.map(function(r){return _portalItem(r,getPortalSell(r));}).join('');
   }
   function _portalItem(r,sell){
-    return'<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:8px">'
+    var itemKey=r._code||r._desc||Math.random().toString(36).slice(2);
+    return'<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:8px">'
       +'<div style="flex:1;min-width:0">'
         +(r._code?'<div style="font-size:11px;color:#00e5b8;font-weight:700;letter-spacing:.5px">'+r._code+'</div>':'')
         +'<div style="font-size:14px;font-weight:600;color:#e2e8f0;margin-top:2px">'+r._desc+'</div>'
         +(r._uom?'<div style="font-size:11px;color:#64748b;margin-top:2px">per '+r._uom+'</div>':'')
       +'</div>'
-      +(sell>0?'<div style="font-size:18px;font-weight:800;color:#00e5b8;white-space:nowrap">$'+sell.toFixed(2)+'</div>':'<div style="font-size:14px;color:#64748b">—</div>')
+      +(sell>0?'<div style="font-size:16px;font-weight:800;color:#00e5b8;white-space:nowrap;flex-shrink:0">$'+sell.toFixed(2)+'</div>':'')
+      +(sell>0?'<input type="number" class="pq-qty" min="0" step="1" placeholder="Qty" data-code="'+esc(itemKey)+'"'
+        +' oninput="(function(inp){var q=parseFloat(inp.value)||0;_portalUpdateCart(\''+esc(itemKey)+'\',q,'+sell+',{_desc:\''+esc((r._desc||'').replace(/'/g,'')).replace(/\\/g,'')+'\',_code:\''+esc((r._code||'').replace(/'/g,''))+'\',_uom:\''+esc((r._uom||'').replace(/'/g,''))+'\'});})(this)"'
+        +' style="width:56px;padding:6px 4px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-family:inherit;font-size:13px;text-align:center;outline:none;flex-shrink:0">':'')
     +'</div>';
   }
   el.innerHTML='<div style="max-width:520px;margin:0 auto;padding:0 0 40px">'
@@ -13396,6 +13481,14 @@ function _renderPortal(el,custName,marginPct,items,portalData){
      +'<div id="portal-count" style="font-size:11px;color:#64748b;margin-top:6px">'+items.length+' items'+(_getPriceCategories&&_getPriceCategories().length?' across '+_getPriceCategories().length+' categories':'')+'</div>'
    +'</div>'
    +'<div id="portal-list" style="padding:0 16px">'+buildList()+'</div>'
+   +'<div id="portal-cart-bar" style="display:none;position:sticky;bottom:0;background:#0f172a;border-top:1px solid rgba(0,229,184,.3);padding:12px 16px;align-items:center;gap:10px;z-index:20">'
+     +'<div style="flex:1;min-width:0">'
+       +'<div style="font-size:11px;color:#00e5b8;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Quote Request</div>'
+       +'<div style="font-size:12px;color:#94a3b8"><span id="pcb-count">0 items</span> &bull; Total: <span id="pcb-total" style="color:#00e5b8;font-weight:700">$0.00</span></div>'
+       +'<div id="pcb-msg" style="font-size:11px;color:#64748b;margin-top:2px"></div>'
+     +'</div>'
+     +'<button id="pcb-submit" onclick="_portalSubmitQuote()" style="background:#00e5b8;color:#000;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">Send Request &#10140;</button>'
+   +'</div>'
    +'<div style="padding:16px 16px 10px;border-top:1px solid rgba(255,255,255,.07);margin-top:8px">'
      +'<div style="font-size:11px;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px">Export</div>'
      +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
@@ -13415,6 +13508,43 @@ function _renderPortal(el,custName,marginPct,items,portalData){
       if(cnt)cnt.textContent=f.length+(q?' matching':'')+(f.length!==items.length?' of '+items.length:'')+(items.length===1?' item':' items');
     });
   }
+}
+
+/* ── PORTAL CART & SELF-SERVICE QUOTE ── */
+var _portalCart={};var _portalToken=null;var _portalCustName=null;
+
+function _portalUpdateCart(code,qty,sell,r){
+  if(qty>0){_portalCart[code]={qty:qty,sell:sell,name:r._desc||code,code:r._code||code,uom:r._uom||''};}
+  else{delete _portalCart[code];}
+  _portalRenderCartBar();
+}
+function _portalRenderCartBar(){
+  var bar=document.getElementById('portal-cart-bar');if(!bar)return;
+  var codes=Object.keys(_portalCart);
+  if(!codes.length){bar.style.display='none';return;}
+  var total=0,count=0;
+  codes.forEach(function(k){total+=(_portalCart[k].sell||0)*(_portalCart[k].qty||0);count+=_portalCart[k].qty||0;});
+  bar.style.display='flex';
+  var countEl=bar.querySelector('#pcb-count');var totalEl=bar.querySelector('#pcb-total');
+  if(countEl)countEl.textContent=codes.length+' item'+(codes.length!==1?'s':'');
+  if(totalEl)totalEl.textContent='$'+total.toFixed(2);
+}
+function _portalSubmitQuote(){
+  var codes=Object.keys(_portalCart);
+  if(!codes.length){return;}
+  var items=codes.map(function(k){return{code:k,name:_portalCart[k].name,qty:_portalCart[k].qty,price:_portalCart[k].sell,uom:_portalCart[k].uom};});
+  var btn=document.getElementById('pcb-submit');if(btn){btn.disabled=true;btn.textContent='Sending...';}
+  sb.from('portal_quote_requests').insert({token:_portalToken,customer_name:_portalCustName,items:items,submitted_at:new Date().toISOString()}).then(function(res){
+    if(btn){btn.disabled=false;btn.textContent='Send Request';}
+    if(res.error){
+      var msg=document.getElementById('pcb-msg');if(msg){msg.style.color='#ef4444';msg.textContent='Error sending — try again';}
+      return;
+    }
+    var bar=document.getElementById('portal-cart-bar');
+    if(bar){bar.innerHTML='<div style="flex:1;text-align:center;color:#10b981;font-weight:700;font-size:14px">&#10003; Quote request sent! Your sales rep will be in touch.</div>';}
+    _portalCart={};
+    document.querySelectorAll('.pq-qty').forEach(function(inp){inp.value='';});
+  });
 }
 
 /* ── PORTAL EXPORTS (called from customer-facing portal page) ── */
