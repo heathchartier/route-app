@@ -2075,6 +2075,7 @@ function syncDown(){
   var done=false;
   function finish(){
     if(done)return;done=true;
+    _bt('syncDown finish');
     try{
       migrateBaseCustomers();
       // One-time cleanup: remove 15 fake demo customers that got added accidentally
@@ -2091,7 +2092,7 @@ function syncDown(){
   }
   function offlineFinish(reason){
     if(done)return;done=true;
-    console.warn('syncDown offline:',reason);
+    console.warn('syncDown offline:',reason);_bt('syncDown OFFLINE '+reason);
     try{migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();}catch(e){}
     if(sl)sl.textContent='Offline mode';
   }
@@ -4344,6 +4345,7 @@ function syncDown(){
   var done=false;
   function finish(){
     if(done)return;done=true;
+    _bt('syncDown finish');
     try{
       migrateBaseCustomers();
       // One-time cleanup: remove 15 fake demo customers that got added accidentally
@@ -4360,7 +4362,7 @@ function syncDown(){
   }
   function offlineFinish(reason){
     if(done)return;done=true;
-    console.warn('syncDown offline:',reason);
+    console.warn('syncDown offline:',reason);_bt('syncDown OFFLINE '+reason);
     try{migrateBaseCustomers();rDash();rCust();rGrps();checkFirstRun();}catch(e){}
     if(sl)sl.textContent='Offline mode';
   }
@@ -9667,6 +9669,7 @@ var _pinBuf='';
 var _appUnlockedThisSession=false; // in-memory only — cleared when WKWebView process is killed
 function initAppLock(){
   var pin=localStorage.getItem('hrt_pin');
+  _bt('initAppLock pin='+!!pin+' unlocked='+_appUnlockedThisSession);
   if(!pin)return;
   if(_appUnlockedThisSession)return;
   showLockScreen();
@@ -14403,7 +14406,7 @@ function _doRecalcGroups(){
   generateRouteGroups(function(){toast('Groups updated!');go('grps');});
 }
 
-function _onResume(){var dp=document.getElementById('p-dash');if(dp&&dp.style.display!=='none')rDash();if(CURRENT_USER)syncDown();}document.addEventListener('visibilitychange',function(){if(!document.hidden)_onResume();});window.addEventListener('pageshow',function(e){if(e.persisted)_onResume();});window.addEventListener('focus',function(){_onResume();});
+function _onResume(){_bt('resume event');var dp=document.getElementById('p-dash');if(dp&&dp.style.display!=='none')rDash();if(CURRENT_USER)syncDown();}document.addEventListener('visibilitychange',function(){if(!document.hidden)_onResume();});window.addEventListener('pageshow',function(e){if(e.persisted)_onResume();});window.addEventListener('focus',function(){_onResume();});
 
 // iOS Safari pull-to-refresh block
 (function(){
@@ -14907,7 +14910,8 @@ function onLogin(user,fresh){
   // Only a fresh sign-in skips the lock; restoring a saved session at launch must still prompt for the PIN
   if(fresh){_appUnlockedThisSession=true;sessionStorage.setItem('hrt_unlocked','1');}
   var _startErrs=[];
-  function _step(name,fn){try{fn();}catch(e){console.error('startup '+name+':',e);_startErrs.push(name+': '+(e&&e.message||e));}}
+  _bt('onLogin start fresh='+!!fresh);
+  function _step(name,fn){try{fn();_bt('ok '+name);}catch(e){console.error('startup '+name+':',e);_bt('ERR '+name+': '+(e&&e.message||e));_startErrs.push(name+': '+(e&&e.message||e));}}
   _step('loadRolling',function(){loadRolling();});
   _step('loadPricing',function(){loadPricing();});
   _step('rPendingEdits',function(){rPendingEdits();});
@@ -14938,6 +14942,8 @@ function onLogin(user,fresh){
       if(msb)msb.style.display='';
     }
   });
+  _bt('onLogin end');
+  setTimeout(function(){_bt('post-render pass');try{rDash();}catch(e){_bt('ERR post rDash: '+(e&&e.message||e));}try{rCust();}catch(e){}},700);
   if(_startErrs.length){try{localStorage.setItem('hrt_startup_err',_startErrs.join(' | '));}catch(e){}toast('Startup issue: '+_startErrs[0]);}
 }
 
@@ -15408,9 +15414,14 @@ function saveBizCardCustomer(){
 }
 
 
+function _bt(m){try{var t=Math.round(performance.now());var cur=localStorage.getItem('hrt_boot_trace')||'';localStorage.setItem('hrt_boot_trace',(cur+'
+'+t+'ms '+m).slice(-3000));}catch(e){}}
 function initApp(){
+  try{localStorage.setItem('hrt_boot_trace','');}catch(e){}
+  _bt('initApp start hasPin='+!!localStorage.getItem('hrt_pin')+' hasCred='+!!localStorage.getItem('hrt_cred_id'));
   document.body.style.overflow='hidden';
   sb.auth.getSession().then(function(res){
+    _bt('getSession resolved session='+!!(res.data&&res.data.session));
     if(res.data&&res.data.session&&res.data.session.user){
       onLogin(res.data.session.user);
     }else{
