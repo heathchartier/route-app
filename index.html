@@ -9740,9 +9740,23 @@ function unlockApp(){
   if(el){el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},300);}
   _resetAutoLockTimer();
 }
+function _hasNativeBiometric(){
+  return !!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers['biometric-auth']);
+}
+window.onBiometricResult=function(r){
+  if(!r)return;
+  if(r.purpose==='enable'){
+    if(r.success){localStorage.setItem('hrt_cred_id','native');toast('&#129661; Face ID enabled!');updateSecurityStatus();}
+    else{toast('Face ID not enabled'+(r.error?': '+r.error:''));}
+  }else if(r.success){unlockApp();}
+};
 function tryFaceID(){
   var credId=localStorage.getItem('hrt_cred_id');
   if(!credId)return;
+  if(credId==='native'){
+    if(_hasNativeBiometric())window.webkit.messageHandlers['biometric-auth'].postMessage({purpose:'unlock'});
+    return;
+  }
   try{
     var credIdBytes=Uint8Array.from(atob(credId),function(c){return c.charCodeAt(0);});
     navigator.credentials.get({
@@ -9786,6 +9800,7 @@ function confirmNewPIN(){
 }
 function showFaceIDSetup(){
   if(!localStorage.getItem('hrt_pin')){toast('Set a PIN first');return;}
+  if(_hasNativeBiometric()){window.webkit.messageHandlers['biometric-auth'].postMessage({purpose:'enable'});return;}
   if(!window.PublicKeyCredential){toast('Face ID not supported on this device');return;}
   navigator.credentials.create({
     publicKey:{
