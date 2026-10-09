@@ -550,9 +550,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 <body>
 
 <!-- AUTH SCREEN -->
-<div id="auth-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;overflow:hidden">
-  <div style="width:100%;max-width:400px">
-    <div style="text-align:center;margin-bottom:40px">
+<div id="auth-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;padding:20px 24px;box-sizing:border-box;overflow-y:auto;-webkit-overflow-scrolling:touch">
+  <div style="width:100%;max-width:400px;margin:auto 0">
+    <div style="text-align:center;margin-bottom:22px">
       <div style="font-size:38px;font-weight:900;color:var(--teal);letter-spacing:-1.5px">FieldIQ</div>
       <div style="font-size:13px;color:var(--sub);margin-top:6px;letter-spacing:.3px">Outside Sales Intelligence</div>
     </div>
@@ -560,7 +560,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <button id="auth-tab-signin" onclick="authTab('signin')" style="flex:1;padding:10px;border:none;border-radius:var(--r2);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;background:var(--teal);color:#000">Sign In</button>
       <button id="auth-tab-signup" onclick="authTab('signup')" style="flex:1;padding:10px;border:none;border-radius:var(--r2);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;background:transparent;color:var(--sub)">Sign Up</button>
     </div>
-    <div id="auth-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:12px;font-size:13px;margin-bottom:16px;line-height:1.4;color:#ef4444"></div>
+    <div id="auth-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:var(--r2);padding:9px 12px;font-size:13px;margin-bottom:10px;line-height:1.4;color:#ef4444"></div>
     <div id="auth-name-wrap" style="display:none">
       <input id="auth-name" type="text" placeholder="Your full name" autocomplete="name" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
       <input id="auth-company" type="text" placeholder="Company name" autocomplete="organization" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
