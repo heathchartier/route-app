@@ -11481,6 +11481,7 @@ function _showDiag(txt){
 }
 function runSyncDiag(){
   var lines=['FieldIQ Sync Diagnostic\n'];
+  try{lines.push('LAUNCH TRACE:'+(localStorage.getItem('hrt_boot_trace')||' (none)')+'\n');}catch(e){}
   if(!CURRENT_USER){
     lines.push('NOT SIGNED IN\nSign in first, then run diagnostic.');
     _showDiag(lines.join('\n'));return;
