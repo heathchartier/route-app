@@ -565,9 +565,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <input id="auth-name" type="text" placeholder="Your full name" autocomplete="name" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
       <input id="auth-company" type="text" placeholder="Company name" autocomplete="organization" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
     </div>
-    <input id="auth-email" type="email" placeholder="Email address" autocomplete="email" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
+    <input id="auth-email" type="email" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Email address" autocomplete="email" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 16px;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none">
     <div style="position:relative;margin-bottom:6px">
-      <input id="auth-pass" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 44px 14px 16px;font-size:15px;font-family:inherit;outline:none">
+      <input id="auth-pass" type="password" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Password" autocomplete="current-password" style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:14px 44px 14px 16px;font-size:15px;font-family:inherit;outline:none">
       <button type="button" onclick="var i=document.getElementById('auth-pass');i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'👁':'🙈'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;padding:0;line-height:1">👁</button>
     </div>
     <div id="auth-pass-hint" style="display:none;font-size:12px;color:var(--sub);margin-bottom:8px;padding:0 2px">Minimum 6 characters required</div>
@@ -14806,13 +14806,13 @@ function doAuth(){
   if(AUTH_MODE==='signin'){
     sb.auth.signInWithPassword({email:email,password:pass}).then(function(r){
       btn.disabled=false;btn.textContent='Sign In';
-      if(r.error){showAuthError(r.error.message||'Invalid email or password.');authTab('signin');return;}
+      if(r.error){authTab('signin');showAuthError(r.error.message||'Invalid email or password.');return;}
       if(r.data&&r.data.user){onLogin(r.data.user);}
-      else{showAuthError('Sign in failed. Please check your credentials.');authTab('signin');}
+      else{authTab('signin');showAuthError('Sign in failed. Please check your credentials.');}
     }).catch(function(err){
       btn.disabled=false;btn.textContent='Sign In';
-      showAuthError(err.message||'Network error. Please try again.');
       authTab('signin');
+      showAuthError((err&&err.message)||'Sign in failed: '+String(err));
     });
   }else{
     var name=(document.getElementById('auth-name').value||'').trim();
@@ -14825,8 +14825,8 @@ function doAuth(){
         if(msg.toLowerCase().includes('already registered')||msg.toLowerCase().includes('already exists')||msg.toLowerCase().includes('duplicate')){
           msg = 'This email already has an account. Try signing in instead.';
         }
-        showAuthError(msg);
         authTab('signup');
+        showAuthError(msg);
         return;
       }
       if(r.data&&r.data.user&&r.data.user.id){
@@ -14834,8 +14834,8 @@ function doAuth(){
         if(company)ST.userProfile.company=company;
         onLogin(r.data.user);
       }else{
-        showAuthError('Check your email to confirm your account, then sign in.',true);
         authTab('signup');
+        showAuthError('Check your email to confirm your account, then sign in.',true);
       }
     }).catch(function(err){
       btn.disabled=false;btn.textContent='Create Account';
@@ -14844,8 +14844,8 @@ function doAuth(){
       if(msg.toLowerCase().includes('already registered')||msg.toLowerCase().includes('already exists')||msg.toLowerCase().includes('duplicate')){
         msg = 'This email already has an account. Try signing in instead.';
       }
-      showAuthError(msg);
       authTab('signup');
+      showAuthError(msg);
     });
   }
 }
@@ -15621,20 +15621,19 @@ function _buildMyDayWith(lat,lng){
 </div>
 
 <!-- ══ IAP PAYWALL ══════════════════════════════════════════════════════════ -->
-<div id="paywall-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:10000;overflow-y:auto;padding:20px">
-  <div style="max-width:500px;margin:0 auto;padding:40px 0">
-    <div style="text-align:center;margin-bottom:32px">
-      <div style="font-size:48px;margin-bottom:12px">⚡</div>
-      <div style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:8px">Unlock FieldIQ</div>
-      <div style="font-size:15px;color:var(--sub);line-height:1.6">The CRM built for outside sales reps who live in their car</div>
-      <div style="margin-top:12px">
-        <button onclick="hidePaywall();var as=document.getElementById('auth-screen');if(as)as.style.display='flex';" style="background:none;border:none;color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline">Already have an account? Sign In</button>
+<div id="paywall-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:10000;overflow-y:auto;padding:calc(env(safe-area-inset-top,0px) + 12px) 20px calc(env(safe-area-inset-bottom,0px) + 12px);box-sizing:border-box">
+  <div style="max-width:440px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:34px;margin-bottom:4px">⚡</div>
+      <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px">Unlock FieldIQ</div>
+      <div style="font-size:13px;color:var(--sub);line-height:1.4">The CRM built for outside sales reps who live in their car</div>
+      <div style="margin-top:8px">
+        <button onclick="hidePaywall();var as=document.getElementById('auth-screen');if(as)as.style.display='flex';" style="background:none;border:none;color:var(--teal);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:underline;padding:4px 8px">Already have an account? Sign In</button>
       </div>
     </div>
 
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:24px">
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px">Everything you need:</div>
-      <div style="display:flex;flex-direction:column;gap:12px">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
+      <div style="display:flex;flex-direction:column;gap:7px">
         <div style="display:flex;gap:10px"><div style="color:var(--teal);flex-shrink:0">✓</div><div style="font-size:13px;color:var(--sub)">Smart route planning with multi-stop navigation</div></div>
         <div style="display:flex;gap:10px"><div style="color:var(--teal);flex-shrink:0">✓</div><div style="font-size:13px;color:var(--sub)">Visit tracking & streak counter</div></div>
         <div style="display:flex;gap:10px"><div style="color:var(--teal);flex-shrink:0">✓</div><div style="font-size:13px;color:var(--sub)">Price list with instant quote builder</div></div>
@@ -15644,18 +15643,14 @@ function _buildMyDayWith(lat,lng){
       </div>
     </div>
 
-    <div style="background:linear-gradient(135deg,rgba(0,229,184,.15),rgba(0,209,122,.08));border:1px solid var(--teal);border-radius:var(--r2);padding:20px;text-align:center;margin-bottom:24px">
-      <div style="font-size:36px;font-weight:800;color:var(--teal);margin-bottom:4px">$19.99<span style="font-size:16px;font-weight:600;color:var(--sub)">/month</span></div>
-      <div style="font-size:13px;color:var(--sub);margin-bottom:16px">14-day free trial • Cancel anytime</div>
-      <button id="paywall-subscribe-btn" onclick="startSubscribe()" style="width:100%;padding:16px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:12px">Start Free Trial</button>
-      <button onclick="restoreSubscribe()" style="width:100%;padding:12px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Restore Purchase</button>
+    <div style="background:linear-gradient(135deg,rgba(0,229,184,.15),rgba(0,209,122,.08));border:1px solid var(--teal);border-radius:var(--r2);padding:14px 16px;text-align:center;margin-bottom:10px">
+      <div style="font-size:30px;font-weight:800;color:var(--teal);margin-bottom:2px">$19.99<span style="font-size:15px;font-weight:600;color:var(--sub)">/month</span></div>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:10px">14-day free trial • Cancel anytime</div>
+      <button id="paywall-subscribe-btn" onclick="startSubscribe()" style="width:100%;padding:14px;border-radius:var(--r2);background:var(--teal);color:#000;border:none;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:8px">Start Free Trial</button>
+      <button onclick="restoreSubscribe()" style="width:100%;padding:10px;border-radius:var(--r2);background:transparent;border:1px solid var(--border2);color:var(--sub);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Restore Purchase</button>
     </div>
 
-    <div style="text-align:center;margin-bottom:16px">
-      <button onclick="hidePaywall();var as=document.getElementById('auth-screen');if(as)as.style.display='flex';" style="background:none;border:none;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline">Already have an account? Sign In</button>
-    </div>
-
-    <div style="font-size:11px;color:var(--dim);text-align:center;line-height:1.6">
+    <div style="font-size:10px;color:var(--dim);text-align:center;line-height:1.4">
       Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage subscriptions in App Store settings.
     </div>
   </div>
