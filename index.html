@@ -14891,33 +14891,39 @@ function onLogin(user,fresh){
   }
   // Only a fresh sign-in skips the lock; restoring a saved session at launch must still prompt for the PIN
   if(fresh){_appUnlockedThisSession=true;sessionStorage.setItem('hrt_unlocked','1');}
-  loadRolling();
-  loadPricing();
-  rPendingEdits();
-  rDiscrepCard();
-  var teslaCont=document.getElementById('d-tesla-cont');
-  if(teslaCont)teslaCont.addEventListener('click',continueRollingRoute);
-  var sg=smartGroup();
-  cG=sg;
-  var gl=document.getElementById('g-lbl');
-  if(gl)gl.textContent=getGroupName(sg);
-  try{rDash();}catch(e){console.error('rDash:',e);}
-  try{rCust();}catch(e){console.error('rCust:',e);}
-  try{rGrps();}catch(e){}
-  try{rVend();}catch(e){}
-  try{renderCustomRoute();}catch(e){}
-  syncDown();
-  checkAndNotify();
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
-  initAppLock();
-  updateSecurityStatus();
-  migrateBaseCustomers();
-  go('dash');
-  if(isIOSApp()){
-    requestIAPStatus();
-    var msb=document.getElementById('manage-sub-btn');
-    if(msb)msb.style.display='';
-  }
+  var _startErrs=[];
+  function _step(name,fn){try{fn();}catch(e){console.error('startup '+name+':',e);_startErrs.push(name+': '+(e&&e.message||e));}}
+  _step('loadRolling',function(){loadRolling();});
+  _step('loadPricing',function(){loadPricing();});
+  _step('rPendingEdits',function(){rPendingEdits();});
+  _step('rDiscrepCard',function(){rDiscrepCard();});
+  _step('teslaCont',function(){var t=document.getElementById('d-tesla-cont');if(t)t.addEventListener('click',continueRollingRoute);});
+  _step('smartGroup',function(){
+    var sg=smartGroup();
+    cG=sg;
+    var gl=document.getElementById('g-lbl');
+    if(gl)gl.textContent=getGroupName(sg);
+  });
+  _step('rDash',function(){rDash();});
+  _step('rCust',function(){rCust();});
+  _step('rGrps',function(){rGrps();});
+  _step('rVend',function(){rVend();});
+  _step('renderCustomRoute',function(){renderCustomRoute();});
+  _step('syncDown',function(){syncDown();});
+  _step('checkAndNotify',function(){checkAndNotify();});
+  _step('serviceWorker',function(){if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}});
+  _step('initAppLock',function(){initAppLock();});
+  _step('updateSecurityStatus',function(){updateSecurityStatus();});
+  _step('migrateBaseCustomers',function(){migrateBaseCustomers();});
+  _step('go',function(){go('dash');});
+  _step('iap',function(){
+    if(isIOSApp()){
+      requestIAPStatus();
+      var msb=document.getElementById('manage-sub-btn');
+      if(msb)msb.style.display='';
+    }
+  });
+  if(_startErrs.length){try{localStorage.setItem('hrt_startup_err',_startErrs.join(' | '));}catch(e){}toast('Startup issue: '+_startErrs[0]);}
 }
 
 // ── IN-APP PURCHASE (iOS App Store) ──────────────────────────────────────────
