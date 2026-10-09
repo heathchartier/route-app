@@ -14807,7 +14807,7 @@ function doAuth(){
     sb.auth.signInWithPassword({email:email,password:pass}).then(function(r){
       btn.disabled=false;btn.textContent='Sign In';
       if(r.error){authTab('signin');showAuthError(r.error.message||'Invalid email or password.');return;}
-      if(r.data&&r.data.user){onLogin(r.data.user);}
+      if(r.data&&r.data.user){onLogin(r.data.user,true);}
       else{authTab('signin');showAuthError('Sign in failed. Please check your credentials.');}
     }).catch(function(err){
       btn.disabled=false;btn.textContent='Sign In';
@@ -14832,7 +14832,7 @@ function doAuth(){
       if(r.data&&r.data.user&&r.data.user.id){
         if(name)ST.userProfile.name=name;
         if(company)ST.userProfile.company=company;
-        onLogin(r.data.user);
+        onLogin(r.data.user,true);
       }else{
         authTab('signup');
         showAuthError('Check your email to confirm your account, then sign in.',true);
@@ -14850,7 +14850,7 @@ function doAuth(){
   }
 }
 
-function onLogin(user){
+function onLogin(user,fresh){
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
   // Reset ST to blank so previous session data doesn't leak into a new account
@@ -14889,9 +14889,8 @@ function onLogin(user){
     var _po=document.getElementById('paywall-overlay');
     if(_po)_po.style.display='none';
   }
-  // Fresh password login already proves identity — skip app lock screen this session
-  _appUnlockedThisSession=true;
-  sessionStorage.setItem('hrt_unlocked','1');
+  // Only a fresh sign-in skips the lock; restoring a saved session at launch must still prompt for the PIN
+  if(fresh){_appUnlockedThisSession=true;sessionStorage.setItem('hrt_unlocked','1');}
   loadRolling();
   loadPricing();
   rPendingEdits();
@@ -15013,7 +15012,7 @@ window.onSIWAToken=async function(data){
       if(!user.user_metadata.userProfile)user.user_metadata.userProfile={};
       if(!user.user_metadata.userProfile.name)user.user_metadata.userProfile.name=data.name.trim();
     }
-    onLogin(user);
+    onLogin(user,true);
   }catch(e){
     showAuthError('Sign in failed. Please try again.');
   }
