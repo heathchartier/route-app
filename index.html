@@ -9802,6 +9802,7 @@ function confirmNewPIN(){
   updateSecurityStatus();
 }
 function showFaceIDSetup(){
+  _bt('faceid tap pin='+!!localStorage.getItem('hrt_pin')+' native='+(typeof _hasNativeBiometric==='function'&&_hasNativeBiometric()));
   if(!localStorage.getItem('hrt_pin')){toast('Set a PIN first');return;}
   if(_hasNativeBiometric()){window.webkit.messageHandlers['biometric-auth'].postMessage({purpose:'enable'});return;}
   if(!window.PublicKeyCredential){toast('Face ID not supported on this device');return;}
@@ -14870,8 +14871,12 @@ function doAuth(){
 }
 
 function onLogin(user,fresh){
+  var _startErrs=[];
+  function _step(name,fn){try{fn();_bt('ok '+name);}catch(e){console.error('startup '+name+':',e);_bt('ERR '+name+': '+(e&&e.message||e)+' | '+String(e&&e.stack||'').split(String.fromCharCode(10))[0].slice(0,160));_startErrs.push(name+': '+(e&&e.message||e));}}
+  _bt('onLogin enter');
   CURRENT_USER=user;
   SK='fieldiq_'+user.id;
+  _step('loadState',function(){
   // Reset ST to blank so previous session data doesn't leak into a new account
   ST={visits:{},notes:{},hot:{},archived:{},removed:{},edits:{},addedCustomers:[],scheduled:{},vendorEdits:{},addedVendors:[],pendingEdits:{},competitors:{},hiddenCards:{},groupNotes:{},snoozed:{},contacts:{},tierTargets:{},weekPlan:{},samples:{},dismissedDupes:[],tags:{},groupNames:{},noteHistory:{},salesTargets:{},orders:{},followups:{},todos:{},quotes:{},mileage:{},photos:{},expenses:[],productReqs:{},commRate:3,quoteMarginFloor:0,autoLockMinutes:0,custMargins:{},custCatMargins:{},custItemPrices:{},salesOverrides:{},portalTokens:{},standingAlerts:{},revTargets:{},visitHours:{},tierWindows:{},cardOrder:[],custSegments:{},custVerticals:{},custOpportunities:{},custAR:{},custTargets:{},custPurchaseHistory:{},custPriceSent:{},priceChangeHistory:[],userProfile:{name:'',company:'',erpName:'',territory:'',homeZip:'',homeAddress:'',stopsPerDay:10}};
   lLoad();
@@ -14882,6 +14887,8 @@ function onLogin(user,fresh){
   if(ST.addedCustomers.length!==_before){lSave();console.log('Removed',_before-ST.addedCustomers.length,'demo customers');}
   // Clear any leftover demo localStorage keys
   localStorage.removeItem('hrt_demo');localStorage.removeItem('hrt_demo_bk_visits');localStorage.removeItem('hrt_demo_bk_orders');localStorage.removeItem('hrt_demo_bk_notes');localStorage.removeItem('hrt_demo_bk_hot');localStorage.removeItem('hrt_demo_bk_comp');localStorage.removeItem('hrt_demo_bk_fu');localStorage.removeItem('hrt_demo_bk_ac');localStorage.removeItem('hrt_demo_mode');localStorage.removeItem('hrt_demo_real_ST');localStorage.removeItem('hrt_demo_real_CB');
+  });
+  _step('profile',function(){
   if(!ST.userProfile)ST.userProfile={};
   // Restore profile from auth metadata if localStorage was cleared
   var meta=user.user_metadata||{};
@@ -14893,11 +14900,15 @@ function onLogin(user,fresh){
     ST.groupNames=meta.groupNames;
   }
   if(!ST.userProfile.name)ST.userProfile.name=user.email.split('@')[0];
+  });
+  _step('hideAuth',function(){
   document.body.style.overflow='';
   var as=document.getElementById('auth-screen');
   if(as)as.style.display='none';
   var ul=document.getElementById('auth-user-lbl');
   if(ul)ul.textContent='Signed in as '+user.email;
+  });
+  _step('freeAccess',function(){
   // Free access accounts: immediately suppress trial screen + paywall
   if(isFreeAccess()){
     try{localStorage.setItem('fieldiq_trial_info_seen','1');}catch(e){}
@@ -14910,9 +14921,8 @@ function onLogin(user,fresh){
   }
   // Only a fresh sign-in skips the lock; restoring a saved session at launch must still prompt for the PIN
   if(fresh){_appUnlockedThisSession=true;sessionStorage.setItem('hrt_unlocked','1');}
-  var _startErrs=[];
+  });
   _bt('onLogin start fresh='+!!fresh);
-  function _step(name,fn){try{fn();_bt('ok '+name);}catch(e){console.error('startup '+name+':',e);_bt('ERR '+name+': '+(e&&e.message||e));_startErrs.push(name+': '+(e&&e.message||e));}}
   _step('loadRolling',function(){loadRolling();});
   _step('loadPricing',function(){loadPricing();});
   _step('rPendingEdits',function(){rPendingEdits();});
