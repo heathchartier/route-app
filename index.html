@@ -2981,6 +2981,9 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <button id="paywall-sub-btn" onclick="iapSubscribe()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.2px;margin-bottom:12px">Start Free Trial</button>
     <button onclick="iapRestore()" style="width:100%;background:transparent;color:var(--sub);border:1px solid var(--border2);border-radius:var(--r2);padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Restore Purchase</button>
     <div id="paywall-msg" style="text-align:center;font-size:12px;color:var(--sub);margin-top:16px;line-height:1.5">Subscription renews monthly at $19.99. Cancel anytime.</div>
+    <div style="text-align:center;margin-top:14px">
+      <button onclick="document.getElementById('paywall-screen').style.display='none';doSignOut();" style="background:none;border:none;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline;padding:6px 10px">Sign out / use a different account</button>
+    </div>
   </div>
 </div>
 
@@ -14986,7 +14989,7 @@ function iapRestore(){
 window.onIAPStatus=function(data){
   var pw=document.getElementById('paywall-screen');
   if(!pw)return;
-  if(data.status==='active'){
+  if(data.status==='active'||(typeof isFreeAccess==='function'&&isFreeAccess())){
     pw.style.display='none';
   }else{
     pw.style.display='flex';
