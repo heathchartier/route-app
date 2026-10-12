@@ -15415,8 +15415,7 @@ function saveBizCardCustomer(){
 }
 
 
-function _bt(m){try{var t=Math.round(performance.now());var cur=localStorage.getItem('hrt_boot_trace')||'';localStorage.setItem('hrt_boot_trace',(cur+'
-'+t+'ms '+m).slice(-3000));}catch(e){}}
+function _bt(m){try{var t=Math.round(performance.now());var cur=localStorage.getItem('hrt_boot_trace')||'';localStorage.setItem('hrt_boot_trace',(cur+String.fromCharCode(10)+t+'ms '+m).slice(-3000));}catch(e){}}
 function initApp(){
   try{localStorage.setItem('hrt_boot_trace','');}catch(e){}
   _bt('initApp start hasPin='+!!localStorage.getItem('hrt_pin')+' hasCred='+!!localStorage.getItem('hrt_cred_id'));
@@ -16116,10 +16115,10 @@ async function docsLoad() {
   var uid = CURRENT_USER.id;
   var listPath = uid + (_docsFolder ? '/' + _docsFolder : '');
   var res = await sb.storage.from('fieldiq-docs').list(listPath, { sortBy: { column: 'name', order: 'asc' }, limit: 300 });
-  if (res.error) { el.innerHTML = '<div style=”text-align:center;padding:24px 0;color:var(--red);font-size:13px”>Error loading files</div>'; return; }
+  if (res.error) { el.innerHTML = '<div style="text-align:center;padding:24px 0;color:var(--red);font-size:13px">Error loading files</div>'; return; }
   var items = (res.data || []).filter(function(f) { return f.name !== '.keep'; });
   if (!items.length) {
-    el.innerHTML = '<div style=”text-align:center;padding:24px 0;color:var(--dim);font-size:13px”>'
+    el.innerHTML = '<div style="text-align:center;padding:24px 0;color:var(--dim);font-size:13px">'
       + (_docsFolder ? 'Folder is empty' : 'No documents yet — tap Upload File or Take Photo to add one.')
       + '</div>';
     return;
@@ -16133,15 +16132,15 @@ async function docsLoad() {
 
 /* ── Render rows ── */
 function docsFolderRow(f) {
-  var nameSafe = f.name.replace(/'/g, “\\'”);
-  return '<div style=”display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer” onclick=”docsEnterFolder(\'' + nameSafe + '\')”>'
-    + '<div style=”font-size:26px;flex-shrink:0”>&#128194;</div>'
-    + '<div style=”flex:1;min-width:0”>'
-    + '<div style=”font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis”>' + f.name + '</div>'
-    + '<div style=”font-size:11px;color:var(--sub);margin-top:2px”>Folder</div>'
+  var nameSafe = f.name.replace(/'/g, "\\'");
+  return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="docsEnterFolder(\'' + nameSafe + '\')">'
+    + '<div style="font-size:26px;flex-shrink:0">&#128194;</div>'
+    + '<div style="flex:1;min-width:0">'
+    + '<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + f.name + '</div>'
+    + '<div style="font-size:11px;color:var(--sub);margin-top:2px">Folder</div>'
     + '</div>'
-    + '<button onclick=”event.stopPropagation();docsDeleteFolder(\'' + nameSafe + '\')” style=”padding:6px 10px;border-radius:var(--r3);background:transparent;border:1px solid rgba(255,77,106,.3);color:var(--red);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0”>&#10005;</button>'
-    + '<span style=”color:var(--dim);font-size:18px;flex-shrink:0”>&#8250;</span>'
+    + '<button onclick="event.stopPropagation();docsDeleteFolder(\'' + nameSafe + '\')" style="padding:6px 10px;border-radius:var(--r3);background:transparent;border:1px solid rgba(255,77,106,.3);color:var(--red);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">&#10005;</button>'
+    + '<span style="color:var(--dim);font-size:18px;flex-shrink:0">&#8250;</span>'
     + '</div>';
 }
 
@@ -16149,15 +16148,15 @@ function docsFileRow(f, listPath) {
   var display = f.name.replace(/^\d{13}-/, '');
   var size = (f.metadata && f.metadata.size) ? docsBytes(f.metadata.size) : '';
   var path = listPath + '/' + f.name;
-  var pathSafe = path.replace(/'/g, “\\'”);
-  var dispSafe = display.replace(/'/g, “\\'”);
-  return '<div style=”display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)”>'
-    + '<div style=”font-size:26px;flex-shrink:0”>' + docsIcon(f.name) + '</div>'
-    + '<div style=”flex:1;min-width:0;cursor:pointer” onclick=”docsOpen(\'' + pathSafe + '\')”>'
-    + '<div style=”font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)”>' + display + '</div>'
-    + (size ? '<div style=”font-size:11px;color:var(--sub);margin-top:2px”>' + size + '</div>' : '')
+  var pathSafe = path.replace(/'/g, "\\'");
+  var dispSafe = display.replace(/'/g, "\\'");
+  return '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">'
+    + '<div style="font-size:26px;flex-shrink:0">' + docsIcon(f.name) + '</div>'
+    + '<div style="flex:1;min-width:0;cursor:pointer" onclick="docsOpen(\'' + pathSafe + '\')">'
+    + '<div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">' + display + '</div>'
+    + (size ? '<div style="font-size:11px;color:var(--sub);margin-top:2px">' + size + '</div>' : '')
     + '</div>'
-    + '<button onclick=”docsDelete(\'' + pathSafe + '\',\'' + dispSafe + '\')” style=”padding:6px 10px;border-radius:var(--r3);background:transparent;border:1px solid rgba(255,77,106,.3);color:var(--red);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0”>&#10005;</button>'
+    + '<button onclick="docsDelete(\'' + pathSafe + '\',\'' + dispSafe + '\')" style="padding:6px 10px;border-radius:var(--r3);background:transparent;border:1px solid rgba(255,77,106,.3);color:var(--red);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">&#10005;</button>'
     + '</div>';
 }
 
@@ -16184,7 +16183,7 @@ async function docsOpen(path) {
 }
 
 async function docsDelete(path, name) {
-  if (!confirm('Delete “' + name + '”?')) return;
+  if (!confirm('Delete "' + name + '"?')) return;
   var res = await sb.storage.from('fieldiq-docs').remove([path]);
   if (res.error) { showToast('Delete failed'); return; }
   showToast('Deleted');
@@ -16192,7 +16191,7 @@ async function docsDelete(path, name) {
 }
 
 async function docsDeleteFolder(folderName) {
-  if (!confirm('Delete folder “' + folderName + '” and everything inside it?')) return;
+  if (!confirm('Delete folder "' + folderName + '" and everything inside it?')) return;
   if (!CURRENT_USER) return;
   var uid = CURRENT_USER.id;
   var prefix = uid + '/' + folderName + '/';
