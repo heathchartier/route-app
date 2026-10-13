@@ -11455,7 +11455,7 @@ function bulkResharePortals(){
     var prevSentCats=(ST.custPriceSent[c.code]&&ST.custPriceSent[c.code].categories)||[];
     var filteredItems=prevSentCats.length?priceData.filter(function(r){return prevSentCats.indexOf((r._cat||'').trim())!==-1;}):priceData;
     var portalRow={token:token,customer_name:c.name,customer_code:c.code,margin_pct:margin,items:filteredItems,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins};
-    sb.from('price_portals').upsert(portalRow,{onConflict:'token'}).then(function(res){
+    _portalUpsert(portalRow).then(function(res){
       if(!res.error){
         ST.custPriceSent[c.code]={lastSent:new Date().toISOString(),categories:prevSentCats,itemCount:filteredItems.length};
       }
@@ -13497,7 +13497,7 @@ function _doGeneratePortal(code,selectedCats){
   var pinnedPrices=ST.custItemPrices&&ST.custItemPrices[code]||{};
   var itemMargins=ST.custItemMargins&&ST.custItemMargins[code]||{};
   var portalRow={token:token,customer_name:custName,customer_code:code,margin_pct:margin,items:filteredItems,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins};
-  sb.from('price_portals').upsert(portalRow,{onConflict:'token'}).then(function(res){
+  _portalUpsert(portalRow).then(function(res){
     if(res.error){
       ST.portalTokens[code]=null;lSave();
       toast('Portal error: '+res.error.message);return;
@@ -13507,6 +13507,24 @@ function _doGeneratePortal(code,selectedCats){
     lSave();syncUp();
     rPricingSection(code);
     showPortalReady(code);
+  });
+}
+function _portalUpsert(row){
+  return sb.from('price_portals').upsert(row,{onConflict:'token'}).then(function(res){
+    if(res.error&&/item_margins/.test(res.error.message||'')){
+      var r2=Object.assign({},row);delete r2.item_margins;
+      return sb.from('price_portals').upsert(r2,{onConflict:'token'});
+    }
+    return res;
+  });
+}
+function _portalFetch(token){
+  var cols='customer_name,margin_pct,items,cat_margins,pinned_prices';
+  return sb.from('price_portals').select(cols+',item_margins').eq('token',token).single().then(function(res){
+    if(res.error&&/item_margins/.test(res.error.message||'')){
+      return sb.from('price_portals').select(cols).eq('token',token).single();
+    }
+    return res;
   });
 }
 function showPortalReady(code){
@@ -13604,13 +13622,13 @@ function _checkPortalMode(){
   var portalDiv=document.getElementById('portal-root');
   if(!portalDiv){portalDiv=document.createElement('div');portalDiv.id='portal-root';portalDiv.style.cssText='position:fixed;inset:0;background:#0f172a;color:#e2e8f0;font-family:inherit;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:99999';document.body.appendChild(portalDiv);}
   portalDiv.innerHTML='<div style="max-width:520px;margin:0 auto;padding:20px 16px"><div style="text-align:center;padding:40px 0"><div style="font-size:32px;margin-bottom:8px">⏳</div><div style="font-size:16px;color:#7aa3c4">Loading your price list...</div></div></div>';
-  sb.from('price_portals').select('customer_name,margin_pct,items,cat_margins,pinned_prices').eq('token',token).single().then(function(res){
+  _portalFetch(token).then(function(res){
     if(res.error||!res.data){
       portalDiv.innerHTML='<div style="max-width:520px;margin:0 auto;padding:40px 16px;text-align:center"><div style="font-size:32px;margin-bottom:12px">🔗</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">Link not found</div><div style="font-size:14px;color:#64748b">This price list link may have expired or been revoked. Contact your sales rep for a new link.</div></div>';
       return;
     }
     var d=res.data;
-    _renderPortal(portalDiv,d.customer_name,d.margin_pct,d.items,{catMargins:d.cat_margins||{},pinnedPrices:d.pinned_prices||{}});
+    _renderPortal(portalDiv,d.customer_name,d.margin_pct,d.items,{catMargins:d.cat_margins||{},pinnedPrices:d.pinned_prices||{},itemMargins:d.item_margins||{}});
     // Track portal view — fire-and-forget upsert to portal_views table
     try{sb.from('portal_views').upsert({token:token,viewed_at:new Date().toISOString()},{onConflict:'token'}).then(function(){});}catch(e){}
   });
