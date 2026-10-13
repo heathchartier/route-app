@@ -13188,7 +13188,7 @@ function rPricingSection(code){
      +'</div>'
      +(hasPortal
        ?'<div style="display:flex;gap:6px">'
-          +'<button onclick="copyPortalLink(\''+esc(code)+'\')" style="background:var(--teal2);border:1px solid rgba(0,229,184,.3);color:var(--teal);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128279; Copy</button>'
+          +'<button onclick="showPortalReady(\''+esc(code)+'\')" style="background:var(--teal2);border:1px solid rgba(0,229,184,.3);color:var(--teal);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128279; Share / View</button>'
           +'<button onclick="revokePortal(\''+esc(code)+'\')" style="background:var(--red2);border:1px solid rgba(255,77,106,.3);color:var(--red);border-radius:var(--r2);padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128465;</button>'
         +'</div>'
        :'<button onclick="generatePortalLink(\''+esc(code)+'\')" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r2);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">&#128279; Generate</button>')
@@ -13450,6 +13450,7 @@ function generatePortalLink(code){
   var lastSent=(ST.custPriceSent&&ST.custPriceSent[code]&&ST.custPriceSent[code].categories)||[];
   var preCheck=lastSent.length?lastSent:cats; // default: all checked on first share
   var sheet=document.createElement('div');
+  sheet.id='pgp-sheet';
   sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1300;display:flex;align-items:flex-end;justify-content:center';
   sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(36px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
    +'<div style="width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>'
@@ -13477,7 +13478,7 @@ function _pgpConfirm(code){
   var selected=[];
   boxes.forEach(function(b){if(b.checked)selected.push(b.getAttribute('data-cat'));});
   if(!selected.length){toast('Select at least one category');return;}
-  var sheet=document.querySelector('div[style*="z-index:1300"]');if(sheet)sheet.remove();
+  var sheet=document.getElementById('pgp-sheet');if(sheet)sheet.remove();
   _doGeneratePortal(code,selected);
 }
 function _doGeneratePortal(code,selectedCats){
@@ -13505,9 +13506,43 @@ function _doGeneratePortal(code,selectedCats){
     ST.custPriceSent[code]={lastSent:new Date().toISOString(),categories:selectedCats,itemCount:filteredItems.length};
     lSave();syncUp();
     rPricingSection(code);
-    copyPortalLink(code);
-    toast('Portal link copied! Share with '+custName+(selectedCats.length?' ('+selectedCats.length+' categor'+(selectedCats.length===1?'y':'ies')+')'  :''));
+    showPortalReady(code);
   });
+}
+function showPortalReady(code){
+  var token=ST.portalTokens&&ST.portalTokens[code];
+  if(!token){toast('No portal yet - tap Generate first');return;}
+  var c=null;var a=allC();for(var i=0;i<a.length;i++){if(a[i].code===code){c=a[i];break;}}
+  var name=c?c.name:'this customer';
+  var url=_getPortalURL(token);
+  var sent=(ST.custPriceSent&&ST.custPriceSent[code])||{};
+  var old=document.getElementById('portal-ready');if(old)old.remove();
+  var sh=document.createElement('div');
+  sh.id='portal-ready';
+  sh.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1400;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var b='display:block;width:100%;box-sizing:border-box;padding:13px;border-radius:var(--r2);text-align:center;text-decoration:none;font-size:15px;font-weight:700;margin-bottom:10px;cursor:pointer;font-family:inherit;border:1px solid var(--border2);background:var(--bg3);color:var(--text)';
+  sh.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+    +'<div style="font-size:18px;font-weight:800;margin-bottom:4px">&#10003; Portal ready</div>'
+    +'<div style="font-size:13px;color:var(--sub);line-height:1.5;margin-bottom:14px">Send this link to <strong style="color:var(--text)" id="pr-name"></strong>. They see only their own prices, can search the list, and can send you a quote request - no login needed.'
+    +(sent.itemCount?'<br><span style="color:var(--teal)">'+sent.itemCount+' items shared</span>':'')+'</div>'
+    +'<input id="pr-url" readonly style="width:100%;box-sizing:border-box;padding:11px 12px;border-radius:var(--r2);border:1px solid var(--border2);background:var(--bg);color:var(--text);font-size:12px;font-family:inherit;margin-bottom:12px">'
+    +'<button id="pr-share" style="'+b+';background:var(--teal);color:#000;border:none">Share link</button>'
+    +'<button id="pr-copy" style="'+b+'">Copy link</button>'
+    +'<a id="pr-open" target="_blank" style="'+b+'">Open it to preview</a>'
+    +'<button id="pr-done" style="width:100%;padding:11px;border:none;background:transparent;color:var(--sub);font-size:14px;cursor:pointer;font-family:inherit">Done</button>'
+    +'</div>';
+  document.body.appendChild(sh);
+  document.getElementById('pr-name').textContent=name;
+  document.getElementById('pr-url').value=url;
+  document.getElementById('pr-open').href=url;
+  document.getElementById('pr-copy').onclick=function(){copyPortalLink(code);};
+  var shareBtn=document.getElementById('pr-share');
+  shareBtn.onclick=function(){
+    if(navigator.share){navigator.share({title:'Your pricing from '+((ST.userProfile&&ST.userProfile.company)||'FieldIQ'),url:url}).catch(function(){});}
+    else{copyPortalLink(code);}
+  };
+  document.getElementById('pr-done').onclick=function(){sh.remove();};
+  sh.addEventListener('click',function(e){if(e.target===sh)sh.remove();});
 }
 function copyPortalLink(code){
   var token=ST.portalTokens&&ST.portalTokens[code];
