@@ -14921,6 +14921,8 @@ function onLogin(user,fresh){
     if(_tb)_tb.style.display='none';
     var _po=document.getElementById('paywall-overlay');
     if(_po)_po.style.display='none';
+    var _ps=document.getElementById('paywall-screen');
+    if(_ps)_ps.style.display='none';
   }
   // Only a fresh sign-in skips the lock; restoring a saved session at launch must still prompt for the PIN
   if(fresh){_appUnlockedThisSession=true;sessionStorage.setItem('hrt_unlocked','1');}
@@ -14989,7 +14991,10 @@ function iapRestore(){
 window.onIAPStatus=function(data){
   var pw=document.getElementById('paywall-screen');
   if(!pw)return;
-  if(data.status==='active'||(typeof isFreeAccess==='function'&&isFreeAccess())){
+  var _free=(typeof isFreeAccess==='function'&&isFreeAccess());
+  _bt('iapStatus '+(data&&data.status)+' user='+(CURRENT_USER&&CURRENT_USER.email)+' free='+_free);
+  // Never cover the sign-in screen: the paywall is only for signed-in accounts without a subscription
+  if(!CURRENT_USER||_free||(data&&data.status==='active')){
     pw.style.display='none';
   }else{
     pw.style.display='flex';
