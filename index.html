@@ -1994,7 +1994,7 @@ function openM(code){
   var mgm=document.getElementById('m-gm');if(mgm)mgm.href='https://www.google.com/maps/search/'+encodeURIComponent(addr);
   var mam=document.getElementById('m-am');if(mam)mam.href='https://maps.apple.com/?q='+encodeURIComponent(addr);
   var mwz=document.getElementById('m-wz');if(mwz)mwz.href='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr);
-  var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="https://www.google.com/maps/search/'+encodeURIComponent(addr)+'" target="_blank" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
+  var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="#" data-a="'+encodeURIComponent(addr)+'" onclick="showMapChooser(decodeURIComponent(this.getAttribute(\'data-a\')));return false" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
   var mp=document.getElementById('m-p');if(mp)mp.innerHTML=c.phone?'<a href="tel:'+esc(c.phone)+'" style="color:var(--blue);text-decoration:none">'+esc(c.phone)+'</a><a href="sms:'+esc(c.phone)+'" style="margin-left:10px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;text-decoration:none">&#128172; SMS</a>':'No phone';
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="mailto:'+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
@@ -4267,7 +4267,7 @@ function openM(code){
   var mgm=document.getElementById('m-gm');if(mgm)mgm.href='https://www.google.com/maps/search/'+encodeURIComponent(addr);
   var mam=document.getElementById('m-am');if(mam)mam.href='https://maps.apple.com/?q='+encodeURIComponent(addr);
   var mwz=document.getElementById('m-wz');if(mwz)mwz.href='https://waze.com/ul?navigate=yes&q='+encodeURIComponent(addr);
-  var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="https://www.google.com/maps/search/'+encodeURIComponent(addr)+'" target="_blank" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
+  var ma=document.getElementById('m-a');if(ma)ma.innerHTML=addr?'<a href="#" data-a="'+encodeURIComponent(addr)+'" onclick="showMapChooser(decodeURIComponent(this.getAttribute(\'data-a\')));return false" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
   var mp=document.getElementById('m-p');if(mp)mp.innerHTML=c.phone?'<a href="tel:'+esc(c.phone)+'" style="color:var(--blue);text-decoration:none">'+esc(c.phone)+'</a><a href="sms:'+esc(c.phone)+'" style="margin-left:10px;background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.3);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;text-decoration:none">&#128172; SMS</a>':'No phone';
   var me=document.getElementById('m-e');if(me)me.innerHTML=c.email?'<a href="mailto:'+esc(c.email)+'" style="color:var(--blue);text-decoration:none">'+esc(c.email)+'</a>':'No email';
   var mg=document.getElementById('m-g');if(mg)mg.textContent=getGroupName(c.group)+(c.zip?' / Zip '+c.zip:'');
@@ -5893,7 +5893,7 @@ function openVM(code){
   var mn=document.getElementById('vm-n');if(mn)mn.textContent=vend.name;
   var addr=[vend.address,vend.city,vend.state,vend.zip].filter(function(x){return x;}).join(', ');
   var ma=document.getElementById('vm-a');
-  if(ma)ma.innerHTML=addr?'<a href="https://maps.apple.com/?q='+encodeURIComponent(addr)+'" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
+  if(ma)ma.innerHTML=addr?'<a href="#" data-a="'+encodeURIComponent(addr)+'" onclick="showMapChooser(decodeURIComponent(this.getAttribute(\'data-a\')));return false" style="color:var(--blue);text-decoration:none">'+esc(addr)+'</a>':'No address';
   var mp=document.getElementById('vm-p');
   if(mp)mp.innerHTML=vend.phone?'<a href="tel:'+esc(vend.phone)+'" style="color:var(--blue);text-decoration:none">'+esc(vend.phone)+'</a>':'No phone';
   var mgm=document.getElementById('vm-gm');if(mgm)mgm.href='https://www.google.com/maps/search/'+encodeURIComponent(addr);
@@ -16028,6 +16028,30 @@ function forcePaywallTest(){
 var _docsCropper = null;
 var _docsPendingFile = null;
 var _docsFolder = ''; // '' = root, otherwise = subfolder name
+
+function showToast(m){ try{ toast(m); }catch(e){} }
+
+function showMapChooser(addr){
+  var old=document.getElementById('map-chooser'); if(old) old.remove();
+  var q=encodeURIComponent(addr||'');
+  var sheet=document.createElement('div');
+  sheet.id='map-chooser';
+  sheet.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9500;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)';
+  var btn='display:block;width:100%;box-sizing:border-box;padding:14px;border-radius:var(--r2);text-align:center;text-decoration:none;font-size:15px;font-weight:700;margin-bottom:10px;border:1px solid var(--border2);background:var(--bg3);color:var(--text)';
+  sheet.innerHTML='<div style="background:var(--bg2);border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border2)">'
+    +'<div style="font-size:15px;font-weight:800;margin-bottom:4px">Open in…</div>'
+    +'<div style="font-size:12px;color:var(--sub);margin-bottom:14px;word-break:break-word"></div>'
+    +'<a href="https://maps.apple.com/?q='+q+'" target="_blank" style="'+btn+'">Apple Maps</a>'
+    +'<a href="https://www.google.com/maps/search/'+q+'" target="_blank" style="'+btn+'">Google Maps</a>'
+    +'<a href="https://waze.com/ul?navigate=yes&q='+q+'" target="_blank" style="'+btn+'">Waze</a>'
+    +'<button type="button" id="map-chooser-x" style="width:100%;padding:12px;border-radius:var(--r2);border:none;background:transparent;color:var(--sub);font-size:14px;cursor:pointer;font-family:inherit">Cancel</button>'
+    +'</div>';
+  sheet.querySelector('div > div:nth-child(2)').textContent=addr||'';
+  sheet.addEventListener('click',function(e){
+    if(e.target===sheet||e.target.id==='map-chooser-x'||(e.target.tagName==='A')) setTimeout(function(){sheet.remove();},50);
+  });
+  document.body.appendChild(sheet);
+}
 
 function docsPickFile() { document.getElementById('docs-file-input').click(); }
 function docsPickPhoto() { document.getElementById('docs-camera-input').click(); }
