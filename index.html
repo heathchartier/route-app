@@ -657,7 +657,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 <!-- PAGES - all visible by default, JS will hide non-active ones -->
 <div id="toast-undo"><span id="toast-undo-msg">Logged</span><button id="toast-undo-note" onclick="undoNotePrompt()" style="display:none;background:rgba(129,140,248,.2);color:#818cf8;border:1px solid rgba(129,140,248,.35);border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">+Note</button><button id="toast-undo-btn" onclick="undoLastVisit()">UNDO</button></div>
 
-<div id="p-dash" style="padding-bottom:80px">
+<div id="p-dash" style="padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr">
     <div class="hdr-top">
       <div><h1 id="d-greet">Good morning, Heath</h1><div class="sub" id="d-date"></div></div>
@@ -672,6 +672,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
       <div class="stat"><div class="stat-n" style="color:var(--green)">0</div><div class="stat-l">Visited</div></div>
       <div class="stat"><div class="stat-n" style="color:var(--amber)">0</div><div class="stat-l">Not Avail</div></div>
       <div class="stat"><div class="stat-n" style="color:var(--red)">0</div><div class="stat-l">Overdue</div></div>
+    </div>
+    <div class="card" id="d-portal-requests-card" style="display:none">
+      <div class="card-hdr">
+        <div class="lbl" style="margin:0;color:var(--teal)">&#128272; Portal Quote Requests</div>
+        <span id="d-portal-req-count" style="background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
+      </div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers who submitted quote requests from their portal</div>
+      <div id="d-portal-req-list"></div>
     </div>
     <div id="d-empty-state" style="display:none;padding:24px 16px 16px">
       <div style="background:linear-gradient(135deg,rgba(0,229,184,.08),rgba(74,158,255,.06));border:1px solid rgba(0,229,184,.2);border-radius:var(--r);padding:24px 20px;text-align:center;margin-bottom:12px">
@@ -820,14 +828,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Products customers have asked for that haven't been filled yet</div>
     <div id="d-prodreq-list"></div>
   </div>
-  <div class="card" id="d-portal-requests-card" style="display:none">
-    <div class="card-hdr">
-      <div class="lbl" style="margin:0;color:var(--teal)">&#128272; Portal Quote Requests</div>
-      <span id="d-portal-req-count" style="background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
-    </div>
-    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers who submitted quote requests from their portal</div>
-    <div id="d-portal-req-list"></div>
-  </div>
   <div class="card" id="d-price-alerts-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128203; Pricing Needs Update</div>
@@ -934,7 +934,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
 </div>
 
-<div id="p-grps" style="display:none;padding-bottom:80px">
+<div id="p-grps" style="display:none;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div><h1>Route Groups</h1><div class="sub grp-count-sub">61 route groups</div></div>
@@ -948,7 +948,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <div class="body" id="g-map" style="display:none"></div>
 </div>
 
-<div id="p-set" style="display:none;padding-bottom:80px">
+<div id="p-set" style="display:none;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr">
     <h1>Settings</h1>
     <div class="sub" id="sync-lbl">Checking sync...</div>
@@ -1273,14 +1273,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
 </div>
 
-<div id="p-vend" style="display:none;padding-bottom:90px">
+<div id="p-vend" style="display:none;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr"><h1>Suppliers</h1><div class="sub" id="v-lbl">Loading...</div>
     <div class="srch-wrap" style="margin-top:8px"><span class="srch-icon">&#128269;</span><input class="srch" id="v-srch" type="search" placeholder="Search suppliers..."></div>
   </div>
   <div class="body" id="v-list"></div>
 </div>
 
-<div id="p-price" style="display:none;padding-bottom:90px">
+<div id="p-price" style="display:none;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><h1>Pricing</h1><div class="sub" id="pr-lbl">No price sheet loaded</div></div>
@@ -2981,6 +2981,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <button id="paywall-sub-btn" onclick="iapSubscribe()" style="width:100%;background:var(--teal);color:#000;border:none;border-radius:var(--r2);padding:16px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.2px;margin-bottom:12px">Start Free Trial</button>
     <button onclick="iapRestore()" style="width:100%;background:transparent;color:var(--sub);border:1px solid var(--border2);border-radius:var(--r2);padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Restore Purchase</button>
     <div id="paywall-msg" style="text-align:center;font-size:12px;color:var(--sub);margin-top:16px;line-height:1.5">Subscription renews monthly at $19.99. Cancel anytime.</div>
+    <div id="paywall-who" style="text-align:center;font-size:11px;color:var(--dim);margin-top:8px"></div>
     <div style="text-align:center;margin-top:14px">
       <button onclick="document.getElementById('paywall-screen').style.display='none';doSignOut();" style="background:none;border:none;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline;padding:6px 10px">Sign out / use a different account</button>
     </div>
@@ -2990,7 +2991,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 <!-- PAGES - all visible by default, JS will hide non-active ones -->
 <div id="toast-undo"><span id="toast-undo-msg">Logged</span><button id="toast-undo-note" onclick="undoNotePrompt()" style="display:none;background:rgba(129,140,248,.2);color:#818cf8;border:1px solid rgba(129,140,248,.35);border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">+Note</button><button id="toast-undo-btn" onclick="undoLastVisit()">UNDO</button></div>
 
-<div id="p-dash" style="display:none;padding-bottom:80px">
+<div id="p-dash" style="display:none;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr">
     <div class="hdr-top">
       <div><h1 id="d-greet">Good morning, Heath</h1><div class="sub" id="d-date"></div></div>
@@ -3131,14 +3132,6 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
     <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Products customers have asked for that haven't been filled yet</div>
     <div id="d-prodreq-list"></div>
   </div>
-  <div class="card" id="d-portal-requests-card" style="display:none">
-    <div class="card-hdr">
-      <div class="lbl" style="margin:0;color:var(--teal)">&#128272; Portal Quote Requests</div>
-      <span id="d-portal-req-count" style="background:rgba(0,229,184,.15);color:var(--teal);border:1px solid rgba(0,229,184,.3);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700">0</span>
-    </div>
-    <div style="font-size:11px;color:var(--sub);margin-bottom:10px">Customers who submitted quote requests from their portal</div>
-    <div id="d-portal-req-list"></div>
-  </div>
   <div class="card" id="d-price-alerts-card" style="display:none">
     <div class="card-hdr">
       <div class="lbl" style="margin:0;color:var(--amber)">&#128203; Pricing Needs Update</div>
@@ -3245,7 +3238,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
 </div>
 
-<div id="p-grps" style="display:none;padding-bottom:80px">
+<div id="p-grps" style="display:none;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div><h1>Route Groups</h1><div class="sub grp-count-sub">61 route groups</div></div>
@@ -3259,7 +3252,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   <div class="body" id="g-map" style="display:none"></div>
 </div>
 
-<div id="p-set" style="display:none;padding-bottom:80px">
+<div id="p-set" style="display:none;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr">
     <h1>Settings</h1>
     <div class="sub" id="sync-lbl">Checking sync...</div>
@@ -3545,14 +3538,14 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
   </div>
 </div>
 
-<div id="p-vend" style="display:none;padding-bottom:90px">
+<div id="p-vend" style="display:none;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr"><h1>Suppliers</h1><div class="sub" id="v-lbl">Loading...</div>
     <div class="srch-wrap" style="margin-top:8px"><span class="srch-icon">&#128269;</span><input class="srch" id="v-srch" type="search" placeholder="Search suppliers..."></div>
   </div>
   <div class="body" id="v-list"></div>
 </div>
 
-<div id="p-price" style="display:none;padding-bottom:90px">
+<div id="p-price" style="display:none;padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))">
   <div class="hdr">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div><h1>Pricing</h1><div class="sub" id="pr-lbl">No price sheet loaded</div></div>
@@ -8391,7 +8384,7 @@ function showHowToUse(){
     {icon:'&#128272;',title:'Security',body:'Set a PIN in Settings to lock the app. You can also enable Face ID / Touch ID so you unlock with biometrics instead of typing your PIN every time.'},
     {icon:'&#128506;',title:'Rolling Route',body:'Tap "Route" on any group to pick your nav app. Apple Maps uses rolling batches of 4 stops at a time — when you return to FieldIQ, tap "Continue" to load the next batch. Rolling Route (Google Maps) and Waze both use a 1-stop-at-a-time approach — great for Tesla and Android Auto. Use "Share Next Stop" on the active route card to send the next stop to any navigation app. Google Maps loads all stops at once. Set your home address in My Profile to add "Start from home" and "Return home" toggles to any route.'},
     {icon:'&#128194;',title:'Pricing Tab',body:'Upload your price sheet (Excel or CSV). Set a global margin % and sell prices calculate instantly. Search by item code or description. Per-customer pricing overrides the global margin using a 3-layer waterfall: (1) flat markup % per customer, (2) category margins if your sheet has a product group column, (3) item price pins for exact dollar overrides on specific SKUs. Set these in any customer card under Pricing.'},
-    {icon:'&#128279;',title:'Customer Price Portal',body:'Inside any customer card, tap "Generate" under Customer Price Portal to create a unique shareable link. Your customer gets a clean, searchable view of their own prices — no login, no app install. The link reflects their waterfall pricing (pins → category → flat). Revoke the link anytime from the same card.'},
+    {icon:'&#128279;',title:'Customer Price Portal',body:'Open a customer, tap Generate under Customer Price Portal, choose which product categories to include, and tap Generate. A Portal ready screen gives you the link: Share it, Copy it, or open it to preview exactly what your customer sees. Your customer sees only their own prices, can search the list, add quantities and send you a quote request, with no login or app install. New requests appear at the top of your Dashboard under Portal Quote Requests; tap Quote to turn one into a quote. Tap Share / View on the customer card any time to get the link again, or use the trash button to revoke it.'},
     {icon:'&#128200;',title:'Per-Customer Pricing',body:'Open any customer card → Pricing section. Set a Base Markup % to override the global margin just for that customer. If your price sheet includes a Product Group/Category column, you can also set different margins per category. For individual SKUs, use Item Price Pins to lock in an exact dollar price — pins always win over everything else. All of these flow into the quote builder and order screen automatically.'},
     {icon:'&#128260;',title:'Cross-Device Sync',body:'Your data syncs automatically across all your devices — log a visit on your phone, see it on your laptop instantly. Sync status shows in the top bar. Use Settings → Force Upload if you ever need to manually push data to the cloud.'},
     {icon:'&#128274;',title:'Account & Security',body:'Sign in with your email, Google, or Apple ID. Settings → Account lets you change your password or email address. Settings → App Security lets you set a PIN and enable Face ID. Manage or cancel your FieldIQ subscription anytime from Settings → Manage Subscription. You can delete your account and all data from Settings → Account → Delete My Account.'},
@@ -11315,6 +11308,8 @@ function rProductReqCard(){
 
 /* ── PORTAL QUOTE REQUESTS (rep side) ── */
 var _portalReqCache=null;var _portalReqCacheTs=0;
+var _portalSeenIds=null;
+setInterval(function(){try{var dp=document.getElementById('p-dash');if(CURRENT_USER&&!document.hidden&&dp&&dp.style.display!=='none')rPortalRequests();}catch(e){}},30000);
 function rPortalRequests(){
   var card=document.getElementById('d-portal-requests-card');
   var list=document.getElementById('d-portal-req-list');
@@ -11323,10 +11318,20 @@ function rPortalRequests(){
   if(!ST.portalTokens||!Object.values(ST.portalTokens).some(function(t){return t&&t!==null;})){card.style.display='none';return;}
   // Only re-fetch if cache is older than 60 seconds
   var now=Date.now();
-  if(_portalReqCache&&(now-_portalReqCacheTs)<60000){_renderPortalReqs(_portalReqCache,card,list,cnt);return;}
+  if(_portalReqCache&&(now-_portalReqCacheTs)<20000){_renderPortalReqs(_portalReqCache,card,list,cnt);return;}
   sb.from('portal_quote_requests').select('*').order('submitted_at',{ascending:false}).limit(20).then(function(res){
     if(res.error||!res.data){card.style.display='none';return;}
     _portalReqCache=res.data;_portalReqCacheTs=Date.now();
+    try{
+      var _tc={};Object.keys(ST.portalTokens||{}).forEach(function(c){if(ST.portalTokens[c])_tc[ST.portalTokens[c]]=c;});
+      var _live=res.data.filter(function(r){return _tc[r.token]&&!r.dismissed;});
+      if(_portalSeenIds===null){_portalSeenIds={};}
+      else{
+        var _fresh=_live.filter(function(r){return !_portalSeenIds[r.id];});
+        if(_fresh.length){toast('&#128276; New quote request from '+esc(_fresh[0].customer_name||'a customer'));}
+      }
+      _live.forEach(function(r){_portalSeenIds[r.id]=1;});
+    }catch(e){}
     _renderPortalReqs(res.data,card,list,cnt);
   });
 }
@@ -11363,10 +11368,12 @@ function _acceptPortalRequest(custCode,reqId){
   if(!ST.quotes&&!ST||!reqId)return;
   var data=_portalReqCache&&_portalReqCache.filter(function(r){return r.id===reqId;})[0];
   if(!data||!data.items||!data.items.length){toast('No items in request');return;}
-  _qCode=custCode;
-  _qItems=data.items.map(function(it){return{name:it.name||it.code||'Item',qty:it.qty||1,price:it.price||0,cost:null};});
+  var _reqItems=data.items.map(function(it){return{name:it.name||it.code||'Item',qty:it.qty||1,price:it.price||0,cost:null};});
   showQuoteBuilder(custCode);
-  setTimeout(function(){_renderQRows();},100);
+  _qCode=custCode;
+  _qItems=_reqItems;
+  try{_renderQRows();}catch(e){}
+  setTimeout(function(){_qItems=_reqItems;try{_renderQRows();}catch(e){}},120);
   _dismissPortalRequest(reqId);
 }
 function _dismissPortalRequest(reqId){
@@ -13765,6 +13772,11 @@ function _portalSubmitQuote(){
     }
     var bar=document.getElementById('portal-cart-bar');
     if(bar){bar.innerHTML='<div style="flex:1;text-align:center;color:#10b981;font-weight:700;font-size:14px">&#10003; Quote request sent! Your sales rep will be in touch.</div>';}
+    var _ov=document.createElement('div');
+    _ov.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.94);display:flex;align-items:center;justify-content:center;padding:24px';
+    _ov.innerHTML='<div style="max-width:340px;width:100%;text-align:center;color:#e2e8f0;font-family:inherit"><div style="font-size:54px;margin-bottom:10px;color:#10b981">&#10003;</div><div style="font-size:20px;font-weight:800;margin-bottom:8px">Request sent</div><div style="font-size:14px;color:#94a3b8;line-height:1.5;margin-bottom:20px">Your sales rep has your quote request and will be in touch shortly.</div><button style="width:100%;padding:14px;border-radius:12px;border:none;background:#10b981;color:#052e16;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit">Done</button></div>';
+    _ov.querySelector('button').onclick=function(){_ov.remove();};
+    document.body.appendChild(_ov);
     _portalCart={};
     document.querySelectorAll('.pq-qty').forEach(function(inp){inp.value='';});
   });
@@ -14464,7 +14476,7 @@ function _doRecalcGroups(){
   generateRouteGroups(function(){toast('Groups updated!');go('grps');});
 }
 
-function _onResume(){_bt('resume event');var dp=document.getElementById('p-dash');if(dp&&dp.style.display!=='none')rDash();if(CURRENT_USER)syncDown();}document.addEventListener('visibilitychange',function(){if(!document.hidden)_onResume();});window.addEventListener('pageshow',function(e){if(e.persisted)_onResume();});window.addEventListener('focus',function(){_onResume();});
+function _onResume(){_bt('resume event');_portalReqCache=null;var dp=document.getElementById('p-dash');if(dp&&dp.style.display!=='none')rDash();if(CURRENT_USER)syncDown();}document.addEventListener('visibilitychange',function(){if(!document.hidden)_onResume();});window.addEventListener('pageshow',function(e){if(e.persisted)_onResume();});window.addEventListener('focus',function(){_onResume();});
 
 // iOS Safari pull-to-refresh block
 (function(){
@@ -15051,6 +15063,7 @@ window.onIAPStatus=function(data){
     pw.style.display='none';
   }else{
     pw.style.display='flex';
+    var _who=document.getElementById('paywall-who');if(_who)_who.textContent='Signed in as '+((CURRENT_USER&&CURRENT_USER.email)||'unknown');
   }
 };
 
