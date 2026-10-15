@@ -2956,7 +2956,7 @@ nav{box-shadow:0 -1px 0 rgba(255,255,255,.05),0 -4px 24px rgba(0,0,0,.4)}
 <body>
 
 <!-- PAYWALL SCREEN -->
-<div id="paywall-screen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:10000;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:auto">
+<div id="paywall-screen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:9000;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:auto">
   <div style="width:100%;max-width:380px">
     <div style="text-align:center;margin-bottom:32px">
       <div style="font-size:38px;font-weight:900;color:var(--teal);letter-spacing:-1.5px">FieldIQ</div>
@@ -15817,6 +15817,13 @@ function isFreeAccess(){
   return FREE_ACCESS_EMAILS.map(function(e){return e.toLowerCase();}).indexOf(email) !== -1;
 }
 
+setInterval(function(){
+  try{
+    var pw=document.getElementById('paywall-screen');
+    if(pw&&pw.style.display!=='none'&&CURRENT_USER&&isFreeAccess()){pw.style.display='none';_bt('paywall-screen force-hidden for free account');}
+  }catch(e){}
+},1500);
+
 // Check subscription status on app load
 function checkSubscription(){
   if(_isPortalMode) return; // portal mode — never show auth or paywall to customers
@@ -15929,7 +15936,7 @@ function updateTrialBanner(daysLeft){
 
 // iOS calls this with subscription status
 window.onIAPStatus = function(result){
-  if(isFreeAccess()) return; // free accounts ignore IAP status — always have access
+  if(isFreeAccess()){ var _pw=document.getElementById('paywall-screen'); if(_pw)_pw.style.display='none'; try{_bt('iapStatus(final) '+(result&&result.status)+' user='+(CURRENT_USER&&CURRENT_USER.email)+' free=true');}catch(e){} return; } // free accounts ignore IAP status — always have access
   _setSubStatus(result.status); // persist to localStorage
   if(result.status === 'active'){
     hidePaywall();
