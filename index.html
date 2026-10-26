@@ -14989,9 +14989,10 @@ function onLogin(user,fresh){
     var _ps=document.getElementById('paywall-screen');
     if(_ps)_ps.style.display='none';
   }
+  });
   // Only a fresh sign-in skips the lock; restoring a saved session at launch must still prompt for the PIN
   if(fresh){_appUnlockedThisSession=true;sessionStorage.setItem('hrt_unlocked','1');}
-  });
+  _step('subscription',function(){ if(typeof checkSubscription==='function')checkSubscription(); });
   _bt('onLogin start fresh='+!!fresh);
   _step('loadRolling',function(){loadRolling();});
   _step('loadPricing',function(){loadPricing();});
@@ -15854,7 +15855,8 @@ function checkSubscription(){
         updateTrialBanner(-graceLeft); // negative = grace mode
       } else {
         _setSubStatus(SUBSCRIPTION_STATUS === 'cancelled' ? 'cancelled' : 'expired');
-        showPaywall();
+        // Only show pricing once we know who is signed in (free accounts must never see it at launch)
+        if(CURRENT_USER){ showPaywall(); }
         return false;
       }
     }else{
