@@ -27,6 +27,8 @@ ALTER TABLE price_portals ADD COLUMN IF NOT EXISTS items jsonb;
 ALTER TABLE price_portals ADD COLUMN IF NOT EXISTS cat_margins jsonb DEFAULT '{}'::jsonb;
 ALTER TABLE price_portals ADD COLUMN IF NOT EXISTS pinned_prices jsonb DEFAULT '{}'::jsonb;
 ALTER TABLE price_portals ADD COLUMN IF NOT EXISTS item_margins jsonb DEFAULT '{}'::jsonb;
+ALTER TABLE price_portals ADD COLUMN IF NOT EXISTS company_name text;  -- rep's company, shown as the portal's home-screen name
+ALTER TABLE price_portals ADD COLUMN IF NOT EXISTS user_id uuid;       -- owning rep (needed later for push notifications)
 
 -- 3. Portal engagement tracking
 CREATE TABLE IF NOT EXISTS portal_views (

@@ -4641,23 +4641,23 @@ function rNewCustomers(){
 var DASH_CARDS=[
   {key:'brief',label:'Morning Briefing',el:'d-brief'},
   {key:'nba',label:'Next Best Action',el:'d-nba'},
-  {key:'streak',label:'Visit Streak',el:'d-streak'},
-  {key:'goal',label:'Weekly Goal',el:'d-goal-card'},
-  {key:'newcusts',label:'New Accounts',el:'d-new-card'},
-  {key:'leaderboard',label:'YTD Leaderboard',el:'d-leaderboard'},
   {key:'hotleads',label:'Hot Leads Overdue',el:'d-hot-card'},
-  {key:'winback',label:'Win-Back Targets',el:'d-winback-card'},
-  {key:'trend',label:'Visit Trend Chart',el:'d-trend-card'},
-  {key:'pace',label:'Sales Pace',el:'d-pace-card'},
   {key:'due',label:'Due Soon',el:'d-due-card'},
-  {key:'schedule',label:'This Week\'s Schedule',el:'d-sched-card'},
-  {key:'quiet',label:'Going Quiet',el:'d-quiet-card'},
-  {key:'comp',label:'Competitor Intel',el:'d-comp-card'},
   {key:'tier',label:'Visit Cadence Overdue',el:'d-tier-card'},
-  {key:'weekplan',label:'Weekly Plan',el:'d-plan-card'},
   {key:'samples',label:'Sample Follow-Ups',el:'d-samples-card'},
+  {key:'schedule',label:'This Week\'s Schedule',el:'d-sched-card'},
+  {key:'weekplan',label:'Weekly Plan',el:'d-plan-card'},
+  {key:'goal',label:'Weekly Goal',el:'d-goal-card'},
+  {key:'streak',label:'Visit Streak',el:'d-streak'},
+  {key:'quiet',label:'Going Quiet',el:'d-quiet-card'},
+  {key:'winback',label:'Win-Back Targets',el:'d-winback-card'},
+  {key:'newcusts',label:'New Accounts',el:'d-new-card'},
+  {key:'pace',label:'Sales Pace',el:'d-pace-card'},
   {key:'target',label:'Visit Goal Tracker',el:'d-target-card'},
-  {key:'coverage',label:'Territory Coverage',el:'d-coverage-card'}
+  {key:'coverage',label:'Territory Coverage',el:'d-coverage-card'},
+  {key:'comp',label:'Competitor Intel',el:'d-comp-card'},
+  {key:'trend',label:'Visit Trend Chart',el:'d-trend-card'},
+  {key:'leaderboard',label:'YTD Leaderboard',el:'d-leaderboard'}
 ];
 function dashCardHidden(key){
   var h=ST.hiddenCards||{};return !!h[key];
@@ -4678,6 +4678,7 @@ function applyCardOrder(){
     var el=document.getElementById(card.el);
     if(el)body.appendChild(el);
   }
+  ['d-quote-analytics','d-mileage','d-expenses-card','d-recently','d-monthly-report','d-route-summary'].forEach(function(id){var x=document.getElementById(id);if(x)body.appendChild(x);});
 }
 function moveCard(key,dir){
   var order=getCardOrder();
@@ -8230,7 +8231,7 @@ function rNavBadge(){
     if(todos.some(function(t){return !t.done&&t.dueDate&&t.dueDate<=today;})){hasDue=true;break;}
   }
   var badge=nb.querySelector('.nav-badge');
-  if(hasDue){if(!badge){badge=document.createElement('span');badge.className='nav-badge';nb.appendChild(badge);}}
+  if(hasDue||window._portalReqPending>0){if(!badge){badge=document.createElement('span');badge.className='nav-badge';nb.appendChild(badge);}}
   else{if(badge)badge.remove();}
 }
 
@@ -11342,6 +11343,7 @@ function _renderPortalReqs(data,card,list,cnt){
   var tokenToCode={};
   if(ST.portalTokens){Object.keys(ST.portalTokens).forEach(function(code){if(ST.portalTokens[code]&&ST.portalTokens[code]!==null)tokenToCode[ST.portalTokens[code]]=code;});}
   var relevant=data.filter(function(r){return tokenToCode[r.token]&&!r.dismissed;});
+  window._portalReqPending=relevant.length;try{rNavBadge();}catch(e){}
   if(!relevant.length){card.style.display='none';return;}
   cnt.textContent=relevant.length;card.style.display='block';
   var a=allC();
@@ -11462,7 +11464,7 @@ function bulkResharePortals(){
     ST.portalTokens[c.code]=token;
     var prevSentCats=(ST.custPriceSent[c.code]&&ST.custPriceSent[c.code].categories)||[];
     var filteredItems=prevSentCats.length?priceData.filter(function(r){return prevSentCats.indexOf((r._cat||'').trim())!==-1;}):priceData;
-    var portalRow={token:token,customer_name:c.name,customer_code:c.code,margin_pct:margin,items:filteredItems,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins};
+    var portalRow={token:token,customer_name:c.name,customer_code:c.code,margin_pct:margin,items:filteredItems,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins,company_name:((ST.userProfile&&ST.userProfile.company)||''),user_id:((CURRENT_USER&&CURRENT_USER.id)||null)};
     _portalUpsert(portalRow).then(function(res){
       if(!res.error){
         ST.custPriceSent[c.code]={lastSent:new Date().toISOString(),categories:prevSentCats,itemCount:filteredItems.length};
@@ -13504,7 +13506,7 @@ function _doGeneratePortal(code,selectedCats){
   var catMargins=ST.custCatMargins&&ST.custCatMargins[code]||{};
   var pinnedPrices=ST.custItemPrices&&ST.custItemPrices[code]||{};
   var itemMargins=ST.custItemMargins&&ST.custItemMargins[code]||{};
-  var portalRow={token:token,customer_name:custName,customer_code:code,margin_pct:margin,items:filteredItems,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins};
+  var portalRow={token:token,customer_name:custName,customer_code:code,margin_pct:margin,items:filteredItems,cat_margins:catMargins,pinned_prices:pinnedPrices,item_margins:itemMargins,company_name:((ST.userProfile&&ST.userProfile.company)||''),user_id:((CURRENT_USER&&CURRENT_USER.id)||null)};
   _portalUpsert(portalRow).then(function(res){
     if(res.error){
       ST.portalTokens[code]=null;lSave();
@@ -13517,23 +13519,68 @@ function _doGeneratePortal(code,selectedCats){
     showPortalReady(code);
   });
 }
+var _PORTAL_OPT_COLS=['item_margins','company_name','user_id'];
 function _portalUpsert(row){
   return sb.from('price_portals').upsert(row,{onConflict:'token'}).then(function(res){
-    if(res.error&&/item_margins/.test(res.error.message||'')){
-      var r2=Object.assign({},row);delete r2.item_margins;
-      return sb.from('price_portals').upsert(r2,{onConflict:'token'});
+    if(res.error){
+      var msg=res.error.message||'',stripped=false,r2=Object.assign({},row);
+      _PORTAL_OPT_COLS.forEach(function(c){if(msg.indexOf(c)>=0&&c in r2){delete r2[c];stripped=true;}});
+      if(stripped)return _portalUpsert(r2);
     }
     return res;
   });
 }
 function _portalFetch(token){
-  var cols='customer_name,margin_pct,items,cat_margins,pinned_prices';
-  return sb.from('price_portals').select(cols+',item_margins').eq('token',token).single().then(function(res){
-    if(res.error&&/item_margins/.test(res.error.message||'')){
-      return sb.from('price_portals').select(cols).eq('token',token).single();
-    }
-    return res;
-  });
+  var base='customer_name,margin_pct,items,cat_margins,pinned_prices';
+  var tries=[base+',item_margins,company_name',base+',item_margins',base];
+  function go(k){
+    return sb.from('price_portals').select(tries[k]).eq('token',token).single().then(function(res){
+      if(res.error&&k<tries.length-1&&/column|schema cache/i.test(res.error.message||''))return go(k+1);
+      return res;
+    });
+  }
+  return go(0);
+}
+function _applyPortalBranding(company){
+  try{
+    var title=((company||'').trim()?(company.trim()+' '):'')+'Pricing';
+    document.title=title;
+    document.querySelectorAll('meta[name="apple-mobile-web-app-title"]').forEach(function(m){m.setAttribute('content',title);});
+    document.querySelectorAll('link[rel="manifest"]').forEach(function(l){l.parentNode.removeChild(l);});
+  }catch(e){}
+}
+function _portalInstallTip(root){
+  try{
+    if(!/iPhone|iPad|iPod/.test(navigator.userAgent)||navigator.standalone)return;
+    if(localStorage.getItem('pq_tip_seen'))return;
+    var tip=document.createElement('div');
+    tip.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:99998;background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.45;display:flex;gap:10px;align-items:flex-start;box-shadow:0 8px 30px rgba(0,0,0,.5)';
+    tip.innerHTML='<div style="flex:1">Keep this pricing handy: tap the <strong>Share</strong> button in Safari, then <strong>Add to Home Screen</strong>.</div><button style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;line-height:1;padding:0 4px">&times;</button>';
+    tip.querySelector('button').onclick=function(){tip.remove();try{localStorage.setItem('pq_tip_seen','1');}catch(e){}};
+    document.body.appendChild(tip);
+  }catch(e){}
+}
+function applySettingsOrder(){
+  try{
+    var root=document.querySelector('#p-set .body')||document.getElementById('p-set');
+    if(!root||root.getAttribute('data-ordered'))return;
+    var order=['Quick Access','My Info & Pay','Security','Route Settings','Reports & Exports','Documents','Customer Data','Suppliers','Tools & Features','Data Health','Backup','Sync & Storage','Account','About'];
+    var groups={},pre=[],tail=[],danger=null,cur=null;
+    Array.prototype.slice.call(root.children).forEach(function(el){
+      var t=(el.textContent||'').replace(/\s+/g,' ').trim();
+      if(el.id==='settings-copyright'||(t.indexOf('Back to top')>=0&&t.length<30)){tail.push(el);return;}
+      if(order.indexOf(t)>=0){cur=t;groups[cur]=[el];return;}
+      if(/^\W*Danger Zone/.test(t)&&(' '+el.className+' ').indexOf(' card ')>=0){danger=el;return;}
+      if(cur)groups[cur].push(el);else pre.push(el);
+    });
+    var seq=pre.slice();
+    order.forEach(function(k){if(groups[k])seq=seq.concat(groups[k]);});
+    Object.keys(groups).forEach(function(k){if(order.indexOf(k)<0)seq=seq.concat(groups[k]);});
+    if(danger)seq.push(danger);
+    seq=seq.concat(tail);
+    seq.forEach(function(el){root.appendChild(el);});
+    root.setAttribute('data-ordered','1');
+  }catch(e){try{_bt('ERR applySettingsOrder: '+e.message);}catch(x){}}
 }
 function showPortalReady(code){
   var token=ST.portalTokens&&ST.portalTokens[code];
@@ -13637,6 +13684,7 @@ function _checkPortalMode(){
     }
     var d=res.data;
     _renderPortal(portalDiv,d.customer_name,d.margin_pct,d.items,{catMargins:d.cat_margins||{},pinnedPrices:d.pinned_prices||{},itemMargins:d.item_margins||{}});
+    _applyPortalBranding(d.company_name);_portalInstallTip(portalDiv);
     // Track portal view — fire-and-forget upsert to portal_views table
     try{sb.from('portal_views').upsert({token:token,viewed_at:new Date().toISOString()},{onConflict:'token'}).then(function(){});}catch(e){}
   });
@@ -14994,6 +15042,7 @@ function onLogin(user,fresh){
   // Only a fresh sign-in skips the lock; restoring a saved session at launch must still prompt for the PIN
   if(fresh){_appUnlockedThisSession=true;sessionStorage.setItem('hrt_unlocked','1');}
   _step('subscription',function(){ if(typeof checkSubscription==='function')checkSubscription(); });
+  _step('settingsOrder',function(){applySettingsOrder();});
   _bt('onLogin start fresh='+!!fresh);
   _step('loadRolling',function(){loadRolling();});
   _step('loadPricing',function(){loadPricing();});
