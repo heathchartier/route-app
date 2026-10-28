@@ -13608,7 +13608,18 @@ function showPortalReady(code){
   document.getElementById('pr-name').textContent=name;
   document.getElementById('pr-url').value=url;
   document.getElementById('pr-open').href=url;
-  document.getElementById('pr-copy').onclick=function(){copyPortalLink(code);};
+  document.getElementById('pr-copy').onclick=function(){
+    var btn=this,inp=document.getElementById('pr-url');
+    function ok(){
+      btn.textContent='✓ Link copied!';btn.style.background='var(--teal)';btn.style.color='#000';btn.style.borderColor='var(--teal)';
+      setTimeout(function(){btn.textContent='Copy link';btn.style.background='var(--bg3)';btn.style.color='var(--text)';btn.style.borderColor='var(--border2)';},2000);
+    }
+    function legacy(){
+      try{inp.focus();inp.select();inp.setSelectionRange(0,9999);if(document.execCommand('copy')){ok();return;}}catch(e){}
+      btn.textContent='Press and hold the link above to copy';
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(ok).catch(legacy);}else{legacy();}
+  };
   var shareBtn=document.getElementById('pr-share');
   shareBtn.onclick=function(){
     if(navigator.share){navigator.share({title:'Your pricing from '+((ST.userProfile&&ST.userProfile.company)||'FieldIQ'),url:url}).catch(function(){});}
