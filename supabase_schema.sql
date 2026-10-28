@@ -54,6 +54,25 @@ CREATE POLICY "Public insert" ON portal_quote_requests FOR INSERT TO anon WITH C
 DROP POLICY IF EXISTS "Auth all" ON portal_quote_requests;
 CREATE POLICY "Auth all" ON portal_quote_requests FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
+-- 4b. Email the rep when a request arrives (edge function portal-request-notify)
+ALTER TABLE portal_quote_requests ADD COLUMN IF NOT EXISTS notified_at timestamptz;
+CREATE EXTENSION IF NOT EXISTS pg_net WITH SCHEMA extensions;
+CREATE OR REPLACE FUNCTION notify_portal_request() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, extensions AS $$
+BEGIN
+  PERFORM net.http_post(
+    url := 'https://oaxkcsnmiozpnnhlmkmi.supabase.co/functions/v1/portal-request-notify',
+    headers := '{"Content-Type":"application/json"}'::jsonb,
+    body := jsonb_build_object('id', NEW.id)
+  );
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  RETURN NEW;  -- never block a customer's request because the alert failed
+END $$;
+DROP TRIGGER IF EXISTS portal_request_notify ON portal_quote_requests;
+CREATE TRIGGER portal_request_notify AFTER INSERT ON portal_quote_requests
+  FOR EACH ROW EXECUTE FUNCTION notify_portal_request();
+
 -- 5. Push notification subscriptions
 CREATE TABLE IF NOT EXISTS push_subscriptions (
   endpoint text PRIMARY KEY,
